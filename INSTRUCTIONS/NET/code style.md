@@ -7,6 +7,7 @@ applyTo: '**/*.cs'
 ## For writing code
 
 - 4-space indentation.
+- Don´t use braces after an if or else statement if the body is a single line.
 - Always use a blank line between code blocks (methods, properties, constructors, etc).
 - Always add a blank line before if, for, foreach, and return.
 - Always add a blank line after opening or before closing braces.
