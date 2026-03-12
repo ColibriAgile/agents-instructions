@@ -27,6 +27,7 @@ Ao ser solicitado para melhorar a descrição de uma tarefa, o agente deve:
   - Critérios de aceite
   - Notas técnicas
   - Outras informações (opcional)
+- Manter informações técnicas como JSONs, schemas e definições de classes em Notas técnicas, garantindo que sejam claras e bem formatadas usando Markdown.
 
 # Adicionando comentários às tarefas
 
