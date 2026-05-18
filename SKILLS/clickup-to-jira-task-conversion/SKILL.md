@@ -127,11 +127,19 @@ Se projeto ou tipo da issue não estiverem claros e forem necessários para a cr
    - Se o MCP não conseguir criar comentários, tente a API correspondente do Jira antes de registrar a limitação.
    - Se houver limitação técnica que impeça a migração de comentários, informe claramente ao usuário quais comentários não puderam ser migrados e por quê.
 
+7. Após a migração bem-sucedida, atualize o ClickUp.
+   - Depois que a issue do Jira, comentários essenciais, vínculos de épico, versões e subtarefas necessárias tiverem sido migrados com sucesso, altere o status da tarefa original do ClickUp para `MIGRATED`.
+   - Altere também o status de todas as subtarefas do ClickUp para `MIGRATED`, incluindo as subtarefas que estavam fechadas (`closed`) antes da migração.
+   - Tente atualizar esses status primeiro via MCP do ClickUp.
+   - Se o MCP do ClickUp não conseguir atualizar o status da tarefa principal ou das subtarefas, tente a API correspondente do ClickUp antes de registrar limitação.
+   - Só faça essa alteração de status quando a migração tiver sido concluída com sucesso; não marque como `MIGRATED` se a criação no Jira ou vínculos essenciais tiverem falhado.
+
 ## Regra geral de fallback MCP → API
 
 - Para operações de leitura, criação, atualização, associação ou criação de entidades relacionadas, tente primeiro via MCP.
 - Se o MCP falhar, não expuser a operação necessária ou não suportar determinado campo/entidade, tente a API correspondente antes de assumir fallback manual.
 - Aplique essa regra especialmente a:
+   - atualização de status no ClickUp após migração
   - criação e associação de subtarefas
   - criação e atualização de versões / Fix Version
   - gravação de `Release title` e `Release notes`
@@ -140,9 +148,10 @@ Se projeto ou tipo da issue não estiverem claros e forem necessários para a cr
   - atualização de campos adicionais da issue
 - Só use fallback em descrição, épico KBR ou ação manual quando MCP e API não resolverem a operação.
 
-7. Confirme o resultado.
+8. Confirme o resultado.
    - Informe chave, título e link da issue criada no Jira.
    - Resuma quaisquer campos que não puderam ser migrados automaticamente.
+    - Informe que a tarefa original do ClickUp e suas subtarefas foram marcadas como `MIGRATED`, quando isso tiver sido concluído com sucesso.
    - Sugira próximos passos se algo exigir ação manual.
 
 ## Regras de decisão
@@ -189,6 +198,8 @@ Antes de concluir, verifique se:
 - todas as subtarefas da origem, incluindo as fechadas (`closed`), foram consideradas na migração
 - quando o MCP não suportou ou falhou em uma operação relevante, houve tentativa via API antes de aplicar fallback manual
 - subtarefas foram criadas automaticamente quando possível
+- a tarefa original do ClickUp foi atualizada para o status `MIGRATED` após sucesso da migração
+- as subtarefas do ClickUp também foram atualizadas para `MIGRATED`, incluindo as que estavam `closed`
 - limitações de migração foram informadas ao usuário
 - a resposta final inclui o identificador da issue criada
 
@@ -212,6 +223,7 @@ Se algum campo do ClickUp não tiver equivalente direto no Jira:
 - para épico, mantenha a referência ao épico original registrada na descrição quando não for possível localizar, criar ou associar o épico correspondente no Jira
 - se o campo de épico estiver vazio no ClickUp, use o épico `KBR` no Jira como fallback padrão
 - antes de qualquer fallback manual, tente resolver a operação via API se o MCP falhar ou não suportar a operação
+- para atualização final de status no ClickUp, só marque como `MIGRATED` quando a migração tiver sido bem-sucedida; se a atualização falhar via MCP e API, informe a limitação ao usuário
 - informe ao usuário qualquer perda de estrutura, automação ou metadado
 
 ## Formato sugerido para descrição no Jira
