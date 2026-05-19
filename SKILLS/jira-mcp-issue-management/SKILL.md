@@ -79,17 +79,17 @@ Se houver menção explícita a nomes de funções, métodos, classes ou símbol
    - Registre notas técnicas apenas quando houver endpoints, tabelas, integrações, dependências ou restrições relevantes.
    - Ao final da descrição, inclua uma sugestão de Story Points usando a sequência de Fibonacci modificada.
 
-4. Aplique a formatação obrigatória da descrição.
+4. Aplique a formatação obrigatória da descrição usando ADF (Atlassian Document Format).
    - O título da issue deve ficar em uma linha própria.
-   - Cada seção da descrição deve usar cabeçalho `H3`.
+   - Cada seção da descrição deve usar cabeçalho `H2`.
    - O conteúdo de cada seção deve começar na linha seguinte ao cabeçalho.
-   - Use texto normal abaixo de cada `H3`, sem colocar o conteúdo na mesma linha do título da seção.
-   - Estruture a descrição com as seções abaixo, nesta ordem, salvo pedido explícito em contrário:
-     - `### Contexto`
-     - `### User Story`
-     - `### Critérios de Aceite`
-     - `### Notas Técnicas`
-     - `### Sugestão de Story Points`
+   - Use texto normal abaixo de cada `H2`, sem colocar o conteúdo na mesma linha do título da seção.
+   - Estruture a descrição com as seções abaixo usando H2, nesta ordem, salvo pedido explícito em contrário:
+     - `Contexto`
+     - `User Story`
+     - `Critérios de Aceite`
+     - `Notas Técnicas`
+     - `Sugestão de Story Points`
 
 5. Faça perguntas somente quando necessário.
    - Interrompa e pergunte de forma pontual se o texto enviado estiver confuso.
@@ -151,7 +151,7 @@ Antes de concluir, verifique se:
 - nenhuma informação crítica foi inventada
 - nomes técnicos de funções ou símbolos foram traduzidos para linguagem de negócio quando apropriado
 - a descrição está com uma linha para o título e o conteúdo das seções começa apenas na linha seguinte
-- todas as seções usam `H3`
+- todas as seções usam `H2` com ADF (Atlassian Document Format).
 - a descrição contém `Contexto`, `User Story`, `Critérios de Aceite`, `Notas Técnicas` e `Sugestão de Story Points`
 - os critérios de aceite estão testáveis e objetivos
 - as notas técnicas não vazam jargão desnecessário para leitores funcionais
@@ -164,24 +164,24 @@ Antes de concluir, verifique se:
 
 Use este esqueleto como padrão para criar ou reescrever descrições:
 
-`### Contexto`
+`Contexto`
 
 Texto normal explicando por que estamos fazendo isso e qual o impacto.
 
-`### User Story`
+`User Story`
 
 `Como [papel], eu quero [funcionalidade], para que [benefício]`.
 
-`### Critérios de Aceite`
+`Critérios de Aceite`
 
 - Item obrigatório 1
 - Item obrigatório 2
 
-`### Notas Técnicas`
+`Notas Técnicas`
 
 Texto normal com endpoints, tabelas, dependências, integrações ou observações técnicas.
 
-`### Sugestão de Story Points`
+`Sugestão de Story Points`
 
 Sugestão de pontos baseada em complexidade, risco e incerteza, usando a sequência de Fibonacci modificada.
 
