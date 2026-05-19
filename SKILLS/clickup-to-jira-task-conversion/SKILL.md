@@ -16,7 +16,7 @@ Ela deve preferir jira MCP como caminho principal, mas usar a API correspondente
 
 Ela deve priorizar fidelidade funcional, clareza e confirmação mínima: perguntar apenas o que for indispensável para criar a issue corretamente no Jira.
 
-Ela usa sempre a sintaxe de formatação de texto compatível como Jira ao invés de Markdown.
+Ela usa sempre ADF (Atlassian Document Format) para formataçao de texto compatível como Jira ao invés de Markdown.
 
 ## Quando usar
 
@@ -62,7 +62,7 @@ Se projeto ou tipo da issue não estiverem claros e forem necessários para a cr
    - Título do ClickUp → summary do Jira.
    - Descrição do ClickUp → description do Jira.
    - Checklist, critérios ou passos → seção estruturada na descrição.
-   - Na descrição gerada no Jira, todos os headers/títulos de seção devem ser formatados como `H2`, usando `## <título>`.
+   - Na descrição gerada no Jira, todos os headers/títulos de seção devem ser formatados como `H2`, usando ADF (Atlassian Document Format).
    - Prioridade → prioridade equivalente no Jira, quando existir correspondência razoável.
    - Campo `Pontos do Sprint` do ClickUp → mapear para `Story Points` ou `Points` ou `Estimate` no Jira, preservando o valor numérico original sempre que houver campo compatível no projeto ou board. Se não conseguir, adicione na descrição em destaque: STORY POINTS NO CLICKUP: X.
    - Version do ClickUp → mapear para Fix Version no Jira quando existir uma versão correspondente no projeto de destino.
@@ -200,7 +200,7 @@ Antes de concluir, verifique se:
 - o épico do ClickUp foi localizado ou criado no Jira antes da tarefa migrada, quando aplicável
 - a tarefa migrada foi associada ao épico correto no Jira, quando aplicável
 - quando o campo de épico veio vazio no ClickUp, a tarefa foi associada ao épico `KBR` no Jira
-- todos os títulos/seções da descrição gerada no Jira usam `H2` (`##`)
+- todos os títulos/seções da descrição gerada no Jira usam `H2` com ADF (Atlassian Document Format)
 - requisitos, links e contexto importante foram preservados
 - todos os comentários disponíveis foram migrados ou, se houver limitação técnica, a perda foi informada claramente
 - cada comentário migrado contém cabeçalho destacado com usuário do ClickUp e data original
@@ -241,7 +241,7 @@ Se algum campo do ClickUp não tiver equivalente direto no Jira:
 
 Sempre que ajudar, organize a descrição com seções curtas como:
 
-- Todos os headers/títulos devem ser gerados como `H2`, no formato `## <título>`.
+- Todos os headers/títulos devem ser gerados como `H2`, no formato ADF (Atlassian Document Format).
 
 - Contexto
 - Objetivo
