@@ -16,6 +16,8 @@ Ela deve preferir jira MCP como caminho principal, mas usar a API correspondente
 
 Ela deve priorizar fidelidade funcional, clareza e confirmação mínima: perguntar apenas o que for indispensável para criar a issue corretamente no Jira.
 
+Ela usa sempre a sintaxe de formatação de texto compatível como Jira ao invés de Markdown.
+
 ## Quando usar
 
 Use esta skill quando o usuário pedir algo como:
@@ -62,7 +64,7 @@ Se projeto ou tipo da issue não estiverem claros e forem necessários para a cr
    - Checklist, critérios ou passos → seção estruturada na descrição.
    - Na descrição gerada no Jira, todos os headers/títulos de seção devem ser formatados como `H2`, usando `## <título>`.
    - Prioridade → prioridade equivalente no Jira, quando existir correspondência razoável.
-   - Campo `Pontos do Sprint` do ClickUp → mapear para `Story Points` no Jira, preservando o valor numérico original sempre que houver campo compatível no projeto ou board.
+   - Campo `Pontos do Sprint` do ClickUp → mapear para `Story Points` ou `Points` ou `Estimate` no Jira, preservando o valor numérico original sempre que houver campo compatível no projeto ou board. Se não conseguir, adicione na descrição em destaque: STORY POINTS NO CLICKUP: X.
    - Version do ClickUp → mapear para Fix Version no Jira quando existir uma versão correspondente no projeto de destino.
    - `Release title` do ClickUp → migrar para os metadados da versão correspondente no Jira sempre que houver campo compatível; se a versão precisar ser criada, use esse valor como nome/título de release quando fizer sentido.
    - `Release notes` do ClickUp → migrar para a descrição/notas da versão correspondente no Jira sempre que houver suporte na entidade de versão do projeto.
@@ -101,7 +103,7 @@ Se projeto ou tipo da issue não estiverem claros e forem necessários para a cr
    - Se o jira MCP não conseguir criar a issue, subtarefas, versão, comentários, vínculo de épico ou atualizar campos adicionais, tente a API correspondente do Jira antes de declarar falha.
    - Preencha o campo `labels` com `desktop` por padrão.
    - Se houver labels relevantes no ClickUp e fizer sentido mantê-las, preserve `desktop` e acrescente as demais labels úteis sem duplicação.
-   - Se houver valor em `Pontos do Sprint` na tarefa de origem e o destino suportar `Story Points`, grave o valor correspondente na issue criada.
+   - Se houver valor em `Pontos do Sprint` na tarefa de origem e o destino suportar `Story Points`, `Points` ou `Estimate`, grave o valor correspondente na issue criada.
    - Se o destino não suportar `Story Points` diretamente, preserve o valor original de `Pontos do Sprint` na descrição e informe a limitação ao usuário.
    - Se a tarefa de origem tiver Version, associe a Fix Version correspondente na issue do Jira.
    - Se a Fix Version ainda não existir e puder ser criada, crie-a antes de concluir a associação.
@@ -113,6 +115,7 @@ Se projeto ou tipo da issue não estiverem claros e forem necessários para a cr
    - Se não for possível gravar `Release title` e/ou `Release notes` diretamente na versão do Jira, preserve esses valores na descrição da issue e informe a limitação ao usuário.
    - Se houver épico correspondente ou recém-criado, associe a tarefa migrada a esse épico.
    - Se o jira MCP não conseguir criar ou associar o épico, tente a API correspondente antes de aplicar o fallback configurado.
+   - Se não for possível sincronizar o status da tarefa do Clickup com o JIRA, adicione um comentário ao final com o status original do clickup.
    - Se não for possível criar ou associar o épico, use o épico KBR.
    - Preserve links de referência para a tarefa original do ClickUp.
    - Ao criar comentários no Jira, use um cabeçalho destacado antes do texto original, por exemplo: `**Comentário do ClickUp — <usuário> — <data original>**`.
