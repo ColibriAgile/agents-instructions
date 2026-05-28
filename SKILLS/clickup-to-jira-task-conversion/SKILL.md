@@ -16,7 +16,9 @@ Ela deve preferir jira MCP como caminho principal, mas usar a API correspondente
 
 Ela deve priorizar fidelidade funcional, clareza e confirmação mínima: perguntar apenas o que for indispensável para criar a issue corretamente no Jira.
 
-Ela usa sempre ADF (Atlassian Document Format) para formataçao de texto compatível como Jira ao invés de Markdown.
+Ela usa sempre ADF (Atlassian Document Format) para formataçao de texto compatível com o Jira ao invés de Markdown.
+
+Ao enviar `body` para o Jira, trate tanto descrição quanto comentários como conteúdo estruturado em ADF, inclusive quando o comentário original for apenas texto simples.
 
 ## Quando usar
 
@@ -47,34 +49,26 @@ Na ausência de instrução diferente, use como padrão:
 
 Se projeto ou tipo da issue não estiverem claros e forem necessários para a criação, use o padrão acima. Pergunte apenas se ainda restar ambiguidade ou se o MCP exigir outro campo obrigatório.
 
+Quando o tipo da issue não for informado nem inferível pelo tipo, status ou tags da tarefa no ClickUp, use `Story` como tipo padrão no Jira.
+
 ## Procedimento
 
 1. Identifique a tarefa de origem no ClickUp.
    - Use o MCP do ClickUp para localizar a tarefa correta.
    - Se o MCP do ClickUp não conseguir localizar, listar ou expandir os dados necessários da tarefa, tente a API correspondente antes de concluir que a operação não é suportada.
+   - Antes de iniciar a migração, verifique se a tarefa do ClickUp já possui status `MIGRATED` ou um comentário com link para o Jira. Se sim, informe ao usuário e pergunte se deseja duplicar a migração ou atualizar a issue existente.
    - Se houver ambiguidade, confirme qual tarefa deve ser usada.
 
 2. Leia os detalhes completos da tarefa.
    - Capture pelo menos: título, descrição, status, prioridade, responsáveis, datas, labels/tags, checklist, campo `Pontos do Sprint`, Version, `Release title`, `Release notes`, épico relacionado, todas as subtarefas incluindo as fechadas (`closed`), links, todos os comentários e campos customizados disponíveis.
-   - Se houver conteúdo muito extenso, preserve o essencial e resuma o restante sem perder requisitos.
+   - Se a descrição exceder `32.000` caracteres, preserve requisitos, critérios de aceite, checklist, links, campos estruturados e comentários na íntegra, e resuma apenas trechos narrativos, contexto histórico ou duplicações evidentes.
 
 3. Monte um rascunho de equivalência para o Jira.
    - Título do ClickUp → summary do Jira.
    - Descrição do ClickUp → description do Jira.
    - Checklist, critérios ou passos → seção estruturada na descrição.
    - Na descrição gerada no Jira, todos os headers/títulos de seção devem ser formatados como `H2`, usando ADF (Atlassian Document Format).
-   - Prioridade → prioridade equivalente no Jira, quando existir correspondência razoável.
-   - Campo `Pontos do Sprint` do ClickUp → mapear para `Story Points` ou `Points` ou `Estimate` no Jira, preservando o valor numérico original sempre que houver campo compatível no projeto ou board. Se não conseguir, adicione na descrição em destaque: STORY POINTS NO CLICKUP: X.
-   - Version do ClickUp → mapear para Fix Version no Jira quando existir uma versão correspondente no projeto de destino.
-   - `Release title` do ClickUp → migrar para os metadados da versão correspondente no Jira sempre que houver campo compatível; se a versão precisar ser criada, use esse valor como nome/título de release quando fizer sentido.
-   - `Release notes` do ClickUp → migrar para a descrição/notas da versão correspondente no Jira sempre que houver suporte na entidade de versão do projeto.
-   - Se a versão correspondente não existir no Jira, tente criá-la antes de concluir a criação ou atualização da issue.
-   - Labels → preencher o campo `labels` do Jira com `desktop`.
-   - Se houver labels úteis do ClickUp e o destino suportar múltiplas labels, preserve `desktop` e adicione as demais labels relevantes sem duplicação.
-   - Épico do ClickUp → localizar o épico correspondente no Jira.
-   - Se o campo de épico vier vazio, nulo ou sem valor útil no ClickUp, use diretamente o épico `KBR` no Jira.
-   - Se o épico correspondente não existir no Jira, crie primeiro um épico com as mesmas regras de migração de tarefas, adaptadas ao tipo `Epic`.
-   - Depois de localizar ou criar o épico, associe a tarefa migrada a esse épico no Jira.
+   - Prioridade, pontos, versão, release, labels e épico devem seguir o mapeamento e o fallback definidos em `Tratamento de lacunas e incompatibilidades`.
    - Responsáveis, datas e links → mapear quando os campos existirem no projeto Jira.   
    - Subtarefas → sempre buscar e migrar todas as subtarefas do ClickUp, incluindo as fechadas (`closed`).
    - Subtarefas → criar automaticamente no Jira sempre que o MCP e o tipo de issue suportarem esse fluxo.
@@ -82,43 +76,19 @@ Se projeto ou tipo da issue não estiverem claros e forem necessários para a cr
 4. Determine os campos obrigatórios do destino.
    - Verifique se a instância Jira de destino é `https://colibri.atlassian.net/`, salvo se o usuário pedir explicitamente outra.
    - Verifique se o projeto Jira está definido.
-   - Verifique se o tipo da issue está definido.
-   - Verifique se o campo `Story Points` está disponível para o projeto/tipo/board de destino quando a tarefa de origem tiver valor em `Pontos do Sprint`.
-   - Verifique se a Fix Version correspondente à Version do ClickUp já existe no projeto Jira de destino.
-   - Verifique se os metadados de versão do Jira permitem registrar `Release title` e `Release notes` na versão correspondente.
-   - Se não existir, tente criar a versão no projeto antes de associá-la à issue.
-   - Verifique se o épico do ClickUp já existe no Jira e pode ser associado à tarefa migrada.
-   - Se o campo de épico estiver vazio no ClickUp, prepare a associação direta da tarefa ao épico `KBR` no Jira.
-   - Se o épico não existir, prepare a criação prévia do épico no Jira antes da tarefa filha.
-   - Para subtarefas, versões, épicos, comentários e demais campos/entidades relacionadas, prefira MCP; se o MCP não suportar a operação ou falhar na execução, prepare fallback via API antes de assumir limitação definitiva.
+   - Determine o tipo da issue a partir do tipo, tags ou contexto da tarefa no ClickUp; se isso não for possível com segurança, use `Story`.
+   - Verifique os campos e entidades relacionados conforme o mapeamento definido em `Tratamento de lacunas e incompatibilidades`.
+   - Para subtarefas, versões, épicos, comentários e demais entidades relacionadas, siga a `Regra geral de fallback MCP → API` antes de assumir limitação definitiva.
    - Se qualquer um deles estiver ausente ou ambíguo, pergunte ao usuário antes de criar.
    - Se houver mais de uma correspondência plausível de tipo, apresente opções curtas.
 
 5. Crie a issue no Jira.
    - Use por padrão a instância `https://colibri.atlassian.net/`, o projeto `COL` e o contexto/space `Colibri`; se houver seleção de board aplicável, prefira `DEV`.
-   - Se a tarefa do ClickUp pertencer a um épico, confirme se o épico correspondente já existe no Jira.
-   - Se o campo de épico estiver vazio no ClickUp, associe a tarefa migrada ao épico `KBR` no Jira.
-   - Se não existir, crie primeiro o épico no Jira usando as mesmas regras desta skill, adaptando o tipo da issue para `Epic` e reaproveitando descrição, comentários, labels, Version/Fix Version, `Release title`/`Release notes`, `Pontos do Sprint`/`Story Points` quando fizer sentido e demais campos compatíveis.
-   - Use o jira MCP para criar a issue com os campos mapeados.
-   - Se o jira MCP não conseguir criar a issue, subtarefas, versão, comentários, vínculo de épico ou atualizar campos adicionais, tente a API correspondente do Jira antes de declarar falha.
-   - Preencha o campo `labels` com `desktop` por padrão.
-   - Se houver labels relevantes no ClickUp e fizer sentido mantê-las, preserve `desktop` e acrescente as demais labels úteis sem duplicação.
-   - Se houver valor em `Pontos do Sprint` na tarefa de origem e o destino suportar `Story Points`, `Points` ou `Estimate`, grave o valor correspondente na issue criada.
-   - Se o destino não suportar `Story Points` diretamente, preserve o valor original de `Pontos do Sprint` na descrição e informe a limitação ao usuário.
-   - Se a tarefa de origem tiver Version, associe a Fix Version correspondente na issue do Jira.
-   - Se a Fix Version ainda não existir e puder ser criada, crie-a antes de concluir a associação.
-   - Se o jira MCP não conseguir criar ou associar a versão, tente a API do Jira para criar/atualizar a versão e associá-la à issue.
-   - Se houver `Release title` e/ou `Release notes`, grave esses dados na versão correspondente do Jira sempre que o jira MCP e o projeto suportarem edição/criação desses metadados.
-   - Se a versão precisar ser criada no Jira, inclua `Release title` e `Release notes` já na criação da versão, sempre que possível.
-   - Se o jira MCP não conseguir gravar `Release title` e/ou `Release notes`, tente a API correspondente antes de usar fallback em descrição.
-   - Se não for possível criar ou associar a Fix Version, preserve o valor original da Version na descrição e informe a limitação ao usuário.
-   - Se não for possível gravar `Release title` e/ou `Release notes` diretamente na versão do Jira, preserve esses valores na descrição da issue e informe a limitação ao usuário.
-   - Se houver épico correspondente ou recém-criado, associe a tarefa migrada a esse épico.
-   - Se o jira MCP não conseguir criar ou associar o épico, tente a API correspondente antes de aplicar o fallback configurado.
+   - Use o jira MCP para criar a issue com os campos mapeados segundo `Tratamento de lacunas e incompatibilidades`.
+   - Se o jira MCP não conseguir criar a issue, subtarefas, versão, comentários, vínculo de épico ou atualizar campos adicionais, siga a `Regra geral de fallback MCP → API`.
    - Se não for possível sincronizar o status da tarefa do Clickup com o JIRA, adicione um comentário ao final com o status original do clickup.
-   - Se não for possível criar ou associar o épico, use o épico KBR.
    - Preserve links de referência para a tarefa original do ClickUp.
-   - Ao criar comentários no Jira, use um cabeçalho destacado antes do texto original, por exemplo: `**Comentário do ClickUp — <usuário> — <data original>**`.
+   - Ao criar comentários no Jira, use um cabeçalho destacado antes do texto original, representado em ADF, por exemplo com um parágrafo em `strong`: `Comentário do ClickUp — <usuário> — <data original>`.
    - Quando o Jira não permitir preservar a autoria técnica original, mantenha no cabeçalho o nome do usuário do ClickUp e a data original para preservar contexto de auditoria.
    - Se suportado, crie as subtarefas equivalentes automaticamente, incluindo as que estiverem fechadas (`closed`) na origem.
    - Se o jira MCP não conseguir criar subtarefas, tente a API correspondente do Jira antes de desistir da criação.
@@ -126,8 +96,11 @@ Se projeto ou tipo da issue não estiverem claros e forem necessários para a cr
 
 6. Adicione os comentários migrados à issue do Jira.
    - Para cada comentário do ClickUp, crie um comentário correspondente no Jira usando o formato sugerido.
+   - Sempre envie o `body` do comentário em ADF; não envie string simples quando a operação esperar documento estruturado.
+   - Mesmo para comentários curtos, use ao menos um documento ADF com o cabeçalho de origem e um parágrafo com o texto original.
    - Preserve a ordem cronológica e inclua em cada comentário um cabeçalho em destaque com o usuário original do ClickUp e a data original do comentário.
    - Se o MCP não conseguir criar comentários, tente a API correspondente do Jira antes de registrar a limitação.
+   - Se a criação do comentário falhar por formato, suspeite primeiro de payload fora de ADF antes de concluir que o Jira não aceita a operação.
    - Se houver limitação técnica que impeça a migração de comentários, informe claramente ao usuário quais comentários não puderam ser migrados e por quê.
 
 7. Após a migração bem-sucedida, atualize o ClickUp.
@@ -189,21 +162,18 @@ Não interrompa para perguntas desnecessárias se:
 Antes de concluir, verifique se:
 
 - a tarefa correta do ClickUp foi usada
+- foi verificado se a tarefa já estava `MIGRATED` ou se já existia comentário com link para Jira antes de iniciar a migração
 - summary e description no Jira refletem o conteúdo principal da origem
 - a issue foi criada na instância Jira `https://colibri.atlassian.net/`, salvo instrução explícita em contrário
 - projeto e tipo da issue estão corretos
 - o destino padrão `Colibri` / `COL` / `DEV` foi usado quando apropriado
 - o campo `labels` da issue no Jira contém `desktop`
-- o campo `Pontos do Sprint` do ClickUp foi migrado para `Story Points` no Jira com o mesmo valor quando o destino suportava esse campo
-- Version do ClickUp foi mapeada para Fix Version no Jira quando existia ou pôde ser criada a versão correspondente
-- `Release title` e `Release notes` foram migrados para a versão correspondente no Jira quando o destino suportava esses metadados
-- o épico do ClickUp foi localizado ou criado no Jira antes da tarefa migrada, quando aplicável
-- a tarefa migrada foi associada ao épico correto no Jira, quando aplicável
-- quando o campo de épico veio vazio no ClickUp, a tarefa foi associada ao épico `KBR` no Jira
+- os campos principais listados em `Tratamento de lacunas e incompatibilidades` foram migrados, associados ou preservados com o fallback correto
 - todos os títulos/seções da descrição gerada no Jira usam `H2` com ADF (Atlassian Document Format)
 - requisitos, links e contexto importante foram preservados
 - todos os comentários disponíveis foram migrados ou, se houver limitação técnica, a perda foi informada claramente
 - cada comentário migrado contém cabeçalho destacado com usuário do ClickUp e data original
+- cada comentário migrado enviado ao Jira usa `body` em ADF, mesmo quando o conteúdo original era texto simples
 - todas as subtarefas da origem, incluindo as fechadas (`closed`), foram consideradas na migração
 - quando o MCP não suportou ou falhou em uma operação relevante, houve tentativa via API antes de aplicar fallback manual
 - subtarefas foram criadas automaticamente quando possível
@@ -217,9 +187,13 @@ Antes de concluir, verifique se:
 
 Ao criar comentários no Jira, prefira este formato:
 
-`**Comentário do ClickUp — <usuário> — <data original>**`
+Cabeçalho em ADF com destaque forte contendo:
 
-Em seguida, adicione o texto original do comentário sem perder quebras de linha relevantes.
+`Comentário do ClickUp — <usuário> — <data original>`
+
+Em seguida, adicione o texto original do comentário em blocos ADF apropriados, sem perder quebras de linha relevantes.
+
+Não use Markdown cru como formato final do comentário no Jira. Se a operação aceitar `body`, envie ADF válido.
 
 ## Tratamento de lacunas e incompatibilidades
 
@@ -227,15 +201,25 @@ Se algum campo do ClickUp não tiver equivalente direto no Jira:
 
 - priorize preservar a informação na descrição
 - deixe explícito o que foi convertido literalmente e o que foi resumido
-- para `Pontos do Sprint`, mantenha o valor original registrado na descrição quando o campo `Story Points` do Jira não estiver disponível
-- para Version, mantenha o valor original registrado na descrição quando a Fix Version correspondente não existir e não puder ser criada
-- para `Release title` e `Release notes`, mantenha os valores originais registrados na descrição quando os metadados de versão do Jira não estiverem disponíveis ou não puderem ser atualizados
-- para épico, mantenha a referência ao épico original registrada na descrição quando não for possível localizar, criar ou associar o épico correspondente no Jira
-- se o campo de épico estiver vazio no ClickUp, use o épico `KBR` no Jira como fallback padrão
-- antes de qualquer fallback manual, tente resolver a operação via API se o MCP falhar ou não suportar a operação
-- para o comentário final no ClickUp, tente registrar o link completo da issue migrada via MCP e depois via API; se ambos falharem, informe a limitação ao usuário
-- para atualização final de status no ClickUp, só marque como `MIGRATED` quando a migração tiver sido bem-sucedida; se a atualização falhar via MCP e API, informe a limitação ao usuário
-- informe ao usuário qualquer perda de estrutura, automação ou metadado
+
+| Campo no ClickUp | Destino no Jira | Fallback se indisponível |
+| --- | --- | --- |
+| Tipo da tarefa | Tipo da issue | Se não for informado nem inferível com segurança, use `Story` |
+| Labels/tags | `labels` | Sempre preserve `desktop`; se não houver suporte a múltiplas labels, mantenha ao menos `desktop` |
+| `Pontos do Sprint` | `Story Points`, `Points` ou `Estimate` | Preserve o valor original na descrição |
+| Version | Fix Version | Tente criar a versão; se não for possível, preserve o valor original na descrição |
+| `Release title` | Nome/título da versão correspondente | Tente gravar na versão; se não for possível, preserve na descrição |
+| `Release notes` | Descrição/notas da versão correspondente | Tente gravar na versão; se não for possível, preserve na descrição |
+| Épico | Épico correspondente no Jira | Tente localizar ou criar; se o campo vier vazio, use `KBR`; se ainda assim não for possível associar, preserve a referência na descrição |
+| Comentários | Comentários da issue em ADF | Siga MCP → API; se falhar, informe quais comentários não foram migrados |
+| Subtarefas | Subtarefas da issue | Siga MCP → API; se falhar, descreva claramente quais subtarefas precisam ser recriadas |
+| Link da tarefa original | Descrição ou comentário de referência | Preserve pelo menos um link navegável para a origem |
+| Status final da tarefa ClickUp | `MIGRATED` no ClickUp | Só atualize após sucesso da migração; se falhar via MCP e API, informe a limitação |
+
+- Antes de qualquer fallback manual, siga a `Regra geral de fallback MCP → API`.
+- Para o comentário final no ClickUp, tente registrar o link completo da issue migrada via MCP e depois via API; se ambos falharem, informe a limitação ao usuário.
+- Para atualização final de status no ClickUp, só marque como `MIGRATED` quando a migração tiver sido bem-sucedida; se a atualização falhar via MCP e API, informe a limitação ao usuário.
+- Informe ao usuário qualquer perda de estrutura, automação ou metadado.
 
 ## Formato sugerido para descrição no Jira
 

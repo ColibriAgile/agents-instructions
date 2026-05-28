@@ -14,6 +14,8 @@ Esta skill transforma pedidos informais em operações completas de criação, e
 
 Ela também cria e mantém comentários, estrutura descrições no formato solicitado pelo usuário e prepara o texto para ficar próximo de um estado `Sprint Ready`.
 
+Para o Jira MCP, trate descrições e comentários como conteúdo estruturado: quando houver envio de `body`, use ADF (Atlassian Document Format), inclusive para comentários simples em texto puro.
+
 ## Quando usar
 
 Use esta skill quando o usuário pedir algo como:
@@ -91,22 +93,28 @@ Se houver menção explícita a nomes de funções, métodos, classes ou símbol
      - `Notas Técnicas`
      - `Sugestão de Story Points`
 
-5. Faça perguntas somente quando necessário.
+5. Para comentários, use ADF sempre que houver envio de `body`.
+   - Não envie comentário como string simples quando a operação esperar `body` estruturado.
+   - Mesmo para comentários curtos, monte um documento ADF válido, normalmente com um único parágrafo contendo o texto.
+   - Se o comentário tiver lista, destaque ou múltiplos blocos, represente isso corretamente em ADF em vez de concatenar tudo em texto cru.
+   - Se a operação de comentário falhar por formato, suspeite primeiro de payload fora de ADF antes de concluir que o Jira não aceita comentários.
+
+6. Faça perguntas somente quando necessário.
    - Interrompa e pergunte de forma pontual se o texto enviado estiver confuso.
    - Interrompa e pergunte se faltar informação crítica para criar corretamente a issue.
    - Prefira perguntas curtas, fechadas e diretamente acionáveis.
    - Se houver várias lacunas, agrupe em uma lista curta para reduzir ida e volta.
 
-6. Execute a operação no Jira via MCP.
+7. Execute a operação no Jira via MCP.
    - Para criação, use o Jira MCP para criar a issue na instância `https://colibri.atlassian.net/`, no contexto `Colibri`, preferindo o board `DEV`, com título, descrição, assignee, tipo, `component` correto e `label` igual a `desktop`.
    - Para edição, atualize apenas os campos pedidos ou claramente necessários para alinhar o chamado ao objetivo informado.
    - Sempre aplique a `label` `desktop`, salvo instrução explícita em contrário.
    - Se o usuário confirmar que deseja colocar a tarefa no sprint ativo, tente fazer essa associação; se não confirmar, não associe automaticamente.
-   - Para comentários, registre um comentário objetivo, contextual e profissional na issue correta apenas quando houver pedido explícito do usuário.
+   - Para comentários, registre um comentário objetivo, contextual e profissional na issue correta apenas quando houver pedido explícito do usuário, enviando o `body` em ADF mesmo quando o conteúdo for apenas texto simples.
    - Ao redigir comentários, use o contexto da sessão para manter continuidade e evitar perder decisões já tomadas.
    - Se algum campo ou operação não estiver disponível diretamente no fluxo principal do MCP, use as chamadas REST suportadas pelo mesmo servidor antes de concluir que a operação não é possível.
 
-7. Confirme o resultado.
+8. Confirme o resultado.
    - Em criação, informe a chave e o resumo da issue criada.
    - Em edição, informe quais campos foram alterados.
    - Em comentário, informe que o comentário foi adicionado e resuma o teor.
@@ -157,6 +165,7 @@ Antes de concluir, verifique se:
 - as notas técnicas não vazam jargão desnecessário para leitores funcionais
 - a sugestão final de Story Points aparece ao final da descrição
 - comentários só foram adicionados quando houve solicitação explícita
+- comentários enviados via `body` foram formatados em ADF, mesmo quando continham apenas texto simples
 - os comentários consideram corretamente o contexto da sessão quando essa operação foi pedida
 - a resposta final deixa claro o que foi criado, alterado ou comentado
 
