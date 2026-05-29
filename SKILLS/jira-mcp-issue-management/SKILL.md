@@ -1,6 +1,6 @@
 ---
 name: jira-mcp-issue-management
-description: 'Cria, edita e mantém chamados no Jira usando servidor Jira MCP com suporte a chamadas REST. Antes de agir, deve carregar ou iniciar o Jira MCP se ele ainda não estiver ativo, assumir que o token da API já está configurado no MCP e tentar executar a operação pela API REST exposta pelo próprio servidor antes de desistir ou sugerir alternativas manuais. Use quando o usuário pedir para abrir tarefa, atualizar issue, refinar descrição, ajustar assignee, tipo, component, label, ou deixar um chamado Sprint Ready na instância https://colibri.atlassian.net/, contexto Colibri e board DEV. Adiciona `label` como `desktop`, tenta inferir `component` a partir do contexto e pergunta antes quando faltar informação crítica como issue key, tipo, assignee, component ou contexto funcional. Também pergunta se o usuário deseja colocar a tarefa no sprint ativo.'
+description: 'Cria, edita e mantém chamados no Jira usando servidor Jira MCP com suporte a chamadas REST. Antes de agir, deve usar ferramentas concretas do Jira MCP, como `mcp_jira_jira_patch` ou `mcp_jira_jira_put`, para executar a operação pela API REST exposta pelo próprio servidor e confirmar que o MCP está acessível na sessão atual. Assuma que o token da API já está configurado no MCP. Use quando o usuário pedir para abrir tarefa, atualizar issue, refinar descrição, ajustar assignee, tipo, component, label, ou deixar um chamado Sprint Ready na instância https://colibri.atlassian.net/, contexto Colibri e board DEV. Use `label` `desktop` como padrão, tente inferir `component` a partir do contexto e pergunte apenas quando faltar informação crítica, inclusive sobre entrada no sprint ativo.'
 argument-hint: 'Descreva o rascunho, issue existente ou alteração desejada; inclua a issue key se já existir.'
 user-invocable: true
 disable-model-invocation: false
@@ -14,7 +14,7 @@ Esta skill transforma pedidos informais em operações completas de criação, e
 
 Ela também cria e mantém comentários, estrutura descrições no formato solicitado pelo usuário e prepara o texto para ficar próximo de um estado `Sprint Ready`.
 
-Assuma por padrão que o Jira MCP já foi cadastrado com credenciais válidas e token apto a criar e atualizar issues. Portanto, antes de concluir que falta integração, autenticação ou permissão, tente carregar ou iniciar o servidor MCP e execute a operação via REST pelo próprio MCP. Não transfira para o usuário a responsabilidade de repetir que a API deve ser usada.
+Assuma por padrão que o Jira MCP já foi cadastrado com credenciais válidas e token apto a criar e atualizar issues. Portanto, antes de concluir que falta integração, autenticação ou permissão, tente usar uma ferramenta concreta do Jira MCP, como `mcp_jira_jira_patch` ou `mcp_jira_jira_put`; a primeira chamada bem-sucedida confirma que o servidor está acessível na sessão. Não transfira para o usuário a responsabilidade de repetir que a API deve ser usada.
 
 Para o Jira MCP, trate descrições e comentários como conteúdo estruturado: quando houver envio de `body`, use ADF (Atlassian Document Format), inclusive para comentários simples em texto puro.
 
@@ -56,19 +56,22 @@ Ao redigir o conteúdo do chamado, aja como um Product Owner e Tech Lead Sênior
 
 A missão é transformar rascunhos informais em tarefas de desenvolvimento prontas para o estado de `Sprint Ready`, mantendo clareza funcional e precisão técnica.
 
-Se houver menção explícita a nomes de funções, métodos, classes ou símbolos de código, reescreva isso em texto corrente inteligível para usuários comuns, a menos que o usuário peça explicitamente para preservar os nomes técnicos.
+Use linguagem de negócio nas seções `Contexto`, `User Story` e `Critérios de Aceite`. Coloque endpoints, tabelas, integrações, dependências e outros detalhes técnicos somente em `Notas Técnicas`, e sempre acompanhe cada referência técnica com uma explicação breve sobre finalidade, impacto ou restrição.
 
 ## Procedimento
 
 1. Prepare o canal de integração.
-   - Antes de qualquer tentativa manual, carregue ou inicie o Jira MCP disponível no ambiente se ele ainda não estiver ativo.
+   - Antes de qualquer tentativa manual, verifique se as ferramentas `mcp_jira_jira_patch` ou `mcp_jira_jira_put` estão disponíveis na sessão atual. Se estiverem, use a ferramenta compatível com a operação real que precisa executar; essa primeira chamada é a ação concreta que faz o VS Code conectar ao servidor MCP configurado para Jira. Se nenhuma dessas ferramentas estiver disponível, trate isso como MCP não registrado ou indisponível nesta sessão e informe esse bloqueio explicitamente.
    - Assuma que o token de API e a autenticação já estão configurados no MCP. Não peça token, e-mail, URL base ou segredo novamente, exceto se o próprio servidor retornar erro explícito de autenticação ou autorização.
+   - Se o servidor retornar erro `4xx` não relacionado a autenticação, como campo inválido, projeto não encontrado ou valor incompatível, informe ao usuário o erro exato retornado e pergunte como deseja proceder antes de tentar novamente.
    - Priorize operações REST expostas pelo Jira MCP para criar, editar, comentar, transicionar, relacionar sprint e ajustar campos.
    - Se existir ferramenta de alto nível para a operação desejada, você pode usá-la; se ela não cobrir todo o fluxo ou falhar, continue pela API REST do mesmo MCP antes de dizer que não é possível.
    - Não redirecione para browser, automação de tela, scraping ou instruções manuais enquanto ainda houver caminho viável pelo Jira MCP.
 
 2. Classifique a intenção do pedido.
    - Identifique se o usuário quer criar uma nova issue, editar uma issue existente, adicionar comentário, ou revisar e melhorar o texto de um chamado.
+   - Se o usuário pedir para excluir uma issue, informe que exclusão não é suportada por esta skill.
+   - Se o usuário pedir para cancelar uma issue, não trate isso como exclusão: oriente o fluxo para transição de status, como `Cancelled`, se esse status existir no projeto.
    - Se a intenção estiver ambígua, pergunte antes de executar qualquer operação no Jira.
 
 3. Valide os dados mínimos.
@@ -87,7 +90,7 @@ Se houver menção explícita a nomes de funções, métodos, classes ou símbol
    - Derive um `component` provável a partir do contexto, quando possível, e marque mentalmente essa hipótese para confirmação apenas se houver ambiguidade.
    - Converta a necessidade em uma user story no formato: `Como [papel], eu quero [funcionalidade], para que [benefício]`.
    - Expanda critérios de aceite em bullets verificáveis.
-   - Registre notas técnicas apenas quando houver endpoints, tabelas, integrações, dependências ou restrições relevantes.
+   - Preencha `Notas Técnicas` apenas quando houver endpoints, tabelas, integrações, dependências ou restrições relevantes, seguindo a regra de redação definida acima.
    - Ao final da descrição, inclua uma sugestão de Story Points usando a sequência de Fibonacci modificada.
 
 5. Aplique a formatação obrigatória da descrição usando ADF (Atlassian Document Format).
@@ -155,7 +158,7 @@ Não interrompa com perguntas desnecessárias quando:
 - o `component` puder ser inferido com segurança a partir do contexto da sessão ou do pedido atual
 - o rascunho contiver informação suficiente para estruturar um chamado Sprint Ready
 - a única tarefa restante for melhorar clareza textual sem alterar significado
-- o único bloqueio aparente for ausência de tentativa prévia de inicializar o Jira MCP ou de usar a API REST do próprio MCP
+- o único bloqueio aparente for ausência de uma chamada prévia via `mcp_jira_jira_patch` ou `mcp_jira_jira_put`
 - a dúvida for apenas se existe token configurado; assuma que já existe até o servidor provar o contrário
 
 ## Critérios de qualidade
@@ -163,25 +166,16 @@ Não interrompa com perguntas desnecessárias quando:
 Antes de concluir, verifique se:
 
 - a operação correta foi identificada: criação, edição, comentário ou refinamento
-- o Jira MCP foi carregado ou iniciado antes de concluir que a integração não estava disponível
-- a API REST do Jira MCP foi tentada quando a operação exigia escrita ou quando o fluxo principal não bastou
 - a issue certa foi usada quando houver `issue key`
-- a instância `https://colibri.atlassian.net/`, o contexto `Colibri` e o board `DEV` foram usados como padrão quando aplicável
-- o `label` `desktop` foi aplicado quando apropriado
 - título, tipo, assignee e `component` estão consistentes com o pedido
-- o `component` foi inferido corretamente a partir do contexto ou confirmado com o usuário
-- a decisão sobre colocar ou não a tarefa no sprint ativo foi perguntada explicitamente
 - nenhuma informação crítica foi inventada
-- nomes técnicos de funções ou símbolos foram traduzidos para linguagem de negócio quando apropriado
-- a descrição está com uma linha para o título e o conteúdo das seções começa apenas na linha seguinte
-- todas as seções usam `H2` com ADF (Atlassian Document Format).
-- a descrição contém `Contexto`, `User Story`, `Critérios de Aceite`, `Notas Técnicas` e `Sugestão de Story Points`
+- o fluxo operacional da seção `Procedimento` foi seguido
+- a descrição segue o `Formato obrigatório da descrição`
+- nomes técnicos foram traduzidos nas seções funcionais e mantidos em `Notas Técnicas` apenas quando necessários, com contexto compreensível
 - os critérios de aceite estão testáveis e objetivos
 - as notas técnicas não vazam jargão desnecessário para leitores funcionais
-- a sugestão final de Story Points aparece ao final da descrição
-- comentários só foram adicionados quando houve solicitação explícita
-- comentários enviados via `body` foram formatados em ADF, mesmo quando continham apenas texto simples
-- os comentários consideram corretamente o contexto da sessão quando essa operação foi pedida
+- a sugestão final de Story Points aparece ao final da descrição quando houver descrição completa de issue
+- comentários seguem as regras da seção `Procedimento` quando essa operação foi pedida
 - a resposta final deixa claro o que foi criado, alterado ou comentado
 
 ## Formato obrigatório da descrição
