@@ -20,7 +20,7 @@ Additionally, if an argument uses a lambda expression or a nested call with its 
 - XMLDoc is mandatory for public classes and methods.
 - Non-inheritable classes must be sealed.
 - DRY: avoid code repetition.
-- Write code always in english.
+- Write code always in brazilian portuguese.
 - Use modern collections and initializers ([] and [..] when possible).
 - Add <inherited /> for inherited members in XMLDoc.
 - Always put using before namespace declaration and sort them alphabetically.
@@ -64,7 +64,7 @@ Additionally, if an argument uses a lambda expression or a nested call with its 
 - Use code blocks for code snippets.
 - Use links for references and further reading.
 - Keep documentation up to date with code changes.
-- Write always in english.
+- Write allways in brazilian portuguese.
 - Keep a section dedicate to give credits to third-party libraries used in the project.
 
 ## For keeping the code formatted
