@@ -200,11 +200,28 @@ Para listas:
 
 1. Confirmar projeto (`WIN` se não informado)
 2. Confirmar tipo de issue (inferir pelo contexto: bug → Bug, funcionalidade → Story, etc.)
-3. Inferir `assignee` se mencionado; caso contrário, omitir o campo
-4. Inferir componente pelo contexto do workspace se possível
-5. Aplicar label `desktop` por padrão
-6. Criar via `mcp__aashari_mcp-_jira_post` → `/rest/api/3/issue`
-7. Retornar link da issue criada: `https://colibri.atlassian.net/browse/{key}`
+3. **Gerar a descrição usando a skill `jira-issue-description-generator`** antes de criar a issue:
+   - Invocar a skill passando o tipo de issue inferido e o contexto da conversa/workspace
+   - A skill retorna Markdown estruturado — converter para ADF antes de enviar à API
+4. Inferir `assignee` se mencionado; caso contrário, omitir o campo
+5. Inferir componente pelo contexto do workspace se possível
+6. Aplicar label `desktop` por padrão
+7. Criar via `mcp__aashari_mcp-_jira_post` → `/rest/api/3/issue`
+8. Retornar link da issue criada: `https://colibri.atlassian.net/browse/{key}`
+
+### Conversão Markdown → ADF (saída do jira-issue-description-generator)
+
+A skill `jira-issue-description-generator` produz Markdown puro. Ao montar o campo `description` para a API, converter:
+
+| Markdown | ADF node |
+|----------|----------|
+| Parágrafo | `{ "type": "paragraph", "content": [{ "type": "text", "text": "..." }] }` |
+| `## Título` | `{ "type": "heading", "attrs": { "level": 2 }, "content": [{ "type": "text", "text": "..." }] }` |
+| `- item` | `bulletList` > `listItem` > `paragraph` |
+| `**negrito**` | `text` com `"marks": [{ "type": "strong" }]` |
+| `_itálico_` | `text` com `"marks": [{ "type": "em" }]` |
+| `` `código` `` | `text` com `"marks": [{ "type": "code" }]` |
+| Bloco de código | `{ "type": "codeBlock", "attrs": { "language": "..." }, "content": [...] }` |
 
 ## Workflow padrão para edição de issue
 
