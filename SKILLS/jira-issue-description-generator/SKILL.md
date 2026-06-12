@@ -22,8 +22,9 @@ Use esta skill quando o usuário pedir:
 1. Lê o contexto disponível na sessão: conversa atual, código analisado, memória de repo, arquivos abertos ou referenciados.
 2. Determina o **tipo da issue** — pelo argumento ou deduzido do contexto.
 3. Aplica o **template correto** para o tipo determinado.
-4. Gera a descrição completa em Markdown, pronta para colar manualmente no Jira.
-5. Exibe o resultado como bloco de código Markdown para facilitar a cópia.
+4. Gera um título consiso e descritivo para a tarefa do Jira, baseado no contexto.
+5. Gera a descrição completa em Markdown, pronta para colar manualmente no Jira.
+6. Exibe o resultado como bloco de código Markdown para facilitar a cópia.
 
 ---
 
@@ -49,6 +50,8 @@ Use esta skill quando o usuário pedir:
 ### Bug
 
 ```
+<titulo>
+
 ## Contexto
 <texto corrido: origem, motivação, quando foi percebido>
 
@@ -89,6 +92,8 @@ Use esta skill quando o usuário pedir:
 ### QA Defect
 
 ```
+<titulo>
+
 ## Contexto
 <texto corrido>
 
@@ -132,6 +137,8 @@ Use esta skill quando o usuário pedir:
 ### Internal Defect
 
 ```
+<titulo>
+
 ## Contexto
 <texto corrido>
 
@@ -171,6 +178,8 @@ Use esta skill quando o usuário pedir:
 ### Feature
 
 ```
+<titulo>
+
 ## Contexto
 <texto corrido: problema, motivação, impacto, origem da demanda>
 
@@ -205,6 +214,8 @@ Como <perfil>, quero <objetivo>, para <benefício>.
 ### Improvement
 
 ```
+<titulo>
+
 ## Contexto
 <texto corrido>
 
@@ -230,6 +241,8 @@ Como <perfil>, quero <objetivo>, para <benefício>.
 ### Spike
 
 ```
+<titulo>
+
 ## Contexto
 <texto corrido: motivação, risco ou incerteza que originou a investigação>
 
@@ -263,6 +276,8 @@ Como <perfil>, quero <objetivo>, para <benefício>.
 ### UI/UX
 
 ```
+<titulo>
+
 ## Contexto
 <texto corrido>
 
@@ -293,6 +308,8 @@ Como <perfil>, quero <objetivo>, para <benefício>.
 ### Deficit
 
 ```
+<titulo>
+
 ## Contexto
 <texto corrido>
 
@@ -319,6 +336,8 @@ Como <perfil>, quero <objetivo>, para <benefício>.
 ### Technical
 
 ```
+<titulo>
+
 ## Contexto
 <texto corrido>
 
@@ -344,6 +363,8 @@ Como <perfil>, quero <objetivo>, para <benefício>.
 ### Doc
 
 ```
+<titulo>
+
 ## Contexto
 <texto corrido>
 
