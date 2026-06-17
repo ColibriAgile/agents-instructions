@@ -2,11 +2,10 @@
 setlocal
 
 set "BASE_SOURCE=%~dp0"
-set "BASE_TARGET=%USERPROFILE%\.copilot"
 
-call :CreateJunction "SKILLS" "skills"
-call :CreateJunction "INSTRUCTIONS" "instructions"
-call :CreateJunction "AGENTS" "agents"
+call :CreateLinks "SKILLS" "skills"
+call :CreateLinks "INSTRUCTIONS" "instructions"
+call :CreateLinks "AGENTS" "agents"
 
 echo.
 echo Todas as junctions foram criadas.
@@ -14,8 +13,15 @@ pause
 exit /b
 
 
+:CreateLinks
+call :CreateJunction "%~1" "%~2" "%USERPROFILE%\.copilot"
+call :CreateJunction "%~1" "%~2" "%USERPROFILE%\.codex"
+goto :eof
+
+
 :CreateJunction
 set "SOURCE=%BASE_SOURCE%%~1"
+set "BASE_TARGET=%~3"
 set "TARGET=%BASE_TARGET%\%~2"
 
 echo.
@@ -34,7 +40,7 @@ if exist "%TARGET%" (
     )
 )
 
-REM Garante que .copilot exista
+REM Garante que a pasta base exista
 if not exist "%BASE_TARGET%" (
     mkdir "%BASE_TARGET%"
 )
