@@ -37,13 +37,21 @@ Use esta skill para atualizar pacotes NuGet de uma solução .NET de forma contr
   - Se houver mais de uma solução, pergunte ao usuário qual deve ser atualizada.
   - Se não houver nenhuma solução, peça o caminho da solução principal.
 3. Verifique se o repositório contém o submódulo ou diretório `_lib`.
-4. Quando `_lib` existir, confirme que ele não está em estado detached HEAD antes de executar qualquer comando `dotnet outdated`. Execute, a partir da raiz do repositório:
+4. Antes de iniciar a atualização, prepare cada repositório git que será alterado: sempre o repositório principal e, quando `_lib` existir, também o repositório da biblioteca. Para cada um, execute os comandos a partir da sua própria raiz:
+
+  ```bash
+  git symbolic-ref --quiet --short HEAD
+  git pull --ff-only
+  ```
+
+  Para o repositório principal, os comandos devem ser executados na raiz do projeto. Para `_lib`, execute-os dentro de `_lib` ou use o caminho explicitamente:
 
   ```bash
   git -C _lib symbolic-ref --quiet --short HEAD
+  git -C _lib pull --ff-only
   ```
 
-  O comando deve retornar o nome da branch e código de saída zero. Se falhar ou não retornar uma branch, interrompa o fluxo e solicite que o usuário faça checkout de uma branch no submódulo antes de continuar.
+  O primeiro comando deve retornar o nome da branch e código de saída zero. Se falhar ou não retornar uma branch, o repositório está em estado detached HEAD: interrompa o fluxo e solicite que o usuário faça checkout de uma branch antes de continuar. Execute `git pull --ff-only` somente após essa validação. Se o pull falhar, inclusive por não ser possível fazer fast-forward, interrompa o fluxo e peça ao usuário que resolva a divergência antes de atualizar pacotes.
 5. Quando `_lib` existir e contiver `CoLib.Library.sln`, atualize essa solução primeiro. Se o arquivo não estiver nesse caminho, localize a solução da biblioteca e confirme o caminho efetivo antes de executar a atualização.
 6. Depois, atualize a solução principal selecionada.
 
