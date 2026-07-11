@@ -114,7 +114,34 @@ Se o usuário escolher rollback:
 3. execute novamente build e testes;
 4. registre o pacote, a versão fixada e o motivo da decisão.
 
-### 6. Encerrar com um resumo verificável
+### 6. Gerar mensagens de commit
+
+Depois que todas as soluções forem atualizadas e validadas, gere duas mensagens de commit separadas, sem executar `git commit`:
+
+1. Uma mensagem para as alterações realizadas no submódulo `_lib`.
+2. Uma mensagem para as alterações realizadas no repositório principal.
+
+As mensagens devem ser escritas em português sem formatação e compatível com GitHub. Cada mensagem deve conter:
+
+- um título curto e objetivo;
+- um resumo das alterações;
+- uma lista de todos os pacotes atualizados no respectivo repositório, com a versão no formato `de => para`;
+- uma seção de validação com os comandos de build e testes executados e seus resultados.
+
+Quando não houver pacotes atualizados em um dos repositórios, apenas omita. Não misture na mensagem do repositório principal os pacotes atualizados exclusivamente no submódulo `_lib`.
+
+Use esta estrutura para cada mensagem:
+
+```
+chore(nuget): <título do commit>
+
+Pacotes atualizados
+
+- `<Pacote>`: `<versão anterior>` => `<versão nova>`
+
+```
+
+### 7. Encerrar com um resumo verificável
 
 Ao concluir com sucesso, informe:
 
@@ -124,6 +151,7 @@ Ao concluir com sucesso, informe:
 - resultado de `dotnet build` para cada solução;
 - resultado de `dotnet test` e quantidade de testes, quando disponível;
 - avisos ou pacotes que permaneceram sem atualização;
+- as duas mensagens de commit geradas, uma para `_lib` e outra para o repositório principal;
 - arquivos alterados, se essa informação estiver disponível.
 
 Se o fluxo for interrompido, informe claramente o ponto de parada e a decisão que aguarda o usuário.
