@@ -21,7 +21,7 @@ Use esta skill para atualizar pacotes NuGet de uma solução .NET de forma contr
 
 - Preserve alterações não relacionadas que já estejam no working tree.
 - Antes de atualizar, identifique a solução alvo e registre quais soluções serão alteradas.
-- Não faça rollback automático, não fixe versões manualmente e não aplique correções para breaking changes sem confirmação do usuário.
+- Não faça rollback automático, não fixe versões manualmente e não aplique correções para breaking changes sem confirmação do usuário. Após o usuário confirmar explicitamente o rollback, fixe a versão anterior ou compatível somente para concluir esse rollback.
 - Se build ou testes indicarem que uma atualização quebrou compatibilidade, interrompa o fluxo imediatamente e pergunte se o usuário deseja:
   1. continuar corrigindo a incompatibilidade; ou
   2. fazer rollback e fixar a versão problemática para uma análise posterior.
@@ -37,21 +37,17 @@ Use esta skill para atualizar pacotes NuGet de uma solução .NET de forma contr
   - Se houver mais de uma solução, pergunte ao usuário qual deve ser atualizada.
   - Se não houver nenhuma solução, peça o caminho da solução principal.
 3. Verifique se o repositório contém o submódulo ou diretório `_lib`.
-4. Antes de iniciar a atualização, prepare cada repositório git que será alterado: sempre o repositório principal e, quando `_lib` existir, também o repositório da biblioteca. Para cada um, execute os comandos a partir da sua própria raiz:
-
-  ```bash
-  git symbolic-ref --quiet --short HEAD
-  git pull --ff-only
-  ```
-
-  Para o repositório principal, os comandos devem ser executados na raiz do projeto. Para `_lib`, execute-os dentro de `_lib` ou use o caminho explicitamente:
-
-  ```bash
-  git -C _lib symbolic-ref --quiet --short HEAD
-  git -C _lib pull --ff-only
-  ```
-
-  O primeiro comando deve retornar o nome da branch e código de saída zero. Se falhar ou não retornar uma branch, o repositório está em estado detached HEAD: interrompa o fluxo e solicite que o usuário faça checkout de uma branch antes de continuar. Execute `git pull --ff-only` somente após essa validação. Se o pull falhar, inclusive por não ser possível fazer fast-forward, interrompa o fluxo e peça ao usuário que resolva a divergência antes de atualizar pacotes.
+4. Antes de iniciar a atualização, prepare cada repositório git que será alterado, sempre começando pelo repositório principal:
+  - **4a. Repositório principal:**
+    1. Execute `git symbolic-ref --quiet --short HEAD` na raiz do projeto.
+    2. Confirme que o comando terminou com código de saída zero e retornou o nome de uma branch. Se falhar ou não retornar uma branch, o repositório está em estado detached HEAD: interrompa o fluxo e solicite que o usuário faça checkout de uma branch antes de continuar.
+    3. Somente após essa validação, execute `git pull --ff-only` na raiz do projeto.
+    4. Se o pull falhar, inclusive por não ser possível fazer fast-forward, interrompa o fluxo e peça ao usuário que resolva a divergência antes de atualizar pacotes.
+  - **4b. Repositório da biblioteca:** se `_lib` existir, execute os seguintes passos dentro de `_lib` ou usando o caminho explicitamente:
+    1. Execute `git -C _lib symbolic-ref --quiet --short HEAD`.
+    2. Confirme que o comando terminou com código de saída zero e retornou o nome de uma branch. Se falhar ou não retornar uma branch, o repositório está em estado detached HEAD: interrompa o fluxo e solicite que o usuário faça checkout de uma branch antes de continuar.
+    3. Somente após essa validação, execute `git -C _lib pull --ff-only`.
+    4. Se o pull falhar, inclusive por não ser possível fazer fast-forward, interrompa o fluxo e peça ao usuário que resolva a divergência antes de atualizar pacotes.
 5. Quando `_lib` existir e contiver `CoLib.Library.sln`, atualize essa solução primeiro. Se o arquivo não estiver nesse caminho, localize a solução da biblioteca e confirme o caminho efetivo antes de executar a atualização.
 6. Depois, atualize a solução principal selecionada.
 
@@ -95,7 +91,7 @@ Após cada solução atualizada, execute, nesta ordem:
 1. `dotnet build <solucao>`
 2. `dotnet test <solucao>`
 
-Analise o output completo, incluindo erros de compilação, falhas de testes, warnings novos relevantes, falhas de restauração e incompatibilidades de API.
+Analise o output completo, incluindo erros de compilação, falhas de testes, warnings novos, falhas de restauração e incompatibilidades de API.
 
 Se o build falhar ou os testes falharem por causa de uma atualização:
 
@@ -105,6 +101,10 @@ Se o build falhar ou os testes falharem por causa de uma atualização:
 - pergunte se deve continuar corrigindo a incompatibilidade ou fazer rollback e fixar a versão do pacote.
 
 Não declare sucesso enquanto houver falhas causadas pela atualização.
+
+#### 4.1 Remover warnings
+
+ Se os warnings puderem ser removidos alterando exclusivamente arquivos já modificados pela atualização de pacotes e sem alterar assinaturas públicas de API ou comportamento observável, faça a correção. Caso contrário, pergunte ao usuário se deve continuar.
 
 ### 5. Corrigir somente com autorização
 
@@ -118,7 +118,7 @@ Se o usuário escolher continuar:
 Se o usuário escolher rollback:
 
 1. reverta apenas as alterações produzidas pela atualização problemática;
-2. fixe explicitamente a versão anterior ou compatível do pacote;
+2. após a confirmação explícita do usuário, fixe a versão anterior ou compatível do pacote;
 3. execute novamente build e testes;
 4. registre o pacote, a versão fixada e o motivo da decisão.
 
@@ -146,6 +146,11 @@ chore(nuget): <título do commit>
 Pacotes atualizados
 
 - `<Pacote>`: `<versão anterior>` => `<versão nova>`
+
+Validação
+
+- `dotnet build <solucao>`: <resultado>
+- `dotnet test <solucao>`: <resultado e quantidade de testes>
 
 ```
 
