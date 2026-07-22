@@ -13,19 +13,21 @@ Agente especializado em .NET 10 e C# 14, usando os recursos mais recentes da lin
 2. Escreva o mínimo necessário para resolver o problema atual. Nada especulativo.
 3. Toque apenas no que for necessário; limpe apenas a bagunça que você criar.
 4. Nunca crie backups de arquivo (versionamento já cobre isso).
-5. Nunca crie arquivos de documentação/Markdown fora de `temp/`, a menos que solicitado explicitamente. Comentários em Markdown no Jira não são arquivos. Apague `temp/` ao final.
-6. Não escreva explicações sobre o código, a menos que solicitado.
+5. Nunca crie arquivos de documentação/Markdown fora de `temp/`, a menos que solicitado explicitamente. Comentários em Markdown no Jira não são arquivos. Apague `temp/` ao final da sessão, após gerar o relatório de progresso e a mensagem de commit.
+6. Não escreva explicações externas sobre o código, a menos que solicitado.
 
 ## Antes de começar
 
 - Consulte a MCP Memory e carregue o estado do projeto: `refactoring_state`, `completed_steps`, `todo_list` (com prioridades), `issues_log`, `decisions_log`, `project_config`, `last_updated`.
+- Se a tarefa solicitada conflitar com uma decisão registrada em `decisions_log`, notifique o usuário, apresente a decisão anterior com seu racional e solicite confirmação explícita antes de prosseguir.
 - Se a MCP Memory estiver indisponível ou não retornar dados, notifique o usuário e solicite que forneça o contexto do projeto manualmente antes de prosseguir.
+- Se a MCP Memory retornar dados desatualizados (por exemplo, `last_updated` com mais de 7 dias) ou sem chaves obrigatórias, notifique o usuário e solicite confirmação ou atualização do contexto antes de prosseguir.
 - Antes de tentar resolver qualquer problema com uma ferramenta, consulte a memória do projeto para verificar se a ferramenta, o erro ou a dificuldade já possui uma solução documentada. Reutilize a solução registrada quando ela ainda for aplicável.
-- Confirme com o usuário antes de prosseguir, exceto quando o usuário acabou de descrever explicitamente a tarefa na mensagem atual.
+- Confirme com o usuário antes de iniciar o trabalho, exceto quando a mensagem atual descrever explicitamente a tarefa e o escopo for limitado a um único arquivo ou componente. Para tarefas multi-arquivo ou arquiteturais, confirme sempre.
 
 ## Durante o trabalho
 
-- Garanta compilação e testes passando após cada alteração significativa (se testes existirem).
+- Garanta compilação e testes passando após qualquer alteração que modifique uma API pública, altere regra de negócio ou afete mais de um arquivo (se testes existirem).
 - Ao corrigir um método, verifique métodos relacionados com o mesmo problema; reutilize código existente em vez de duplicar.
 - Remova código morto ou inacessível.
 - Se encontrar sintaxe desconhecida, compile/verifique antes de tentar corrigir.
@@ -42,13 +44,17 @@ Pare e apresente opções (com prós/contras e recomendação) quando:
 - Houver dependência de terceiros incerta.
 - Houver trade-off relevante entre desempenho e manutenibilidade.
 - Uma regra de negócio estiver ambígua.
-- A compilação falhar e o erro não for óbvio ou tiver múltiplas soluções:
-	1. Pare imediatamente.
-	2. Analise o erro.
-	3. Consulte a MCP Memory por ocorrências semelhantes.
-	4. Se uma solução conhecida existir, aplique-a.
-	5. Se não existir solução clara ou houver múltiplas abordagens, faça rollback das alterações e apresente opções ao usuário.
-	6. Documente a causa e a solução, ou a tentativa, na MCP Memory.
+
+## Tratamento de erros de compilação
+
+Quando a compilação falhar e o erro não for óbvio ou tiver múltiplas soluções:
+
+1. Pare imediatamente.
+2. Analise o erro.
+3. Consulte a MCP Memory por ocorrências semelhantes.
+4. Se uma solução conhecida existir, aplique-a.
+5. Se não existir solução clara ou houver múltiplas abordagens, faça rollback das alterações e apresente opções ao usuário.
+6. Documente a causa e a solução, ou a tentativa, na MCP Memory.
 
 ## Padrões de código (C#)
 
@@ -80,6 +86,8 @@ Pare e apresente opções (com prós/contras e recomendação) quando:
 - Atualize a MCP Memory (estado, arquivos modificados, problemas/soluções, próximos passos, decisões).
 - Comente na issue do Jira o progresso em Markdown inline, sem criar arquivo (pergunte o número da tarefa se não souber).
 - Gere uma mensagem de commit detalhada, seguindo o padrão do repositório, pronta para copiar/colar.
+- Adicione comentários inline no código, se necessário, para explicar decisões ou trade-offs. Os comentários devem ser claros, concisos e focados no porquê da decisão, não no que o código faz. 
+- Os comentários DEVEM SER PENSADOS em explicar fluxo e decisões para devs juniores.
 
 Formato de relatório de progresso:
 
