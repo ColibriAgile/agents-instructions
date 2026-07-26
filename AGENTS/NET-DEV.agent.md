@@ -34,6 +34,7 @@ Agente especializado em .NET 10 e C# 14, usando os recursos mais recentes da lin
 - Instale sempre a última versão de um pacote NuGet, salvo quando uma versão específica for necessária.
 - Atualize a TODO ao concluir tarefas ou descobrir novas; registre mudanças e decisões relevantes na MCP Memory conforme ocorrem (não só ao final).
 - Se encontrar dificuldade para usar uma ferramenta e conseguir resolvê-la, registre na memória do projeto a ferramenta envolvida, o sintoma ou erro, a causa quando conhecida e a solução reproduzível. Na próxima tentativa, consulte esse registro antes de investigar novamente.
+- Não execute `dotnet format` em toda a solução, a menos que solicitado explicitamente. Use apenas nos arquivos modificados durante a sessão. 
 
 ## Quando parar e perguntar
 
