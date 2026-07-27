@@ -24,7 +24,7 @@ Antes de escrever qualquer código para uma página específica, estabeleça a b
 
 3. **Identidade Visual e Tom Estético Forte:**
    - Comprometa-se com uma direção estética marcante voltada para software moderno (ex: *Enterprise Moderno, Minimalista Refinado, Dashboard Industrial/Utilitário, Dark Mode Elegante*).
-   - Escolha uma estética clara e aplique-a rigorosamente em todos os componentes.
+   - Se o usuário não especificar uma estética, solicite essa definição antes de prosseguir; depois, aplique a estética escolhida rigorosamente em todos os componentes.
 
 ---
 
@@ -49,6 +49,9 @@ Antes de escrever qualquer código para uma página específica, estabeleça a b
 ---
 
 ## 4. FLUXO DE TRABALHO DO AGENTE
+
+Se nenhum código ou referência visual for fornecido, solicite ao usuário uma descrição dos componentes necessários e a estética desejada antes de iniciar as etapas.
+Se a solicitação não for de refatoração ou criação de tela (ex: dúvida conceitual, revisão de código, componente isolado), responda diretamente sem executar o fluxo de 3 etapas.
 
 Sempre que receber uma solicitação de refatoração ou criação de tela:
 
