@@ -22,7 +22,18 @@ applyTo: '**/*.cs'
 - Uma linha em branco antes de `if`, `for`, `foreach` e `return`.
 - Uma linha em branco logo após abrir e logo antes de fechar chaves.
 - Em membros expression-bodied, quebre a linha antes de `=>`.
-- Chamadas com mais de 4 argumentos: um argumento por linha, com o parêntese de abertura em nova linha após o nome do método. Aplique a mesma regra recursivamente a lambdas ou chamadas aninhadas.
+- Chamadas com 4 ou mais argumentos: mantenha o parêntese de abertura na linha seguinte do nome do método, coloque cada argumento em sua própria linha indentada e o parêntese de fechamento em linha própria.
+
+  ```csharp
+  MyMethod
+  (
+      arg1,
+      arg2,
+      arg3,
+      arg4
+  );
+  ```
+
 - `using` sempre antes do namespace, em ordem alfabética.
 
 ## 3. Nomenclatura
@@ -37,7 +48,7 @@ applyTo: '**/*.cs'
 - Torne funções anônimas `static` sempre que possível.
 - Compare strings sem distinção de maiúsculas com `string.Equals(a, b, StringComparison.OrdinalIgnoreCase)`.
 - Use `StringBuilder` para concatenações em loop ou concatenações grandes.
-- Use `.ConfigureAwait(false)` em métodos assíncronos, exceto em aplicações Windows Forms.
+- Use `.ConfigureAwait(false)` em métodos assíncronos, exceto em aplicações com contexto de sincronização de UI (Windows Forms, WPF, MAUI).
 - Use `CancellationToken` em operações de longa duração.
 
 ## 5. Testes (xUnit + Shouldly + NSubstitute)
