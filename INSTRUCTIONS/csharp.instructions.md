@@ -13,4 +13,6 @@ As regras de C# estão separadas por responsabilidade para evitar duplicação e
 
 Para criação, revisão ou diagnóstico de testes C#, use a skill `csharp-tests`. Para testes PostgreSQL, use também a skill `pgsql-test-runner`.
 
+Para qualquer build, teste, publish ou execução de projeto .NET, use obrigatoriamente a skill `dotnet-efficient-validation` antes de executar comandos. Para buscas, grep ou inspeção de diff no repositório, use obrigatoriamente `repository-cli-efficiency`.
+
 Use o arquivo temático correspondente ao contexto da tarefa. O agente .NET deve referenciar estas instruções e skills em vez de copiar suas regras.

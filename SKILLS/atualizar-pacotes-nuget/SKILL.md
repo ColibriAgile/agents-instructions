@@ -17,6 +17,8 @@ Use esta skill para atualizar pacotes NuGet de uma solução .NET de forma contr
 - build e testes após cada solução atualizada;
 - detecção de incompatibilidades e breaking changes.
 
+Antes de executar qualquer build, teste ou publish, use obrigatoriamente a skill `dotnet-efficient-validation`. Depois de alterar referencias de pacote, faca uma restauracao explicita; somente entao use `build --no-restore` e `test --no-build --no-restore`.
+
 ## Regras de segurança
 
 - Preserve alterações não relacionadas que já estejam no working tree.
@@ -53,19 +55,21 @@ Use esta skill para atualizar pacotes NuGet de uma solução .NET de forma contr
 
 A ordem padrão é:
 
-1. `dotnet outdated -u _lib\CoLib.Library.sln`
-2. `dotnet build _lib\CoLib.Library.sln`
-3. `dotnet test _lib\CoLib.Library.sln`
-4. `dotnet outdated -u <solucao-principal.sln ou solucao-principal.slnx>`
-5. `dotnet build <solucao-principal.sln ou solucao-principal.slnx>`
-6. `dotnet test <solucao-principal.sln ou solucao-principal.slnx>`
+1. `rtk dotnet outdated -u _lib\CoLib.Library.sln --no-restore`
+2. `rtk dotnet restore _lib\CoLib.Library.sln --nologo --verbosity:minimal`
+3. `rtk dotnet build _lib\CoLib.Library.sln --no-restore --nologo --verbosity:minimal`
+4. `rtk dotnet test _lib\CoLib.Library.sln --no-build --no-restore --nologo --logger "console;verbosity=minimal"`
+5. `rtk dotnet outdated -u <solucao-principal.sln ou solucao-principal.slnx> --no-restore`
+6. `rtk dotnet restore <solucao-principal.sln ou solucao-principal.slnx> --nologo --verbosity:minimal`
+7. `rtk dotnet build <solucao-principal.sln ou solucao-principal.slnx> --no-restore --nologo --verbosity:minimal`
+8. `rtk dotnet test <solucao-principal.sln ou solucao-principal.slnx> --no-build --no-restore --nologo --logger "console;verbosity=minimal"`
 
 Adapte separadores e caminhos ao sistema operacional. O comando equivalente para uma solução `.slnx` é o mesmo, substituindo apenas o caminho do arquivo.
 
 ### 2. Verificar `dotnet outdated`
 
-1. Verifique se o comando `dotnet outdated` está disponível. Use o comando `dotnet tool list --global` para confirmar se a ferramenta está instalada globalmente.
-2. Se não estiver disponível, tente instalar a ferramenta globalmente com `dotnet tool install --global dotnet-outdated-tool`.
+1. Verifique se o comando `dotnet outdated` está disponível. Use `rtk dotnet tool list --global` para confirmar se a ferramenta está instalada globalmente.
+2. Se não estiver disponível, tente instalar a ferramenta globalmente com `rtk dotnet tool install --global dotnet-outdated-tool`.
 3. Verifique novamente se o comando passou a estar disponível.
 4. Se a instalação não funcionar, pare sem atualizar pacotes e solicite ao usuário a instalação manual da ferramenta.
 
@@ -73,7 +77,7 @@ Não substitua `dotnet outdated` por uma atualização manual ou por outro mecan
 
 ### 3. Atualizar uma solução por vez
 
-Para cada solução, execute `dotnet outdated -u <solucao>` e aguarde a conclusão antes de iniciar a próxima etapa.
+Para cada solução, execute `rtk dotnet outdated -u <solucao> --no-restore` e aguarde a conclusão antes de iniciar a próxima etapa.
 
 Após a atualização, examine o resultado para identificar:
 
@@ -88,10 +92,11 @@ Uma falha de restauração já é motivo para interromper e pedir orientação q
 
 Após cada solução atualizada, execute, nesta ordem:
 
-1. `dotnet build <solucao>`
-2. `dotnet test <solucao>`
+1. `rtk dotnet restore <solucao> --nologo --verbosity:minimal`
+2. `rtk dotnet build <solucao> --no-restore --nologo --verbosity:minimal`
+3. `rtk dotnet test <solucao> --no-build --no-restore --nologo --logger "console;verbosity=minimal"`
 
-Analise o output completo, incluindo erros de compilação, falhas de testes, warnings novos, falhas de restauração e incompatibilidades de API.
+Analise a saida minima, incluindo erros de compilacao, falhas de testes, warnings novos, falhas de restauracao e incompatibilidades de API. Se houver falha, repita apenas a etapa necessaria com saida normal ou `rtk proxy`.
 
 Se o build falhar ou os testes falharem por causa de uma atualização:
 

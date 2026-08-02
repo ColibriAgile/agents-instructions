@@ -7,6 +7,8 @@ description: "Run or troubleshoot .NET tests that depend on PostgreSQL, Npgsql, 
 
 Use this skill when a .NET test run depends on PostgreSQL and you need to stabilize the environment before deciding whether a failure is a code regression.
 
+Before running `dotnet build` or `dotnet test`, also use the `dotnet-efficient-validation` skill. Keep the PostgreSQL environment setup, but use the narrowest project and test filter possible.
+
 ## Default Test Environment
 
 Before running PostgreSQL-backed tests in this workspace, prefer these process-level environment variables:
@@ -40,7 +42,7 @@ Expected local service:
 $env:PGSQL_CONN_STRING = 'Host=localhost;Port=4500;Database=postgres;User Id=tester;Password=tester;Include Error Detail=true'
 $env:PGSQ_USER = 'tester'
 $env:PGSQL_PASSWORD = 'tester'
-dotnet test '.\_lib\CoLib.Library.sln' --no-build --nologo -v minimal
+rtk dotnet test '.\_lib\CoLib.Library.sln' --no-build --no-restore --nologo --logger "console;verbosity=minimal"
 ```
 
 ## Decision Rule

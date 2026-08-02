@@ -24,7 +24,8 @@ argument-hint: "Descreva o teste C# a criar, revisar ou corrigir"
 7. Use NSubstitute somente para interfaces ou classes virtuais; use uma instância real ou extraia uma interface para classes não virtuais.
 8. Teste pela API pública e evite reflection para acessar membros privados.
 9. Extraia strings e números reutilizados para constantes em `UPPER_CASE`; use raw strings para conteúdo multilinha e strings verbatim para caminhos.
-10. Execute primeiro o teste mais específico e, depois, o conjunto relacionado afetado pela mudança.
+10. Antes de executar qualquer `dotnet test` ou `dotnet build`, use obrigatoriamente a skill `dotnet-efficient-validation`.
+11. Execute primeiro o teste mais específico e, depois, o conjunto relacionado afetado pela mudança. Após um build válido, use `--no-build --no-restore --nologo --logger "console;verbosity=minimal"`.
 
 ## PostgreSQL
 
