@@ -1,5 +1,5 @@
 ---
-applyTo: '**/*.cs'
+description: "Use when writing or reviewing C# async/await, pattern matching, performance, logging, CancellationToken, or type safety."
 ---
 
 # Boas práticas de C#

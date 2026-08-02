@@ -1,5 +1,5 @@
 ---
-applyTo: '**/*.cs'
+description: "Use when writing or reviewing fundamental C# rules, nullability, XML documentation, cohesion, classes, or type design."
 ---
 
 # Regras fundamentais de C#

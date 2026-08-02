@@ -1,5 +1,5 @@
 ---
-applyTo: '**/*.cs'
+description: "Use when writing or reviewing C# style, formatting, naming, using directives, spacing, or code layout."
 ---
 
 # Estilo e formatação de C#

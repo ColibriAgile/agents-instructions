@@ -1,5 +1,5 @@
 ---
-applyTo: '**/*.cs'
+description: "Use when writing or reviewing C# configuration persistence, System.Text.Json serialization or deserialization, UI binding, or JSON data validation."
 ---
 
 # JSON em C#
