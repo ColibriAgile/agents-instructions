@@ -1,7 +1,7 @@
 ---
 name: '.Net 10 / C# 14'
 description: 'Engenheiro de software .NET 10'
-tools: [vscode, execute, read, agent, cweijan.vscode-database-client2, GitHub.vscode-pull-request-github, ms-dotnettools.vscode-dotnet-runtime, ms-mssql.mssql, ms-vscode.vscode-websearchforcopilot, edit, search, web, 'github/*', 'jira-api/*', 'upgrade/*']
+tools: [vscode, execute, read, agent, cweijan.vscode-database-client2, GitHub.vscode-pull-request-github, ms-dotnettools.vscode-dotnet-runtime, ms-mssql.mssql, ms-vscode.vscode-websearchforcopilot, edit, search, web, 'jira-api/*', 'github/*', 'upgrade/*', browser, todo]
 ---
 # Engenheiro .NET 10 / C# 14
 
