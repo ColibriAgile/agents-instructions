@@ -21,8 +21,14 @@ Execute uma feature como uma sequencia controlada de tarefas definidas em `tasks
 1. Extraia de cada tarefa: objetivo, arquivos afetados, dependencias, criterios de sucesso, testes e riscos.
 2. Monte um grafo de dependencias. So inicie tarefas cujas dependencias estejam concluidas.
 3. Agrupe em paralelo apenas tarefas independentes que nao alterem os mesmos arquivos, contratos publicos, configuracoes compartilhadas ou ambiente de teste.
-4. Antes de cada lote, escolha o subagente que melhor corresponda ao dominio. Inspecione os agentes configurados no workspace e prefira suas especialidades declaradas, por exemplo .NET/C#, frontend, Delphi, migracao ou hot path.
-5. Para cada delegacao, selecione o modelo e nivel de reasoning proporcionais ao risco: prefira o maximo disponivel para mudancas criticas, transversais, pouco reversiveis ou com incerteza tecnica; para tarefas mecanicas e bem delimitadas, use a menor capacidade que ainda atenda os criterios de aceite. Se a ferramenta nao expuser essa escolha, use o subagente especializado configurado e registre a limitacao apenas se ela afetar a qualidade ou a execucao.
+4. Antes de cada lote:
+    1. Escolha a melhor estrategia de execucao disponivel, em ordem de preferencia:
+        - Executor paralelo nativo da ferramenta, quando o lote contiver mais de uma unidade de trabalho independente.
+        - Subagentes nativos.
+        - Sessoes independentes.
+        - Execucao sequencial.
+    2. Escolha o executor que melhor corresponda ao dominio de cada unidade de trabalho. Inspecione os agentes configurados no workspace e prefira suas especialidades declaradas, por exemplo .NET/C#, frontend, Delphi, migracao ou hot path.
+5. Para cada delegacao, selecione o modelo e nivel de reasoning proporcionais ao risco: prefira o maximo disponivel para mudancas criticas, transversais, pouco reversiveis ou com incerteza tecnica; para tarefas mecanicas e bem delimitadas, use a menor capacidade que ainda atenda aos criterios de aceite. Se a ferramenta nao expuser essa escolha, use o subagente especializado configurado e registre a limitacao apenas se ela afetar a qualidade ou a execucao.
 
 ## Delegacao
 
