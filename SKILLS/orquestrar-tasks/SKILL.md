@@ -1,7 +1,7 @@
 ---
 name: orquestrar-tasks
 description: "Orquestra a execucao de tarefas de uma feature a partir de tasks/prd-<nome>/. Use quando o usuario pedir para executar, coordenar ou acompanhar tarefas definidas por PRD, TechSpec e arquivos task_*.md, inclusive com subagentes paralelos, revisao e retrabalho."
-argument-hint: "--prd nome-da-task"
+argument-hint: "--prd nome-da-task --budget economico|medio|alto"
 disable-model-invocation: true
 ---
 
@@ -28,7 +28,10 @@ Execute uma feature como uma sequencia controlada de tarefas definidas em `tasks
         - Sessoes independentes.
         - Execucao sequencial.
     2. Escolha o executor que melhor corresponda ao dominio de cada unidade de trabalho. Inspecione os agentes configurados no workspace e prefira suas especialidades declaradas, por exemplo .NET/C#, frontend, Delphi, migracao ou hot path.
-5. Para cada delegacao, selecione o modelo e nivel de reasoning proporcionais ao risco: prefira o maximo disponivel para mudancas criticas, transversais, pouco reversiveis ou com incerteza tecnica; para tarefas mecanicas e bem delimitadas, use a menor capacidade que ainda atenda aos criterios de aceite. Se a ferramenta nao expuser essa escolha, use o subagente especializado configurado e registre a limitacao apenas se ela afetar a qualidade ou a execucao.
+5. Para cada delegacao, selecione o modelo e nivel de reasoning proporcionais ao risco levando em consideração o budget informado em `--budget`
+    - para budget "economico", use modelos de custo mais baixo e reasoning limitado como gpt-5.6-luna com reasoning medio a xhigh
+    - para budget "medio", use modelos de custo medio e reasoning completo como gpt-5.6-terra com reasoning medio
+    - para budget "alto", use modelos de custo mais alto e reasoning completo como gpt-5.6-terra com reasoning high ou xhigh
 
 ## Delegacao
 
