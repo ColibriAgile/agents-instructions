@@ -4,6 +4,7 @@ setlocal
 set "BASE_SOURCE=%~dp0"
 set "BASE_COPILOT=%USERPROFILE%\.copilot"
 set "BASE_CODEX=%USERPROFILE%\.codex"
+set "BASE_CLAUDE=%USERPROFILE%\.claude"
 set "SOURCE_FILE=%BASE_SOURCE%RTK-PWSH.md"
 
 call :CreateJunction "%BASE_COPILOT%" "SKILLS"      "skills"
@@ -11,6 +12,12 @@ call :CreateJunction "%BASE_COPILOT%" "INSTRUCTIONS" "instructions"
 call :CreateJunction "%BASE_COPILOT%" "AGENTS"       "agents"
 
 call :CreateJunction "%BASE_CODEX%"   "SKILLS"       "skills"
+
+if exist "%BASE_CLAUDE%\" (
+    call :CreateJunction "%BASE_CLAUDE%" "SKILLS"       "skills"
+    call :CreateJunction "%BASE_CLAUDE%" "INSTRUCTIONS" "instructions"
+    call :CreateJunction "%BASE_CLAUDE%" "AGENTS"       "agents"
+)
 
 call :CreateSymlink "%USERPROFILE%\.claude"
 call :CreateSymlink "%USERPROFILE%\.codex"
