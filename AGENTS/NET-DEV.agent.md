@@ -50,6 +50,6 @@ Se a compilação falhar com erro não óbvio ou múltiplas soluções, pare, an
 
 ## Ao final da sessão
 
-- Gere uma mensagem de commit detalhada seguindo o padrão do repositório.
+- Gere uma mensagem de commit detalhada em portugues no padrão github.
 - Use comentários inline apenas quando explicarem o porquê de uma decisão ou trade-off.
 - Se aplicável, comente nas issues o progresso em Markdown inline, sem criar arquivos.

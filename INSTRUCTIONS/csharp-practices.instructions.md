@@ -5,6 +5,7 @@ description: "Use when writing or reviewing C# async/await, pattern matching, pe
 # Boas práticas de C#
 
 - Prefira pattern matching, early returns, `is null`, `switch` expressions e coleções modernas (`[]`, `[..]`).
+- Use não mais do que 3 níveis de aninhamento; extraia métodos ou use early returns/guard clauses para reduzir a complexidade.
 - Prefira `record` para DTOs, propriedades `init` e membros `required` quando aplicável.
 - Torne funções anônimas `static` sempre que possível.
 - Compare strings sem distinção de maiúsculas com `string.Equals(a, b, StringComparison.OrdinalIgnoreCase)`.
