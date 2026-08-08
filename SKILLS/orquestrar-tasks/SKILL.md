@@ -28,8 +28,8 @@ Execute uma feature como uma sequencia controlada de tarefas definidas em `tasks
         - Sessoes independentes.
         - Execucao sequencial.
     2. Escolha o executor que melhor corresponda ao dominio de cada unidade de trabalho. Inspecione os agentes configurados no workspace e prefira suas especialidades declaradas, por exemplo .NET/C#, frontend, Delphi, migracao ou hot path.
-5. Para cada delegacao, selecione o modelo e nivel de reasoning proporcionais ao risco levando em consideração o budget informado em `--budget`
-    - para budget "economico", use gpt-5.6-luna com reasoning medio a xhigh
+5. Para cada delegacao, selecione o modelo e nivel de reasoning proporcionais ao risco levando em consideração o budget informado em `--budget` (o padrão é economico)
+    - para budget "economico" ou não informado, use gpt-5.6-luna com reasoning high a xhigh
     - para budget "medio", use gpt-5.6-luna com reasoning medio a xhigh até o gpt-5.6-terra com reasoning medio
     - para budget "alto", use modelos de custo mais alto e reasoning completo como gpt-5.6-terra com reasoning high ou xhigh
 
