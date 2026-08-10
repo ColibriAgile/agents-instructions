@@ -48,21 +48,32 @@ Se houver zero candidatos, mais de uma pasta não resolvida por esses critérios
 ## Planejamento e execução
 
 1. Para cada tarefa, extraia objetivo, arquivos permitidos, critérios de sucesso, testes obrigatórios, riscos e dependências.
-2. Crie lotes de execução. Só coloque tarefas no mesmo lote quando forem independentes e não alterarem os mesmos arquivos, contratos públicos, configurações compartilhadas, migrações ou ambiente de teste.
+2. Crie lotes de execução para delegar para subagentes. Só coloque tarefas no mesmo lote quando forem independentes e não alterarem os mesmos arquivos, contratos públicos, configurações compartilhadas, migrações ou ambiente de teste.
 3. Antes de delegar, escolha o executor mais adequado entre os agentes configurados no workspace, considerando o domínio da tarefa, como .NET/C#, frontend, Delphi, migração ou hot path. Para tarefas pequenas e isoladas, execute diretamente.
-4. Ao delegar, informe sempre:
+   3.1. Se um executor tiver configuração de tools inválidas para o ambiente, apenas ignore essas tools ou se preferir gere uma cópia desse executor com as tools equivalentes no ambiente atual antes de executar.
+4. Antes de cada lote:
+    1. Escolha a melhor estrategia de execucao disponivel, em ordem de preferencia:
+        - Executor paralelo nativo da ferramenta, quando o lote contiver mais de uma unidade de trabalho independente.
+        - Subagentes nativos.
+        - Sessoes independentes.
+        - Execucao sequencial.
+5. Para cada delegacao, selecione o modelo e nivel de reasoning proporcionais ao risco levando em consideração o budget informado em `--budget` (o padrão é economico)
+    - para budget "economico" ou não informado, use gpt-5.6-luna ou sonnet com reasoning high a xhigh
+    - para budget "medio", use gpt-5.6-luna ou sonnet com reasoning medio a xhigh até o gpt-5.6-terra ou opus com reasoning medio
+    - para budget "alto", use modelos de custo mais alto e reasoning completo como gpt-5.6-terra ou opus com reasoning high ou xhigh
+6. Ao delegar, informe sempre:
    - caminho absoluto da pasta da code review e do `task_[num].md`;
    - achado correspondente em `codereview.md`;
    - escopo, requisitos, critérios de sucesso e testes;
    - arquivos que podem ser alterados e restrições de coexistência;
    - instrução para implementar, validar e relatar arquivos, comandos, resultados e bloqueios.
-5. Não aceite apenas análise ou uma sugestão: a delegação deve produzir a implementação e as validações cabíveis.
-6. Aguarde todas as tarefas independentes do lote antes de iniciar tarefas dependentes. Para tarefas que compartilham arquivos, execute sequencialmente.
-7. Se uma tarefa exigir alteração fora dos arquivos relevantes, mudar arquitetura, contradizer a TechSpec ou revelar que o achado está incorreto, pare e peça decisão humana.
+7. Não aceite apenas análise ou uma sugestão: a delegação deve produzir a implementação e as validações cabíveis.
+8. Aguarde todas as tarefas independentes do lote antes de iniciar tarefas dependentes. Para tarefas que compartilham arquivos, execute sequencialmente.
+9. Se uma tarefa exigir alteração fora dos arquivos relevantes, mudar arquitetura, contradizer a TechSpec ou revelar que o achado está incorreto, pare e peça decisão humana.
 
 ## Revisão e retrabalho
 
-Depois de cada tarefa implementada:
+Depois de cada tarefa implementada pelo subagente:
 
 1. Inspecione as alterações e compare-as com o achado no `codereview.md`, cada requisito e cada critério de sucesso da tarefa.
 2. Procure regressões em contratos, tratamento de erros, casos limite, segurança, concorrência, persistência, performance e padrões do projeto conforme o domínio da alteração.

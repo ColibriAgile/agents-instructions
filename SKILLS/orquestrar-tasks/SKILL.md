@@ -42,6 +42,7 @@ Para cada tarefa, envie ao subagente:
 - escopo exato, criterios de aceite e testes exigidos;
 - arquivos que pode alterar e restricoes de coexistencia com outras tarefas;
 - a instrucao para implementar, validar e relatar arquivos modificados, comandos executados, resultados e bloqueios.
+- instrua o subagente a marcar cada subtask do arquivo de task relacionado conforme for concluida.
 
 Nao aceite apenas uma explicacao: a delegacao deve produzir a implementacao e as validacoes cabiveis. Aguarde o resultado de todo o lote paralelo antes de revisar qualquer tarefa que dependa dele.
 
