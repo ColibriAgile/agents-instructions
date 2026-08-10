@@ -49,15 +49,14 @@ Se houver zero candidatos, mais de uma pasta não resolvida por esses critérios
 
 1. Para cada tarefa, extraia objetivo, arquivos permitidos, critérios de sucesso, testes obrigatórios, riscos e dependências.
 2. Crie lotes de execução para delegar para subagentes. Só coloque tarefas no mesmo lote quando forem independentes e não alterarem os mesmos arquivos, contratos públicos, configurações compartilhadas, migrações ou ambiente de teste.
-3. Antes de delegar, escolha o executor mais adequado entre os agentes configurados no workspace, considerando o domínio da tarefa, como .NET/C#, frontend, Delphi, migração ou hot path. Para tarefas pequenas e isoladas, execute diretamente.
-   3.1. Se um executor tiver configuração de tools inválidas para o ambiente, apenas ignore essas tools ou se preferir gere uma cópia desse executor com as tools equivalentes no ambiente atual antes de executar.
-4. Antes de cada lote:
-    1. Escolha a melhor estrategia de execucao disponivel, em ordem de preferencia:
-        - Executor paralelo nativo da ferramenta, quando o lote contiver mais de uma unidade de trabalho independente.
-        - Subagentes nativos.
-        - Sessoes independentes.
-        - Execucao sequencial.
-5. Para cada delegacao, selecione o modelo e nivel de reasoning proporcionais ao risco levando em consideração o budget informado em `--budget` (o padrão é economico)
+3. Para cada lote, escolha o executor mais adequado entre os agentes configurados no workspace, considerando o domínio da tarefa, como .NET/C#, frontend, Delphi, migração ou hot path. Para tarefas pequenas e isoladas, execute diretamente.
+   1. Se um executor tiver configuração de tools inválidas para o ambiente, apenas ignore essas tools ou se preferir gere uma cópia desse executor com as tools equivalentes no ambiente atual antes de executar.
+4. Para cada lote, escolha a melhor estrategia de execucao disponivel, em ordem de preferencia:
+      - Executor paralelo nativo da ferramenta, quando o lote contiver mais de uma unidade de trabalho independente.
+      - Subagentes nativos.
+      - Sessoes independentes.
+      - Execucao sequencial.
+5. Para cada lote, selecione o modelo e nivel de reasoning proporcionais ao risco levando em consideração o budget informado em `--budget` (o padrão é economico)
     - para budget "economico" ou não informado, use gpt-5.6-luna ou sonnet com reasoning high a xhigh
     - para budget "medio", use gpt-5.6-luna ou sonnet com reasoning medio a xhigh até o gpt-5.6-terra ou opus com reasoning medio
     - para budget "alto", use modelos de custo mais alto e reasoning completo como gpt-5.6-terra ou opus com reasoning high ou xhigh
@@ -98,7 +97,7 @@ Quando não houver mais `task_[num].md` pendentes na raiz:
 
 1. Execute a suíte de testes proporcional ao conjunto de correções, além das validações específicas já executadas.
 2. Releia a seção de problemas do `codereview.md` e confirme que cada achado foi corrigido, testado e vinculado à tarefa correspondente.
-3. Quando o ambiente permitir, execute novamente `execute-review` para gerar uma nova pasta de revisão. Compare o novo relatório com os achados originais e não declare conformidade se algum deles continuar pendente.
+3. Quando o ambiente permitir, execute novamente `executar-review` para gerar uma nova pasta de revisão. Compare o novo relatório com os achados originais e não declare conformidade se algum deles continuar pendente.
 4. Se a nova revisão encontrar itens diferentes, preserve o novo relatório e informe que são pendências novas; não os misture com as tarefas já concluídas.
 5. Considere o fluxo concluído somente quando:
    - todas as tarefas estiverem em `done/`;
