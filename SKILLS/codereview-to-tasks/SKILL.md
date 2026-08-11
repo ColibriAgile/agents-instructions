@@ -1,17 +1,17 @@
 ---
 name: codereview-to-tasks
-description: 'Analisa o relatório codereview.md gerado por execute-review e cria tarefas de correção para cada não conformidade acionável. Use para transformar code reviews reprovados ou com ressalvas em task_[num].md na pasta da revisão.'
-argument-hint: '--codereview caminho-da-pasta ou --num numero-da-revisao'
+description: 'Analisa o relatório codereview.md gerado por executar-review e cria tarefas de correção para cada não conformidade acionável. Use para transformar code reviews reprovados ou com ressalvas em task_[num].md na pasta da revisão.'
+argument-hint: '--prd nome-da-feature --num numero-da-revisao'
 disable-model-invocation: true
 ---
 
 # Code Review para Tarefas
 
-Converta um artefato da skill `execute-review` em tarefas de implementação focadas na correção dos problemas encontrados. Esta é uma skill pessoal e grava os arquivos diretamente na pasta da code review selecionada.
+Converta um artefato da skill `executar-review` em tarefas de implementação focadas na correção dos problemas encontrados. Esta é uma skill pessoal e grava os arquivos diretamente na pasta da code review selecionada.
 
 ## Quando usar
 
-- Quando existir um relatório `codereview.md` produzido por `execute-review`.
+- Quando existir um relatório `codereview.md` produzido por `executar-review`.
 - Quando for necessário transformar itens `NOK`, tasks incompletas, testes falhando ou recomendações acionáveis em tarefas.
 - Quando houver mais de uma pasta `codereview_*` e for necessário usar a revisão mais recente.
 
@@ -19,20 +19,26 @@ Não use para executar a correção no código, substituir o code review ou cria
 
 ## Entrada e seleção da revisão
 
-Aceite uma destas entradas:
+Aceite:
 
-- `--codereview <caminho>`: usa explicitamente a pasta informada.
-- `--num <n>`: usa a pasta `codereview_<n>` encontrada no workspace.
-- Sem argumento: localiza recursivamente pastas `codereview_*` que contenham `codereview.md`.
+- `--prd <nome-da-feature>` e `--num <n>` juntos: usa explicitamente `/tasks/prd-<nome-da-feature>/codereview_<n>/`.
+- `--prd <nome-da-feature>` sem `--num`: restringe a busca às pastas `codereview_*` dentro de `/tasks/prd-<nome-da-feature>/`.
+- `--num <n>` sem `--prd`: restringe a busca às pastas `codereview_<n>` de qualquer feature em `/tasks/prd-*/`.
+- Sem `--prd` e sem `--num`: considera todas as pastas `/tasks/prd-*/codereview_*/`.
 
-Quando não houver entrada explícita:
+Monte a lista de candidatas aplicando os filtros acima:
 
-1. Considere somente diretórios cujo nome seja `codereview_<n>` com `<n>` numérico e que contenham `codereview.md`.
-2. Se houver mais de um, selecione o maior número de revisão.
-3. Se não houver sufixo numérico válido, use o `codereview.md` com a data de modificação mais recente como fallback.
-4. Informe no resultado o caminho escolhido. Nunca misture achados de revisões diferentes.
+1. Localize recursivamente diretórios `codereview_<n>` com sufixo numérico dentro de `/tasks/prd-*/` que contenham `codereview.md`.
+2. Descarte pastas sem `codereview.md`.
+3. Nunca misture achados de revisões diferentes.
 
-Se a pasta ou o relatório não existir, estiver vazio ou houver ambiguidade que não possa ser resolvida pelos critérios acima, pare e explique o problema sem criar arquivos.
+Depois de aplicar os filtros:
+
+- Zero candidatas: pare e explique o problema sem criar arquivos.
+- Exatamente uma candidata: use-a diretamente, sem perguntar.
+- Mais de uma candidata: liste cada uma como `<nome-da-feature> / codereview_<n>` e use a tool de pergunta para o usuário escolher qual revisão converter antes de criar qualquer arquivo.
+
+Informe no resultado o caminho escolhido. Se o relatório da candidata selecionada estiver vazio ou ilegível, pare e explique o problema sem criar arquivos.
 
 ## Procedimento
 

@@ -1,15 +1,15 @@
 ---
 name: executar-codereview-tasks
 description: 'Executa as tarefas task_[num].md geradas a partir de um code review, implementa as correções, valida cada resultado, faz retrabalho quando necessário e conclui com uma nova verificação da revisão.'
-argument-hint: '--codereview caminho-da-pasta ou --num numero-da-revisao [--budget economico|medio|alto]'
+argument-hint: '--prd nome-da-feature --num numero-da-revisao [--budget economico|medio|alto]'
 disable-model-invocation: true
 ---
 
 # Executar Tarefas de Code Review
 
-Implemente e valide as tarefas de correção geradas pela skill `codereview-to-tasks` dentro de uma pasta `codereview_*`. A skill pode delegar tarefas a subagentes, mas mantém a revisão, a validação e a decisão de conclusão sob controle do agente principal.
+Implemente e valide as tarefas de correção geradas pela skill `codereview-to-tasks` dentro da pasta `/tasks/prd-[nome-da-feature]/codereview_*`. O agente principal atua apenas como orquestrador: planeja, delega, revisa, decide o retrabalho e conclui. A implementação de cada tarefa é sempre feita por um subagente — nunca diretamente pelo agente principal, mesmo em correções pequenas ou de um único arquivo.
 
-A skill `orquestrar-tasks` é a referência para dependências, execução em lotes, delegação e retrabalho. Não a reutilize diretamente: tarefas de code review não exigem `prd.md`, `techspec.md` ou `tasks.md`, e o estado é controlado pela pasta `done/` da própria revisão.
+Esta skill segue a mesma estratégia de orquestração da skill `orquestrar-tasks` (grafo de dependências, lotes paralelos, escolha de executor e modelo, delegação obrigatória, revisão e retrabalho). Não reutilize `orquestrar-tasks` diretamente: tarefas de code review não exigem `prd.md`, `techspec.md` ou `tasks.md`, e o estado é controlado pela pasta `done/` da própria revisão.
 
 ## Quando usar
 
@@ -23,19 +23,23 @@ Não use para criar tarefas, executar QA sem um relatório de code review ou alt
 
 Aceite:
 
-- `--codereview <caminho>`: usa explicitamente a pasta informada.
-- `--num <n>`: usa a pasta `codereview_<n>` encontrada no workspace.
-- Sem argumento: localiza recursivamente pastas `codereview_*` com `codereview.md` e tarefas pendentes.
+- `--prd <nome-da-feature>` e `--num <n>` juntos: usa explicitamente `/tasks/prd-<nome-da-feature>/codereview_<n>/`.
+- `--prd <nome-da-feature>` sem `--num`: restringe a busca às pastas `codereview_*` dentro de `/tasks/prd-<nome-da-feature>/`.
+- `--num <n>` sem `--prd`: restringe a busca às pastas `codereview_<n>` de qualquer feature em `/tasks/prd-*/`.
+- Sem `--prd` e sem `--num`: considera todas as pastas `/tasks/prd-*/codereview_*/`.
 - `--budget economico|medio|alto`: ajusta o custo e a profundidade das delegações; o padrão é `economico`.
 
-Sem entrada explícita, selecione a revisão pelo mesmo critério de `codereview-to-tasks`:
+Monte a lista de candidatas aplicando os filtros acima:
 
-1. Considere diretórios `codereview_<n>` com sufixo numérico, `codereview.md` e pelo menos um `task_[num].md` na raiz.
-2. Escolha o maior número de revisão.
-3. Se não houver sufixo numérico válido, use a pasta cujo `codereview.md` tiver a modificação mais recente.
-4. Nunca combine tarefas ou relatórios de pastas diferentes.
+1. Localize recursivamente diretórios `codereview_<n>` com sufixo numérico dentro de `/tasks/prd-*/` que contenham `codereview.md` e pelo menos um `task_[num].md` pendente (fora de `done/`) na raiz.
+2. Descarte pastas sem `codereview.md` ou sem nenhuma tarefa pendente.
+3. Nunca combine tarefas ou relatórios de pastas diferentes.
 
-Se houver zero candidatos, mais de uma pasta não resolvida por esses critérios ou um caminho explícito inválido, pare e peça a decisão necessária antes de alterar arquivos.
+Depois de aplicar os filtros:
+
+- Zero candidatas: pare e informe que não há revisão pendente compatível com os parâmetros informados.
+- Exatamente uma candidata: use-a diretamente, sem perguntar.
+- Mais de uma candidata: liste cada uma como `<nome-da-feature> / codereview_<n>` (com a contagem de tarefas pendentes) e use a tool de pergunta para o usuário escolher qual executar antes de alterar qualquer arquivo.
 
 ## Pré-condições
 
@@ -45,30 +49,39 @@ Se houver zero candidatos, mais de uma pasta não resolvida por esses critérios
 4. Verifique o estado atual do repositório e preserve alterações existentes do usuário. Não reverta mudanças fora do escopo da tarefa.
 5. Determine as dependências pela ordem indicada nas tarefas, pelos arquivos e contratos compartilhados e pela relação entre as correções. Quando a ordem não puder ser inferida com segurança, pare para decisão humana.
 
-## Planejamento e execução
+## Planejamento
 
 1. Para cada tarefa, extraia objetivo, arquivos permitidos, critérios de sucesso, testes obrigatórios, riscos e dependências.
-2. Crie lotes de execução para delegar para subagentes. Só coloque tarefas no mesmo lote quando forem independentes e não alterarem os mesmos arquivos, contratos públicos, configurações compartilhadas, migrações ou ambiente de teste.
-3. Para cada lote, escolha o executor mais adequado entre os agentes configurados no workspace, considerando o domínio da tarefa, como .NET/C#, frontend, Delphi, migração ou hot path. Para tarefas pequenas e isoladas, execute diretamente.
-   1. Se um executor tiver configuração de tools inválidas para o ambiente, apenas ignore essas tools ou se preferir gere uma cópia desse executor com as tools equivalentes no ambiente atual antes de executar.
-4. Para cada lote, escolha a melhor estrategia de execucao disponivel, em ordem de preferencia:
+2. Monte um grafo de dependências a partir da ordem indicada nas tarefas, dos arquivos e contratos compartilhados e da relação entre as correções. Quando a ordem não puder ser inferida com segurança, pare para decisão humana.
+3. Agrupe em lotes apenas tarefas independentes que não alterem os mesmos arquivos, contratos públicos, configurações compartilhadas, migrações ou ambiente de teste.
+4. Antes de cada lote:
+   1. Escolha a melhor estratégia de execução disponível, em ordem de preferência:
       - Executor paralelo nativo da ferramenta, quando o lote contiver mais de uma unidade de trabalho independente.
       - Subagentes nativos.
-      - Sessoes independentes.
-      - Execucao sequencial.
-5. Para cada lote, selecione o modelo e nivel de reasoning proporcionais ao risco levando em consideração o budget informado em `--budget` (o padrão é economico)
-    - para budget "economico" ou não informado, use gpt-5.6-luna ou sonnet com reasoning high a xhigh
-    - para budget "medio", use gpt-5.6-luna ou sonnet com reasoning medio a xhigh até o gpt-5.6-terra ou opus com reasoning medio
-    - para budget "alto", use modelos de custo mais alto e reasoning completo como gpt-5.6-terra ou opus com reasoning high ou xhigh
-6. Ao delegar, informe sempre:
-   - caminho absoluto da pasta da code review e do `task_[num].md`;
-   - achado correspondente em `codereview.md`;
-   - escopo, requisitos, critérios de sucesso e testes;
-   - arquivos que podem ser alterados e restrições de coexistência;
-   - instrução para implementar, validar e relatar arquivos, comandos, resultados e bloqueios.
-7. Não aceite apenas análise ou uma sugestão: a delegação deve produzir a implementação e as validações cabíveis.
-8. Aguarde todas as tarefas independentes do lote antes de iniciar tarefas dependentes. Para tarefas que compartilham arquivos, execute sequencialmente.
-9. Se uma tarefa exigir alteração fora dos arquivos relevantes, mudar arquitetura, contradizer a TechSpec ou revelar que o achado está incorreto, pare e peça decisão humana.
+      - Sessões independentes.
+      - Execução sequencial.
+   2. Escolha o executor que melhor corresponda ao domínio de cada tarefa entre os agentes configurados no workspace, considerando .NET/C#, frontend, Delphi, migração ou hot path.
+      - Se um executor tiver configuração de tools inválida para o ambiente, ignore essas tools ou gere uma cópia do executor com tools equivalentes no ambiente atual antes de executar.
+5. Para cada delegação, selecione o modelo e o nível de reasoning proporcionais ao risco, considerando o budget informado em `--budget` (o padrão é economico):
+   - budget "economico" ou não informado: gpt-5.6-luna ou sonnet com reasoning high a xhigh;
+   - budget "medio": gpt-5.6-luna ou sonnet com reasoning medio a xhigh, até gpt-5.6-terra ou opus com reasoning medio;
+   - budget "alto": modelos de custo mais alto e reasoning completo, como gpt-5.6-terra ou opus com reasoning high ou xhigh.
+
+## Delegação
+
+Regra sem exceção: toda tarefa, inclusive tarefas pequenas ou de um único arquivo, é implementada por um subagente (ou pelo executor/sessão equivalente escolhido no planejamento). O agente principal nunca edita o código da correção diretamente; seu papel é orquestrar, revisar e decidir.
+
+Para cada tarefa, informe ao subagente:
+
+- caminho absoluto da pasta da code review e do `task_[num].md`;
+- achado correspondente em `codereview.md`;
+- escopo, requisitos, critérios de sucesso e testes;
+- arquivos que podem ser alterados e restrições de coexistência com as demais tarefas do lote;
+- instrução para implementar, validar e relatar arquivos alterados, comandos executados, resultados e bloqueios.
+
+Não aceite apenas análise ou uma sugestão: a delegação deve produzir a implementação e as validações cabíveis. Aguarde o resultado de todo o lote paralelo antes de revisar ou iniciar tarefas dependentes dele. Para tarefas que compartilham arquivos, delegue-as sequencialmente, uma de cada vez.
+
+Se uma tarefa exigir alteração fora dos arquivos relevantes, mudar arquitetura, contradizer a TechSpec ou revelar que o achado está incorreto, pare e peça decisão humana antes de delegar.
 
 ## Revisão e retrabalho
 
