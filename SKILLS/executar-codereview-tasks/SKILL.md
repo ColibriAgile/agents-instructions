@@ -63,9 +63,9 @@ Depois de aplicar os filtros:
    2. Escolha o executor que melhor corresponda ao domínio de cada tarefa entre os agentes configurados no workspace, considerando .NET/C#, frontend, Delphi, migração ou hot path.
       - Se um executor tiver configuração de tools inválida para o ambiente, ignore essas tools ou gere uma cópia do executor com tools equivalentes no ambiente atual antes de executar.
 5. Para cada delegação, selecione o modelo e o nível de reasoning proporcionais ao risco, considerando o budget informado em `--budget` (o padrão é economico):
-   - budget "economico" ou não informado: gpt-5.6-luna ou sonnet com reasoning high a xhigh;
-   - budget "medio": gpt-5.6-luna ou sonnet com reasoning medio a xhigh, até gpt-5.6-terra ou opus com reasoning medio;
-   - budget "alto": modelos de custo mais alto e reasoning completo, como gpt-5.6-terra ou opus com reasoning high ou xhigh.
+   - budget "economico" ou não informado: gpt-5.6-luna ou sonnet com reasoning medio;
+   - budget "medio": gpt-5.6-luna ou sonnet com reasoning medio a high, até gpt-5.6-terra ou opus com reasoning medio;
+   - budget "alto": modelos de custo mais alto e reasoning completo, como gpt-5.6-terra ou opus com reasoning medio.
 
 ## Delegação
 

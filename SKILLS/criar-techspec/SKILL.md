@@ -12,7 +12,7 @@ A TechSpec define **o como** — arquitetura, componentes, contratos e testes. O
 
 1. **Analisar o PRD** — leia-o por completo; extraia requisitos, restrições e métricas de sucesso.
 
-2. **Explorar o projeto** — use o agente Explore antes de perguntar qualquer coisa ao usuário: arquivos e módulos afetados, interfaces e pontos de integração, quem chama/é chamado, configs, persistência, tratamento de erros, testes e infra existentes. Avalie reutilizar bibliotecas existentes versus construir. Pesquise na web a documentação das bibliotecas envolvidas e as regras de negócio em aberto.
+2. **Explorar o projeto** — use o agente Explore antes de perguntar qualquer coisa ao usuário: arquivos e módulos afetados, interfaces e pontos de integração, quem chama/é chamado, configs, persistência, tratamento de erros, testes e infra existentes. Avalie reutilizar bibliotecas e classes existentes versus construir. Pesquise na web a documentação das bibliotecas envolvidas e as regras de negócio em aberto.
    _Pronto quando:_ der para nomear cada componente novo ou modificado e onde ele se encaixa no código atual.
 
 3. **Esclarecer** — pergunte ao usuário (use a tool de perguntas) antes de redigir, focando no que a exploração não respondeu: limites de domínio, fluxo de dados e contratos, dependências externas (modos de falha, timeouts, idempotência), interfaces principais, cenários de teste críticos.
