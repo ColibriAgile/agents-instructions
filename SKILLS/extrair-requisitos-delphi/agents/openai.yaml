@@ -1,0 +1,4 @@
+interface:
+  display_name: "Requisitos de legado Delphi"
+  short_description: "Extrai PRDs de funcionalidades Delphi legadas"
+  default_prompt: "Use $extrair-requisitos-delphi para explorar uma funcionalidade Delphi e gerar seu PRD de migracao para C#."
