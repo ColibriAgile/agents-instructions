@@ -1,7 +1,7 @@
 ---
 name: commit
-description: 'Cria commits no padrão conventional commits (título + descrição em bullets), tratando primeiro os submódulos com alterações pendentes e depois o repositório principal. Use quando o usuário pedir para commitar, fazer commit, salvar alterações no git, gerar mensagem de commit, ou usar /commit. NUNCA faz push nem pull, exceto se explicitamente solicitado.'
-argument-hint: '[contexto opcional sobre o que foi feito]'
+description: 'Cria commits no padrão conventional commits (título + descrição em bullets), tratando primeiro os submódulos com alterações pendentes e depois o repositório principal. Use quando o usuário pedir para commitar, fazer commit, salvar alterações no git, gerar mensagem de commit, ou usar /commit. Só envia ao remoto quando o argumento `push`/`--push` for informado.'
+argument-hint: '[--push] [contexto opcional sobre o que foi feito]'
 disable-model-invocation: true
 ---
 
@@ -9,9 +9,11 @@ disable-model-invocation: true
 
 Commita as alterações pendentes: primeiro cada submódulo sujo, depois o repositório principal.
 
+O argumento `push` (ou `--push`) em `$ARGUMENTS` liga o **modo push**: depois de commitar, envia ao remoto (passo 7). Sem ele, a skill para nos commits locais.
+
 ## Regras invioláveis
 
-- **NUNCA** executar `git push`, `git pull`, `git fetch` ou `git merge`. Só se o usuário pedir explicitamente nesta mesma solicitação.
+- Rede só no **modo push**, e só com `git push`, `git fetch` e `git pull --rebase` (nunca `git merge` nem pull com merge). Fora do modo push, nada de rede.
 - **NUNCA** usar `--no-verify` ou `--no-gpg-sign`. Se um hook falhar, investigar e reportar, não contornar.
 - Preferir commit novo a `--amend`.
 - Não criar branch, não fazer checkout, não alterar o estado do working tree além do `git add` acordado.
@@ -94,13 +96,34 @@ No Bash, use heredoc equivalente (`git commit -F - <<'EOF'`).
 
 Depois dos submódulos, volte à raiz e repita os passos 3 e 4. O commit do submódulo deixa o gitlink modificado no principal — ele entra normalmente no stage. Se a **única** mudança do principal for o gitlink, use algo como `chore(lib): atualize referência do submódulo <nome>`.
 
-### 6. Reportar
+### 6. Push (só no modo push)
 
-Uma linha por commit criado: `<repo>: <hash curto> <título>`. Diga explicitamente que nada foi enviado ao remoto.
+Envie **os submódulos primeiro, depois o principal** — o gitlink do principal só faz sentido no remoto se os commits do submódulo já estiverem lá.
+
+Para cada repositório com commits à frente do remoto:
+
+```bash
+git -C <repo> push
+```
+
+- **Sem upstream** (`no upstream branch`): `git -C <repo> push -u origin <branch atual>`.
+- **Rejeitado por não-fast-forward**: integre por rebase e tente de novo.
+
+  ```bash
+  git -C <repo> pull --rebase
+  git -C <repo> push
+  ```
+
+- **Conflito no rebase**: resolva arquivo a arquivo preservando as duas intenções — a do commit remoto e a do commit local —, `git add` nos resolvidos e `git rebase --continue` até a fila esvaziar; então `push`. Se a resolução correta for ambígua (mesma linha mudada com propósitos incompatíveis, arquivo binário, conflito em migração/lockfile), execute `git -C <repo> rebase --abort`, deixe o repositório como estava e reporte o conflito para o usuário decidir — sem `--force`, sem `--skip`, sem `-X ours/theirs`.
+- **Push rejeitado por outro motivo** (permissão, hook de servidor, branch protegida): reporte a saída e pare, sem contornar.
+
+### 7. Reportar
+
+Uma linha por commit criado: `<repo>: <hash curto> <título>`. Depois, o destino de cada push (`<repo> → <remote>/<branch>`) ou, fora do modo push, uma linha dizendo que nada foi enviado ao remoto.
 
 ## Casos de borda
 
-- **Nada a commitar em lugar nenhum**: informe e encerre, não force commit vazio.
+- **Nada a commitar em lugar nenhum**: informe e encerre, não force commit vazio. No modo push, ainda faça o passo 6 se houver commits locais à frente do remoto.
 - **Hook de pre-commit falhou**: reporte a saída, não tente contornar. Se o hook reformatou arquivos, re-stage e tente commitar de novo uma vez.
 - **Merge/rebase em andamento** (`MERGE_HEAD`/`rebase-merge` presentes): pare e avise, não commite por cima.
 - **HEAD destacado** (submódulo ou principal — `git -C <repo> symbolic-ref -q --short HEAD` vazio): **pare antes de commitar**. Avise que o commit ficaria órfão e deixe a decisão com o usuário. Só prossiga se ele informar a branch de destino; nesse caso a skill executa:
