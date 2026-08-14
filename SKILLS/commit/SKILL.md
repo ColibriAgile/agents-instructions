@@ -1,7 +1,7 @@
 ---
 name: commit
 description: 'Cria commits no padrão conventional commits (título + descrição em bullets), tratando primeiro os submódulos com alterações pendentes e depois o repositório principal. Use quando o usuário pedir para commitar, fazer commit, salvar alterações no git, gerar mensagem de commit, ou usar /commit. Só envia ao remoto quando o argumento `push`/`--push` for informado.'
-argument-hint: '[--push] [contexto opcional sobre o que foi feito]'
+argument-hint: '[--push|--enviar] [contexto opcional sobre o que foi feito]'
 disable-model-invocation: true
 ---
 
@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 Commita as alterações pendentes: primeiro cada submódulo sujo, depois o repositório principal.
 
-O argumento `push` (ou `--push`) em `$ARGUMENTS` liga o **modo push**: depois de commitar, envia ao remoto (passo 7). Sem ele, a skill para nos commits locais.
+Ligue o **modo push** sempre que a mensagem que invocou a skill contiver as palavras `push`, `--push`, `enviar` ou `--enviar` — seja como argumento de slash command (`/commit --push`), seja em texto livre ("commita e dá push", "pode enviar"). Não há substituição automática de variável: o texto digitado depois de `/commit` é só contexto anexado à mensagem, então basta ler a própria mensagem do usuário para decidir. Em modo push, depois de commitar, envia ao remoto (passo 7). Sem nenhuma dessas palavras, a skill para nos commits locais.
 
 ## Regras invioláveis
 
@@ -44,6 +44,7 @@ Compare `git status --porcelain` (coluna 1 = staged, coluna 2 = working tree):
 |---|---|
 | Nada staged | `git add -A` direto, sem perguntar |
 | Tudo já staged | Prossegue, sem perguntar |
+| Único item fora do stage é o gitlink de um submódulo recém-commitado (resto já staged) | `git add <submódulo>` direto, sem perguntar |
 | Parcialmente staged | Perguntar (ver abaixo) |
 
 No caso parcial, use a tool de perguntas (`AskUserQuestion`) mostrando o que está staged e o que está de fora, com as opções:
@@ -94,7 +95,7 @@ No Bash, use heredoc equivalente (`git commit -F - <<'EOF'`).
 
 ### 5. Repositório principal
 
-Depois dos submódulos, volte à raiz e repita os passos 3 e 4. O commit do submódulo deixa o gitlink modificado no principal — ele entra normalmente no stage. Se a **única** mudança do principal for o gitlink, use algo como `chore(lib): atualize referência do submódulo <nome>`.
+Depois dos submódulos, volte à raiz e repita os passos 3 e 4. O commit do submódulo deixa o gitlink modificado no principal, mas ele aparece como **não staged** (segunda coluna do `git status --porcelain`), mesmo que o resto já estivesse todo staged antes. Nesse caso, aplique a regra da tabela do passo 3: se o gitlink for a única mudança fora do stage, `git add <submódulo>` direto, sem perguntar, e prossiga para o commit. Se a **única** mudança do principal for o gitlink, use algo como `chore(lib): atualize referência do submódulo <nome>`.
 
 ### 6. Push (só no modo push)
 
