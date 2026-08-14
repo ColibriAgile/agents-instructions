@@ -1,6 +1,6 @@
 ---
 name: colibri-logging
-description: Logs — Use when the agent adds or refactors C# application logging to the Colibri standard. Don't use for decisions that replace the logging stack, retention, or payload security policy.
+description: Logs — Use quando o agente adiciona, refatora ou padroniza o logging de aplicação C# para o padrão Colibri. Não use para decisões que substituam a pilha de logging, retenção ou política de segurança de payload.
 ---
 
 # Logs Colibri
@@ -12,7 +12,7 @@ Torne toda alteração de logging rastreável pelo log viewer: descrição curta
 **Etapa 1: Fixar a paridade**
 
 1. Leia `references/rules.md` e `references/guardrails.md` integralmente antes de editar.
-2. Localize o ponto de entrada, a configuração `LoggingSettings.json`, os projetos referenciados, os `ILogger` envolvidos e os testes do fluxo afetado.
+2. Localize o ponto de entrada, os projetos referenciados, os `ILogger` envolvidos e os testes do fluxo afetado.
 3. Quando a alteração envolver uma exceção, divergência de versão, payload sensível, logger temporário ou uma dúvida de precedência, leia `references/evidence.md` integralmente.
 4. Classifique a alteração como bootstrap da aplicação, classe com DI, biblioteca sem DI, mensagem existente, payload HTTP ou teste.
 
@@ -20,7 +20,7 @@ Torne toda alteração de logging rastreável pelo log viewer: descrição curta
 
 **Etapa 2: Paralelizar a implementação**
 
-1. Separe o plano em superfícies sem arquivos compartilhados: configuração de host (`Program.cs`, `LoggingSettings.json`, `.csproj`), chamadas de logging de produção e testes.
+1. Separe o plano em superfícies sem arquivos compartilhados: configuração de host (`Program.cs`, `.csproj`), chamadas de logging de produção e testes.
 2. Quando existirem duas ou mais superfícies independentes, inicie em uma única rodada paralela até três subagentes especializados:
    - configuração: bootstrap, DI, pasta, subpasta, `.logc` e configuração externa;
    - escrita: mensagens, exceções, propriedades estruturadas e payloads;
@@ -35,12 +35,13 @@ Torne toda alteração de logging rastreável pelo log viewer: descrição curta
 
 **Etapa 3: Aplicar o padrão**
 
-1. Aplique R1 e R10 para o bootstrap, DI ou biblioteca sem DI conforme a classificação da etapa anterior.
-2. Aplique R2, R3 e R4 para pasta, subpasta, arquivo diário `.logc` e configuração externa.
-3. Aplique R5, R6 e R7 a toda mensagem nova ou refatorada: descrição antes do primeiro `|`, detalhes estruturados depois dele e exceção no overload de logging.
-4. Aplique R8 quando o escopo tocar template, níveis ou campos do arquivo.
-5. Aplique R9 e R12 para pipeline ASP.NET, bodies HTTP ou payloads de integração.
-6. Preserve os invariantes G1-G10 e escale cada condição listada em `references/guardrails.md`.
+1. Ao adicionar os pacotes da tabela de `references/rules.md`: se já existirem no projeto-alvo, mantenha a versão instalada; se ainda não existirem, adicione a versão estável mais recente disponível no feed. Nunca force upgrade/downgrade só para bater com a versão observada na referência.
+2. Aplique R1 e R10 para o bootstrap, DI ou biblioteca sem DI conforme a classificação da etapa anterior.
+3. Aplique R2, R3 e R4 para pasta, subpasta, arquivo diário `.logc` e configuração externa.
+4. Aplique R5, R6 e R7 a toda mensagem nova ou refatorada: descrição antes do primeiro `|`, detalhes estruturados depois dele e exceção no overload de logging.
+5. Aplique R8 quando o escopo tocar template, níveis ou campos do arquivo.
+6. Aplique R9 e R12 para pipeline ASP.NET, bodies HTTP ou payloads de integração.
+7. Preserve os invariantes G1-G8 e G10, e escale cada condição listada em `references/guardrails.md`.
 
 *Concluído quando:* cada regra aplicável foi executada e cada invariante aplicável foi preservado ou escalado.
 

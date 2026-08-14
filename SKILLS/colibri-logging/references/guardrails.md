@@ -1,7 +1,3 @@
----
-applyTo: "**/*.{cs,json,csproj}"
----
-
 # Guardrails de refatoração: padrão de geração de logs Colibri
 
 ## Invariantes de paridade
@@ -54,12 +50,6 @@ applyTo: "**/*.{cs,json,csproj}"
 - Evidência: E15.
 - Verificação: executar os testes que usam `SetupFakeLogger<T>()` e confirmar níveis/mensagens capturados.
 
-### G9 — Preservar exceções operacionais explicitamente delimitadas
-
-- Condição protegida: `NotaFiscal.Audit` continua reconhecido como ferramenta console com `AddSimpleConsole`, enquanto os demais hosts seguem `CoLib.Logging`; não converter ou copiar esse fluxo por acidente.
-- Evidência: E22, E23.
-- Verificação: se `NotaFiscal.Audit` for alterado, registrar decisão explícita sobre arquivo `.logc`, pasta, retenção e compatibilidade operacional antes de trocar o provider.
-
 ### G10 — Preservar redação e limite dos payloads
 
 - Condição protegida: payloads HTTP que passam pelos helpers Flurl continuam com campos sensíveis redigidos, API keys limitadas e conteúdo excessivo truncado antes da escrita.
@@ -72,11 +62,10 @@ applyTo: "**/*.{cs,json,csproj}"
 - Alterar `LogFileNameTemplate`, extensão `.logc`, `LogSubFolderName`, `PastasDoSistema.Logs`, `SharedFile`, `RollingInterval`, retenção, compactação ou `MaintenanceAuditFileName`.
 - Introduzir uma configuração concorrente em `appsettings.json`, `Serilog.Log.Logger`, `AddSerilog` ou `UseSerilog` sem demonstrar que não haverá duplicidade.
 - Alterar um payload logado, seu formato XML/JSON, ou incluir dados potencialmente sensíveis sem decisão explícita de segurança e retenção.
-- Resolver silenciosamente a divergência entre versões `10.0.10` e `10.0.11` dos pacotes Microsoft; a referência não comprova uma versão única para todos os consumidores.
+- Resolver silenciosamente a divergência entre versões `10.0.10` e `10.0.11` dos pacotes Microsoft **dentro da própria referência**; a referência não comprova uma versão única para todos os consumidores. Isso não se aplica à adoção em projeto-alvo: lá vale a política de `references/rules.md` (manter versão instalada se o pacote já existir; usar a mais recente se for novo).
 - Transformar mensagens antigas sem `|`, interpoladas ou que registram apenas `ex.Message` em uma migração ampla; delimitar o escopo e preservar o comportamento funcional antes de normalizar os demais pontos.
-- Fazer a API usar `appsettings.json` como fonte principal no lugar de `LoggingSettings.json` sem validar a precedência do `LogConfigurationBuilder` e o efeito de `UseSerilogRequestLogging`.
+- Fazer a aplicação web usar `appsettings.json` como fonte principal no lugar do arquivo externo de logging sem validar a precedência do `LogConfigurationBuilder` e o efeito de `UseSerilogRequestLogging`.
 - Remover ou generalizar a redação de campos sensíveis dos helpers Flurl, ou ampliar logs de payload sem revisar truncamento, retenção e dados expostos.
-- Converter `NotaFiscal.Audit` ou o logger temporário de bootstrap da API para o padrão compartilhado sem validar o motivo operacional da exceção e a ordem de inicialização.
 
 ## Gates de validação
 
@@ -89,9 +78,9 @@ applyTo: "**/*.{cs,json,csproj}"
 
 ## Limites do escopo
 
-- Incluído: `CoLib.Logging`, `CoLib.Ambiente.PastasDoSistema`, `CoLib.AspNet` request/response logging, `CoLib.Logging.Fake`, entry points de `NotaFiscal.Api` e `NotaFiscal.Config`, projetos consumidores e mensagens no padrão observado.
+- Incluído: `CoLib.Logging`, `CoLib.Ambiente.PastasDoSistema`, `CoLib.AspNet` request/response logging, `CoLib.Logging.Fake`, entry points dos hosts consumidores, projetos consumidores e mensagens no padrão observado.
 - Incluído: nome da pasta, nome do arquivo, extensão, rolling, layout textual, structured logging, exceções e payloads.
-- Exceções observadas: logger temporário de console no bootstrap de `NotaFiscal.Api` e `NotaFiscal.Audit` como ferramenta console; qualquer normalização exige decisão.
+- Evidências operacionais: logger temporário de console no bootstrap de um host web e um executável console especializado.
 - Lacuna: não há repositório-alvo separado nem confirmação de uma versão consolidada dos pacotes Microsoft para todos os projetos; a decisão deve ser tomada pelo agente responsável pela refatoração.
 - Lacuna: a referência contém usos legados sem `|`, interpolação e `ex.Message`; este documento define o padrão para código novo/refatorado, mas não comprova uma migração total do legado.
 - Lacuna: não foi comprovada uma política de mascaramento de CPF/CNPJ, tokens, credenciais ou outros dados sensíveis nos payloads; qualquer exposição deve ser escalada.

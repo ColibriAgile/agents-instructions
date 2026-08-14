@@ -1,15 +1,10 @@
----
-applyTo: "**/*.{cs,json,csproj}"
----
-
 # Regras extraídas: padrão de geração de logs Colibri
 
 ## Contexto
 
-- Aplicação de referência: repositório `ColibriAgile/nota-fiscal`, branch `master`, commit `6b8c1e4`; referência principal em `_lib/CoLib.Logging`.
-- Aplicação-alvo: projetos C# do mesmo repositório que geram ou consomem logs, incluindo `NotaFiscal/**` e bibliotecas internas em `_lib/**`. Não foi fornecido um repositório-alvo separado.
+- Aplicação-alvo: projetos C# que geram logs e bibliotecas internas em `_lib/**`.
 - Escopo: inicialização do logging, nomeação de arquivos, diretórios, configuração, composição de mensagens, payloads, exceções, logging HTTP e testes.
-- Objetivo de paridade: manter o ecossistema Serilog + `Microsoft.Extensions.Logging`, os arquivos `.logc` por aplicação e mensagens legíveis pelo log viewer no formato `descrição curta|detalhes`.
+- Objetivo: manter o ecossistema Serilog via interface `ILogger<T>` de `Microsoft.Extensions.Logging`, os arquivos `.logc` por aplicação e mensagens legíveis pelo log viewer no formato `descrição curta|detalhes`.
 
 ## Bibliotecas e créditos
 
@@ -33,12 +28,14 @@ applyTo: "**/*.{cs,json,csproj}"
 | `Microsoft.Extensions.Diagnostics.Testing` | `10.8.0` | `FakeLogger<T>` | Usado por `CoLib.Logging.Fake` |
 | `Serilog.AspNetCore` | `10.0.0` no projeto API | `UseSerilogRequestLogging` | Usar apenas para o middleware nativo adicional da API |
 
+**Política de versão ao adotar em outro projeto:** a coluna "Versão observada" reflete o que foi visto na aplicação de referência, não um requisito para o projeto-alvo. Ao adicionar estes pacotes: se o pacote **já existir** no projeto-alvo, manter a versão já instalada (não fazer upgrade/downgrade só para bater com a tabela); se o pacote **ainda não existir**, adicionar a versão estável mais recente disponível no feed do projeto-alvo.
+
 ## Regras de implementação
 
 ### R1 — Inicializar o logging pela biblioteca interna
 
 - Regra: configurar o logger com `CoLib.Logging.Extensions.UseLogging(...)` em hosts ASP.NET/Generic Host ou `IServiceCollection.AddLogging(...)` em aplicações com DI. Depois disso, injetar `ILogger<T>` nas classes.
-- Aplicabilidade: pontos de entrada (`Program.cs`) e classes que produzem logs em `NotaFiscal/**` e `_lib/**`.
+- Aplicabilidade: pontos de entrada (`Program.cs`) e classes que produzem logs nos projetos consumidores e nas bibliotecas internas.
 - Evidência: E2, E7, E13, E14.
 - Confiança: alta.
 - Verificação: o ponto de entrada chama uma extensão de `CoLib.Logging`, o container resolve `ILogger<T>` e não existe um segundo `LoggerConfiguration` concorrente.
@@ -57,11 +54,11 @@ applyTo: "**/*.{cs,json,csproj}"
 - Aplicabilidade: todos os sinks de arquivo da aplicação.
 - Evidência: E3, E4, E5, E16.
 - Confiança: alta.
-- Verificação: para `NF.Api`, por exemplo, o caminho termina em `NotaFiscal.Api\NF.Api_<yyyyMMdd>.logc`; arquivos de manutenção permanecem `log-maintenance.logc`.
+- Verificação: o caminho termina em `<Aplicacao>\<Aplicacao>_<yyyyMMdd>.logc`; arquivos de manutenção permanecem `log-maintenance.logc`.
 
 ### R4 — Manter a configuração no bloco `Log` e no arquivo autodetectável
 
-- Regra: quando a configuração for externa, manter `LoggingSettings.json` na pasta do executável, dentro da seção `Log`, e marcar o arquivo para cópia ao diretório de saída. A biblioteca também procura `LoggingSettings.{DOTNET_ENVIRONMENT}.json` ou `LoggingSettings.{ASPNETCORE_ENVIRONMENT}.json`.
+- Regra: quando a configuração for externa, manter o arquivo de configuração de logging na pasta do executável, dentro da seção `Log`, e marcá-lo para cópia ao diretório de saída. A biblioteca também procura a variante do arquivo correspondente a `DOTNET_ENVIRONMENT` ou `ASPNETCORE_ENVIRONMENT`.
 - Aplicabilidade: aplicações que variam limites, níveis, templates, rotação ou enrichers por ambiente.
 - Evidência: E3, E4, E5.
 - Confiança: alta.
@@ -94,7 +91,7 @@ applyTo: "**/*.{cs,json,csproj}"
 ### R8 — Preservar o layout de campos separado por `|`
 
 - Regra: manter o layout de arquivo `{Timestamp:dd-MM-yyyy HH:mm:ss.fff}|{SourceContext}|{MappedLevel,-5}|{ThreadId}|{Message:lj}{NewLine}{Exception}`, salvo configuração explícita do produto. Preservar o mapeamento de níveis `TRACE`, `DEBUG`, `INFO`, `WARNING`, `ERROR`, `FATAL`, o `SourceContext` e o `ThreadId`.
-- Aplicabilidade: `LoggingSettings.json`, `LogConfigurationOptions.OutputTemplate` e qualquer override de template.
+- Aplicabilidade: arquivo de configuração de logging, `LogConfigurationOptions.OutputTemplate` e qualquer override de template.
 - Evidência: E4, E5, E9.
 - Confiança: alta.
 - Verificação: cada linha possui timestamp, categoria, nível, thread e mensagem em campos separados; exceções continuam disponíveis no final do evento.
@@ -134,7 +131,7 @@ applyTo: "**/*.{cs,json,csproj}"
 ## Padrões observados
 
 - `CoLib.Logging` usa Serilog como implementação e registra o mesmo logger no `Microsoft.Extensions.Logging`; `LibLoggerFactory` começa com `NullLogger` e é inicializada durante o bootstrap.
-- O caminho padrão é `PastasDoSistema.Logs`; `LOGGING_DEBUG_PATH` tem precedência para diagnóstico do processo. A subpasta padrão resolve para `{ApplicationName}`, mas os consumidores atuais usam nomes explícitos como `NotaFiscal.Api` e `NotaFiscal.Config`.
+- O caminho padrão é `PastasDoSistema.Logs`; `LOGGING_DEBUG_PATH` tem precedência para diagnóstico do processo. A subpasta padrão resolve para `{ApplicationName}`, mas os consumidores podem usar nomes explícitos por aplicação.
 - O arquivo é diário, compartilhável entre processos por padrão, limitado por tamanho e retido/compactado conforme `LogConfigurationOptions`. A manutenção diária produz zips `yyyy-MM-dd.zip` e pode escrever `log-maintenance.logc`.
 - Os detalhes observados incluem XML em `OuterXml`, JSON compacto com `Formatting.None`, corpos HTTP textuais, valores nomeados, contagens, status e caminhos. O separador continua sendo a fronteira visual do log viewer.
 - O fluxo Flurl redige campos sensíveis e trunca conteúdo grande antes de registrar; isso é uma proteção específica do helper, não uma garantia automática de todo `ILogger`.
@@ -143,9 +140,9 @@ applyTo: "**/*.{cs,json,csproj}"
 ## Integrações e configuração
 
 - ASP.NET: `builder.Host.UseLogging(...)` configura o logger; `app.UseRequestResponseLogging()` é o middleware interno opcional; `app.UseSerilogRequestLogging()` é o middleware adicional do pacote `Serilog.AspNetCore`.
-- `NotaFiscal.Audit` é uma exceção observada: cria `LoggerFactory` local com `AddSimpleConsole` e `Spectre.Console`; não usar esse fluxo como padrão para novos executáveis sem decisão de produto.
+- Um executável console especializado é uma exceção observada: cria `LoggerFactory` local com `AddSimpleConsole` e `Spectre.Console`; não usar esse fluxo como padrão para novos executáveis sem decisão de produto.
 - Windows Forms/DI: `services.AddLogging(...)` registra Serilog no container; `ILogger<T>` deve ser resolvido por DI.
-- Configuração: `LoggingSettings.json` precisa ser copiado para a saída quando usado. `appsettings.json` com seção `Serilog` não substitui automaticamente a seção `Log` consumida pelo `LogConfigurationBuilder`; usar `WithConfiguration(builder.Configuration)` somente quando essa integração for deliberada.
+- Configuração: o arquivo externo de logging precisa ser copiado para a saída quando usado. `appsettings.json` com seção `Serilog` não substitui automaticamente a seção `Log` consumida pelo `LogConfigurationBuilder`; usar `WithConfiguration(builder.Configuration)` somente quando essa integração for deliberada.
 - Ordem: configurar o logging antes de resolver serviços que escrevem logs, inicializar `LibLoggerFactory` por meio das extensões internas e chamar `LogarInformacoesIniciais()` após o container estar pronto.
 - `SharedFile=true` executa manutenção no bootstrap e no primeiro evento do dia por meio de enricher; hooks de ciclo de vida só são usados quando `SharedFile=false`.
 
