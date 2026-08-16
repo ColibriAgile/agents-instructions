@@ -44,10 +44,11 @@ Leva um repositório da nota atual do `ai-ready-score` até nota 5, gerando inst
 
 ## Passo 6 — Escrever a fonte única
 
-1. Se algum dos arquivos descobertos no Passo 1 já for específico e bem escrito, use-o como fonte única e siga para o Passo 7. Caso contrário, escreva `AGENTS.md` na raiz (serve Codex e OpenCode nativamente) com os comandos de build/test/lint, o mapa de arquitetura e as convenções específicas do repositório levantados nos Passos 2 e 4.
-2. Referencie em uma linha cada skill extraída no Passo 5, para que a ferramenta saiba que existe conhecimento sob demanda disponível — mantenha nesse arquivo só o que toda tarefa precisa; o resto fica exclusivamente na skill correspondente.
+1. Para cada arquivo `.md` de instrução descoberto no Passo 1 (CLAUDE.md, AGENTS.md, .github/copilot-instructions.md etc.), rode `python [skill-dir]/scripts/check_target.py <caminho> <raiz-do-repo>` (read-only) antes de decidir editá-lo. `EXTERNAL_SYMLINK` significa que o caminho é um link simbólico para fora do repositório — editar esse caminho reescreveria um arquivo que o repositório não possui (ex.: uma instrução global ou compartilhada com outros repositórios). Nesse caso, apague apenas o link (nunca o alvo externo) e trate o caminho como ausente: crie ali um arquivo `.md` real e local pelo restante deste passo, sem tocar no arquivo apontado. `REAL` e `IN_REPO_SYMLINK` são seguros para editar diretamente.
+2. Se algum dos arquivos `.md` restantes (REAL ou IN_REPO_SYMLINK) já for específico e bem escrito, use-o como fonte única e siga para o Passo 7. Caso contrário, escreva `AGENTS.md` na raiz (serve Codex e OpenCode nativamente) com os comandos de build/test/lint, o mapa de arquitetura e as convenções específicas do repositório levantados nos Passos 2 e 4.
+3. Referencie em uma linha cada skill extraída no Passo 5, para que a ferramenta saiba que existe conhecimento sob demanda disponível — mantenha nesse arquivo só o que toda tarefa precisa; o resto fica exclusivamente na skill correspondente.
 
-*Done when:* o arquivo fonte existe e cada seção cita um comando, caminho ou convenção real e verificável no repositório.
+*Done when:* cada `.md` de instrução descoberto no Passo 1 foi classificado por `check_target.py`, nenhum `EXTERNAL_SYMLINK` foi editado em vez de materializado localmente, o arquivo fonte existe, e cada seção cita um comando, caminho ou convenção real e verificável no repositório.
 
 ## Passo 7 — Ligar as demais ferramentas por link simbólico
 
@@ -67,3 +68,4 @@ Leva um repositório da nota atual do `ai-ready-score` até nota 5, gerando inst
 
 - Se `scripts/symlink.py` falhar porque o destino já existe como arquivo real diferente, confirme com o usuário se pode substituí-lo antes de rodar de novo com `--force` — o script não sobrescreve sozinho.
 - Se `ai-ready-score` reportar que a raiz do repositório não é gravável, avise o usuário e peça um caminho alternativo em vez de tentar salvar em outro lugar.
+- Se `scripts/check_target.py` reportar `EXTERNAL_SYMLINK` para o arquivo fonte escolhido no Passo 6, nunca edite através do link: apague só o link e crie um arquivo `.md` real no mesmo caminho, preservando intacto o arquivo apontado fora do repositório.
