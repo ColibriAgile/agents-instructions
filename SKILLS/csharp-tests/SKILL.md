@@ -1,6 +1,6 @@
 ---
 name: csharp-tests
-description: "Testes C# com xUnit, Shouldly e NSubstitute calibrados por criticidade. Use ao criar, revisar ou diagnosticar testes unitários e de integração, ao decidir quanto teste uma unidade merece, ao caçar testes que passam sem verificar nada, ou ao rodar mutation testing com Stryker.NET. Não use para preparar o ambiente PostgreSQL (use pgsql-test-runner) nem para executar dotnet build ou dotnet test (use dotnet-efficient-validation)."
+description: "Testes C# com xUnit, Shouldly e NSubstitute calibrados por criticidade. Use ao criar, revisar ou diagnosticar testes unitários e de integração, ao decidir quanto teste uma unidade merece, ao caçar testes que passam sem verificar nada, ao migrar projetos de teste para xUnit v3/Microsoft.Testing.Platform, ou ao rodar mutation testing com Stryker.NET. Não use para preparar o ambiente PostgreSQL (use pgsql-test-runner) nem para executar dotnet build ou dotnet test (use dotnet-efficient-validation)."
 argument-hint: "Descreva o teste C# a criar, revisar ou corrigir"
 ---
 
@@ -17,6 +17,20 @@ Classifique a unidade antes de escrever a primeira linha de teste. O nível defi
 | **Trivial** | DTO, POCO, mapeamento 1:1, wrapper sem decisão | sem teste |
 
 Declare o nível escolhido em uma frase na resposta, não em comentário no código.
+
+## Runner: VSTest ou Microsoft.Testing.Platform
+
+Antes de tocar num projeto de teste, abra seu `.csproj` e identifique o runner — as regras abaixo só valem para o migrado:
+
+- Referencia `xunit.v3` (com `<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>`) → migrado, roda sob **Microsoft.Testing.Platform (MTP)**.
+- Referencia `xunit` sem `.v3` e `Microsoft.NET.Test.Sdk` → legado, roda sob **VSTest**. O resto desta seção não se aplica.
+
+Em projeto migrado:
+
+- `ITestOutputHelper` vem de `Xunit`, não de `Xunit.Abstractions`.
+- Toda assinatura de teste retorna `Task` ou `ValueTask` — MTP falha rápido em `async void`.
+- `IAsyncLifetime.InitializeAsync`/`DisposeAsync` retornam `ValueTask`. Coloque toda limpeza obrigatória em `DisposeAsync`: se a fixture implementa `IDisposable` e `IAsyncDisposable` juntos, só `DisposeAsync` roda.
+- Novo projeto de teste: `<OutputType>Exe</OutputType>` e `<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>` no `.csproj`, pacotes `xunit.v3` + `xunit.runner.visualstudio`, cobertura via `Microsoft.Testing.Extensions.CodeCoverage` — nunca `coverlet.collector`, que não roda sob MTP.
 
 ## O mutante
 
@@ -51,6 +65,7 @@ dotnet stryker -m "**/Dominio/Precificacao/**" --break-at 80
 ```
 
 - Restrinja com `-m` ao escopo crítico, ou use `--since:master` para mutar só o que mudou. Rodar na solução inteira é o que torna mutation testing caro.
+- Em projeto migrado para Microsoft.Testing.Platform, some `--test-runner mtp` (dotnet-stryker ≥ 4.13; suporte ainda em preview) — sem essa flag o Stryker tenta VSTest e falha no projeto.
 - Rode sob demanda ou em job noturno, não no CI de cada PR.
 - Mutante sobrevivente vira teste novo, não `// Stryker disable`.
 
@@ -77,12 +92,13 @@ dotnet stryker -m "**/Dominio/Precificacao/**" --break-at 80
 
 1. Antes de qualquer `dotnet test` ou `dotnet build`, use a skill `dotnet-efficient-validation`.
 2. Execute primeiro o teste mais específico, depois o conjunto relacionado afetado pela mudança.
-3. Após um build válido, use `--no-build --no-restore --nologo --logger "console;verbosity=minimal"`.
+3. Após um build válido, use `--no-build --no-restore --nologo`. Em projeto legado (VSTest), some `--logger "console;verbosity=minimal"`. Em projeto migrado (MTP), `--logger` não existe — use um reporter (ex. `--report-trx`, requer `Microsoft.Testing.Extensions.TrxReport`) e, em SDK 9 ou anterior, separe os argumentos da plataforma com `--` (`dotnet test --no-build -- --report-trx`).
 4. Para testes ou builds dependentes de PostgreSQL, use a skill `pgsql-test-runner`: ela define variáveis de ambiente, serviço local e a ordem de investigação que separa drift de ambiente de regressão de código.
 
 ## Critérios de conclusão
 
 - O nível de criticidade está declarado e o esforço aplicado corresponde a ele.
+- O runner do projeto (VSTest ou MTP) foi identificado pelo `.csproj`, e em projeto migrado nenhum teste novo usa `async void`, o namespace antigo de `ITestOutputHelper` ou `coverlet.collector`.
 - Cada teste escrito falha sob pelo menos um mutante plausível do catálogo, verificado mentalmente.
 - Nenhum teste da mudança se enquadra nos padrões de "testes que não matam mutante nenhum".
 - Em unidade crítica, o Stryker rodou no escopo dela e todo mutante sobrevivente virou teste ou tem justificativa escrita.
