@@ -23,7 +23,7 @@ Leia esta referência **em full** quando a solução usar .NET 10, `global.json`
 
 4. Em .NET 10, `IsTestingPlatformApplication=true` sem opt-in MTP na raiz produz o erro `Testing with VSTest target is no longer supported by Microsoft.Testing.Platform`. Solicite autorização para adicionar o `global.json` mínimo antes dos testes.
 5. O pacote `xunit.v3` versão `4.0.0` importa o suporte MTP v2, mas o zero-test do agregador não autoriza, sozinho, adicionar `UseMicrosoftTestingPlatformRunner`. Primeiro use o fallback `InvokeTestingPlatform`.
-6. Para cobertura MTP, confirme `Microsoft.Testing.Extensions.CodeCoverage` em cada projeto que receberá `--coverage`. `coverlet.collector` sozinho não habilita os argumentos de cobertura MTP.
+6. Para cobertura MTP, confirme `Microsoft.Testing.Extensions.CodeCoverage` em cada projeto que receberá `--coverage`. `coverlet.collector` sozinho não habilita os argumentos de cobertura MTP. Ao atualizar `xunit.runner.visualstudio` de 3.x para 4.x, substitua `coverlet.collector` por `Microsoft.Testing.Extensions.CodeCoverage` no `PackageReference` do projeto de teste; não mantenha os dois pacotes.
 
 ## Comandos MTP
 
