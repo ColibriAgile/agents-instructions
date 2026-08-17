@@ -16,9 +16,10 @@ Audita um repositório e atribui uma nota de 0 a 5 de quão pronto ele está par
 
 ## Passo 2 — Classificar duplicidade e qualidade
 
-1. Para arquivos que aparecem em mais de uma ferramenta (ex. AGENTS.md servindo Codex e OpenCode, ou CLAUDE.md e AGENTS.md com o mesmo teor): se são symlinks apontando para a mesma fonte, é fonte única (bom); se são arquivos reais com hash igual ou conteúdo equivalente colado, é duplicação (risco de divergência — arquivo capado no tier 2).
-2. Julgue especificidade: a instrução cita comandos reais de build/test, arquitetura/módulos reais e convenções do próprio repositório, ou é conselho genérico que serviria para qualquer projeto?
-3. Para cada instrução, avalie se descreve conhecimento estreito e de uso ocasional — como operar um componente, biblioteca ou fluxo específico que não aparece na maioria das tarefas — em vez de algo que toda sessão precisa. Esse tipo de conteúdo pertence a uma skill carregada sob demanda, não a um arquivo sempre carregado.
+1. Invoque a skill `writing-agents-md` (Skill tool) para carregar o rent test (Delta, Frequency, Economy) e a escada de escopo — são os critérios aplicados nos itens 3 e 4 abaixo.
+2. Para arquivos que aparecem em mais de uma ferramenta (ex. AGENTS.md servindo Codex e OpenCode, ou CLAUDE.md e AGENTS.md com o mesmo teor): se são symlinks apontando para a mesma fonte, é fonte única (bom); se são arquivos reais com hash igual ou conteúdo equivalente colado, é duplicação (risco de divergência — arquivo capado no tier 2).
+3. Julgue especificidade pelo teste de Delta: a instrução muda o que o agente faria por padrão, citando comandos reais de build/test, arquitetura/módulos reais e convenções do próprio repositório — ou falha no Delta por ser conselho genérico que serviria para qualquer projeto?
+4. Para cada instrução, avalie pelo teste de Frequency se descreve conhecimento estreito e de uso ocasional — como operar um componente, biblioteca ou fluxo específico que não aparece na maioria das tarefas — em vez de algo que toda sessão precisa. Esse tipo de conteúdo pertence a uma skill carregada sob demanda (ou a um arquivo de subtree/linked doc mais abaixo na escada de escopo), não a um arquivo sempre carregado.
 
 *Done when:* cada arquivo descoberto está classificado como ausente / genérico / duplicado / específico-mas-estreito / específico-e-enxuto, e toda ocorrência de conteúdo que deveria virar skill está listada com arquivo e trecho.
 
