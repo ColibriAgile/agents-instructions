@@ -1,14 +1,20 @@
 # skills.yaml
 # Modelo para uso com Install-Skills.ps1
-# Cada item de "sources" é um repositório GitHub (owner/repo) com a lista
-# de skills que devem ser instaladas/atualizadas no escopo do projeto.
+#
+# "bundles" referencia nomes definidos em bundles.yaml (ColibriAgile/agents-instructions).
+# Todo projeto deve declarar pelo menos o bundle "core" + o(s) bundle(s) de stack/temática
+# que fizerem sentido. Install-Skills.ps1 resolve cada bundle na lista real de skills.
+#
+# "sources" continua existindo para skills avulsas (não cobertas por nenhum bundle) ou
+# vindas de outros repositórios GitHub.
+
+bundles:
+  - core
+  - dotnet
+  - code-review
 
 sources:
-  - repo: ColibriAgile/agents-instructions
+  - repo: pedronauck/skills/skills/mine
     skills:
-      - ai-ready-score
-      - ai-ready-fix
-
-  - repo: vercel-labs/agent-skills
-    skills:
-      - vercel-optimize
+      - deslop
+      - refactoring-analysis

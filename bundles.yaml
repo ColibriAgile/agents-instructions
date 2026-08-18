@@ -1,0 +1,81 @@
+# bundles.yaml
+# Catálogo central de bundles de skills, agrupados por stack e por temática.
+# Cada bundle lista skills que vivem em SKILLS/ neste mesmo repositório.
+# "core" é obrigatório em todo projeto; os demais são compostos pelo projeto
+# (stack + temáticas) ou instalados pontualmente (ex: authoring).
+
+repo: ColibriAgile/agents-instructions
+
+bundles:
+  core:
+    description: Obrigatório em todo projeto — workflow genérico, independente de stack.
+    skills:
+      - commit
+      - repository-cli-efficiency
+      - caveman
+      - no-workarounds
+
+  dotnet:
+    description: Projetos .NET / Colibri.
+    skills:
+      - atualizar-pacotes-nuget
+      - colibri-connection-string
+      - colibri-logging
+      - csharp-string-optimization
+      - csharp-tests
+      - dotnet-efficient-validation
+      - http-client-resilience
+      - pgsql-test-runner
+      - extrair-requisitos-csharp
+
+  delphi:
+    description: Projetos Delphi legados.
+    skills:
+      - extrair-requisitos-delphi
+
+  frontend:
+    description: Interfaces web / UI.
+    skills:
+      - frontend-design
+
+  sdd-planning:
+    description: Fluxo PRD -> TechSpec -> Tasks e descoberta de requisitos antes de planejar.
+    skills:
+      - criar-prd
+      - criar-techspec
+      - criar-tasks
+      - orquestrar-tasks
+      - refactor-spec
+      - grillme
+
+  code-review:
+    description: Revisão de código e execução das correções apontadas.
+    skills:
+      - executar-review
+      - executar-codereview-tasks
+      - codereview-to-tasks
+      - deep-review
+
+  jira-pm:
+    description: Gestão de tarefas no Jira e migração de tarefas do ClickUp.
+    skills:
+      - jira-aashari-mcp
+      - jira-mcp-issue-management
+      - jira-task-refinement
+      - jira-issue-description-generator
+      - clickup-to-jira-task-conversion
+
+  authoring:
+    description: Autoria de skills/agents/rules/hooks — instalação pontual (ad hoc), remover ao final da tarefa.
+    skills:
+      - create-agent
+      - create-hook
+      - create-instructions
+      - create-prompt
+      - create-skill
+      - agent-customization
+      - writing-agents-md
+      - ai-ready-score
+      - ai-ready-fix
+      - writing-skills
+      - to-prompt

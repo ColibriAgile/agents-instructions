@@ -1,26 +1,40 @@
 <#
 .SYNOPSIS
-    Instala ou atualiza skills de agentes de IA a partir de skills.yaml usando `npx skills`.
+    Instala/atualiza skills de agentes de IA a partir de skills.yaml (bundles + sources)
+    usando `npx skills`, e reconcilia skills instaladas que não pertencem ao manifesto.
+    Se skills.yaml não existir e a execução for interativa, dispara Init-Skills.ps1 antes.
 
 .PARAMETER Path
     Caminho do arquivo skills.yaml. Padrão: skills.yaml na pasta atual.
 
 .PARAMETER Silent
-    Modo silencioso: só imprime avisos, erros e o resumo final.
+    Modo silencioso: só imprime avisos, erros e o resumo final. Pula o prompt
+    interativo de remoção de extras e o bootstrap automático (usado por hooks automáticos).
 
 .PARAMETER Detailed
     Mostra a saída completa e em tempo real do `npx skills add` para cada fonte.
+
+.PARAMETER NoReconcile
+    Pula a etapa de reconciliação (detectar/remover skills instaladas fora do manifesto).
+
+.PARAMETER BundlesPath
+    Caminho local do bundles.yaml central. Padrão: bundles.yaml ao lado deste script
+    (ou seja, na sua cópia local clonada de agents-instructions). Para atualizar o
+    catálogo de bundles, dê git pull nessa pasta — não é buscado via rede.
 
 .EXAMPLE
     ./Install-Skills.ps1
     ./Install-Skills.ps1 -Silent
     ./Install-Skills.ps1 -Detailed
+    ./Install-Skills.ps1 -NoReconcile
 #>
 [CmdletBinding()]
 param(
     [string]$Path = (Join-Path (Get-Location) 'skills.yaml'),
     [switch]$Silent,
-    [switch]$Detailed
+    [switch]$Detailed,
+    [switch]$NoReconcile,
+    [string]$BundlesPath = (Join-Path $PSScriptRoot 'bundles.yaml')
 )
 
 if ($Silent -and $Detailed) {
@@ -28,45 +42,46 @@ if ($Silent -and $Detailed) {
     exit 1
 }
 
+. (Join-Path $PSScriptRoot 'Skills.Common.ps1')
+
 if (-not (Test-Path $Path)) {
-    Write-Error "Arquivo não encontrado: $Path"
-    exit 1
-}
-
-function Read-SkillsYaml {
-    param([string]$FilePath)
-
-    $sources = @()
-    $current = $null
-    $inSkills = $false
-
-    foreach ($rawLine in Get-Content -Path $FilePath) {
-        $line = $rawLine -replace '#.*$', ''
-        if ($line.Trim() -eq '') { continue }
-
-        if ($line -match '^\s*-\s*repo:\s*(.+?)\s*$') {
-            if ($current) { $sources += $current }
-            $current = [pscustomobject]@{ Repo = ($matches[1].Trim('"''')); Skills = @() }
-            $inSkills = $false
-            continue
-        }
-        if ($line -match '^\s*skills:\s*$') {
-            $inSkills = $true
-            continue
-        }
-        if ($inSkills -and $line -match '^\s*-\s*(.+?)\s*$') {
-            $current.Skills += $matches[1].Trim('"''')
-            continue
-        }
+    if ($Silent) {
+        Write-Error "Arquivo não encontrado: $Path. Rode Init-Skills.ps1 primeiro (não dá pra usar -Silent num projeto sem skills.yaml)."
+        exit 1
     }
-    if ($current) { $sources += $current }
-    return $sources
+
+    Write-Host "skills.yaml não encontrado em $Path — iniciando configuração..." -ForegroundColor Yellow
+    & (Join-Path $PSScriptRoot 'Init-Skills.ps1')
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path $Path)) {
+        Write-Error "Init-Skills.ps1 não gerou $Path. Abortando."
+        exit 1
+    }
 }
 
-$sources = Read-SkillsYaml -FilePath $Path | Where-Object { $_.Skills.Count -gt 0 }
+$manifest = Read-ProjectManifest -FilePath $Path
+$mergedSources = @{}
+
+if ($manifest.Bundles.Count -gt 0) {
+    $catalog = Get-BundlesCatalog -FilePath $BundlesPath
+    foreach ($bundleName in $manifest.Bundles) {
+        if (-not $catalog.Bundles.Contains($bundleName)) {
+            Write-Warning "Bundle '$bundleName' não encontrado em bundles.yaml de $BundlesPath — ignorado."
+            continue
+        }
+        Add-SkillSet -Table $mergedSources -Repo $catalog.Repo -Skills $catalog.Bundles[$bundleName]
+    }
+}
+
+foreach ($src in $manifest.Sources) {
+    Add-SkillSet -Table $mergedSources -Repo $src.Repo -Skills $src.Skills
+}
+
+$sources = $mergedSources.Keys | ForEach-Object {
+    [pscustomobject]@{ Repo = $_; Skills = @($mergedSources[$_]) }
+} | Where-Object { $_.Skills.Count -gt 0 }
 
 if (-not $sources -or $sources.Count -eq 0) {
-    Write-Error "Nenhuma fonte com skills encontrada em $Path"
+    Write-Error "Nenhuma skill resolvida a partir de bundles/sources em $Path"
     exit 1
 }
 
@@ -103,6 +118,51 @@ foreach ($source in $sources) {
 if (-not $Silent) {
     Write-Host ""
     Write-Host "Concluído: $($sources.Count - $failed.Count)/$($sources.Count) fontes processadas com sucesso."
+}
+
+if (-not $NoReconcile) {
+    $required = [System.Collections.Generic.HashSet[string]]::new()
+    foreach ($src in $sources) { foreach ($sk in $src.Skills) { [void]$required.Add($sk) } }
+
+    $installedJson = & npx --yes skills list --json 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        try {
+            $installed = $installedJson | ConvertFrom-Json
+            # Só considera skills instaladas via `skills add` (sourceType preenchido).
+            # Skills escritas à mão no projeto (source: null) nunca entram na reconciliação.
+            $installedNames = @($installed | Where-Object { $_.sourceType } | ForEach-Object { $_.name } | Sort-Object -Unique)
+        }
+        catch {
+            $installedNames = @()
+        }
+
+        $extras = @($installedNames | Where-Object { -not $required.Contains($_) })
+
+        if ($extras.Count -gt 0) {
+            Write-Host ""
+            Write-Host "Skills instaladas fora do manifesto deste projeto (bundles ad hoc esquecidos?):" -ForegroundColor Yellow
+            $extras | ForEach-Object { Write-Host "  - $_" }
+
+            if (-not $Silent) {
+                $answer = $null
+                try {
+                    $answer = Read-Host "Remover alguma? Nomes separados por espaço, ou Enter para pular"
+                }
+                catch {
+                    Write-Warning "Terminal não interativo — pulando remoção automática."
+                }
+                if ($answer -and $answer.Trim()) {
+                    $toRemove = @($answer.Trim() -split '\s+' | Where-Object { $extras -contains $_ })
+                    if ($toRemove.Count -gt 0) {
+                        & npx --yes skills remove @toRemove -y
+                    }
+                }
+            }
+        }
+    }
+    else {
+        Write-Warning "Não foi possível listar skills instaladas para reconciliação."
+    }
 }
 
 if ($failed.Count -gt 0) {
