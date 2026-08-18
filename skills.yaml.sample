@@ -1,0 +1,14 @@
+# skills.yaml
+# Modelo para uso com Install-Skills.ps1
+# Cada item de "sources" é um repositório GitHub (owner/repo) com a lista
+# de skills que devem ser instaladas/atualizadas no escopo do projeto.
+
+sources:
+  - repo: ColibriAgile/agents-instructions
+    skills:
+      - ai-ready-score
+      - ai-ready-fix
+
+  - repo: vercel-labs/agent-skills
+    skills:
+      - vercel-optimize

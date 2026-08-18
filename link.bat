@@ -7,14 +7,14 @@ set "BASE_CODEX=%USERPROFILE%\.codex"
 set "BASE_CLAUDE=%USERPROFILE%\.claude"
 set "SOURCE_FILE=%BASE_SOURCE%RTK-PWSH.md"
 
-call :CreateJunction "%BASE_COPILOT%" "SKILLS"      "skills"
 call :CreateJunction "%BASE_COPILOT%" "INSTRUCTIONS" "instructions"
 call :CreateJunction "%BASE_COPILOT%" "AGENTS"       "agents"
 
-call :CreateJunction "%BASE_CODEX%"   "SKILLS"       "skills"
+call :RemoveJunction "%BASE_COPILOT%" "SKILLS"
+call :RemoveJunction "%BASE_CODEX%"   "SKILLS"
+call :RemoveJunction "%BASE_CLAUDE%"  "SKILLS"
 
 if exist "%BASE_CLAUDE%\" (
-    call :CreateJunction "%BASE_CLAUDE%" "SKILLS"       "skills"
     call :CreateJunction "%BASE_CLAUDE%" "INSTRUCTIONS" "instructions"
     call :CreateJunction "%BASE_CLAUDE%" "AGENTS"       "agents"
 )
@@ -55,6 +55,23 @@ if exist "%TARGET%" (
 
 REM Cria junction
 mklink /J "%TARGET%" "%SOURCE%"
+
+goto :eof
+
+
+:RemoveJunction
+set "BASE=%~1"
+set "TARGET=%BASE%\%~2"
+
+if exist "%TARGET%" (
+    echo.
+    echo ========================================
+    echo Removendo: %TARGET%
+    rmdir "%TARGET%" 2>nul
+    if exist "%TARGET%" (
+        rmdir /s /q "%TARGET%"
+    )
+)
 
 goto :eof
 
