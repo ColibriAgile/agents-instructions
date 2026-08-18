@@ -48,12 +48,16 @@ bundles:
       - refactor-spec
       - grillme
 
-  code-review:
-    description: Revisão de código e execução das correções apontadas.
+  sdd-review:
+    description: Revisão das tasks implementadas com o fluxo sdd-planning.
     skills:
       - executar-review
       - executar-codereview-tasks
       - codereview-to-tasks
+
+  code-review:
+    description: Revisão de código e execução das correções apontadas.
+    skills:
       - deep-review
 
   jira-pm:

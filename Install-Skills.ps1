@@ -144,18 +144,24 @@ if (-not $NoReconcile) {
             $extras | ForEach-Object { Write-Host "  - $_" }
 
             if (-not $Silent) {
-                $answer = $null
+                $toRemove = @()
+                $fzf = Get-Command fzf -ErrorAction SilentlyContinue
                 try {
-                    $answer = Read-Host "Remover alguma? Nomes separados por espaço, ou Enter para pular"
+                    if ($fzf) {
+                        $toRemove = @($extras | & fzf --multi --prompt="Remover skills> " --header="Tab marca, Enter confirma, Esc pula")
+                    }
+                    else {
+                        $answer = Read-Host "Remover alguma? Nomes separados por espaço, ou Enter para pular"
+                        if ($answer -and $answer.Trim()) {
+                            $toRemove = @($answer.Trim() -split '\s+' | Where-Object { $extras -contains $_ })
+                        }
+                    }
                 }
                 catch {
                     Write-Warning "Terminal não interativo — pulando remoção automática."
                 }
-                if ($answer -and $answer.Trim()) {
-                    $toRemove = @($answer.Trim() -split '\s+' | Where-Object { $extras -contains $_ })
-                    if ($toRemove.Count -gt 0) {
-                        & npx --yes skills remove @toRemove -y
-                    }
+                if ($toRemove.Count -gt 0) {
+                    & npx --yes skills remove @toRemove -y
                 }
             }
         }
