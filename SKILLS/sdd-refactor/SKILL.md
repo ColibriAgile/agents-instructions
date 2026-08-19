@@ -1,9 +1,9 @@
 ---
-name: refactor-spec
+name: sdd-refactor
 description: Gera PRD e TechSpec de refatoração (SDD para refactor) em tasks/prd-[slug]/, no mesmo formato consumido pela skill sdd-tasks. Foco em preservar comportamento em vez de definir comportamento novo. Use sempre que o usuário pedir para refatorar código existente, especialmente em projetos difíceis de testar E2E (Windows Forms, código legado, UI desktop). Também use quando o usuário mencionar "spec de refactor", "refatorar sem quebrar", "preservar comportamento", ou precisar planejar uma refatoração arquitetural (extrair serviço, mudar padrão de acesso a dados, separar lógica de UI) antes de tocar no código ou antes de rodar /sdd-tasks. Não use para refactors mecânicos triviais (rename, extract method local) que não precisam de spec formal, nem para specs de feature nova (aí é o par sdd-prd/sdd-techspec padrão).
 ---
 
-# Refactor Spec (SDD para Refatorações)
+# SDD Refactor (PRD + TechSpec para Refatorações)
 
 Gera o par `prd.md` + `techspec.md` de uma refatoração, em `tasks/prd-[slug]/`, no mesmo formato que a skill `sdd-tasks` consome. A diferença em relação ao par PRD/TechSpec de feature nova é o foco: aqui "requisito" é comportamento existente que não pode mudar, não comportamento novo a construir.
 

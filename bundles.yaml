@@ -48,7 +48,7 @@ bundles:
       - sdd-techspec
       - sdd-tasks
       - sdd-orquestrar
-      - refactor-spec
+      - sdd-refactor
       - sdd-review
       - sdd-codereview-execute
       - sdd-codereview-plan
