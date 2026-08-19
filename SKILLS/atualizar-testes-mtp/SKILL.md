@@ -1,6 +1,6 @@
 ---
 name: atualizar-testes-mtp
-description: 'MTP: migra um projeto de testes .NET de VSTest para Microsoft.Testing.Platform, para imediatamente sem alterar nada quando o projeto já é MTP, remove Microsoft.NET.Test.Sdk e coverlet.collector, adiciona Microsoft.Testing.Extensions.CodeCoverage, corrige o CS0619 da migração xUnit v3 para v4, troca a action do workflow testes.yml para a action MTP dedicada e recupera zero-testes com o fallback InvokeTestingPlatform. Use quando o usuário pedir para migrar testes de VSTest para MTP, quando um teste retornar zero resultados ou o erro "Testing with VSTest target is no longer supported", ou quando um workflow de testes precisar trocar para a action MTP. Don''t use for atualizar pacotes de um projeto que já é MTP (use atualizar-pacotes-nuget) nem para escrever novos testes.'
+description: 'MTP: migra um projeto de testes .NET de VSTest para Microsoft.Testing.Platform, para imediatamente sem alterar nada quando o projeto já é MTP, remove Microsoft.NET.Test.Sdk e coverlet.collector, adiciona Microsoft.Testing.Extensions.CodeCoverage, alinha xUnit à MTP v2 e corrige o CS0619 da migração xUnit v3 para v4, troca a action do workflow testes.yml para a action MTP dedicada e recupera zero-testes com o fallback InvokeTestingPlatform. Use quando o usuário pedir para migrar testes de VSTest para MTP, quando a execução falhar ao carregar a extensão de cobertura MTP, quando um teste retornar zero resultados ou o erro "Testing with VSTest target is no longer supported", ou quando um workflow de testes precisar trocar para a action MTP. Don''t use for atualizar pacotes de um projeto que já é MTP (use atualizar-pacotes-nuget) nem para escrever novos testes.'
 ---
 
 # Atualizar testes para MTP
@@ -12,7 +12,7 @@ Migra um projeto de testes .NET de VSTest para Microsoft.Testing.Platform (MTP) 
 - É uma migração de mão única: confirme VSTest antes de tocar em qualquer arquivo; um projeto já MTP para o fluxo sem alteração.
 - Trate VSTest/MTP como decisão de `global.json` + preflight MSBuild, nunca como troca de flags por tentativa e erro.
 - Trate zero testes retornados pelo agregador MTP como diagnóstico de tooling até a execução `InvokeTestingPlatform` por projeto confirmar o contrário.
-- Solicite autorização explícita antes de criar/alterar `global.json` e antes de aplicar a migração xUnit v4 (CS0619). Remover os pacotes VSTest e adicionar a extensão de cobertura MTP é o próprio escopo da migração e não exige confirmação adicional.
+- Tudo que a migração exigir para o projeto rodar em MTP é escopo desta skill: arquivos de configuração (`global.json`, `.csproj`, workflow) e pacotes NuGet (remover, adicionar, atualizar versão), incluindo qualquer requisito não listado explicitamente aqui que a investigação da migração revelar. Execute cada um diretamente, sem perguntar — criar/editar `global.json`, ajustar pacotes, `OutputType` e a versão do xUnit exigida pela cobertura MTP v2 são exemplos, não uma lista fechada. Solicite autorização explícita apenas antes de aplicar a migração xUnit v4 (CS0619), pois ela muda o comportamento de paralelização dos testes.
 
 ## Passos
 
@@ -34,35 +34,37 @@ Migra um projeto de testes .NET de VSTest para Microsoft.Testing.Platform (MTP) 
 4. Se o `global.json` já declarar MTP ou `UseMicrosoftTestingPlatformRunner=true`, o projeto já está migrado: pare aqui, não altere pacotes, `global.json` nem workflow. Informe que atualizações de pacotes desse projeto seguem por `atualizar-pacotes-nuget`.
 5. Caso contrário — VSTest confirmado ou nenhum sinal de MTP encontrado —, prossiga com a migração nos próximos passos.
 
-*Done when:* o projeto tem status de runner decidido e registrado, e o resultado é um de dois: fluxo encerrado por já ser MTP (nenhuma alteração feita), ou VSTest confirmado com migração autorizada a prosseguir.
+*Done when:* o projeto tem status de runner decidido e registrado, e o resultado é um de dois: fluxo encerrado por já ser MTP (nenhuma alteração feita), ou VSTest confirmado e a migração segue direto para o passo 2.
 
-### 2. Remover os pacotes VSTest e adicionar a cobertura MTP
+### 2. Ajustar o projeto de teste
 
 1. Em cada projeto de teste migrado, remova as referências `Microsoft.NET.Test.Sdk` e `coverlet.collector`; nenhum dos dois é usado pelo runtime MTP.
 2. Adicione `Microsoft.Testing.Extensions.CodeCoverage` em cada projeto que participará de execução com cobertura; `coverlet.collector` sozinho não habilita os argumentos de cobertura MTP e não pode coexistir com a extensão.
+3. Defina `<OutputType>Exe</OutputType>` no `.csproj` de cada projeto de teste migrado quando ainda não estiver presente; MTP exige que o projeto de teste seja executável. Siga o padrão já usado por outro projeto MTP do repositório (ex.: `_lib`) quando houver um. É parte obrigatória da migração, não peça confirmação.
 
-*Done when:* todo `.csproj` migrado não referencia mais `Microsoft.NET.Test.Sdk` nem `coverlet.collector`, e referencia `Microsoft.Testing.Extensions.CodeCoverage` em vez deles.
+*Done when:* todo `.csproj` migrado não referencia mais `Microsoft.NET.Test.Sdk` nem `coverlet.collector`, referencia `Microsoft.Testing.Extensions.CodeCoverage` em vez deles, e declara `OutputType=Exe`.
 
 ### 3. Ativar o MTP via global.json
 
-1. Solicite autorização e crie/edite o `global.json` mínimo na raiz da solução com o bloco `test.runner` do passo 1.
+1. Crie/edite diretamente o `global.json` mínimo na raiz da solução com o bloco `test.runner` do passo 1; é parte obrigatória da migração, não peça confirmação.
 2. Não adicione `UseMicrosoftTestingPlatformRunner` diretamente no projeto apenas porque um agregador retornou zero testes; confirme primeiro o preflight do passo 1 e o fallback do passo 7.
 
-*Done when:* `global.json` reflete o modo MTP para a solução, e a mudança teve autorização registrada.
+*Done when:* `global.json` reflete o modo MTP para a solução.
 
-### 4. Corrigir o CS0619 da migração xUnit v4
+### 4. Alinhar o xUnit à MTP v2 e corrigir o CS0619
 
-1. Ao migrar um projeto onde `xunit.v3` já está em `4.0.0` ou superior, espere o erro `CS0619` em `CollectionBehaviorAttribute.DisableTestParallelization` no build.
-2. Solicite autorização e aplique a migração que preserva execução serial:
+1. `Microsoft.Testing.Extensions.CodeCoverage` requer MTP v2. Um projeto com `xunit.v3` abaixo de `4.0.0` traz MTP v1: o build passa, mas a execução falha ao carregar a extensão de cobertura. Quando detectar essa combinação, atualize `xunit.v3` e `xunit.runner.visualstudio` para `4.0.0` ou superior diretamente, sem pedir confirmação; é parte obrigatória da migração.
+2. Após a atualização, espere o erro `CS0619` em `CollectionBehaviorAttribute.DisableTestParallelization` no build quando o projeto usar esse atributo.
+3. Solicite autorização e aplique a migração que preserva execução serial:
 
    ```csharp
    [assembly: Xunit.v3.Parallelization(Mode = Xunit.Sdk.ParallelMode.None)]
    ```
 
-3. Use o namespace totalmente qualificado quando o arquivo de atributos não importar `Xunit.v3` e `Xunit.Sdk`.
-4. Não transforme outros avisos xUnit em correções presumidas; trate apenas o `CS0619` confirmado no projeto afetado.
+4. Use o namespace totalmente qualificado quando o arquivo de atributos não importar `Xunit.v3` e `Xunit.Sdk`.
+5. Não transforme outros avisos xUnit em correções presumidas; trate apenas o `CS0619` confirmado no projeto afetado.
 
-*Done when:* o projeto compila sem `CS0619`, ou a etapa foi pulada por não haver `xunit.v3` em 4.0.0 ou superior.
+*Done when:* o projeto usa `xunit.v3` e `xunit.runner.visualstudio` em `4.0.0` ou superior, compila sem `CS0619`, e a execução de testes carrega a extensão de cobertura sem erro.
 
 ### 5. Atualizar o workflow de testes
 
