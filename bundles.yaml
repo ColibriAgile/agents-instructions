@@ -12,7 +12,8 @@ bundles:
     skills:
       - commit
       - repository-cli-efficiency
-      - caveman
+      - caveman      
+      - grillme
       - no-workarounds
 
   dotnet:
@@ -48,7 +49,6 @@ bundles:
       - sdd-tasks
       - sdd-orquestrar
       - refactor-spec
-      - grillme
       - sdd-review
       - sdd-codereview-execute
       - sdd-codereview-plan
