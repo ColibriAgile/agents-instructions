@@ -1,17 +1,17 @@
 ---
-name: sdd-codereview-plan
-description: 'Analisa o relatório codereview.md gerado por sdd-review e cria tarefas de correção para cada não conformidade acionável. Use para transformar code reviews reprovados ou com ressalvas em task_[num].md na pasta da revisão.'
+name: sdd-codereview-tasks
+description: 'Analisa o relatório codereview.md gerado por sdd-codereview e cria tarefas de correção para cada não conformidade acionável. Use para transformar code reviews reprovados ou com ressalvas em task_[num].md na pasta da revisão.'
 argument-hint: '--prd nome-da-feature --num numero-da-revisao'
 disable-model-invocation: true
 ---
 
 # Code Review para Tarefas
 
-Converta um artefato da skill `sdd-review` em tarefas de implementação focadas na correção dos problemas encontrados. Esta é uma skill pessoal e grava os arquivos diretamente na pasta da code review selecionada.
+Converta um artefato da skill `sdd-codereview` em tarefas de implementação focadas na correção dos problemas encontrados. Esta é uma skill pessoal e grava os arquivos diretamente na pasta da code review selecionada.
 
 ## Quando usar
 
-- Quando existir um relatório `codereview.md` produzido por `sdd-review`.
+- Quando existir um relatório `codereview.md` produzido por `sdd-codereview`.
 - Quando for necessário transformar itens `NOK`, tasks incompletas, testes falhando ou recomendações acionáveis em tarefas.
 - Quando houver mais de uma pasta `codereview_*` e for necessário usar a revisão mais recente.
 
@@ -25,6 +25,8 @@ Aceite:
 - `--prd <nome-da-feature>` sem `--num`: restringe a busca às pastas `codereview_*` dentro de `/tasks/prd-<nome-da-feature>/`.
 - `--num <n>` sem `--prd`: restringe a busca às pastas `codereview_<n>` de qualquer feature em `/tasks/prd-*/`.
 - Sem `--prd` e sem `--num`: considera todas as pastas `/tasks/prd-*/codereview_*/`.
+
+Se `--prd` e/ou `--num` não forem informados, deduza-os primeiro pelo contexto da sessão atual (revisão em andamento, pasta `codereview_*` ou relatório recém-referenciados etc.); só recorra à busca ampla no repositório para o que não puder ser deduzido com segurança.
 
 Monte a lista de candidatas aplicando os filtros acima:
 

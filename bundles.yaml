@@ -49,9 +49,9 @@ bundles:
       - sdd-tasks
       - sdd-orquestrar
       - sdd-refactor
-      - sdd-review
-      - sdd-codereview-execute
-      - sdd-codereview-plan
+      - sdd-codereview
+      - sdd-codereview-tasks
+      - sdd-codereview-fix      
 
   code-review:
     description: Revisão de código e execução das correções apontadas.

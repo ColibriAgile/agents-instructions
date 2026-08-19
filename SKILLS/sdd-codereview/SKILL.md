@@ -1,11 +1,11 @@
 ---
-name: sdd-review
+name: sdd-codereview
 description: Use essa skill quando for necessário revisar o código de uma funcionalidade, garantindo que ela está em confirmidade com os padrões estabelecidos nas rules e skills do projeto e também segue o que está definido na TechSpec em `techspec.md` e nos arquivos das tasks. Não utilize quando estiver fazendo QA ou correção de defeitos.
 argument-hint: --prd nome-da-funcionalidade
 disable-model-invocation: true
 ---
 
-Entrada: `--prd` identifica o slug da feature, localiza-a na pasta `./tasks/prd-[nome-da-feature]`
+Entrada: `--prd` identifica o slug da feature. Sem argumento, deduza o slug pelo contexto da sessão atual (feature em revisão, PRD/TechSpec/tasks recém-referenciados etc.) e só então localize a pasta em `./tasks/prd-*/`, usando `./tasks/prd-[nome-da-feature]`.
 
 ## Fluxo
 

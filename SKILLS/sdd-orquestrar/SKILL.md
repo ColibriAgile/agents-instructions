@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # Orquestrar Tasks
 
-Execute uma feature como uma sequencia controlada de tarefas definidas em `tasks/prd-<nome>/`. A entrada `--prd` identifica o slug; sem ela, localize uma unica pasta `tasks/prd-*/`. Se houver zero ou mais de uma candidata, pare e use a tool de pergunta para obter o slug.
+Execute uma feature como uma sequencia controlada de tarefas definidas em `tasks/prd-<nome>/`. A entrada `--prd` identifica o slug; sem ela, deduza o slug pelo contexto da sessão atual (feature em execucao, PRD/TechSpec/tasks recem-referenciados etc.) e só então localize uma unica pasta `tasks/prd-*/`. Se houver zero ou mais de uma candidata, pare e use a tool de pergunta para obter o slug.
 
 ## Precondicoes
 

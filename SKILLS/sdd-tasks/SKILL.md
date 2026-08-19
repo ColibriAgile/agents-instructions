@@ -5,7 +5,7 @@ argument-hint: --prd nome-da-feature
 disable-model-invocation: true
 ---
 
-Entrada: `--prd` identifica o slug da feature; sem argumento, localize a pasta em `./tasks/prd-*/`. Obrigatórios: `tasks/prd-[slug]/prd.md` e `tasks/prd-[slug]/techspec.md` — se faltar algum, pare e aponte a skill correspondente (`/sdd-prd`, `/sdd-techspec`).
+Entrada: `--prd` identifica o slug da feature; sem argumento, deduza o slug pelo contexto da sessão atual (feature em discussão, PRD/TechSpec recém-criados, pasta já referenciada etc.) e só então localize a pasta em `./tasks/prd-*/`. Obrigatórios: `tasks/prd-[slug]/prd.md` e `tasks/prd-[slug]/techspec.md` — se faltar algum, pare e aponte a skill correspondente (`/sdd-prd`, `/sdd-techspec`).
 
 Cada tarefa é uma **entrega**: concluível de forma independente, com escopo claro e seus próprios testes. Referencie o `techspec.md` em vez de repetir detalhes de implementação.
 

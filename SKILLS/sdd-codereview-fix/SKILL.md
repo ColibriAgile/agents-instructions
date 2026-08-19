@@ -1,5 +1,5 @@
 ---
-name: sdd-codereview-execute
+name: sdd-codereview-fix
 description: 'Executa as tarefas task_[num].md geradas a partir de um code review, implementa as correções, valida cada resultado, faz retrabalho quando necessário e conclui com uma nova verificação da revisão.'
 argument-hint: '--prd nome-da-feature --num numero-da-revisao [--budget economico|medio|alto]'
 disable-model-invocation: true
@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # Executar Tarefas de Code Review
 
-Implemente e valide as tarefas de correção geradas pela skill `sdd-codereview-plan` dentro da pasta `/tasks/prd-[nome-da-feature]/codereview_*`. O agente principal atua apenas como orquestrador: planeja, delega, revisa, decide o retrabalho e conclui. A implementação de cada tarefa é sempre feita por um subagente — nunca diretamente pelo agente principal, mesmo em correções pequenas ou de um único arquivo.
+Implemente e valide as tarefas de correção geradas pela skill `sdd-codereview-tasks` dentro da pasta `/tasks/prd-[nome-da-feature]/codereview_*`. O agente principal atua apenas como orquestrador: planeja, delega, revisa, decide o retrabalho e conclui. A implementação de cada tarefa é sempre feita por um subagente — nunca diretamente pelo agente principal, mesmo em correções pequenas ou de um único arquivo.
 
 Esta skill segue a mesma estratégia de orquestração da skill `sdd-orquestrar` (grafo de dependências, lotes paralelos, escolha de executor e modelo, delegação obrigatória, revisão e retrabalho). Não reutilize `sdd-orquestrar` diretamente: tarefas de code review não exigem `prd.md`, `techspec.md` ou `tasks.md`, e o estado é controlado pela pasta `done/` da própria revisão.
 
@@ -28,6 +28,8 @@ Aceite:
 - `--num <n>` sem `--prd`: restringe a busca às pastas `codereview_<n>` de qualquer feature em `/tasks/prd-*/`.
 - Sem `--prd` e sem `--num`: considera todas as pastas `/tasks/prd-*/codereview_*/`.
 - `--budget economico|medio|alto`: ajusta o custo e a profundidade das delegações; o padrão é `economico`.
+
+Se `--prd` e/ou `--num` não forem informados, deduza-os primeiro pelo contexto da sessão atual (revisão em andamento, pasta `codereview_*` ou tarefas recém-referenciadas etc.); só recorra à busca ampla no repositório para o que não puder ser deduzido com segurança.
 
 Monte a lista de candidatas aplicando os filtros acima:
 
@@ -110,7 +112,7 @@ Quando não houver mais `task_[num].md` pendentes na raiz:
 
 1. Execute a suíte de testes proporcional ao conjunto de correções, além das validações específicas já executadas.
 2. Releia a seção de problemas do `codereview.md` e confirme que cada achado foi corrigido, testado e vinculado à tarefa correspondente.
-3. Quando o ambiente permitir, execute novamente `sdd-review` para gerar uma nova pasta de revisão. Compare o novo relatório com os achados originais e não declare conformidade se algum deles continuar pendente.
+3. Quando o ambiente permitir, execute novamente `sdd-codereview` para gerar uma nova pasta de revisão. Compare o novo relatório com os achados originais e não declare conformidade se algum deles continuar pendente.
 4. Se a nova revisão encontrar itens diferentes, preserve o novo relatório e informe que são pendências novas; não os misture com as tarefas já concluídas.
 5. Considere o fluxo concluído somente quando:
    - todas as tarefas estiverem em `done/`;
