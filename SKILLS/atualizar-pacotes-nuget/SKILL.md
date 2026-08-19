@@ -46,7 +46,7 @@ Mantém uma atualização NuGet **tight**: uma solução por vez, restore explí
 2. Execute `rtk dotnet outdated -u <solução> --no-restore`.
 3. Registre cada pacote alterado no formato `pacote: versão anterior => versão nova`.
 4. Classifique atualizações major, prévias, mudanças de runner e avisos de dependência como risco de compatibilidade.
-5. Ao atualizar `xunit.runner.visualstudio` de 3.x para 4.x, leia `references/mtp.md` em full e substitua `coverlet.collector` por `Microsoft.Testing.Extensions.CodeCoverage` no projeto de teste afetado.
+5. Ao atualizar `xunit.runner.visualstudio` de 3.x para 4.x, leia `references/mtp.md` em full e remova o pacote `coverlet.collector` de todos os projetos de testes adicionando `Microsoft.Testing.Extensions.CodeCoverage`.
 6. Pare antes da próxima solução quando `dotnet outdated` falhar, não resolver uma dependência ou indicar incompatibilidade de versão.
 
 *Done when:* a solução atualizou ou confirmou todos os pacotes disponíveis, cada mudança de versão e risco está registrado, e a troca de cobertura foi aplicada quando `xunit.runner.visualstudio` cruzou para 4.x.
