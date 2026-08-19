@@ -27,6 +27,7 @@ bundles:
       - http-client-resilience
       - pgsql-test-runner
       - extrair-requisitos-csharp
+      - colibri-ports
 
   delphi:
     description: Projetos Delphi legados.
@@ -83,3 +84,4 @@ bundles:
       - ai-ready-fix
       - writing-skills
       - to-prompt
+      - bundle-orphan-skills
