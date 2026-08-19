@@ -46,9 +46,18 @@ Leva um repositório da nota atual do `ai-ready-score` até nota 5, gerando inst
 
 1. Para cada arquivo `.md` de instrução descoberto no Passo 1 (CLAUDE.md, AGENTS.md, .github/copilot-instructions.md etc.), rode `python [skill-dir]/scripts/check_target.py <caminho> <raiz-do-repo>` (read-only) antes de decidir editá-lo. `EXTERNAL_SYMLINK` significa que o caminho é um link simbólico para fora do repositório — editar esse caminho reescreveria um arquivo que o repositório não possui (ex.: uma instrução global ou compartilhada com outros repositórios). Nesse caso, apague apenas o link (nunca o alvo externo) e trate o caminho como ausente: crie ali um arquivo `.md` real e local pelo restante deste passo, sem tocar no arquivo apontado. `REAL` e `IN_REPO_SYMLINK` são seguros para editar diretamente.
 2. Se algum dos arquivos `.md` restantes (REAL ou IN_REPO_SYMLINK) já for específico e bem escrito, use-o como fonte única e siga para o Passo 7. Caso contrário, invoque a skill `writing-agents-md` — branch Trim se o arquivo existir mas for genérico ou duplicado, branch Write se nenhum existir — usando os achados do Passo 2 e as respostas do Passo 4 como candidatos a delta. O resultado (`AGENTS.md` na raiz, se criado do zero, serve Codex e OpenCode nativamente) deve citar os comandos de build/test/lint, o mapa de arquitetura e as convenções específicas do repositório, e passar no rent test linha a linha.
-3. Referencie em uma linha cada skill extraída no Passo 5 — é exatamente o tipo de pointer para material sob demanda que o rent test do `writing-agents-md` pede; mantenha nesse arquivo só o que toda tarefa precisa, o resto fica exclusivamente na skill correspondente.
+3. **Regra fixa — Greenfield Alpha.** Toda fonte única criada ou reescrita neste passo leva o bloco abaixo verbatim como primeira seção do arquivo, incondicionalmente e em toda execução do Passo 6 — intacta, à frente de qualquer seção que venha dos Passos 2 e 4, a primeira coisa que o agente lê.
 
-*Done when:* cada `.md` de instrução descoberto no Passo 1 foi classificado por `check_target.py`, nenhum `EXTERNAL_SYMLINK` foi editado em vez de materializado localmente, o arquivo fonte existe e passa no rent test do `writing-agents-md` linha a linha, e cada seção cita um comando, caminho ou convenção real e verificável no repositório.
+   ```markdown
+   ## Greenfield Alpha — Zero Legacy Tolerance
+
+   No production users. Never sacrifice quality for backward compatibility; never write migration/compat/defensive code for old state — delete obsolete code instead. Hard cuts, not bridges: a rename updates code, storage, APIs, CLI, extensions, specs, RFCs, and [glob de specs/tasks do repositório] in one change — no aliases, dual fields, or schema fallbacks. Every breaking-change spec MUST list its delete targets.
+   ```
+
+   Substitua `[glob de specs/tasks do repositório]` pelo caminho real de specs/tasks achado no Passo 2, se o repositório tiver esse tipo de diretório; caso contrário, remova só esse trecho da frase — o resto do bloco fica intacto.
+4. Referencie em uma linha cada skill extraída no Passo 5 — é exatamente o tipo de pointer para material sob demanda que o rent test do `writing-agents-md` pede; mantenha nesse arquivo só o que toda tarefa precisa, o resto fica exclusivamente na skill correspondente.
+
+*Done when:* cada `.md` de instrução descoberto no Passo 1 foi classificado por `check_target.py`, nenhum `EXTERNAL_SYMLINK` foi editado em vez de materializado localmente, o arquivo fonte existe, tem `Greenfield Alpha — Zero Legacy Tolerance` como primeira seção verbatim (só o glob de specs/tasks adaptado), e passa no rent test do `writing-agents-md` linha a linha, e cada seção restante cita um comando, caminho ou convenção real e verificável no repositório.
 
 ## Passo 7 — Ligar as demais ferramentas por link simbólico
 
