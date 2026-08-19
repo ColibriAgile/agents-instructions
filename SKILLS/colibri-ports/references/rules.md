@@ -18,7 +18,7 @@
 ## Fluxo de leitura
 
 1. `ConfiguracoesDeAmbiente` determina `PastasDoSistema.Base` e lê a fonte correspondente ao ambiente.
-2. Na máquina Master, lê `master/config/ncrmaster.cfg`, seção `[Portas]`, chave `d-connect`.
+2. Na máquina Master, lê `master/config/ncrmaster.cfg`, seção `[Portas]`, chave `d-connect`; a leitura usa `LerComCommandLineArgs`, portanto um argumento de linha de comando válido para a mesma chave vence o valor do INI.
 3. Na máquina cliente, lê `client/config/launcher.boot` e o cache `client/config/launcher.conexao`; no JSON, usa `portas.d-connect`.
 4. O valor é exposto na propriedade correspondente de `ConfiguracoesDeAmbiente`, normalmente em `Portas`.
 5. A implementação deve selecionar a propriedade exigida pelo alvo; `Portas.DConnect` é apenas o caso concreto observado no DConnect.
@@ -33,11 +33,12 @@
 
 O DConnect fornece a referência concreta: `Portas.DConnect` resulta de `[Portas] d-connect` no Master ou `portas.d-connect` no cache cliente. Esse mapeamento serve para orientar a leitura de outras propriedades, não para determinar um endpoint.
 
-`ConfiguracoesDeAmbiente` é criada diretamente e suas instâncias estáticas/lazy carregam a configuração no ciclo de vida da instância. O provedor Colibri pode ser usado como abstração mockável quando a propriedade desejada existir no contrato.
+`ConfiguracoesDeAmbiente` é criada diretamente e os consumidores observados a mantêm em campos `static readonly`, carregando a configuração uma vez por ciclo de vida do tipo. O provedor Colibri pode ser usado como abstração mockável quando a propriedade desejada existir no contrato.
 
 ## Defaults e falhas
 
 - Ausência do arquivo Master ou de `launcher.boot` produz `InvalidOperationException`.
-- Falhas de leitura de `launcher.conexao` são ignoradas e os defaults já inicializados permanecem.
+- Falhas de leitura de `launcher.conexao` são capturadas. Se ocorrerem antes da atribuição de `Portas`, os defaults já inicializados permanecem; valores de porta ausentes ou inválidos individualmente também usam seus defaults.
+- A atribuição de `Portas` ocorre antes do processamento de alguns blocos opcionais de conexão. Uma exceção posterior não desfaz os valores de porta já carregados.
 - Não há validação de faixa, disponibilidade ou retry de leitura comprovados.
 - Não há recarga dinâmica comprovada após alterações nos arquivos.

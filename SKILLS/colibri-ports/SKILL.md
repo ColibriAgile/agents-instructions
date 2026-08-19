@@ -1,6 +1,6 @@
 ---
 name: colibri-ports
-description: Leitura de portas Colibri: use quando um projeto C# precisar criar ou adaptar código para ler o valor de uma porta usando CoLib.Ambiente e CoLib.Colibri, preservando fontes, propriedades, defaults, erros e ciclo de vida comprovados pelo DConnect. Não use para consumir endpoints do DConnect, ler portas fora do ambiente Colibri ou alterar o formato de launcher.conexao sem evidência.
+description: 'Leitura de portas Colibri: use quando um projeto C# precisar criar ou adaptar código para ler o valor de uma porta usando CoLib.Ambiente e CoLib.Colibri, preservando fontes, propriedades, defaults, erros e ciclo de vida comprovados pelo DConnect. Não use para consumir endpoints do DConnect, ler portas fora do ambiente Colibri ou alterar o formato de launcher.conexao sem evidência.'
 ---
 
 # Leitura de portas Colibri
@@ -12,7 +12,7 @@ Esta skill orienta a criação de código C# que lê um valor de porta a partir 
 **Step 1: Fixar o contrato**
 
 1. O agente deve identificar o projeto-alvo, o tipo de host, o target framework, as instruções aplicáveis, os arquivos afetados e os testes existentes.
-2. O agente deve registrar a propriedade de porta solicitada, sua finalidade local, as fontes Master/cliente, defaults, erros e ciclo de vida esperados.
+2. O agente deve registrar a propriedade de porta solicitada, sua finalidade local, as fontes Master/cliente, precedências, defaults, erros e ciclo de vida esperados.
 3. Se não houver projeto-alvo concreto, o agente deve produzir orientação de paridade e manter a adoção como lacuna, sem inventar APIs.
 
 *Done when:* fonte, alvo, escopo, glob `**/*.cs`, propriedade de porta e critério de paridade estão explícitos.
@@ -44,7 +44,7 @@ Esta skill orienta a criação de código C# que lê um valor de porta a partir 
 
 **Step 5: Validar a paridade**
 
-1. O agente deve testar as fontes Master e cliente, a propriedade solicitada, defaults, arquivos obrigatórios ausentes e cache inválido.
+1. O agente deve testar as fontes Master e cliente, a propriedade solicitada, a precedência de argumentos de linha de comando no Master, defaults, arquivos obrigatórios ausentes e falhas do cache antes e depois da atribuição de `Portas`.
 2. O agente deve testar a distinção entre propriedades de porta e confirmar que o valor lido é o usado pelo código-alvo local.
 3. O agente deve executar somente os comandos de validação já existentes no alvo; antes de `dotnet build`, `dotnet test`, `dotnet publish` ou `dotnet run`, deve carregar `dotnet-efficient-validation`.
 
@@ -61,6 +61,7 @@ Esta skill orienta a criação de código C# que lê um valor de porta a partir 
 
 - Se `CoLib.Ambiente` ou `CoLib.Colibri` não estiver disponível, o agente deve marcar `incompatível` e escalar a escolha da dependência; a implementação deve preservar a proveniência em vez de substituir a biblioteca por semelhança nominal.
 - Se `ncrmaster.cfg` ou `launcher.boot` forem obrigatórios e estiverem ausentes, o agente deve preservar a falha explícita observada.
-- Se `launcher.conexao` tiver formato ou produtor desconhecido, o agente deve preservar a leitura somente após confirmar o contrato; caso contrário, deve registrar uma lacuna.
+- Se `launcher.conexao` tiver formato ou produtor desconhecido, o agente deve preservar a leitura somente após confirmar o contrato; caso contrário, deve registrar uma lacuna. Trate a atribuição de `Portas` como não transacional: uma falha posterior não implica restauração automática dos defaults.
+- Se o alvo reproduzir a leitura do Master, preserve a precedência de argumentos de linha de comando válidos sobre os valores do INI; registre uma decisão quando essa precedência não fizer parte do requisito.
 - Se a propriedade solicitada não existir no contrato Colibri comprovado, o agente deve registrar a lacuna e escalar a adaptação antes de criar uma nova abstração.
 - Se o alvo exigir reload, validação de faixa, probe de disponibilidade, retry ou consumo de endpoint, o agente deve tratar isso como decisão fora da evidência extraída.
