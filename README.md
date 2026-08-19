@@ -4,7 +4,7 @@ A repository designed to store and organize instruction files for AI agents, cat
 ## Bundles de skills
 
 `bundles.yaml` é o catálogo central de bundles por stack (`dotnet`, `delphi`, `frontend`) e por
-temática (`sdd-planning`, `code-review`, `jira-pm`, `authoring`), além do bundle `core`
+temática (`sdd`, `code-review`, `jira-pm`, `authoring`), além do bundle `core`
 (obrigatório em todo projeto).
 
 Cada projeto declara os bundles que usa em um `skills.yaml` próprio (veja `skills.yaml.sample`),

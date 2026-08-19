@@ -1,11 +1,11 @@
 ---
-name: criar-tasks
-description: Tasks — decomposição de uma feature em tarefas de implementação a partir do PRD e da TechSpec existentes em tasks/prd-*/. Use quando o usuário pedir para quebrar a feature em tarefas ou planejar a execução. Não use para redigir o PRD (criar-prd) nem a TechSpec (criar-techspec).
+name: sdd-tasks
+description: Tasks — decomposição de uma feature em tarefas de implementação a partir do PRD e da TechSpec existentes em tasks/prd-*/. Use quando o usuário pedir para quebrar a feature em tarefas ou planejar a execução. Não use para redigir o PRD (sdd-prd) nem a TechSpec (sdd-techspec).
 argument-hint: --prd nome-da-feature
 disable-model-invocation: true
 ---
 
-Entrada: `--prd` identifica o slug da feature; sem argumento, localize a pasta em `./tasks/prd-*/`. Obrigatórios: `tasks/prd-[slug]/prd.md` e `tasks/prd-[slug]/techspec.md` — se faltar algum, pare e aponte a skill correspondente (`/criar-prd`, `/criar-techspec`).
+Entrada: `--prd` identifica o slug da feature; sem argumento, localize a pasta em `./tasks/prd-*/`. Obrigatórios: `tasks/prd-[slug]/prd.md` e `tasks/prd-[slug]/techspec.md` — se faltar algum, pare e aponte a skill correspondente (`/sdd-prd`, `/sdd-techspec`).
 
 Cada tarefa é uma **entrega**: concluível de forma independente, com escopo claro e seus próprios testes. Referencie o `techspec.md` em vez de repetir detalhes de implementação.
 

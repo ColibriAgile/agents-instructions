@@ -40,22 +40,18 @@ bundles:
     skills:
       - frontend-design
 
-  sdd-planning:
-    description: Fluxo PRD -> TechSpec -> Tasks e descoberta de requisitos antes de planejar.
+  sdd:
+    description: Fluxo SDD completo — PRD -> TechSpec -> Tasks -> execução -> code review.
     skills:
-      - criar-prd
-      - criar-techspec
-      - criar-tasks
-      - orquestrar-tasks
+      - sdd-prd
+      - sdd-techspec
+      - sdd-tasks
+      - sdd-orquestrar
       - refactor-spec
       - grillme
-
-  sdd-review:
-    description: Revisão das tasks implementadas com o fluxo sdd-planning.
-    skills:
-      - executar-review
-      - executar-codereview-tasks
-      - codereview-to-tasks
+      - sdd-review
+      - sdd-codereview-execute
+      - sdd-codereview-plan
 
   code-review:
     description: Revisão de código e execução das correções apontadas.

@@ -1,5 +1,5 @@
 ---
-name: executar-review
+name: sdd-review
 description: Use essa skill quando for necessário revisar o código de uma funcionalidade, garantindo que ela está em confirmidade com os padrões estabelecidos nas rules e skills do projeto e também segue o que está definido na TechSpec em `techspec.md` e nos arquivos das tasks. Não utilize quando estiver fazendo QA ou correção de defeitos.
 argument-hint: --prd nome-da-funcionalidade
 disable-model-invocation: true

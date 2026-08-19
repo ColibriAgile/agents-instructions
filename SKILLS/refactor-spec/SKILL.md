@@ -1,11 +1,11 @@
 ---
 name: refactor-spec
-description: Gera PRD e TechSpec de refatoração (SDD para refactor) em tasks/prd-[slug]/, no mesmo formato consumido pela skill criar-tasks. Foco em preservar comportamento em vez de definir comportamento novo. Use sempre que o usuário pedir para refatorar código existente, especialmente em projetos difíceis de testar E2E (Windows Forms, código legado, UI desktop). Também use quando o usuário mencionar "spec de refactor", "refatorar sem quebrar", "preservar comportamento", ou precisar planejar uma refatoração arquitetural (extrair serviço, mudar padrão de acesso a dados, separar lógica de UI) antes de tocar no código ou antes de rodar /criar-tasks. Não use para refactors mecânicos triviais (rename, extract method local) que não precisam de spec formal, nem para specs de feature nova (aí é o par criar-prd/criar-techspec padrão).
+description: Gera PRD e TechSpec de refatoração (SDD para refactor) em tasks/prd-[slug]/, no mesmo formato consumido pela skill sdd-tasks. Foco em preservar comportamento em vez de definir comportamento novo. Use sempre que o usuário pedir para refatorar código existente, especialmente em projetos difíceis de testar E2E (Windows Forms, código legado, UI desktop). Também use quando o usuário mencionar "spec de refactor", "refatorar sem quebrar", "preservar comportamento", ou precisar planejar uma refatoração arquitetural (extrair serviço, mudar padrão de acesso a dados, separar lógica de UI) antes de tocar no código ou antes de rodar /sdd-tasks. Não use para refactors mecânicos triviais (rename, extract method local) que não precisam de spec formal, nem para specs de feature nova (aí é o par sdd-prd/sdd-techspec padrão).
 ---
 
 # Refactor Spec (SDD para Refatorações)
 
-Gera o par `prd.md` + `techspec.md` de uma refatoração, em `tasks/prd-[slug]/`, no mesmo formato que a skill `criar-tasks` consome. A diferença em relação ao par PRD/TechSpec de feature nova é o foco: aqui "requisito" é comportamento existente que não pode mudar, não comportamento novo a construir.
+Gera o par `prd.md` + `techspec.md` de uma refatoração, em `tasks/prd-[slug]/`, no mesmo formato que a skill `sdd-tasks` consome. A diferença em relação ao par PRD/TechSpec de feature nova é o foco: aqui "requisito" é comportamento existente que não pode mudar, não comportamento novo a construir.
 
 ## Quando usar
 
@@ -13,9 +13,9 @@ Gera o par `prd.md` + `techspec.md` de uma refatoração, em `tasks/prd-[slug]/`
 - Refatorações em código com cobertura de teste fraca ou impossível de testar E2E (WinForms, código legado)
 - Refatorações de lógica financeira/crítica onde regressão silenciosa é cara
 - Refatorações feitas por agente de IA (Claude Code), onde a spec funciona como grade de contenção
-- Como preparação para rodar `/criar-tasks` num refactor
+- Como preparação para rodar `/sdd-tasks` num refactor
 
-Não usar para: rename, extract method local, refactors de um único arquivo com boa cobertura de testes já existente — aí o teste + IDE já bastam. Também não usar para specs de feature nova (usar `criar-prd` + `criar-techspec` normalmente).
+Não usar para: rename, extract method local, refactors de um único arquivo com boa cobertura de testes já existente — aí o teste + IDE já bastam. Também não usar para specs de feature nova (usar `sdd-prd` + `sdd-techspec` normalmente).
 
 ## Fluxo
 
@@ -33,11 +33,11 @@ Não usar para: rename, extract method local, refactors de um único arquivo com
 
 4. **Gerar `prd.md`** em `tasks/prd-[slug]/` a partir de `assets/TEMPLATE_PRD_REFACTOR.md`. Cada requisito (Rn) deve ser um comportamento observável específico e verificável — não genérico.
 
-5. **Gerar `techspec.md`** em `tasks/prd-[slug]/` a partir de `assets/TEMPLATE_TECHSPEC_REFACTOR.md`. Ponto crítico: a seção **Test cases** deve enumerar exaustivamente todo teste (automatizado ou manual) que verifica os requisitos do PRD — é essa tabela que a `criar-tasks` inventaria ao quebrar em tarefas. Cada test case referencia o ID do requisito correspondente.
+5. **Gerar `techspec.md`** em `tasks/prd-[slug]/` a partir de `assets/TEMPLATE_TECHSPEC_REFACTOR.md`. Ponto crítico: a seção **Test cases** deve enumerar exaustivamente todo teste (automatizado ou manual) que verifica os requisitos do PRD — é essa tabela que a `sdd-tasks` inventaria ao quebrar em tarefas. Cada test case referencia o ID do requisito correspondente.
 
-6. **Ordenar o plano de execução por risco crescente** dentro da techspec: extrair lógica testável primeiro (baixo risco), mexer em code-behind/controles por último (alto risco). Isso mapeia diretamente na regra de ordenação por dependência que a `criar-tasks` já aplica.
+6. **Ordenar o plano de execução por risco crescente** dentro da techspec: extrair lógica testável primeiro (baixo risco), mexer em code-behind/controles por último (alto risco). Isso mapeia diretamente na regra de ordenação por dependência que a `sdd-tasks` já aplica.
 
-7. **Reportar os arquivos gerados** e sugerir o próximo passo: rodar `/criar-tasks --prd [slug]` para quebrar em tarefas.
+7. **Reportar os arquivos gerados** e sugerir o próximo passo: rodar `/sdd-tasks --prd [slug]` para quebrar em tarefas.
 
 ## Notas específicas para stack WinForms + DevExpress
 
@@ -49,4 +49,4 @@ Não usar para: rename, extract method local, refactors de um único arquivo com
 ## Referência
 
 - `assets/TEMPLATE_PRD_REFACTOR.md` — template do PRD
-- `assets/TEMPLATE_TECHSPEC_REFACTOR.md` — template da TechSpec (contém a tabela de test cases que a `criar-tasks` consome)
+- `assets/TEMPLATE_TECHSPEC_REFACTOR.md` — template da TechSpec (contém a tabela de test cases que a `sdd-tasks` consome)

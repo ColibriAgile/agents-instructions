@@ -1,17 +1,17 @@
 ---
-name: codereview-to-tasks
-description: 'Analisa o relatório codereview.md gerado por executar-review e cria tarefas de correção para cada não conformidade acionável. Use para transformar code reviews reprovados ou com ressalvas em task_[num].md na pasta da revisão.'
+name: sdd-codereview-plan
+description: 'Analisa o relatório codereview.md gerado por sdd-review e cria tarefas de correção para cada não conformidade acionável. Use para transformar code reviews reprovados ou com ressalvas em task_[num].md na pasta da revisão.'
 argument-hint: '--prd nome-da-feature --num numero-da-revisao'
 disable-model-invocation: true
 ---
 
 # Code Review para Tarefas
 
-Converta um artefato da skill `executar-review` em tarefas de implementação focadas na correção dos problemas encontrados. Esta é uma skill pessoal e grava os arquivos diretamente na pasta da code review selecionada.
+Converta um artefato da skill `sdd-review` em tarefas de implementação focadas na correção dos problemas encontrados. Esta é uma skill pessoal e grava os arquivos diretamente na pasta da code review selecionada.
 
 ## Quando usar
 
-- Quando existir um relatório `codereview.md` produzido por `executar-review`.
+- Quando existir um relatório `codereview.md` produzido por `sdd-review`.
 - Quando for necessário transformar itens `NOK`, tasks incompletas, testes falhando ou recomendações acionáveis em tarefas.
 - Quando houver mais de uma pasta `codereview_*` e for necessário usar a revisão mais recente.
 

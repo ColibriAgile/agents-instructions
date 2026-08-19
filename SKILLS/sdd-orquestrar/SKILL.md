@@ -1,5 +1,5 @@
 ---
-name: orquestrar-tasks
+name: sdd-orquestrar
 description: "Orquestra a execucao de tarefas de uma feature a partir de tasks/prd-<nome>/. Use quando o usuario pedir para executar, coordenar ou acompanhar tarefas definidas por PRD, TechSpec e arquivos task_*.md, inclusive com subagentes paralelos, revisao e retrabalho."
 argument-hint: "--prd nome-da-task --budget economico|medio|alto"
 disable-model-invocation: true
