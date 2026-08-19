@@ -17,6 +17,10 @@
 .PARAMETER NoReconcile
     Pula a etapa de reconciliação (detectar/remover skills instaladas fora do manifesto).
 
+.PARAMETER NoPull
+    Pula o `git pull` automático e a checagem de commit/push pendente na cópia local de
+    agents-instructions antes de ler bundles.yaml.
+
 .PARAMETER BundlesPath
     Caminho local do bundles.yaml central. Padrão: bundles.yaml ao lado deste script
     (ou seja, na sua cópia local clonada de agents-instructions). Para atualizar o
@@ -34,6 +38,7 @@ param(
     [switch]$Silent,
     [switch]$Detailed,
     [switch]$NoReconcile,
+    [switch]$NoPull,
     [string]$BundlesPath = (Join-Path $PSScriptRoot 'bundles.yaml')
 )
 
@@ -43,6 +48,11 @@ if ($Silent -and $Detailed) {
 }
 
 . (Join-Path $PSScriptRoot 'Skills.Common.ps1')
+
+if (-not $NoPull) {
+    Sync-BundlesRepo -BundlesPath $BundlesPath -Quiet:$Silent
+    Assert-BundlesRepoPushed -BundlesPath $BundlesPath
+}
 
 if (-not (Test-Path $Path)) {
     if ($Silent) {

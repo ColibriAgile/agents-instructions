@@ -13,10 +13,16 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$BundlesPath = (Join-Path $PSScriptRoot 'bundles.yaml')
+    [string]$BundlesPath = (Join-Path $PSScriptRoot 'bundles.yaml'),
+    [switch]$NoPull
 )
 
 . (Join-Path $PSScriptRoot 'Skills.Common.ps1')
+
+if (-not $NoPull) {
+    Sync-BundlesRepo -BundlesPath $BundlesPath
+    Assert-BundlesRepoPushed -BundlesPath $BundlesPath
+}
 
 if (-not (Get-Command fzf -ErrorAction SilentlyContinue)) {
     Write-Error "fzf não encontrado no PATH. Instale (scoop install fzf / winget install fzf) e tente de novo."
