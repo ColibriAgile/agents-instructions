@@ -19,6 +19,7 @@ bundles:
     description: Projetos .NET / Colibri.
     skills:
       - atualizar-pacotes-nuget
+      - atualizar-testes-mtp
       - colibri-connection-string
       - colibri-logging
       - csharp-string-optimization
