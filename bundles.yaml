@@ -15,6 +15,7 @@ bundles:
       - caveman      
       - grillme
       - no-workarounds
+      - lesson-learned
 
   dotnet:
     description: Projetos .NET / Colibri.
@@ -57,6 +58,8 @@ bundles:
     description: Revisão de código e execução das correções apontadas.
     skills:
       - deep-review
+      - architectural-analysis
+      - refactoring-analysis
 
   jira-pm:
     description: Gestão de tarefas no Jira e migração de tarefas do ClickUp.
