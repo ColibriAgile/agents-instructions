@@ -65,3 +65,19 @@ No `.gitignore` do projeto que consome `skills.yaml`, ignore os artefatos gerado
 .codex/skills/
 skills-lock.json
 ```
+
+### Trazer skill de repositório externo
+
+Para adicionar ao catálogo (`SKILLS/`) uma skill que já existe em outro repositório, em vez de
+escrever do zero, use `Import-Skill.ps1`. Ele baixa em pasta temporária isolada e move só o
+resultado para `SKILLS/`, sem deixar `.claude/skills`, `.agents` ou `skills-lock.json` sujos
+neste repositório:
+
+```powershell
+pwsh Import-Skill.ps1 -Source vercel-labs/agent-skills -Skills deploy-to-vercel
+```
+
+Aceita várias skills do mesmo `Source` de uma vez (`-Skills a, b, c`) e `-Force` para
+sobrescrever uma pasta já existente. Ao final, imprime o comando de
+`SKILLS/bundle-orphan-skills/scripts/Set-SkillBundle.ps1` para cada skill baixada — rode-o em
+seguida para colocá-la em um bundle de `bundles.yaml`.
