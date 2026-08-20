@@ -1,17 +1,17 @@
 ---
-name: bundle-orphan-skills
+name: assign-bundles
 description: Atribui interativamente cada skill de SKILLS/ sem bundle a um bundle existente ou novo em bundles.yaml, perguntando skill por skill com opções de bundle existente, bundle novo sugerido e nome customizado.
 disable-model-invocation: true
 ---
 
-# Bundle Orphan Skills
+# Assign Bundles
 
 Atribui cada skill órfã (sem bundle) a um bundle em `bundles.yaml`, uma pergunta por skill.
 
 ## Steps
 
 **Step 1: Levantar as órfãs**
-1. Execute `pwsh SKILLS/bundle-orphan-skills/scripts/Find-OrphanSkills.ps1` a partir da raiz do repositório (read-only).
+1. Execute `pwsh SKILLS/assign-bundles/scripts/Find-OrphanSkills.ps1` a partir da raiz do repositório (read-only).
 2. Se a saída for "Todas as skills pertencem a pelo menos 1 bundle.", pare e informe ao usuário que não há trabalho a fazer.
 
 *Done when:* a lista de skills órfãs (ou a confirmação de que está vazia) está em mãos.
@@ -29,7 +29,7 @@ Atribui cada skill órfã (sem bundle) a um bundle em `bundles.yaml`, uma pergun
 *Done when:* toda skill órfã tem uma resposta — um bundle existente, a sugestão nova aceita, ou um nome customizado via "Other".
 
 **Step 4: Aplicar em bundles.yaml**
-1. Para cada resposta, execute `pwsh SKILLS/bundle-orphan-skills/scripts/Set-SkillBundle.ps1 -Bundle "<nome>" -Skill "<skill>"` (mutating), acrescentando `-Description "<descrição>"` sempre que `<nome>` ainda não existir em `bundles.yaml` (sugestão nova aceita ou nome customizado).
+1. Para cada resposta, execute `pwsh SKILLS/assign-bundles/scripts/Set-SkillBundle.ps1 -Bundle "<nome>" -Skill "<skill>"` (mutating), acrescentando `-Description "<descrição>"` sempre que `<nome>` ainda não existir em `bundles.yaml` (sugestão nova aceita ou nome customizado).
 2. Se o script falhar (mensagem em stderr), corrija o argumento apontado e rode de novo.
 
 *Done when:* rodar o Step 1 de novo mostra "Todas as skills pertencem a pelo menos 1 bundle."

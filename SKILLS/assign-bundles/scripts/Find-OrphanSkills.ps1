@@ -3,7 +3,7 @@
     Lista as skills em SKILLS/ que não pertencem a nenhum bundle de bundles.yaml. (read-only)
 
 .PARAMETER RepoRoot
-    Raiz do repositório agents-instructions. Padrão: resolvida a partir deste script (SKILLS/bundle-orphan-skills/scripts/../../..).
+    Raiz do repositório agents-instructions. Padrão: resolvida a partir deste script (SKILLS/assign-bundles/scripts/../../..).
 
 .PARAMETER SkillsPath
     Caminho da pasta SKILLS. Padrão: SKILLS na raiz do repositório.
@@ -12,7 +12,7 @@
     Caminho do bundles.yaml. Padrão: bundles.yaml na raiz do repositório.
 
 .EXAMPLE
-    pwsh SKILLS/bundle-orphan-skills/scripts/Find-OrphanSkills.ps1
+    pwsh SKILLS/assign-bundles/scripts/Find-OrphanSkills.ps1
 #>
 [CmdletBinding()]
 param(

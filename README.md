@@ -79,5 +79,5 @@ pwsh Import-Skill.ps1 -Source vercel-labs/agent-skills -Skills deploy-to-vercel
 
 Aceita várias skills do mesmo `Source` de uma vez (`-Skills a, b, c`) e `-Force` para
 sobrescrever uma pasta já existente. Ao final, imprime o comando de
-`SKILLS/bundle-orphan-skills/scripts/Set-SkillBundle.ps1` para cada skill baixada — rode-o em
+`SKILLS/assign-bundles/scripts/Set-SkillBundle.ps1` para cada skill baixada — rode-o em
 seguida para colocá-la em um bundle de `bundles.yaml`.

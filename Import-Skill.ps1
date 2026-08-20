@@ -84,5 +84,5 @@ finally {
 Write-Host ""
 Write-Host "Proximo passo — adicionar a um bundle:" -ForegroundColor Cyan
 foreach ($skill in $Skills) {
-    Write-Host "  pwsh SKILLS/bundle-orphan-skills/scripts/Set-SkillBundle.ps1 -Bundle <bundle> -Skill $skill"
+    Write-Host "  pwsh SKILLS/assign-bundles/scripts/Set-SkillBundle.ps1 -Bundle <bundle> -Skill $skill"
 }

@@ -18,9 +18,9 @@
     Caminho do bundles.yaml. Padrão: bundles.yaml na raiz do repositório.
 
 .EXAMPLE
-    pwsh SKILLS/bundle-orphan-skills/scripts/Set-SkillBundle.ps1 -Bundle dotnet -Skill colibri-ports
+    pwsh SKILLS/assign-bundles/scripts/Set-SkillBundle.ps1 -Bundle dotnet -Skill colibri-ports
 .EXAMPLE
-    pwsh SKILLS/bundle-orphan-skills/scripts/Set-SkillBundle.ps1 -Bundle spec-authoring -Skill breakdown-specs -Description "Quebra specs grandes em unidades menores."
+    pwsh SKILLS/assign-bundles/scripts/Set-SkillBundle.ps1 -Bundle spec-authoring -Skill breakdown-specs -Description "Quebra specs grandes em unidades menores."
 #>
 [CmdletBinding()]
 param(

@@ -76,7 +76,7 @@ bundles:
       - agent-customization
       - ai-ready-fix
       - ai-ready-score
-      - bundle-orphan-skills
+      - assign-bundles
       - create-agent
       - create-hook
       - create-instructions
