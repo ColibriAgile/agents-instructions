@@ -91,11 +91,13 @@ if ($skillsIndex -eq -1) {
 
 $lastEntryIndex = $skillsIndex
 $existing = $false
+$existingSkills = [System.Collections.Generic.List[string]]::new()
 for ($i = $skillsIndex + 1; $i -lt $nextHeaderIndex; $i++) {
     if ($lines[$i] -notmatch '^\s*-\s*(.+?)\s*$') { break }
     $lastEntryIndex = $i
     $name = $matches[1].Trim('"''')
     if ($name -eq $Skill) { $existing = $true }
+    $existingSkills.Add($name)
 }
 
 if ($existing) {
@@ -103,6 +105,15 @@ if ($existing) {
     exit 0
 }
 
-$lines.Insert($lastEntryIndex + 1, "      - $Skill")
+$existingSkills.Add($Skill)
+$sortedSkills = $existingSkills | Sort-Object
+
+$lines.RemoveRange($skillsIndex + 1, $lastEntryIndex - $skillsIndex)
+$insertIndex = $skillsIndex + 1
+foreach ($name in $sortedSkills) {
+    $lines.Insert($insertIndex, "      - $name")
+    $insertIndex++
+}
+
 Set-Content -Path $BundlesPath -Value $lines -Encoding UTF8
-Write-Host "Skill '$Skill' adicionada ao bundle '$Bundle'." -ForegroundColor Green
+Write-Host "Skill '$Skill' adicionada ao bundle '$Bundle' (lista ordenada alfabeticamente)." -ForegroundColor Green

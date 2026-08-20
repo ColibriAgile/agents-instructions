@@ -10,12 +10,12 @@ bundles:
   core:
     description: Obrigatório em todo projeto — workflow genérico, independente de stack.
     skills:
+      - caveman
       - commit
-      - repository-cli-efficiency
-      - caveman      
       - grillme
-      - no-workarounds
       - lesson-learned
+      - no-workarounds
+      - repository-cli-efficiency
 
   dotnet:
     description: Projetos .NET / Colibri.
@@ -24,14 +24,13 @@ bundles:
       - atualizar-testes-mtp
       - colibri-connection-string
       - colibri-logging
-      - colibri-ports      
+      - colibri-ports
       - csharp-string-optimization
       - csharp-tests
       - dotnet-efficient-validation
+      - extrair-requisitos-csharp
       - http-client-resilience
       - pgsql-test-runner
-      - extrair-requisitos-csharp
-      - colibri-ports
 
   delphi:
     description: Projetos Delphi legados.
@@ -46,43 +45,43 @@ bundles:
   sdd:
     description: Fluxo SDD completo — PRD -> TechSpec -> Tasks -> execução -> code review.
     skills:
-      - sdd-prd
-      - sdd-techspec
-      - sdd-tasks
-      - sdd-orquestrar
-      - sdd-refactor
       - sdd-codereview
+      - sdd-codereview-fix
       - sdd-codereview-tasks
-      - sdd-codereview-fix      
+      - sdd-orquestrar
+      - sdd-prd
+      - sdd-refactor
+      - sdd-tasks
+      - sdd-techspec
 
   code-review:
     description: Revisão de código e execução das correções apontadas.
     skills:
-      - deep-review
       - architectural-analysis
+      - deep-review
       - refactoring-analysis
 
   jira-pm:
     description: Gestão de tarefas no Jira e migração de tarefas do ClickUp.
     skills:
+      - clickup-to-jira-task-conversion
       - jira-aashari-mcp
+      - jira-issue-description-generator
       - jira-mcp-issue-management
       - jira-task-refinement
-      - jira-issue-description-generator
-      - clickup-to-jira-task-conversion
 
   authoring:
     description: Autoria de skills/agents/rules/hooks — instalação pontual (ad hoc), remover ao final da tarefa.
     skills:
+      - agent-customization
+      - ai-ready-fix
+      - ai-ready-score
+      - bundle-orphan-skills
       - create-agent
       - create-hook
       - create-instructions
       - create-prompt
       - create-skill
-      - agent-customization
-      - writing-agents-md
-      - ai-ready-score
-      - ai-ready-fix
-      - writing-skills
       - to-prompt
-      - bundle-orphan-skills
+      - writing-agents-md
+      - writing-skills
