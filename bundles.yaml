@@ -51,6 +51,7 @@ bundles:
       - sdd-orquestrar
       - sdd-prd
       - sdd-refactor
+      - sdd-task-decomposition
       - sdd-tasks
       - sdd-techspec
 
