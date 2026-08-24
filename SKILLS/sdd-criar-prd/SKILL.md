@@ -1,6 +1,6 @@
 ---
-name: sdd-prd
-description: PRD — Documento de Requisitos de Produto. Use quando o usuário pedir um PRD ou quiser definir requisitos e escopo de uma nova feature ou produto (primeira etapa do fluxo PRD → TechSpec → tasks). Não use para especificação técnica (sdd-techspec) nem para decompor em tarefas (sdd-tasks).
+name: sdd-criar-prd
+description: PRD — Documento de Requisitos de Produto. Use quando o usuário pedir um PRD ou quiser definir requisitos e escopo de uma nova feature ou produto (primeira etapa do fluxo PRD → TechSpec → tasks). Não use para especificação técnica (sdd-criar-techspec) nem para decompor em tarefas (sdd-planejar-tasks).
 argument-hint: --prompt "descrição da feature"
 disable-model-invocation: true
 ---

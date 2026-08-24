@@ -66,6 +66,13 @@ Use PRD e TechSpec como fontes de verdade. Coloque perguntas, resultados de ferr
 
 ## Handoff
 
-- Resultado produzido: [artefato ou comportamento]
-- Decisões novas: [somente as tomadas durante a implementação]
-- Pendências: [bloqueios reais ou —]
+> Atualizado por `sdd-executar-task` durante a implementação.
+
+- Resultado produzido: Pendente de execução.
+- Arquivos alterados: Pendente de execução.
+- Verificações: Pendente de execução.
+- Pendências: Pendente de execução.
+
+### Candidatas a ADR
+
+Pendente de execução. `sdd-executar-task` substitui este texto por candidatas estruturadas ou por `Nenhuma — implementação direta da TechSpec ou decisão local`.

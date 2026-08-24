@@ -43,17 +43,17 @@ bundles:
       - frontend-design
 
   sdd:
-    description: Fluxo SDD completo — PRD -> TechSpec -> Tasks -> execução -> code review.
+    description: Fluxo SDD completo — PRD -> TechSpec -> tasks -> execução -> revisão.
     skills:
-      - sdd-codereview
-      - sdd-codereview-fix
-      - sdd-codereview-tasks
-      - sdd-orquestrar
-      - sdd-prd
-      - sdd-refactor
-      - sdd-task-decomposition
-      - sdd-tasks
-      - sdd-techspec
+      - sdd-criar-prd
+      - sdd-criar-techspec
+      - sdd-executar-correcoes
+      - sdd-executar-task
+      - sdd-orquestrar-tasks
+      - sdd-planejar-correcoes
+      - sdd-planejar-refatoracao
+      - sdd-planejar-tasks
+      - sdd-revisar-codigo
 
   code-review:
     description: Revisão de código e execução das correções apontadas.

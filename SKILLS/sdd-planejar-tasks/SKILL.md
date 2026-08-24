@@ -1,11 +1,11 @@
 ---
-name: sdd-task-decomposition
-description: Decomposição cache-first de PRD e TechSpec em tarefas atômicas e rastreáveis. Use quando a feature já possui tasks/prd-[slug]/prd.md e techspec.md. Não use para criar os documentos de origem nem para implementar as tarefas.
+name: sdd-planejar-tasks
+description: Planeja tasks atômicas e rastreáveis a partir de PRD e TechSpec.
 argument-hint: --prd nome-da-feature
 disable-model-invocation: true
 ---
 
-# SDD Task Decomposition
+# Planejar tasks SDD
 
 Converta PRD e TechSpec em contratos de execução pequenos, rastreáveis e testáveis. Preserve os documentos como fontes de verdade e maximize o prefixo idêntico entre execuções na ordem `prd.md → techspec.md → task atual`.
 
@@ -36,8 +36,9 @@ Converta PRD e TechSpec em contratos de execução pequenos, rastreáveis e test
 3. Separe tarefas quando houver resultados independentes; una preparação sem valor observável à primeira entrega que a consome.
 4. Numere com IDs estáveis `T01`, `T02` e modele dependências como DAG. Ordene pré-requisitos antes dos consumidores e explicite o que cada tarefa desbloqueia.
 5. Mapeie toda tarefa a pelo menos um item do inventário e todo item não pendente a pelo menos uma tarefa. Preserve `fora de escopo` como limite, não como backlog implícito.
+6. Apresente ao usuário o DAG proposto, com títulos, resultados e dependências, e aguarde aprovação antes de gerar arquivos.
 
-*Done when:* o DAG não contém ciclos ou tarefas órfãs, e cada tarefa é implementável, revisável e verificável sem depender de trabalho não declarado.
+*Done when:* o DAG não contém ciclos ou tarefas órfãs, cada tarefa é implementável, revisável e verificável sem depender de trabalho não declarado, e o usuário aprovou a estrutura.
 
 **Step 4: Gerar os contratos**
 
@@ -65,6 +66,6 @@ Converta PRD e TechSpec em contratos de execução pequenos, rastreáveis e test
 
 ## Error Handling
 
-- Se faltar `prd.md`, pare e direcione para `sdd-prd`; se faltar `techspec.md`, pare e direcione para `sdd-techspec`.
+- Se faltar `prd.md`, pare e direcione para `sdd-criar-prd`; se faltar `techspec.md`, pare e direcione para `sdd-criar-techspec`.
 - Se duas fontes se contradisserem em escopo, contrato ou aceite, preserve ambas como evidência, identifique as tarefas afetadas e solicite a decisão mínima necessária.
 - Se um requisito não puder receber teste ou evidência observável, reporte a lacuna na especificação antes de gerar a tarefa correspondente.

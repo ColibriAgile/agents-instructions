@@ -1,10 +1,10 @@
 ---
-name: sdd-techspec
-description: TechSpec — especificação técnica derivada de um PRD existente. Use quando o usuário pedir uma techspec ou a arquitetura de uma feature que já tem PRD em tasks/prd-*/prd.md. Não use sem PRD (sdd-prd) nem para decompor em tarefas (sdd-tasks).
+name: sdd-criar-techspec
+description: TechSpec — especificação técnica derivada de um PRD existente. Use quando o usuário pedir uma techspec ou a arquitetura de uma feature que já tem PRD em tasks/prd-*/prd.md. Não use sem PRD (sdd-criar-prd) nem para decompor em tarefas (sdd-planejar-tasks).
 argument-hint: --prd nome-da-feature
 ---
 
-Entrada: `--prd` identifica o slug da feature; sem argumento, deduza o slug pelo contexto da sessão atual (feature em discussão, PRD recém-criado, pasta já referenciada etc.) e só então localize a pasta em `./tasks/prd-*/`. PRD obrigatório em `tasks/prd-[slug]/prd.md` — se não existir, pare e aponte `/sdd-prd`.
+Entrada: `--prd` identifica o slug da feature; sem argumento, deduza o slug pelo contexto da sessão atual (feature em discussão, PRD recém-criado, pasta já referenciada etc.) e só então localize a pasta em `./tasks/prd-*/`. PRD obrigatório em `tasks/prd-[slug]/prd.md` — se não existir, pare e aponte `/sdd-criar-prd`.
 
 A TechSpec define **o como** — arquitetura, componentes, contratos e testes. O quê/porquê já está no PRD: referencie-o em vez de repeti-lo. Especifique sem implementar: código apenas nos exemplos de interface do template. Prefira arquitetura simples e evolutiva, com interfaces claras.
 

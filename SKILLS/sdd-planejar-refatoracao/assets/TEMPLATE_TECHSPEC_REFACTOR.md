@@ -29,7 +29,7 @@ Decisões de como a refatoração será feita (não o quê — isso está no PRD
 
 ## Test cases
 
-> Esta seção alimenta diretamente a skill `sdd-tasks` — cada linha deve virar um teste concreto (automatizado ou manual) mapeado a um requisito do PRD.
+> Esta seção alimenta diretamente a skill `sdd-planejar-tasks` — cada linha deve virar um teste concreto (automatizado ou manual) mapeado a um requisito do PRD.
 
 | ID | Requisito (PRD) | Tipo | Descrição do teste | Automatizável? |
 |---|---|---|---|---|
@@ -40,7 +40,7 @@ Decisões de como a refatoração será feita (não o quê — isso está no PRD
 
 ## Plano de execução (ordem por risco/dependência)
 
-> Compatível com o critério de ordenação da `sdd-tasks` ("dependências antes das dependentes") — aqui a dependência é por risco: extrair lógica testável primeiro, mexer em UI/controles por último.
+> Compatível com o critério de ordenação da `sdd-planejar-tasks` ("dependências antes das dependentes") — aqui a dependência é por risco: extrair lógica testável primeiro, mexer em UI/controles por último.
 
 1. **[Baixo risco]** Escrever testes de caracterização faltantes (T2, ...)
 2. **[Baixo risco]** Extrair lógica de negócio para classes testáveis (componentes novos da tabela acima)

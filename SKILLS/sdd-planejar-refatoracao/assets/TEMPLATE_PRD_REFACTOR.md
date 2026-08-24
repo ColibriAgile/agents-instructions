@@ -18,7 +18,7 @@ Por que refatorar agora? (dívida técnica bloqueando outra feature, dificuldade
 
 ## Requisitos
 
-> Em refactor, "requisito" não é comportamento novo — é comportamento existente que não pode mudar. Cada linha vira insumo para os test cases da techspec e, depois, para as tarefas geradas pela skill `sdd-tasks`.
+> Em refactor, "requisito" não é comportamento novo — é comportamento existente que não pode mudar. Cada linha vira insumo para os test cases da techspec e, depois, para as tarefas geradas pela skill `sdd-planejar-tasks`.
 
 | ID | Comportamento observável a preservar | Origem/evidência |
 |---|---|---|
