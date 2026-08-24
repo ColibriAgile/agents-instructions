@@ -1,47 +1,77 @@
-# Tarefa X.0: [Título da tarefa]
+# Contexto estável de execução
 
-## Visão geral
+Carregue nesta ordem exata:
 
-[Descrição breve da tarefa]
+1. `tasks/prd-[slug]/codereview_[num]/codereview.md`
+2. Este arquivo
 
-<skills>
-### Conformidade com skills
+Use o relatório como fonte de verdade. Recupere TechSpec, rules, skills e código somente quando apontados abaixo. Coloque perguntas, ferramentas, diffs e estado depois desse prefixo.
 
-[Listar as skills do projeto aplicáveis a esta tarefa]
-</skills>
+---
 
-<requirements>
-[Lista de requisitos obrigatórios (usar os RFs quando aplicável)]
-</requirements>
+# TXX — [título orientado ao resultado]
 
-## Subtarefas
+## Resultado
 
-- [ ] X.1 [Descrição da subtarefa]
-- [ ] X.2 [Descrição da subtarefa]
+[Comportamento observável corrigido ao concluir a task.]
 
-## Detalhes de implementação
+## Dependências e limites
 
-[Referenciar as seções pertinentes do `techspec.md` em vez de copiá-las]
+- Depende de: [IDs ou —]
+- Desbloqueia: [IDs ou —]
+- Dentro do escopo: [mudanças desta correção]
+- Fora do escopo: [limites relevantes]
 
-## Critérios de sucesso
+## Rastreabilidade
 
-- [Resultados mensuráveis]
-- [Requisitos de qualidade]
+| Origem | Seção | Achado coberto |
+| --- | --- | --- |
+| CR-01 | `codereview.md#[seção]` | [não conformidade] |
 
-## Testes da tarefa
+## Requisitos
 
-### Testes unitários
+- [Comportamento esperado pelo review ou pela TechSpec]
+- [Regra e condição de erro ou borda]
 
-- [ ] ...
+## Contexto a recuperar sob demanda
 
-### Testes de integração
+- TechSpec: `[seção, se aplicável]`
+- Rules/skills: [nomes]
+- Código: `[arquivo ou símbolo]` — [relevância]
 
-- [ ] ...
+## Trabalho
 
-### Testes E2E (se aplicável)
+- [ ] TXX.1 [mudança pequena e verificável]
+- [ ] TXX.2 [mudança pequena e verificável]
 
-- [ ] ...
+## Critérios de aceite
 
-## Arquivos relevantes
+- [Condição observável e mensurável]
+- [Não conformidade eliminada sem regressão]
 
-- [Arquivos relevantes para esta tarefa]
+## Verificação
+
+- Unitário: [cenário e resultado, se aplicável]
+- Integração: [fronteira e resultado, se aplicável]
+- E2E: [fluxo crítico, se aplicável]
+- Comandos: `[comando real]`
+- Evidência esperada: [saída, teste, métrica ou artefato]
+
+## Arquivos afetados
+
+- Modificar: `[caminho]`
+- Criar: `[caminho, se necessário]`
+
+## Observabilidade e recuperação
+
+- Sinal operacional: [log, métrica ou health check, se aplicável]
+- Recuperação: [rollback ou reversão, se aplicável]
+
+## Handoff
+
+> Atualizado por `sdd-executar-correcoes` durante a implementação.
+
+- Resultado produzido: Pendente de execução.
+- Arquivos alterados: Pendente de execução.
+- Verificações: Pendente de execução.
+- Pendências: Pendente de execução.

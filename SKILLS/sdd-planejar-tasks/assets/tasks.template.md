@@ -41,3 +41,7 @@
 ## Estado
 
 - [ ] T01 — pendente
+
+## Problemas e soluções
+
+- Nenhum.

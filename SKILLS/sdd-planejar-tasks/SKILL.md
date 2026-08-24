@@ -1,71 +1,76 @@
 ---
 name: sdd-planejar-tasks
-description: Planeja tasks atômicas e rastreáveis a partir de PRD e TechSpec.
-argument-hint: --prd nome-da-feature
+description: Planeja tasks SDD atômicas e rastreáveis sem implementar a feature.
+argument-hint: --prd nome-da-feature [--atualizar]
 disable-model-invocation: true
 ---
 
 # Planejar tasks SDD
 
-Converta PRD e TechSpec em contratos de execução pequenos, rastreáveis e testáveis. Preserve os documentos como fontes de verdade e maximize o prefixo idêntico entre execuções na ordem `prd.md → techspec.md → task atual`.
+Converta PRD e TechSpec em contratos pequenos, rastreáveis e testáveis. Preserve as fontes e maximize o prefixo idêntico entre execuções na ordem `prd.md → techspec.md → task atual`.
 
 ## Steps — decomposição
 
-**Step 1: Fixar o prefixo de origem**
+**Step 1: Fixar fontes e destino**
 
 1. Resolva o slug por `--prd`; na ausência do argumento, use a feature já identificada na sessão.
 2. Exija `tasks/prd-[slug]/prd.md` e `tasks/prd-[slug]/techspec.md`.
 3. Leia ambos integralmente uma vez, sempre na ordem PRD e TechSpec. Trate-os como imutáveis durante esta execução; reinicie o inventário se um deles mudar.
-4. Direcione estado mutável, perguntas e retornos de ferramentas para depois desse prefixo estável.
+4. Verifique `tasks.md`, `task_*.md` e `done/task_*.md` depois desse prefixo. Sem `--atualizar`, preserve qualquer plano existente e pare informando seu caminho. Com `--atualizar`, inventarie IDs, links, estado e handoffs existentes antes de propor mudanças.
+5. Mantenha perguntas, código recuperado, resultados de ferramentas e estado mutável depois das fontes estáveis.
 
-*Done when:* os dois documentos corretos estão carregados integralmente, na ordem fixa, e nenhuma fonte variável foi intercalada entre eles.
+*Done when:* as duas fontes corretas estão carregadas na ordem fixa e o destino está classificado como criação nova ou atualização explícita sem risco de sobrescrita.
 
 **Step 2: Construir o inventário rastreável**
 
-1. Extraia em uma única passagem requisitos funcionais e não funcionais, histórias, fora de escopo, decisões técnicas, componentes, contratos, integrações, riscos, observabilidade, migrações e todos os cenários de teste.
-2. Preserve IDs existentes como `RF1`. Para itens sem ID, atribua IDs locais estáveis por categoria (`US-01`, `NFR-01`, `CMP-01`, `TC-01`) e registre a seção de origem.
-3. Associe cada item a componente afetado, evidência de conclusão e teste previsto. Marque como `pendente` apenas contradições ou lacunas que alterem escopo, dependência ou critério de aceite.
-4. Quando faltar somente um caminho ou comando verificável, inspecione o menor trecho necessário do projeto e registre a evidência sem redesenhar a TechSpec.
+1. Extraia em uma única passagem requisitos funcionais e não funcionais, histórias, fora de escopo, decisões técnicas, componentes, contratos, integrações, riscos, observabilidade, migrações e cenários de teste.
+2. Preserve IDs existentes. Para itens sem ID, atribua IDs locais estáveis por categoria (`US-01`, `NFR-01`, `CMP-01`, `TC-01`) e registre a seção de origem.
+3. Associe cada item a componente afetado, evidência de conclusão e teste previsto. Marque como `pendente` somente contradições ou lacunas que alterem escopo, dependência ou aceite.
+4. Em atualização, preserve o vínculo das obrigações inalteradas com tasks existentes e identifique somente adições, remoções ou impactos reais.
+5. Quando faltar um caminho ou comando verificável, inspecione o menor trecho necessário do projeto sem redesenhar a TechSpec.
 
-*Done when:* todo item do PRD e da TechSpec aparece exatamente uma vez no inventário como mapeável ou pendente, com origem e verificação identificadas.
+*Done when:* todo item das fontes aparece exatamente uma vez como mapeável ou pendente, com origem e verificação, e todo item previamente planejado foi reconciliado.
 
 **Step 3: Formar entregas atômicas**
 
-1. Prefira fatias verticais que entreguem comportamento observável. Crie uma tarefa de fundação somente quando ela desbloquear duas ou mais entregas ou representar uma migração reversível independente.
-2. Faça cada tarefa caber em uma revisão coerente: um resultado, escopo explícito, dependências conhecidas, implementação e testes correspondentes. Inclua unitários, integração e E2E na tarefa que introduz o comportamento.
-3. Separe tarefas quando houver resultados independentes; una preparação sem valor observável à primeira entrega que a consome.
-4. Numere com IDs estáveis `T01`, `T02` e modele dependências como DAG. Ordene pré-requisitos antes dos consumidores e explicite o que cada tarefa desbloqueia.
-5. Mapeie toda tarefa a pelo menos um item do inventário e todo item não pendente a pelo menos uma tarefa. Preserve `fora de escopo` como limite, não como backlog implícito.
-6. Apresente ao usuário o DAG proposto, com títulos, resultados e dependências, e aguarde aprovação antes de gerar arquivos.
+1. Prefira fatias verticais com comportamento observável. Crie fundação separada somente quando ela desbloquear duas ou mais entregas ou for uma migração reversível independente.
+2. Faça cada task caber em uma revisão coerente: um resultado, escopo explícito, dependências conhecidas, implementação e testes correspondentes.
+3. Separe resultados independentes; una preparação sem valor observável à primeira entrega que a consome.
+4. Reuse IDs de tasks inalteradas. Numere novas tasks após o maior ID existente na raiz ou em `done/`, modele dependências como DAG e explicite o que cada task desbloqueia.
+5. Mapeie toda task a pelo menos um item e todo item não pendente a pelo menos uma task. Preserve `fora de escopo` como limite.
+6. Apresente o DAG, o impacto sobre arquivos existentes e a destinação de cada item; aguarde aprovação antes de escrever.
 
-*Done when:* o DAG não contém ciclos ou tarefas órfãs, cada tarefa é implementável, revisável e verificável sem depender de trabalho não declarado, e o usuário aprovou a estrutura.
+*Done when:* o DAG é acíclico, nenhuma task ou obrigação está órfã, tasks concluídas permanecem imutáveis e o usuário aprovou criação ou atualização.
 
 **Step 4: Gerar os contratos**
 
 1. Leia `assets/tasks.template.md` e `assets/task.template.md` desta skill na íntegra.
-2. Grave `tasks/prd-[slug]/tasks.md` como manifesto do DAG e da rastreabilidade.
-3. Grave um `tasks/prd-[slug]/task_[num].md` por tarefa, com numeração de dois dígitos. Preencha todos os campos ou remova os opcionais sem aplicação.
-4. Referencie IDs, títulos de seção e caminhos dos documentos de origem. Repita somente invariantes curtos indispensáveis à execução; mantenha decisões e detalhes técnicos na fonte canônica.
-5. Mantenha contexto estável no início e estado mutável no final. Exclua timestamps e metadados voláteis dos contratos.
+2. Grave `tasks/prd-[slug]/tasks.md` como fonte única do DAG, dos links e do estado.
+3. Crie ou atualize somente os `task_[num].md` aprovados. Nunca sobrescreva uma task em `done/`; preserve IDs e handoffs existentes das tasks inalteradas.
+4. Faça cada link do manifesto apontar para a localização real, na raiz ou em `done/`.
+5. Referencie IDs, seções e caminhos das fontes. Repita apenas invariantes curtos e mantenha detalhes técnicos na TechSpec.
+6. Mantenha contexto estável no início e estado mutável no final. Exclua timestamps e metadados voláteis.
 
-*Done when:* cada entrada do manifesto aponta para um arquivo existente, todos os arquivos seguem os templates e nenhum placeholder permanece.
+*Done when:* cada entrada do manifesto aponta para um arquivo existente, os contratos seguem os templates e nenhum placeholder permanece fora do `Handoff` inicial das tasks novas.
 
 **Step 5: Aplicar o gate de qualidade**
 
 1. Execute uma rodada de crítica e corrija somente falhas observáveis nestes gates:
-   - **Cobertura:** todos os itens não pendentes têm tarefa e verificação.
-   - **Rastreabilidade:** toda tarefa aponta para PRD ou TechSpec por ID e seção.
+   - **Cobertura:** todos os itens não pendentes têm task e verificação.
+   - **Rastreabilidade:** toda task aponta para PRD ou TechSpec por ID e seção.
    - **Dependências:** o DAG é acíclico e cada pré-condição tem dono.
-   - **Atomicidade:** cada tarefa entrega um resultado e inclui seus testes.
-   - **Executabilidade:** caminhos, comandos, critérios de aceite e evidências são concretos.
-   - **Cache-first:** PRD e TechSpec formam o prefixo estável; conteúdo específico e estado ficam na cauda.
-2. Pare após todos os gates passarem ou quando restar uma decisão genuinamente pendente. Liste pendências sem fabricar uma solução.
-3. Apresente os arquivos gerados e aguarde aprovação antes de implementar qualquer tarefa.
+   - **Atomicidade:** cada task entrega um resultado e inclui seus testes.
+   - **Executabilidade:** caminhos, comandos, critérios e evidências são concretos.
+   - **Cache-first:** PRD e TechSpec formam o prefixo; conteúdo variável fica na cauda.
+   - **Idempotência:** rerun preserva IDs, tasks concluídas, links e handoffs.
+2. Pare após todos os gates passarem ou quando restar uma decisão genuína. Liste pendências sem fabricar solução.
+3. Apresente os arquivos gerados e aguarde aprovação antes de implementar.
 
-*Done when:* os seis gates passam, ou cada bloqueio restante está ligado a uma pergunta concreta e a uma tarefa afetada.
+*Done when:* os sete gates passam, ou cada bloqueio restante está ligado a uma pergunta concreta e às tasks afetadas.
 
 ## Error Handling
 
-- Se faltar `prd.md`, pare e direcione para `sdd-criar-prd`; se faltar `techspec.md`, pare e direcione para `sdd-criar-techspec`.
-- Se duas fontes se contradisserem em escopo, contrato ou aceite, preserve ambas como evidência, identifique as tarefas afetadas e solicite a decisão mínima necessária.
-- Se um requisito não puder receber teste ou evidência observável, reporte a lacuna na especificação antes de gerar a tarefa correspondente.
+- Se faltar `prd.md`, direcione para `sdd-criar-prd`; se faltar `techspec.md`, direcione para `sdd-criar-techspec`.
+- Se as fontes se contradisserem, preserve ambas, identifique as tasks afetadas e solicite a decisão mínima.
+- Se manifesto, raiz e `done/` divergirem, pare a atualização e reporte cada link, ID ou estado inconsistente.
+- Se uma obrigação não puder receber teste ou evidência, registre a lacuna antes de gerar a task correspondente.

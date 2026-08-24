@@ -1,6 +1,7 @@
 ---
 name: sdd-executar-task
-description: "Executa uma task SDD exata, implementa seu escopo, valida o resultado e registra o handoff com candidatas a ADR. Use quando uma task_*.md deve ser executada diretamente ou por sdd-orquestrar-tasks. Não use para decompor ou orquestrar uma feature, aprovar a própria task nem publicar ADRs."
+description: "Executa uma task SDD exata, diretamente ou por sdd-orquestrar-tasks; não planeja, aprova nem publica ADRs."
+argument-hint: --task tasks/prd-nome/task_01.md
 ---
 
 # Executar uma task SDD
@@ -47,7 +48,7 @@ Implemente e valide exatamente uma task. Entregue evidências para que o chamado
 
 **Step 5: Entregar o handoff e as candidatas a ADR**
 
-1. Preencha `## Handoff` na task com resultado produzido, arquivos alterados, comandos e resultados de validação e pendências reais.
+1. Atualize o único `## Handoff` da task com resultado produzido, arquivos alterados, comandos, resultados e pendências. Em retry, edite a mesma seção e preserve evidências ainda válidas; nunca duplique o heading.
 2. Registre uma candidata somente quando a decisão:
    - afetar fronteiras, dependências, contratos, persistência, segurança, operação ou atributo de qualidade relevante;
    - envolver alternativa plausível ou trade-off real;
@@ -57,7 +58,7 @@ Implemente e valide exatamente uma task. Entregue evidências para que o chamado
 4. Trate um desvio da TechSpec como bloqueio até existir aprovação humana; depois registre a aprovação em `Relação com TechSpec`.
 5. Entregue as candidatas para uma etapa posterior de promoção; preserve a criação e o aceite do ADR para depois de implementação e QA.
 
-*Done when:* o handoff permite revisão independente, toda decisão arquitetural nova está representada por uma candidata completa ou por um bloqueio, e nenhuma ADR definitiva foi criada.
+*Done when:* existe exatamente um handoff que permite revisão independente, toda decisão arquitetural nova está representada por uma candidata completa ou por um bloqueio, e nenhuma ADR definitiva foi criada.
 
 ## Error Handling
 

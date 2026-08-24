@@ -1,52 +1,60 @@
 ---
 name: sdd-planejar-refatoracao
-description: Gera PRD e TechSpec de refatoração (SDD para refactor) em tasks/prd-[slug]/, no mesmo formato consumido pela skill sdd-planejar-tasks. Foco em preservar comportamento em vez de definir comportamento novo. Use sempre que o usuário pedir para refatorar código existente, especialmente em projetos difíceis de testar E2E (Windows Forms, código legado, UI desktop). Também use quando o usuário mencionar "spec de refactor", "refatorar sem quebrar", "preservar comportamento", ou precisar planejar uma refatoração arquitetural (extrair serviço, mudar padrão de acesso a dados, separar lógica de UI) antes de tocar no código ou antes de rodar /sdd-planejar-tasks. Não use para refactors mecânicos triviais (rename, extract method local) que não precisam de spec formal, nem para specs de feature nova (aí é o par sdd-criar-prd/sdd-criar-techspec padrão).
+description: Planeja uma refatoração SDD preservando comportamento observável sem implementar mudanças.
+argument-hint: --slug nome-da-refatoracao [--atualizar]
+disable-model-invocation: true
 ---
 
 # Planejar refatoração SDD
 
-Gera o par `prd.md` + `techspec.md` de uma refatoração, em `tasks/prd-[slug]/`, no mesmo formato que a skill `sdd-planejar-tasks` consome. A diferença em relação ao par PRD/TechSpec de feature nova é o foco: aqui "requisito" é comportamento existente que não pode mudar, não comportamento novo a construir.
+Gere `prd.md` e `techspec.md` para uma mudança estrutural cujo contrato principal é preservar comportamento existente.
 
-## Quando usar
+## Steps — refatoração
 
-- Refatorações arquiteturais (extrair serviço, trocar padrão de acesso a dados, mover lógica entre camadas)
-- Refatorações em código com cobertura de teste fraca ou impossível de testar E2E (WinForms, código legado)
-- Refatorações de lógica financeira/crítica onde regressão silenciosa é cara
-- Refatorações feitas por agente de IA (Claude Code), onde a spec funciona como grade de contenção
-- Como preparação para rodar `/sdd-planejar-tasks` num refactor
+**Step 1: Fixar alvo e destino**
 
-Não usar para: rename, extract method local, refactors de um único arquivo com boa cobertura de testes já existente — aí o teste + IDE já bastam. Também não usar para specs de feature nova (usar `sdd-criar-prd` + `sdd-criar-techspec` normalmente).
+1. Identifique módulo, classe ou fluxo alvo e derive o slug; use `--slug` quando informado.
+2. Resolva `tasks/prd-[slug]/prd.md` e `techspec.md` antes de escrever.
+3. Se algum arquivo existir sem `--atualizar`, preserve ambos e informe os caminhos. Com atualização explícita, leia PRD e TechSpec existentes e preserve IDs estáveis.
 
-## Fluxo
+*Done when:* alvo, limites, slug e operação estão definidos sem risco de sobrescrita.
 
-1. **Definir o slug.** Se `--slug` não for passado, propor um a partir do nome do módulo/Form (ex: `refactor-pedido-form`). Confirmar com o usuário antes de criar a pasta.
+**Step 2: Inventariar comportamento atual**
 
-2. **Levantar contexto do código-alvo.** Ler o código a ser refatorado (Form, classe, módulo). Identificar:
-   - O que é lógica de negócio pura (extraível, testável)
-   - O que é código-behind ligado a framework (WinForms/DevExpress: eventos, binding, controles)
-   - Cobertura de testes atual (xUnit existente?)
+1. Rastreie entradas, saídas, erros, efeitos, callers, persistência, integrações e casos limite do código alvo.
+2. Use testes, contratos, logs, roteiros e código atual como evidência; diferencie comportamento intencional, acidente aparente e lacuna.
+3. Numere comportamentos a preservar como `R-01`, `R-02` e registre origem verificável.
+4. Pergunte ao usuário somente quando intenção ou limite não puder ser provado e alterar o aceite.
 
-3. **Perguntar ao usuário o que falta** (se não estiver claro pelo contexto):
-   - Escopo exato e motivação
-   - Existe suite de testes de caracterização já escrita, ou precisa ser criada do zero?
-   - Há partes com binding "mágico" do DevExpress que merecem atenção especial?
+*Done when:* todo comportamento dentro do escopo possui ID, evidência e forma de verificação ou pendência explícita.
 
-4. **Gerar `prd.md`** em `tasks/prd-[slug]/` a partir de `assets/TEMPLATE_PRD_REFACTOR.md`. Cada requisito (Rn) deve ser um comportamento observável específico e verificável — não genérico.
+**Step 3: Definir a rede de segurança**
 
-5. **Gerar `techspec.md`** em `tasks/prd-[slug]/` a partir de `assets/TEMPLATE_TECHSPEC_REFACTOR.md`. Ponto crítico: a seção **Test cases** deve enumerar exaustivamente todo teste (automatizado ou manual) que verifica os requisitos do PRD — é essa tabela que a `sdd-planejar-tasks` inventaria ao quebrar em tarefas. Cada test case referencia o ID do requisito correspondente.
+1. Reuse testes existentes e adicione characterization tests somente para comportamento sem proteção.
+2. Prefira asserções semânticas. Use snapshot ou Golden Master somente quando uma asserção menor não representar o resultado e depois de revisar o baseline para não congelar defeitos conhecidos.
+3. Ordene etapas por dependência: caracterização necessária antes da mutação, fatias reversíveis antes dos consumidores e mudança irreversível somente após gate explícito.
+4. Se o alvo usar WinForms ou DevExpress, leia `references/winforms-devexpress.md` desta skill na íntegra; ignore essa referência para outras stacks.
 
-6. **Ordenar o plano de execução por risco crescente** dentro da techspec: extrair lógica testável primeiro (baixo risco), mexer em code-behind/controles por último (alto risco). Isso mapeia diretamente na regra de ordenação por dependência que a `sdd-planejar-tasks` já aplica.
+*Done when:* cada `R-NN` possui teste automatizado, verificação manual justificada ou pendência bloqueante, e o sequenciamento respeita dependências reais.
 
-7. **Reportar os arquivos gerados** e sugerir o próximo passo: rodar `/sdd-planejar-tasks --prd [slug]` para quebrar em tarefas.
+**Step 4: Gerar PRD e TechSpec**
 
-## Notas específicas para stack WinForms + DevExpress
+1. Leia `assets/TEMPLATE_PRD_REFACTOR.md` e `assets/TEMPLATE_TECHSPEC_REFACTOR.md` desta skill na íntegra.
+2. Preencha o PRD com comportamento, limites e aceite; mantenha arquitetura na TechSpec.
+3. Preencha a TechSpec com decisões, componentes, etapas, test cases e rollback. Reuse IDs em atualização.
+4. Crie ou atualize somente os dois arquivos autorizados; não altere código.
 
-- Separação de lógica: preferir um Presenter/MVP leve manual (sem framework extra) — extrair para uma classe `XxxPresenter` que recebe uma interface `IXxxView`, testável via NSubstitute mockando a view.
-- Golden Master: para lógica que alimenta grids/relatórios, serializar (JSON) o output antes da refatoração e comparar programaticamente depois — mesmo sem testar a renderização. Isso vira um test case (tipo "Caracterização") na techspec.
-- Controles DevExpress com comportamento implícito (auto binding, eventos automáticos) são pontos de maior risco de regressão silenciosa — mapear explicitamente na tabela de Componentes afetados.
-- Roteiro de verificação manual é obrigatório para qualquer parte não extraível — vira test case do tipo "Manual" na techspec, não fica solto em lugar nenhum.
+*Done when:* os dois artefatos cobrem todos os `R-NN`, não contêm placeholders e formam entrada válida para `sdd-planejar-tasks`.
 
-## Referência
+**Step 5: Reportar o handoff**
 
-- `assets/TEMPLATE_PRD_REFACTOR.md` — template do PRD
-- `assets/TEMPLATE_TECHSPEC_REFACTOR.md` — template da TechSpec (contém a tabela de test cases que a `sdd-planejar-tasks` consome)
+1. Informe os arquivos, comportamentos preservados, lacunas e riscos.
+2. Indique `sdd-planejar-tasks --prd [slug]` como próximo passo, sem executá-lo automaticamente.
+
+*Done when:* o usuário consegue revisar os contratos e iniciar a decomposição sem recuperar o histórico da conversa.
+
+## Error Handling
+
+- Se o comportamento atual for contraditório, preserve as evidências e bloqueie somente os `R-NN` afetados.
+- Se não houver forma proporcional de verificar um comportamento crítico, mantenha a refatoração pendente até definir a rede de segurança.
+- Se a mudança incluir comportamento novo, separe-o em PRD de feature ou marque-o fora do escopo da refatoração.

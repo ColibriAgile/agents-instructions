@@ -1,24 +1,59 @@
 ---
 name: sdd-criar-techspec
-description: TechSpec — especificação técnica derivada de um PRD existente. Use quando o usuário pedir uma techspec ou a arquitetura de uma feature que já tem PRD em tasks/prd-*/prd.md. Não use sem PRD (sdd-criar-prd) nem para decompor em tarefas (sdd-planejar-tasks).
-argument-hint: --prd nome-da-feature
+description: TechSpec de uma feature com PRD existente; não cria requisitos de produto nem tasks.
+argument-hint: --prd nome-da-feature [--atualizar]
 ---
 
-Entrada: `--prd` identifica o slug da feature; sem argumento, deduza o slug pelo contexto da sessão atual (feature em discussão, PRD recém-criado, pasta já referenciada etc.) e só então localize a pasta em `./tasks/prd-*/`. PRD obrigatório em `tasks/prd-[slug]/prd.md` — se não existir, pare e aponte `/sdd-criar-prd`.
+# Criar TechSpec SDD
 
-A TechSpec define **o como** — arquitetura, componentes, contratos e testes. O quê/porquê já está no PRD: referencie-o em vez de repeti-lo. Especifique sem implementar: código apenas nos exemplos de interface do template. Prefira arquitetura simples e evolutiva, com interfaces claras.
+Defina como satisfazer o PRD usando a arquitetura e os padrões reais do projeto. Referencie obrigações em vez de copiá-las.
 
-## Fluxo
+## Steps — especificação
 
-1. **Analisar o PRD** — leia-o por completo; extraia requisitos, restrições e métricas de sucesso.
+**Step 1: Fixar PRD e destino**
 
-2. **Explorar o projeto** — use o agente Explore antes de perguntar qualquer coisa ao usuário: arquivos e módulos afetados, interfaces e pontos de integração, quem chama/é chamado, configs, persistência, tratamento de erros, testes e infra existentes. Avalie reutilizar bibliotecas e classes existentes versus construir. Pesquise na web a documentação das bibliotecas envolvidas e as regras de negócio em aberto.
-   _Pronto quando:_ der para nomear cada componente novo ou modificado e onde ele se encaixa no código atual.
+1. Resolva `--prd` pelo argumento ou contexto e exija `tasks/prd-[slug]/prd.md`.
+2. Leia o PRD integralmente uma vez.
+3. Resolva `tasks/prd-[slug]/techspec.md`. Se existir sem `--atualizar`, preserve-o e informe o caminho; com `--atualizar`, leia-o depois do PRD e preserve IDs de decisões inalteradas.
 
-3. **Esclarecer** — pergunte ao usuário (use a tool de perguntas) antes de redigir, focando no que a exploração não respondeu: limites de domínio, fluxo de dados e contratos, dependências externas (modos de falha, timeouts, idempotência), interfaces principais, cenários de teste críticos.
-   _Pronto quando:_ toda pergunta tiver resposta ou premissa explícita.
+*Done when:* o PRD está carregado e a operação é criação ou atualização explícita sem risco de sobrescrita.
 
-4. **Redigir** — leia `./TEMPLATE.md` desta skill na íntegra e siga sua estrutura exatamente. Em "Conformidade com skills", verifique as skills do projeto e registre desvios com justificativa. Em "Abordagem de testes", enumere test cases que cubram todos os caminhos críticos (meta: >80% de cobertura).
-   _Pronto quando:_ toda seção do template estiver preenchida e cada componente do passo 2 estiver especificado.
+**Step 2: Inventariar obrigações técnicas**
 
-5. **Salvar e reportar** — grave em `tasks/prd-[slug]/techspec.md` e informe o caminho com um resumo de uma linha.
+1. Extraia em uma passagem requisitos, métricas, restrições, dependências, fora de escopo e critérios de aceite.
+2. Associe cada obrigação a evidência técnica esperada e marque lacunas que alterem arquitetura ou contrato.
+
+*Done when:* toda obrigação do PRD possui consequência técnica ou pendência explícita.
+
+**Step 3: Explorar somente o necessário**
+
+1. Inspecione instruções do repositório, módulos afetados, callers, contratos, configuração, persistência, erros, testes e infraestrutura existentes.
+2. Reuse padrões e dependências já instalados quando satisfizerem o contrato; proponha elemento novo somente com lacuna comprovada.
+3. Consulte documentação primária apenas para bibliotecas, protocolos ou serviços realmente envolvidos.
+4. Separe evidência, premissa e decisão. Pergunte ao usuário somente sobre limite de domínio, trade-off ou contrato que a exploração não resolve.
+
+*Done when:* cada componente novo ou modificado possui localização, responsabilidade, integração e evidência no código atual ou justificativa para ser criado.
+
+**Step 4: Redigir decisões e verificações**
+
+1. Leia `assets/techspec.template.md` desta skill na íntegra.
+2. Preserve IDs do PRD e use IDs estáveis como `DEC-01`, `CMP-01` e `TC-01` para itens técnicos.
+3. Inclua somente seções aplicáveis: dados, endpoints, UI, persistência, migração, integração, segurança, observabilidade e rollout.
+4. Especifique erros, bordas, rollback e testes proporcionais ao risco e ao padrão do projeto; não imponha porcentagem universal de cobertura.
+5. Em atualização, mantenha decisões estáveis e liste impactos sobre tasks existentes.
+
+*Done when:* toda obrigação do PRD está coberta por decisão e teste, cada componente foi especificado e seções irrelevantes foram removidas.
+
+**Step 5: Gravar e reportar impacto**
+
+1. Crie ou atualize somente `tasks/prd-[slug]/techspec.md` conforme autorizado.
+2. Informe o caminho, as decisões principais, pendências e tasks que precisam ser replanejadas.
+
+*Done when:* a TechSpec existe no destino correto e qualquer plano invalidado foi reportado sem alteração silenciosa.
+
+## Error Handling
+
+- Se faltar PRD, direcione para `sdd-criar-prd`.
+- Se código, PRD e documentação externa divergirem, preserve a evidência e solicite a decisão mínima.
+- Se uma decisão não puder receber teste, observação ou rollback proporcional ao risco, registre-a como pendente.
+- Se a TechSpec existente tiver IDs ou contratos contraditórios, reconcilie-os antes de atualizar.

@@ -1,34 +1,33 @@
-# PRD: Refatoração de [Nome do módulo/Form]
+# PRD — Refatoração de [alvo]
 
-- **Autor:**
-- **Data:**
-- **Status:** Rascunho / Aprovado
+## Contexto e motivação
 
-## Contexto
-
-Por que refatorar agora? (dívida técnica bloqueando outra feature, dificuldade de manutenção, preparação para migração, etc.)
+[Problema estrutural, custo atual e razão para refatorar agora.]
 
 ## Escopo
 
-**Módulo/Form/Classe alvo:**
+- Alvo: `[módulo, classe ou fluxo]`
+- Mudança estrutural permitida: [limite]
+- Fora do escopo: [comportamento novo ou área excluída]
 
-**O que muda estruturalmente** (visão de alto nível, sem detalhe de implementação — isso fica na techspec):
+## Comportamentos a preservar
 
-**Non-goals** (o que explicitamente NÃO está no escopo — evita que o refactor vire melhoria de feature disfarçada):
+| ID | Comportamento observável | Origem e evidência | Verificação |
+| --- | --- | --- | --- |
+| R-01 | [entrada, ação e resultado] | `[teste, código, contrato ou roteiro]` | [evidência esperada] |
 
-## Requisitos
+## Restrições
 
-> Em refactor, "requisito" não é comportamento novo — é comportamento existente que não pode mudar. Cada linha vira insumo para os test cases da techspec e, depois, para as tarefas geradas pela skill `sdd-planejar-tasks`.
-
-| ID | Comportamento observável a preservar | Origem/evidência |
-|---|---|---|
-| R1 | Ex: Ao clicar em "Salvar" com campo X vazio, exibe validação Y | Código atual / roteiro manual |
-| R2 | | |
-| R3 | | |
+- [compatibilidade, performance, segurança ou operação]
 
 ## Critérios de aceite
 
-- [ ] Todos os requisitos (R1, R2, ...) verificados após a refatoração
-- [ ] Nenhuma regressão de comportamento fora do escopo declarado
-- [ ] Suite de testes (existente + testes de caracterização novos) passando
-- [ ] Roteiro de verificação manual (ver techspec) executado sem divergência
+- [ ] Todos os `R-NN` foram verificados após a refatoração.
+- [ ] Nenhum comportamento novo entrou no escopo silenciosamente.
+- [ ] Testes e verificações proporcionais ao risco passaram.
+- [ ] Rollback ou reversão foi comprovado quando aplicável.
+
+## Premissas e pendências
+
+- Premissa: [origem e impacto]
+- Pendente: [decisão e IDs afetados]
