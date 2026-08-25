@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
-    Inicializa skills.yaml na pasta atual: escolhe bundles via fzf (core é sempre
-    incluído), grava o manifesto e garante o bloco de artefatos no .gitignore.
+    Inicializa skills.yaml na pasta atual: escolhe bundles via fzf com seleção
+    múltipla pré-marcada nos já presentes no skills.yaml (core é sempre incluído), grava o manifesto e garante o bloco de artefatos no .gitignore.
     Não instala nada — rode Install-Skills.ps1 depois (ou deixe ele chamar isso sozinho
     quando não achar skills.yaml).
 
@@ -30,7 +30,7 @@ if (-not (Get-Command fzf -ErrorAction SilentlyContinue)) {
 }
 
 $catalog = Get-BundlesCatalog -FilePath $BundlesPath
-$pickable = $catalog.Bundles.Keys | Where-Object { $_ -ne 'core' }
+$pickable = @($catalog.Bundles.Keys | Where-Object { $_ -ne 'core' })
 
 if (-not $pickable) {
     Write-Error "Nenhum bundle além de 'core' encontrado em $BundlesPath."
@@ -46,14 +46,21 @@ if (Test-Path $skillsYamlPath) {
     Write-Host "skills.yaml já existe. Bundles atuais: $($existingBundles -join ', ')" -ForegroundColor Yellow
 }
 
-$fzfLines = $pickable | ForEach-Object {
-    $marker = if ($existingBundles -contains $_) { '[já incluído] ' } else { '' }
-    "{0} — {1}{2}" -f $_, $marker, $catalog.Descriptions[$_]
-}
+$fzfLines = $pickable | ForEach-Object { "{0} — {1}" -f $_, $catalog.Descriptions[$_] }
 
-$selected = $fzfLines | fzf --multi `
-    --prompt="Bundles (core sempre incluído) > " `
-    --header="TAB seleciona, ENTER confirma, ESC cancela"
+$preselectBinds = for ($i = 0; $i -lt $pickable.Count; $i++) {
+    if ($existingBundles -contains $pickable[$i]) { "pos($($i + 1))+toggle" }
+}
+$startBind = 'load:' + (@($preselectBinds) -join '+')
+
+$fzfArgs = @(
+    '--multi'
+    '--prompt=Bundles (core sempre incluído) > '
+    '--header=TAB seleciona/deseleciona, ENTER confirma, ESC cancela'
+)
+if ($preselectBinds) { $fzfArgs += @('--bind', $startBind) }
+
+$selected = $fzfLines | & fzf @fzfArgs
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Cancelado." -ForegroundColor DarkGray
