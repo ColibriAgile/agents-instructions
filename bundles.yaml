@@ -14,7 +14,8 @@ bundles:
       - ai-ready-score
       - caveman
       - commit
-      - grillme
+      - grill-me
+      - grill-with-docs
       - lesson-learned
       - no-workarounds
       - repository-cli-efficiency
