@@ -97,14 +97,27 @@ if (-not $sources -or $sources.Count -eq 0) {
 
 $failed = @()
 $i = 0
+$totalSkills = ($sources | ForEach-Object { $_.Skills.Count } | Measure-Object -Sum).Sum
+$sw = [System.Diagnostics.Stopwatch]::StartNew()
+
+if (-not $Silent) {
+    Write-Host ""
+    Write-Host "Instalando $totalSkills skill(s) de $($sources.Count) fonte(s)..." -ForegroundColor Cyan
+    Write-Host ""
+}
 
 foreach ($source in $sources) {
     $i++
     if (-not $Silent) {
-        Write-Host "[$i/$($sources.Count)] $($source.Repo): $($source.Skills -join ', ')" -ForegroundColor Cyan
+        Write-Progress -Activity "Instalando skills" -Status "[$i/$($sources.Count)] $($source.Repo)" -PercentComplete (100 * ($i - 1) / $sources.Count)
+        Write-Host ("  [{0,2}/{1}] " -f $i, $sources.Count) -ForegroundColor DarkGray -NoNewline
+        Write-Host $source.Repo -ForegroundColor White -NoNewline
+        Write-Host " ($($source.Skills.Count) skill(s))" -ForegroundColor DarkGray
+        Write-Host "         $($source.Skills -join ', ')" -ForegroundColor DarkGray
     }
 
     $npxArgs = @('--yes', 'skills', 'add', $source.Repo, '-s') + $source.Skills + @('-y')
+    $itemSw = [System.Diagnostics.Stopwatch]::StartNew()
 
     if ($Detailed) {
         & npx @npxArgs
@@ -116,18 +129,26 @@ foreach ($source in $sources) {
         if ($exitCode -ne 0) { $output | Out-Host }
     }
 
+    $itemSw.Stop()
+
     if ($exitCode -ne 0) {
         $failed += $source.Repo
         Write-Warning "Falha ao instalar/atualizar skills de $($source.Repo)"
     }
     elseif (-not $Silent) {
-        Write-Host "  OK" -ForegroundColor Green
+        Write-Host "         OK" -ForegroundColor Green -NoNewline
+        Write-Host (" ({0:n1}s)" -f $itemSw.Elapsed.TotalSeconds) -ForegroundColor DarkGray
     }
 }
 
+$sw.Stop()
 if (-not $Silent) {
+    Write-Progress -Activity "Instalando skills" -Completed
+    $ok = $sources.Count - $failed.Count
     Write-Host ""
-    Write-Host "Concluído: $($sources.Count - $failed.Count)/$($sources.Count) fontes processadas com sucesso."
+    Write-Host "Concluído: " -NoNewline
+    Write-Host "$ok/$($sources.Count) fonte(s)" -ForegroundColor $(if ($failed.Count -gt 0) { 'Yellow' } else { 'Green' }) -NoNewline
+    Write-Host (" · $totalSkills skill(s) · {0:n1}s" -f $sw.Elapsed.TotalSeconds) -ForegroundColor DarkGray
 }
 
 if (-not $NoReconcile) {
