@@ -10,6 +10,8 @@ bundles:
   core:
     description: Obrigatório em todo projeto — workflow genérico, independente de stack.
     skills:
+      - ai-ready-fix
+      - ai-ready-score
       - caveman
       - commit
       - grillme
@@ -75,8 +77,6 @@ bundles:
     description: Autoria de skills/agents/rules/hooks — instalação pontual (ad hoc), remover ao final da tarefa.
     skills:
       - agent-customization
-      - ai-ready-fix
-      - ai-ready-score
       - assign-bundles
       - create-agent
       - create-hook
