@@ -87,3 +87,8 @@ bundles:
       - to-prompt
       - writing-agents-md
       - writing-skills
+
+  api-docs:
+    description: Documentação de APIs a partir de collections e specs — geração de Markdown para wiki/RAG.
+    skills:
+      - insomnia-to-markdown
