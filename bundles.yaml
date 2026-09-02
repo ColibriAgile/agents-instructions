@@ -14,6 +14,7 @@ bundles:
       - ai-ready-score
       - caveman
       - commit
+      - domain-modeling
       - grill-me
       - grill-with-docs
       - grilling
