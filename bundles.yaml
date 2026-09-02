@@ -16,6 +16,7 @@ bundles:
       - commit
       - grill-me
       - grill-with-docs
+      - grilling
       - lesson-learned
       - no-workarounds
       - repository-cli-efficiency
