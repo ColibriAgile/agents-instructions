@@ -21,6 +21,7 @@ bundles:
       - lesson-learned
       - no-workarounds
       - repository-cli-efficiency
+      - show-me
 
   dotnet:
     description: Projetos .NET / Colibri.

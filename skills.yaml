@@ -1,3 +1,4 @@
 bundles:
   - core
   - authoring
+  - kb
