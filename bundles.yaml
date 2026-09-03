@@ -94,3 +94,9 @@ bundles:
     description: Documentação de APIs a partir de collections e specs — geração de Markdown para wiki/RAG.
     skills:
       - insomnia-to-markdown
+
+  kb:
+    description: Gestão de llmwiki usando o kb
+    skills:
+      - kb
+      - kb-yt-channel
