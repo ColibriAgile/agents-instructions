@@ -22,6 +22,7 @@ bundles:
       - no-workarounds
       - repository-cli-efficiency
       - show-me
+      - investigar-logs
 
   dotnet:
     description: Projetos .NET / Colibri.
