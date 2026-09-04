@@ -49,9 +49,10 @@ Use PRD e TechSpec como fontes de verdade. Coloque perguntas, resultados de ferr
 ## Verificação
 
 - Unitário: [cenário e resultado esperado]
-- Integração: [fronteira e resultado esperado]
-- E2E: [fluxo crítico, se aplicável]
-- Comandos: `[comando real do projeto]`
+- Integração: [fronteira e resultado esperado, com dublê, fake em memória ou fixture]
+- E2E: [fluxo crítico executável localmente, se aplicável]
+- Comandos: `[comando de teste padrão do projeto]`
+- Dependência de ambiente: Nenhuma — roda em máquina de desenvolvimento limpa. | [pré-requisito aprovado pelo usuário: serviço, servidor ou infraestrutura exigida]
 - Evidência esperada: [saída, teste, métrica ou artefato]
 
 ## Arquivos afetados

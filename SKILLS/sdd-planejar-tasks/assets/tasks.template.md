@@ -11,6 +11,7 @@
 
 - Premissa: [decisão necessária para interpretar as fontes]
 - Pendente: [pergunta bloqueante, tarefas afetadas e responsável pela decisão]
+- Fora do plano por dependência de ambiente: [cenário, obrigação de origem, ambiente exigido e decisão do usuário] | Nenhum.
 
 ## Grafo de dependências
 
@@ -36,6 +37,7 @@
 - Dependências: [pass/fail e lacunas]
 - Atomicidade: [pass/fail e lacunas]
 - Executabilidade: [pass/fail e lacunas]
+- Independência de ambiente: [pass/fail, exceções aprovadas pelo usuário e lacunas]
 - Cache-first: [pass/fail e lacunas]
 
 ## Estado

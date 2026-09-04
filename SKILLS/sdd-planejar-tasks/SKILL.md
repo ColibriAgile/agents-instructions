@@ -26,10 +26,11 @@ Converta PRD e TechSpec em contratos pequenos, rastreáveis e testáveis. Preser
 1. Extraia em uma única passagem requisitos funcionais e não funcionais, histórias, fora de escopo, decisões técnicas, componentes, contratos, integrações, riscos, observabilidade, migrações e cenários de teste.
 2. Preserve IDs existentes. Para itens sem ID, atribua IDs locais estáveis por categoria (`US-01`, `NFR-01`, `CMP-01`, `TC-01`) e registre a seção de origem.
 3. Associe cada item a componente afetado, evidência de conclusão e teste previsto. Marque como `pendente` somente contradições ou lacunas que alterem escopo, dependência ou aceite.
-4. Em atualização, preserve o vínculo das obrigações inalteradas com tasks existentes e identifique somente adições, remoções ou impactos reais.
-5. Quando faltar um caminho ou comando verificável, inspecione o menor trecho necessário do projeto sem redesenhar a TechSpec.
+4. Classifique cada verificação prevista como `local` ou `dependente de ambiente`. É `dependente de ambiente` toda verificação que exija servidor ou serviço web no ar, deploy, browser, container, banco, fila, broker, credencial real, rede externa ou qualquer provisionamento que não rode com o comando de teste padrão do projeto em uma máquina de desenvolvimento limpa.
+5. Em atualização, preserve o vínculo das obrigações inalteradas com tasks existentes e identifique somente adições, remoções ou impactos reais.
+6. Quando faltar um caminho ou comando verificável, inspecione o menor trecho necessário do projeto sem redesenhar a TechSpec.
 
-*Done when:* todo item das fontes aparece exatamente uma vez como mapeável ou pendente, com origem e verificação, e todo item previamente planejado foi reconciliado.
+*Done when:* todo item das fontes aparece exatamente uma vez como mapeável ou pendente, com origem, verificação e classificação `local` ou `dependente de ambiente`, e todo item previamente planejado foi reconciliado.
 
 **Step 3: Formar entregas atômicas**
 
@@ -38,9 +39,11 @@ Converta PRD e TechSpec em contratos pequenos, rastreáveis e testáveis. Preser
 3. Separe resultados independentes; una preparação sem valor observável à primeira entrega que a consome.
 4. Reuse IDs de tasks inalteradas. Numere novas tasks após o maior ID existente na raiz ou em `done/`, modele dependências como DAG e explicite o que cada task desbloqueia.
 5. Mapeie toda task a pelo menos um item e todo item não pendente a pelo menos uma task. Preserve `fora de escopo` como limite.
-6. Apresente o DAG, o impacto sobre arquivos existentes e a destinação de cada item; aguarde aprovação antes de escrever.
+6. Não crie task cuja verificação seja `dependente de ambiente`. Primeiro reescreva o cenário como unitário ou de integração com dublês, fakes em memória, fixtures ou testes de contrato que rodem no comando de teste padrão do projeto.
+7. Se uma obrigação só puder ser verificada com ambiente real, pare o planejamento antes de escrever qualquer arquivo e use a ferramenta de pergunta (`AskUserQuestion`) para pedir aprovação explícita, listando o cenário, o ambiente exigido, a alternativa local avaliada e o motivo de ela não cobrir a obrigação. Sem aprovação, registre o cenário como pendente e fora do escopo das tasks, mantendo a obrigação rastreada. Com aprovação, isole-o em task própria, nomeie o pré-requisito de ambiente e não misture verificação local nessa task.
+8. Apresente o DAG, o impacto sobre arquivos existentes, a destinação de cada item e a lista de cenários `dependente de ambiente` com sua decisão; aguarde aprovação antes de escrever.
 
-*Done when:* o DAG é acíclico, nenhuma task ou obrigação está órfã, tasks concluídas permanecem imutáveis e o usuário aprovou criação ou atualização.
+*Done when:* o DAG é acíclico, nenhuma task ou obrigação está órfã, tasks concluídas permanecem imutáveis, nenhuma task exige ambiente sem aprovação explícita do usuário e o usuário aprovou criação ou atualização.
 
 **Step 4: Gerar os contratos**
 
@@ -61,12 +64,13 @@ Converta PRD e TechSpec em contratos pequenos, rastreáveis e testáveis. Preser
    - **Dependências:** o DAG é acíclico e cada pré-condição tem dono.
    - **Atomicidade:** cada task entrega um resultado e inclui seus testes.
    - **Executabilidade:** caminhos, comandos, critérios e evidências são concretos.
+   - **Independência de ambiente:** toda verificação roda no comando de teste padrão do projeto em máquina de desenvolvimento limpa; as exceções existem apenas onde o usuário aprovou e trazem o pré-requisito nomeado.
    - **Cache-first:** PRD e TechSpec formam o prefixo; conteúdo variável fica na cauda.
    - **Idempotência:** rerun preserva IDs, tasks concluídas, links e handoffs.
 2. Pare após todos os gates passarem ou quando restar uma decisão genuína. Liste pendências sem fabricar solução.
 3. Apresente os arquivos gerados e aguarde aprovação antes de implementar.
 
-*Done when:* os sete gates passam, ou cada bloqueio restante está ligado a uma pergunta concreta e às tasks afetadas.
+*Done when:* os oito gates passam, ou cada bloqueio restante está ligado a uma pergunta concreta e às tasks afetadas.
 
 ## Error Handling
 
@@ -74,3 +78,5 @@ Converta PRD e TechSpec em contratos pequenos, rastreáveis e testáveis. Preser
 - Se as fontes se contradisserem, preserve ambas, identifique as tasks afetadas e solicite a decisão mínima.
 - Se manifesto, raiz e `done/` divergirem, pare a atualização e reporte cada link, ID ou estado inconsistente.
 - Se uma obrigação não puder receber teste ou evidência, registre a lacuna antes de gerar a task correspondente.
+- Se a TechSpec prescrever cenário que exige ambiente (E2E contra servidor, smoke pós-deploy, integração com serviço externo real), não o transcreva como task: proponha o equivalente local e, persistindo a necessidade, aplique a aprovação do Step 3 antes de escrever qualquer arquivo.
+- Se a aprovação do ambiente for negada ou a pergunta não for respondida, escreva as demais tasks normalmente e registre o cenário em `Premissas e pendências` do manifesto, com a obrigação de origem e o ambiente que faltaria.
