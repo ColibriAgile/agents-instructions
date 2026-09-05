@@ -20,9 +20,14 @@
 
 ## Rede de segurança
 
+- Perfil: [stack por projeto e evidência, SDK/TFM, runner e comandos existentes]
+- E2E: [omitido por política desktop .NET | cenário pertinente para outro alvo]
+- Pré-requisitos e exclusões dos comandos: [ambiente e projetos/filtros sem E2E desktop]
+- Aceite manual: [roteiro, resultado esperado e responsável, quando necessário]
+
 | ID | Requisito | Nível | Cenário | Resultado esperado | Comando ou roteiro |
 | --- | --- | --- | --- | --- | --- |
-| TC-01 | R-01 | caracterização/unitário/integração/E2E/manual | [cenário] | [resultado] | `[verificação]` |
+| TC-01 | R-01 | [nível permitido pelo perfil] | [cenário] | [resultado] | `[verificação]` |
 
 ## Sequenciamento por dependência
 

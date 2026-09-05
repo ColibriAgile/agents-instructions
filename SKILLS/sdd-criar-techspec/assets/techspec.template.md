@@ -47,9 +47,14 @@
 
 ## Abordagem de testes
 
+- Perfil: [stack por projeto e evidência, SDK/TFM, runner e rota de execução]
+- E2E: [omitido por política desktop .NET | cenário pertinente para outro alvo]
+- Pré-requisitos e exclusões dos comandos: [ambiente, filtros/projetos sem E2E desktop]
+- Aceite manual: [roteiro, resultado esperado e responsável, quando necessário]
+
 | ID | Obrigações | Nível | Cenário | Resultado esperado | Comando ou projeto |
 | --- | --- | --- | --- | --- | --- |
-| TC-01 | RF-01 | unitário/integração/E2E/manual | [cenário] | [resultado] | `[comando]` |
+| TC-01 | RF-01 | [nível permitido pelo perfil] | [cenário] | [resultado] | `[comando ou roteiro]` |
 
 ## Observabilidade e rollout
 

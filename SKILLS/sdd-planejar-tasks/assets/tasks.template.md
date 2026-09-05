@@ -5,13 +5,7 @@
 - PRD: `tasks/prd-[slug]/prd.md`
 - TechSpec: `tasks/prd-[slug]/techspec.md`
 
-> Ordem cache-first para cada execução: PRD → TechSpec → `task_[num].md`. Acrescente perguntas, logs, diffs e estado mutável somente depois desse prefixo.
-
-## Premissas e pendências
-
-- Premissa: [decisão necessária para interpretar as fontes]
-- Pendente: [pergunta bloqueante, tarefas afetadas e responsável pela decisão]
-- Fora do plano por dependência de ambiente: [cenário, obrigação de origem, ambiente exigido e decisão do usuário] | Nenhum.
+> Fontes comuns antes da task e do estado mutável; ordem de leitura não garante cache hit.
 
 ## Grafo de dependências
 
@@ -23,7 +17,7 @@
 
 | ID de origem | Seção da fonte | Obrigação | Tarefas | Evidência ou teste |
 | --- | --- | --- | --- | --- |
-| RF1 | `prd.md#principais-funcionalidades` | [requisito] | T01 | [verificação] |
+| RF-01 | `prd.md#requisitos-funcionais` | [requisito] | T01 | [verificação] |
 | TC-01 | `techspec.md#abordagem-de-testes` | [cenário] | T01 | [teste] |
 
 ## Tarefas
@@ -37,8 +31,14 @@
 - Dependências: [pass/fail e lacunas]
 - Atomicidade: [pass/fail e lacunas]
 - Executabilidade: [pass/fail e lacunas]
-- Independência de ambiente: [pass/fail, exceções aprovadas pelo usuário e lacunas]
-- Cache-first: [pass/fail e lacunas]
+- Perfil de validação: [pass/fail, E2E omitido em desktop .NET, ambiente e lacunas]
+- Idempotência: [pass/fail e lacunas]
+
+## Premissas e pendências
+
+- Premissa: [decisão necessária para interpretar as fontes]
+- Pendente: [pergunta bloqueante, tarefas afetadas e responsável pela decisão]
+- Ambiente necessário: [cenário, obrigação de origem, pré-requisito e autorização/pendência] | Nenhum.
 
 ## Estado
 

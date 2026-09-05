@@ -1,59 +1,20 @@
 ---
 name: sdd-criar-techspec
-description: TechSpec de uma feature com PRD existente; não cria requisitos de produto nem tasks.
+description: TechSpec SDD quando há PRD e é preciso especificar a solução; não cria requisitos nem plano de tasks.
 argument-hint: --prd nome-da-feature [--atualizar]
 ---
 
 # Criar TechSpec SDD
 
-Defina como satisfazer o PRD usando a arquitetura e os padrões reais do projeto. Referencie obrigações em vez de copiá-las.
+1. Resolva `tasks/prd-[slug]/prd.md` e `techspec.md`. Exija PRD; se faltar, indique `sdd-criar-prd`. Leia o PRD uma vez por versão. Reutilize TechSpec existente; atualize somente quando autorizado, preservando IDs.
+   **Saída:** fontes e destino exatos, sem sobrescrita implícita.
+2. Mapeie cada obrigação do PRD para consequência técnica. Inspecione apenas módulos, callers, contratos, persistência, erros, testes e configuração envolvidos. Reuse padrões existentes; justifique dependências e componentes novos com lacuna comprovada. Consulte documentação primária para dúvidas técnicas externas.
+   **Saída:** toda obrigação possui decisão ou pendência; cada componente tem caminho, responsabilidade e integração.
+3. Identifique stack por projeto afetado. Para C#/.NET, leia integralmente [references/dotnet.md](references/dotnet.md) antes de especificar validação. Em desktop .NET, omita execução E2E e registre `E2E: omitido por política desktop .NET`; preserve aceite com testes menores e roteiro manual quando necessário.
+   **Saída:** perfil de validação com evidência da stack, runner, projetos, comandos e limitações.
+4. Leia integralmente [assets/techspec.template.md](assets/techspec.template.md) ao redigir. Use `DEC-01`, `CMP-01`, `TC-01` e IDs do PRD. Cubra contratos, erros, bordas, segurança, concorrência, rollback e rollout aplicáveis, sem duplicar requisitos. Cada obrigação deve ter teste ou outra evidência proporcional; remova seções inaplicáveis.
+   **Saída:** todas as obrigações cobertas; decisões não resolvidas explicitamente pendentes, sem impor cobertura percentual.
+5. Grave somente a TechSpec. Reporte decisões, lacunas e tasks invalidadas por atualização. No fluxo orquestrado, devolva para elaboração do plano e HIL técnico conjunto.
+   **Saída:** artefato revisável com impactos identificados; conflitos de PRD/código/contrato que exigem decisão humana não foram inventados.
 
-## Steps — especificação
-
-**Step 1: Fixar PRD e destino**
-
-1. Resolva `--prd` pelo argumento ou contexto e exija `tasks/prd-[slug]/prd.md`.
-2. Leia o PRD integralmente uma vez.
-3. Resolva `tasks/prd-[slug]/techspec.md`. Se existir sem `--atualizar`, preserve-o e informe o caminho; com `--atualizar`, leia-o depois do PRD e preserve IDs de decisões inalteradas.
-
-*Done when:* o PRD está carregado e a operação é criação ou atualização explícita sem risco de sobrescrita.
-
-**Step 2: Inventariar obrigações técnicas**
-
-1. Extraia em uma passagem requisitos, métricas, restrições, dependências, fora de escopo e critérios de aceite.
-2. Associe cada obrigação a evidência técnica esperada e marque lacunas que alterem arquitetura ou contrato.
-
-*Done when:* toda obrigação do PRD possui consequência técnica ou pendência explícita.
-
-**Step 3: Explorar somente o necessário**
-
-1. Inspecione instruções do repositório, módulos afetados, callers, contratos, configuração, persistência, erros, testes e infraestrutura existentes.
-2. Reuse padrões e dependências já instalados quando satisfizerem o contrato; proponha elemento novo somente com lacuna comprovada.
-3. Consulte documentação primária apenas para bibliotecas, protocolos ou serviços realmente envolvidos.
-4. Separe evidência, premissa e decisão. Pergunte ao usuário somente sobre limite de domínio, trade-off ou contrato que a exploração não resolve.
-
-*Done when:* cada componente novo ou modificado possui localização, responsabilidade, integração e evidência no código atual ou justificativa para ser criado.
-
-**Step 4: Redigir decisões e verificações**
-
-1. Leia `assets/techspec.template.md` desta skill na íntegra.
-2. Preserve IDs do PRD e use IDs estáveis como `DEC-01`, `CMP-01` e `TC-01` para itens técnicos.
-3. Inclua somente seções aplicáveis: dados, endpoints, UI, persistência, migração, integração, segurança, observabilidade e rollout.
-4. Especifique erros, bordas, rollback e testes proporcionais ao risco e ao padrão do projeto; não imponha porcentagem universal de cobertura.
-5. Em atualização, mantenha decisões estáveis e liste impactos sobre tasks existentes.
-
-*Done when:* toda obrigação do PRD está coberta por decisão e teste, cada componente foi especificado e seções irrelevantes foram removidas.
-
-**Step 5: Gravar e reportar impacto**
-
-1. Crie ou atualize somente `tasks/prd-[slug]/techspec.md` conforme autorizado.
-2. Informe o caminho, as decisões principais, pendências e tasks que precisam ser replanejadas.
-
-*Done when:* a TechSpec existe no destino correto e qualquer plano invalidado foi reportado sem alteração silenciosa.
-
-## Error Handling
-
-- Se faltar PRD, direcione para `sdd-criar-prd`.
-- Se código, PRD e documentação externa divergirem, preserve a evidência e solicite a decisão mínima.
-- Se uma decisão não puder receber teste, observação ou rollback proporcional ao risco, registre-a como pendente.
-- Se a TechSpec existente tiver IDs ou contratos contraditórios, reconcilie-os antes de atualizar.
+Mantenha fontes estáveis antes de código recuperado e estado; releia somente versões alteradas. Ordem de leitura ajuda consistência, mas não garante cache do provedor.

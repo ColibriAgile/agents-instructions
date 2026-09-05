@@ -19,7 +19,7 @@
 
 | Origem | Obrigação | Implementação | Teste | Estado | Evidência |
 | --- | --- | --- | --- | --- | --- |
-| RF1 | [requisito] | `[arquivo:símbolo]` | `[teste]` | conforme/não conforme/pendente/não verificável | [evidência] |
+| RF-01 | [requisito] | `[arquivo:símbolo]` | `[teste]` | conforme/não conforme/pendente/não verificável | [evidência] |
 
 ## Conformidade com rules e skills
 
@@ -41,6 +41,11 @@
 
 ## Validações executadas
 
+- Perfil e exclusões: [stack por alvo; E2E omitido por política desktop .NET, quando aplicável]
+- Estado validado: [código/diff, configuração, projetos e ambiente]
+- Evidência reaproveitada: [handoff/relatório e razão de ainda ser válido | nenhuma]
+- Aceite manual: [evidência ou pendência, quando essencial]
+
 | Comando | Resultado | Obrigações cobertas |
 | --- | --- | --- |
 | `[comando]` | passou/falhou/bloqueado | [IDs] |
@@ -51,9 +56,11 @@
 | --- | --- | --- | --- | --- | --- |
 | CR-01 | Crítica/Alta/Média/Baixa | [ID ou regra] | `[arquivo:linha]` — [fato] | [efeito] | [ação ou `Causa ainda pendente`] |
 
-## Pontos positivos
+## Achados anteriores (somente em re-revisão)
 
-- [prática comprovada e sua evidência]
+| Revisão/ID | Estado | Evidência atual |
+| --- | --- | --- |
+| codereview_[anterior]/CR-01 | resolvido/persistente/não verificável | [arquivo/teste ou limitação] |
 
 ## Limitações e pendências
 

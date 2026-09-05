@@ -1,0 +1,13 @@
+# Perfil C#/.NET
+
+Registre o perfil na TechSpec para que planejamento, execução e revisão reutilizem a descoberta.
+
+- Identifique projetos afetados, TFM, SDK efetivo, imports e runner pelos arquivos do repositório. `UseWPF`, `UseWindowsForms`, referências Avalonia/WinUI/MAUI desktop e código de inicialização são evidências; `.csproj` ou TFM Windows sozinho não prova aplicação desktop. Em solução mista, classifique cada alvo e seus testes.
+- Preserve framework, arquitetura e runner existentes. Prefira lógica de domínio, serviços e ViewModels/Presenters testáveis sem abrir a aplicação. Considere thread de UI, dispatcher, eventos/bindings, cancelamento, descarte de recursos e persistência quando o diff os afetar.
+- Desktop .NET: registre `E2E: omitido por política desktop .NET`. Exclua automação de aplicação inteira, browser/WebView e UI desktop, inclusive suítes agregadas que a disparem. A política vale também para testes já existentes; não os apague. Se um comando misturar níveis, selecione projetos ou filtros comprovados sem E2E; se não for possível separá-los, registre bloqueio e use verificações independentes.
+- Preserve a obrigação funcional com testes unitários, integração pertinente e roteiro manual de UI quando necessário. Registre passos, resultado esperado e responsável pela evidência manual; enquanto não executado, aceite essencial permanece pendente. Não renomeie E2E como integração para executá-lo.
+- Descubra comandos no projeto/CI. Se `dotnet-efficient-validation` estiver instalada, leia-a antes de executar validações .NET. Caso contrário, confirme runner e opções por ajuda local: VSTest e Microsoft.Testing.Platform não compartilham necessariamente argumentos. Inclua MSBuild/test runner existente para .NET Framework legado, sem impor migração para `dotnet test`.
+- Compile só projetos afetados e dependentes necessários. Reutilize restore/build apenas para código, pacotes, configuração, TFM e runtime compatíveis; novo diff invalida a evidência correspondente. Serialize validações que compartilham `bin/`, `obj/` ou fixtures. Confira código de saída e quantidade de testes; zero testes e listagem não comprovam aceite.
+- Mantenha contratos reais visíveis: fake em memória não comprova semântica SQL, driver ou serviço externo. Identifique infraestrutura necessária, autorização existente e lacunas. Solicite decisão apenas para pré-requisito indispensável não autorizado; siga com verificações independentes.
+
+O perfil deve conter evidência da stack, projetos, runner/rota, comandos efetivos, exclusões E2E, pré-requisitos e obrigações cobertas. Para alvos web/backend separados, determine E2E por pertinência ao contrato; a presença de um projeto desktop não dispensa testes de toda a solução.

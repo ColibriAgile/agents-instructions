@@ -5,7 +5,7 @@ Carregue nesta ordem exata:
 1. `tasks/prd-[slug]/codereview_[num]/codereview.md`
 2. Este arquivo
 
-Use o relatório como fonte de verdade. Recupere TechSpec, rules, skills e código somente quando apontados abaixo. Coloque perguntas, ferramentas, diffs e estado depois desse prefixo.
+Use a versão do relatório já carregada; recupere contratos e código pertinentes depois. Esta ordem não garante cache hit do host.
 
 ---
 
@@ -26,7 +26,7 @@ Use o relatório como fonte de verdade. Recupere TechSpec, rules, skills e códi
 
 | Origem | Seção | Achado coberto |
 | --- | --- | --- |
-| CR-01 | `codereview.md#[seção]` | [não conformidade] |
+| codereview_[num]/CR-01 | `codereview.md#[seção]` | [não conformidade] |
 
 ## Requisitos
 
@@ -53,7 +53,9 @@ Use o relatório como fonte de verdade. Recupere TechSpec, rules, skills e códi
 
 - Unitário: [cenário e resultado, se aplicável]
 - Integração: [fronteira e resultado, se aplicável]
-- E2E: [fluxo crítico, se aplicável]
+- E2E: [omitido por política desktop .NET | fluxo pertinente de outro alvo]
+- Manual: [roteiro, resultado esperado e responsável, se exigido pelo aceite]
+- Dependência de ambiente: [nenhuma | pré-requisito, autorização existente ou pendência]
 - Comandos: `[comando real]`
 - Evidência esperada: [saída, teste, métrica ou artefato]
 
@@ -74,4 +76,5 @@ Use o relatório como fonte de verdade. Recupere TechSpec, rules, skills e códi
 - Resultado produzido: Pendente de execução.
 - Arquivos alterados: Pendente de execução.
 - Verificações: Pendente de execução.
+- Estado validado: Pendente de execução (código/diff, configuração, projetos e ambiente).
 - Pendências: Pendente de execução.

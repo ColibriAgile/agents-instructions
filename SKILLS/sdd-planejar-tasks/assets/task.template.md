@@ -6,7 +6,7 @@ Carregue nesta ordem exata:
 2. `tasks/prd-[slug]/techspec.md`
 3. Este arquivo
 
-Use PRD e TechSpec como fontes de verdade. Coloque perguntas, resultados de ferramentas, diffs e atualizações de estado depois desse prefixo.
+Use as versões atuais de PRD e TechSpec já carregadas; recupere somente fontes ausentes ou alteradas. Esta ordem não garante cache hit do host.
 
 ---
 
@@ -27,8 +27,8 @@ Use PRD e TechSpec como fontes de verdade. Coloque perguntas, resultados de ferr
 
 | Origem | Seção | Obrigação coberta |
 | --- | --- | --- |
-| RF1 | `prd.md#principais-funcionalidades` | [requisito] |
-| CMP-01 | `techspec.md#visao-dos-componentes` | [decisão técnica] |
+| RF-01 | `prd.md#requisitos-funcionais` | [requisito] |
+| CMP-01 | `techspec.md#componentes-e-fluxo` | [decisão técnica] |
 
 ## Contexto a recuperar sob demanda
 
@@ -49,10 +49,11 @@ Use PRD e TechSpec como fontes de verdade. Coloque perguntas, resultados de ferr
 ## Verificação
 
 - Unitário: [cenário e resultado esperado]
-- Integração: [fronteira e resultado esperado, com dublê, fake em memória ou fixture]
-- E2E: [fluxo crítico executável localmente, se aplicável]
+- Integração: [fronteira, ambiente e resultado esperado; dublê somente se representar o contrato]
+- E2E: [omitido por política desktop .NET | fluxo pertinente de outro alvo]
+- Manual: [roteiro, resultado esperado e responsável, se exigido pelo aceite]
 - Comandos: `[comando de teste padrão do projeto]`
-- Dependência de ambiente: Nenhuma — roda em máquina de desenvolvimento limpa. | [pré-requisito aprovado pelo usuário: serviço, servidor ou infraestrutura exigida]
+- Dependência de ambiente: [nenhuma | pré-requisito, autorização existente ou pendência]
 - Evidência esperada: [saída, teste, métrica ou artefato]
 
 ## Arquivos afetados
@@ -72,6 +73,7 @@ Use PRD e TechSpec como fontes de verdade. Coloque perguntas, resultados de ferr
 - Resultado produzido: Pendente de execução.
 - Arquivos alterados: Pendente de execução.
 - Verificações: Pendente de execução.
+- Estado validado: Pendente de execução (código/diff, configuração, projetos e ambiente).
 - Pendências: Pendente de execução.
 
 ### Candidatas a ADR

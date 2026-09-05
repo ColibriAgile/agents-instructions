@@ -1,82 +1,24 @@
 ---
 name: sdd-planejar-tasks
-description: Planeja tasks SDD atômicas e rastreáveis sem implementar a feature.
+description: Tasks SDD quando é preciso decompor PRD e TechSpec em um DAG executável; não implementa a feature.
 argument-hint: --prd nome-da-feature [--atualizar]
 disable-model-invocation: true
 ---
 
 # Planejar tasks SDD
 
-Converta PRD e TechSpec em contratos pequenos, rastreáveis e testáveis. Preserve as fontes e maximize o prefixo idêntico entre execuções na ordem `prd.md → techspec.md → task atual`.
+1. Resolva `tasks/prd-[slug]/`. Exija e leia `prd.md` e `techspec.md`, nessa ordem, uma vez por versão. Depois inventarie `tasks.md`, `task_*.md` e `done/task_*.md`. Reutilize plano existente sem sobrescrever; para atualização autorizada, preserve IDs, handoffs e tasks concluídas.
+   **Saída:** fontes e estado reconciliados; links quebrados ou IDs conflitantes bloqueiam apenas a atualização afetada.
+2. Extraia em uma passagem obrigações, decisões, componentes, riscos e testes. Preserve IDs; para fontes legadas, atribua IDs locais e seção de origem. Mapeie cada item a entrega e evidência, ou pendência que altere escopo/aceite.
+   **Saída:** inventário completo e rastreável, incluindo limites fora de escopo.
+3. Use fatias verticais: um resultado revisável, implementação e testes na mesma task. Separe fundação apenas quando desbloquear múltiplas entregas ou permitir migração independente. Modele dependências acíclicas e colisões de arquivos/contratos; numere novas tasks após o maior ID na raiz e em `done/`.
+   **Saída:** todo item não pendente tem task; toda task tem origem, limites, dependências e verificação.
+4. Aplique o perfil da TechSpec. Em desktop C#/.NET, omita E2E inclusive local e registre a exclusão; mantenha unitários, integração pertinente e roteiro manual para aceite visual. Em repositórios mistos, classifique por projeto. Para outros alvos, E2E somente quando pertinente ao contrato.
+   Prefira validação local que comprove o comportamento. Um fake não comprova semântica do serviço real: preserve lacunas. Registre ambiente necessário e autorização existente; se faltar decisão indispensável, mantenha a obrigação pendente e prepare as tasks independentes.
+   **Saída:** comandos reais e pré-requisitos conhecidos; nenhuma obrigação desapareceu para baratear testes.
+5. Ao gerar contratos, leia integralmente [assets/tasks.template.md](assets/tasks.template.md) e [assets/task.template.md](assets/task.template.md). Grave o rascunho revisável antes de pedir HIL. Use `tasks.md` como fonte do DAG, links e estado; copie apenas invariantes curtos nas tasks e referencie detalhes da TechSpec.
+   **Saída:** manifesto e tasks existem; links resolvem; IDs únicos; nenhum placeholder fora do handoff inicial.
+6. Confira cobertura, rastreabilidade, DAG, atomicidade, comandos, ambiente e idempotência. Apresente o plano com riscos e pendências. Devolva ao HIL do orquestrador; em uso avulso, obtenha aprovação antes da implementação apenas se ela ainda não estiver autorizada.
+   **Saída:** plano pronto para execução no escopo aprovado ou bloqueios associados a IDs concretos.
 
-## Steps — decomposição
-
-**Step 1: Fixar fontes e destino**
-
-1. Resolva o slug por `--prd`; na ausência do argumento, use a feature já identificada na sessão.
-2. Exija `tasks/prd-[slug]/prd.md` e `tasks/prd-[slug]/techspec.md`.
-3. Leia ambos integralmente uma vez, sempre na ordem PRD e TechSpec. Trate-os como imutáveis durante esta execução; reinicie o inventário se um deles mudar.
-4. Verifique `tasks.md`, `task_*.md` e `done/task_*.md` depois desse prefixo. Sem `--atualizar`, preserve qualquer plano existente e pare informando seu caminho. Com `--atualizar`, inventarie IDs, links, estado e handoffs existentes antes de propor mudanças.
-5. Mantenha perguntas, código recuperado, resultados de ferramentas e estado mutável depois das fontes estáveis.
-
-*Done when:* as duas fontes corretas estão carregadas na ordem fixa e o destino está classificado como criação nova ou atualização explícita sem risco de sobrescrita.
-
-**Step 2: Construir o inventário rastreável**
-
-1. Extraia em uma única passagem requisitos funcionais e não funcionais, histórias, fora de escopo, decisões técnicas, componentes, contratos, integrações, riscos, observabilidade, migrações e cenários de teste.
-2. Preserve IDs existentes. Para itens sem ID, atribua IDs locais estáveis por categoria (`US-01`, `NFR-01`, `CMP-01`, `TC-01`) e registre a seção de origem.
-3. Associe cada item a componente afetado, evidência de conclusão e teste previsto. Marque como `pendente` somente contradições ou lacunas que alterem escopo, dependência ou aceite.
-4. Classifique cada verificação prevista como `local` ou `dependente de ambiente`. É `dependente de ambiente` toda verificação que exija servidor ou serviço web no ar, deploy, browser, container, banco, fila, broker, credencial real, rede externa ou qualquer provisionamento que não rode com o comando de teste padrão do projeto em uma máquina de desenvolvimento limpa.
-5. Em atualização, preserve o vínculo das obrigações inalteradas com tasks existentes e identifique somente adições, remoções ou impactos reais.
-6. Quando faltar um caminho ou comando verificável, inspecione o menor trecho necessário do projeto sem redesenhar a TechSpec.
-
-*Done when:* todo item das fontes aparece exatamente uma vez como mapeável ou pendente, com origem, verificação e classificação `local` ou `dependente de ambiente`, e todo item previamente planejado foi reconciliado.
-
-**Step 3: Formar entregas atômicas**
-
-1. Prefira fatias verticais com comportamento observável. Crie fundação separada somente quando ela desbloquear duas ou mais entregas ou for uma migração reversível independente.
-2. Faça cada task caber em uma revisão coerente: um resultado, escopo explícito, dependências conhecidas, implementação e testes correspondentes.
-3. Separe resultados independentes; una preparação sem valor observável à primeira entrega que a consome.
-4. Reuse IDs de tasks inalteradas. Numere novas tasks após o maior ID existente na raiz ou em `done/`, modele dependências como DAG e explicite o que cada task desbloqueia.
-5. Mapeie toda task a pelo menos um item e todo item não pendente a pelo menos uma task. Preserve `fora de escopo` como limite.
-6. Não crie task cuja verificação seja `dependente de ambiente`. Primeiro reescreva o cenário como unitário ou de integração com dublês, fakes em memória, fixtures ou testes de contrato que rodem no comando de teste padrão do projeto.
-7. Se uma obrigação só puder ser verificada com ambiente real, pare o planejamento antes de escrever qualquer arquivo e use a ferramenta de pergunta (`AskUserQuestion`) para pedir aprovação explícita, listando o cenário, o ambiente exigido, a alternativa local avaliada e o motivo de ela não cobrir a obrigação. Sem aprovação, registre o cenário como pendente e fora do escopo das tasks, mantendo a obrigação rastreada. Com aprovação, isole-o em task própria, nomeie o pré-requisito de ambiente e não misture verificação local nessa task.
-8. Apresente o DAG, o impacto sobre arquivos existentes, a destinação de cada item e a lista de cenários `dependente de ambiente` com sua decisão; aguarde aprovação antes de escrever.
-
-*Done when:* o DAG é acíclico, nenhuma task ou obrigação está órfã, tasks concluídas permanecem imutáveis, nenhuma task exige ambiente sem aprovação explícita do usuário e o usuário aprovou criação ou atualização.
-
-**Step 4: Gerar os contratos**
-
-1. Leia `assets/tasks.template.md` e `assets/task.template.md` desta skill na íntegra.
-2. Grave `tasks/prd-[slug]/tasks.md` como fonte única do DAG, dos links e do estado.
-3. Crie ou atualize somente os `task_[num].md` aprovados. Nunca sobrescreva uma task em `done/`; preserve IDs e handoffs existentes das tasks inalteradas.
-4. Faça cada link do manifesto apontar para a localização real, na raiz ou em `done/`.
-5. Referencie IDs, seções e caminhos das fontes. Repita apenas invariantes curtos e mantenha detalhes técnicos na TechSpec.
-6. Mantenha contexto estável no início e estado mutável no final. Exclua timestamps e metadados voláteis.
-
-*Done when:* cada entrada do manifesto aponta para um arquivo existente, os contratos seguem os templates e nenhum placeholder permanece fora do `Handoff` inicial das tasks novas.
-
-**Step 5: Aplicar o gate de qualidade**
-
-1. Execute uma rodada de crítica e corrija somente falhas observáveis nestes gates:
-   - **Cobertura:** todos os itens não pendentes têm task e verificação.
-   - **Rastreabilidade:** toda task aponta para PRD ou TechSpec por ID e seção.
-   - **Dependências:** o DAG é acíclico e cada pré-condição tem dono.
-   - **Atomicidade:** cada task entrega um resultado e inclui seus testes.
-   - **Executabilidade:** caminhos, comandos, critérios e evidências são concretos.
-   - **Independência de ambiente:** toda verificação roda no comando de teste padrão do projeto em máquina de desenvolvimento limpa; as exceções existem apenas onde o usuário aprovou e trazem o pré-requisito nomeado.
-   - **Cache-first:** PRD e TechSpec formam o prefixo; conteúdo variável fica na cauda.
-   - **Idempotência:** rerun preserva IDs, tasks concluídas, links e handoffs.
-2. Pare após todos os gates passarem ou quando restar uma decisão genuína. Liste pendências sem fabricar solução.
-3. Apresente os arquivos gerados e aguarde aprovação antes de implementar.
-
-*Done when:* os oito gates passam, ou cada bloqueio restante está ligado a uma pergunta concreta e às tasks afetadas.
-
-## Error Handling
-
-- Se faltar `prd.md`, direcione para `sdd-criar-prd`; se faltar `techspec.md`, direcione para `sdd-criar-techspec`.
-- Se as fontes se contradisserem, preserve ambas, identifique as tasks afetadas e solicite a decisão mínima.
-- Se manifesto, raiz e `done/` divergirem, pare a atualização e reporte cada link, ID ou estado inconsistente.
-- Se uma obrigação não puder receber teste ou evidência, registre a lacuna antes de gerar a task correspondente.
-- Se a TechSpec prescrever cenário que exige ambiente (E2E contra servidor, smoke pós-deploy, integração com serviço externo real), não o transcreva como task: proponha o equivalente local e, persistindo a necessidade, aplique a aprovação do Step 3 antes de escrever qualquer arquivo.
-- Se a aprovação do ambiente for negada ou a pergunta não for respondida, escreva as demais tasks normalmente e registre o cenário em `Premissas e pendências` do manifesto, com a obrigação de origem e o ambiente que faltaria.
+Se uma fonte mudar durante o planejamento, reconcilie o inventário e invalide apenas os derivados afetados. Falta de PRD/TechSpec direciona à skill criadora correspondente. Estado mutável fica depois das fontes; leia somente o código necessário para resolver caminhos ou comandos.
