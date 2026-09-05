@@ -1,23 +1,52 @@
-# AI Ready — [nome do repositório]
+# AI Ready: [repositório]
 
-**Nota: [0-5] / 5**
+**Nota: [0-5] / 5** · Rubrica: v2 · Avaliação: [concluída/provisória] · Data: [data]
 
-[Uma frase justificando a nota: qual foi o critério do tier decisivo, ex. "capado em 2 porque CLAUDE.md e AGENTS.md têm o mesmo conteúdo colado, não um symlink".]
+Escopo: [raiz, ferramentas incluídas e evidência ou suposição usada].
+Estado avaliado: [commit quando disponível e alterações locais relevantes].
+Critério decisivo: [primeiro requisito não atendido; para 5, evidência de todos].
+
+## Cobertura por ferramenta
+
+| Ferramenta | Em escopo? | Entrada efetiva | Estado físico | Fonte e carregamento verificado |
+|---|---|---|---|---|
+| Claude Code | [sim/não] | [caminho/configuração] | [estado] | [evidência ou limitação] |
+| Copilot | [sim/não] | [...] | [...] | [...] |
+| Codex | [sim/não] | [...] | [...] | [...] |
+| OpenCode | [sim/não] | [...] | [...] | [...] |
+
+## Critérios cumulativos
+
+| Nível | Atendido? | Evidência ou requisito pendente |
+|---|---|---|
+| 1: instrução utilizável | [sim/não/não verificado] | [...] |
+| 2: orientação específica | [...] | [...] |
+| 3: cobertura e fonte única | [...] | [...] |
+| 4: orientação operacional conferida | [...] | [...] |
+| 5: contexto enxuto e descoberta sob demanda | [...] | [...] |
 
 ## Achados
 
-| Ferramenta | Arquivo esperado | Status | Achado | Sugestão |
+| ID | Evidência (arquivo:linha ou busca de ausência) | Impacto e critério | Ação concreta | Estado |
 |---|---|---|---|---|
-| Claude Code | CLAUDE.md | ausente / duplicado / symlink / genérico / específico | [o que o discover.py e a leitura mostraram] | [ação concreta] |
-| Copilot | .github/copilot-instructions.md | ... | ... | ... |
-| Codex | AGENTS.md | ... | ... | ... |
-| OpenCode | AGENTS.md | ... | ... | ... |
+| AR-001 | [...] | [...] | [...] | [aberto/resolvido/bloqueado] |
 
-## Conhecimento que deveria virar skill
+[Se nenhum: “Nenhum achado no escopo verificado.” Preserve IDs de achados persistentes em reavaliações.]
 
-[Lista de trechos das instruções que são específicos, de uso ocasional, e hoje ficam sempre carregados — cada um com arquivo:linha e o nome de skill sugerido. Se nenhum, escrever "Nenhum encontrado."]
+## Conhecimento candidato a carregamento sob demanda
 
-## Próximos passos para subir a nota
+| Origem e trecho | Por que é ocasional | Destino adequado e gatilho |
+|---|---|---|
+| [arquivo:linha] | [justificativa] | [skill, instrução de subárvore ou documento; quando ler] |
 
-1. [Ação mais barata/impactante primeiro]
-2. ...
+[Se nenhum: “Nenhuma extração necessária.”]
+
+## Verificações e limitações
+
+[Fontes inspecionadas, comandos apenas conferidos versus executados, exclusões da busca,
+falhas de acesso, dependências externas e aspectos não verificados.]
+
+## Próximos passos
+
+[Ações ordenadas pelo critério que limita a nota; dependências ou decisões pendentes.
+Em reavaliações, inclua nota anterior, comparabilidade do escopo e evidência das resoluções.]

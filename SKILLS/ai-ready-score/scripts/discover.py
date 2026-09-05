@@ -1,13 +1,5 @@
-"""Read-only scan for AI-instruction files (Copilot, Claude Code, Codex, OpenCode).
-
-Usage: python discover.py [repo_root]
-
-Prints a deterministic inventory to stdout: which instruction files exist per
-tool, whether they are symlinks (and to what), a content hash to spot
-copy-pasted duplicates, nested CLAUDE.md/AGENTS.md files elsewhere in the
-repo, and any existing skill files (SKILL.md). Exits 1 with a message on
-stderr if repo_root does not exist or is not a directory.
-"""
+"""Read-only, deterministic inventory; file presence does not prove agent loading."""
+import argparse
 import hashlib
 import os
 import sys
@@ -15,99 +7,112 @@ from pathlib import Path
 
 PRUNE_DIRS = {
     ".git", "node_modules", "bin", "obj", "dist", "build", "out",
-    ".venv", "venv", "vendor", "packages", ".next", "target",
+    ".venv", "venv", "vendor", ".next", "target", "__pycache__", ".cache",
 }
-SCAN_LIMIT = 20
-
 CORE_FILES = {
-    "Claude Code": ["CLAUDE.md"],
-    "Codex": ["AGENTS.md"],
-    "OpenCode": ["AGENTS.md"],
-    "Copilot": [".github/copilot-instructions.md"],
+    "Claude Code": "CLAUDE.md",
+    "Codex": "AGENTS.md",
+    "OpenCode": "AGENTS.md",
+    "Copilot": ".github/copilot-instructions.md",
 }
-
-
-def content_hash(path: Path) -> str:
-    try:
-        return hashlib.sha256(path.read_bytes()).hexdigest()[:12]
-    except OSError:
-        return "unreadable"
+RULE_NAMES = {
+    "CLAUDE.md", "CLAUDE.local.md", "AGENTS.md", "AGENTS.override.md", "SKILL.md",
+    ".cursorrules", ".clinerules", ".windsurfrules",
+}
+RULE_DIRS = (".cursor/rules", ".claude/rules", ".clinerules", ".windsurf/rules")
 
 
 def describe(path: Path, root: Path) -> str:
-    rel = path.relative_to(root)
+    rel = path.relative_to(root).as_posix()
+    target = path.resolve()
+    if not target.is_relative_to(root):
+        return f"{rel} -> EXTERNAL {target} (content not read)"
     if path.is_symlink():
-        target = os.readlink(path)
-        resolved = "resolves" if path.exists() else "BROKEN"
-        return f"{rel} -> symlink -> {target} ({resolved})"
-    size = path.stat().st_size
-    h = content_hash(path)
-    return f"{rel} -> real file, {size} bytes, hash={h}"
+        if not path.exists():
+            return f"{rel} -> BROKEN symlink -> {os.readlink(path)}"
+        return f"{rel} -> symlink -> {os.readlink(path)} -> {describe(target, root)}"
+    if path.is_dir():
+        return f"{rel} -> DIRECTORY"
+    data = path.read_bytes()
+    digest = hashlib.sha256(data).hexdigest()
+    return f"{rel} -> regular file, {len(data)} bytes, sha256={digest}"
 
 
-def scan_glob(root: Path, filenames: set[str], limit: int) -> list[Path]:
-    found = []
-    for dirpath, dirnames, filenames_here in os.walk(root):
-        dirnames[:] = [d for d in dirnames if d not in PRUNE_DIRS and not d.startswith(".")]
-        for name in filenames_here:
-            if name in filenames:
-                found.append(Path(dirpath) / name)
-                if len(found) >= limit:
-                    return found
-    return found
-
-
-def main() -> None:
-    root = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path.cwd()
+def inventory(root: Path) -> tuple[list[str], list[str]]:
+    root = root.resolve(strict=True)
     if not root.is_dir():
-        print(f"ERROR: {root} is not a directory", file=sys.stderr)
-        sys.exit(1)
+        raise ValueError(f"{root} is not a directory")
+    lines = [f"# AI-instruction inventory for {root}",
+             "Excluded directories: " + ", ".join(sorted(PRUNE_DIRS)),
+             "Directory links/junctions are listed but not traversed.",
+             "\n## Core entry candidates (verify configuration and loading)"]
+    errors = []
 
-    print(f"# AI-instruction inventory for {root}\n")
+    def emit(path: Path) -> None:
+        try:
+            lines.append("- " + describe(path, root))
+        except (OSError, RuntimeError, ValueError) as exc:
+            errors.append(f"{path}: {exc}")
+            lines.append(f"- {path.relative_to(root).as_posix()} -> ERROR: {exc}")
 
-    print("## Core files (by tool)")
-    for tool, rels in CORE_FILES.items():
-        for rel in rels:
-            path = root / rel
-            if path.exists() or path.is_symlink():
-                print(f"- {tool}: {describe(path, root)}")
+    for tool, rel in CORE_FILES.items():
+        path = root / rel
+        lines.append(f"Tool: {tool}")
+        if os.path.lexists(path):
+            emit(path)
+        else:
+            lines.append(f"- {rel} -> MISSING")
+
+    lines.append("\n## Additional instructions, skills and directory links")
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False,
+                                               onerror=lambda exc: errors.append(str(exc))):
+        directory = Path(dirpath)
+        descend = []
+        for name in sorted(dirnames):
+            child = directory / name
+            if name in PRUNE_DIRS:
+                continue
+            try:
+                is_junction = getattr(child, "is_junction", lambda: False)()
+                linked = child.is_symlink() or is_junction or child.resolve() != child
+            except (OSError, RuntimeError, ValueError) as exc:
+                errors.append(f"{child}: {exc}")
+                lines.append(f"- {child.relative_to(root).as_posix()} -> ERROR: {exc}")
+                continue
+            if linked:
+                emit(child)
             else:
-                print(f"- {tool}: {rel} -> MISSING")
+                descend.append(name)
+                if name in RULE_NAMES:
+                    emit(child)
+        dirnames[:] = descend
+        for name in sorted(filenames):
+            path = directory / name
+            rel = path.relative_to(root).as_posix()
+            if rel in CORE_FILES.values():
+                continue
+            in_rule_dir = any(rel.startswith(prefix + "/") for prefix in RULE_DIRS)
+            if name in RULE_NAMES or name.endswith(".instructions.md") or (
+                in_rule_dir and path.suffix in {".md", ".mdc"}
+            ):
+                emit(path)
+    return lines, errors
 
-    copilot_dir = root / ".github" / "instructions"
-    if copilot_dir.is_dir():
-        matches = sorted(copilot_dir.glob("*.instructions.md"))
-        if matches:
-            print("\n## Copilot path-scoped instructions (.github/instructions/*.instructions.md)")
-            for m in matches:
-                print(f"- {describe(m, root)}")
 
-    nested = scan_glob(root, {"CLAUDE.md", "AGENTS.md"}, SCAN_LIMIT)
-    nested = [p for p in nested if p.parent != root]
-    if nested:
-        print(f"\n## Nested CLAUDE.md / AGENTS.md found elsewhere (first {SCAN_LIMIT})")
-        for p in nested:
-            print(f"- {describe(p, root)}")
-
-    skills = scan_glob(root, {"SKILL.md"}, SCAN_LIMIT)
-    if skills:
-        print(f"\n## Existing SKILL.md files (first {SCAN_LIMIT})")
-        for p in skills:
-            print(f"- {p.relative_to(root)}")
-    else:
-        print("\n## Existing SKILL.md files")
-        print("- none found")
-
-    other_rules = [
-        ".cursorrules", ".clinerules", ".windsurfrules",
-        ".cursor/rules", ".cursor/rules.mdc",
-    ]
-    other_found = [r for r in other_rules if (root / r).exists()]
-    if other_found:
-        print("\n## Other assistant-rule files detected (informative, not scored)")
-        for r in other_found:
-            print(f"- {describe(root / r, root)}")
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("repo_root", nargs="?", default=".")
+    args = parser.parse_args()
+    try:
+        lines, errors = inventory(Path(args.repo_root))
+    except (OSError, RuntimeError, ValueError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+    print("\n".join(lines))
+    for error in errors:
+        print(f"ERROR: {error}", file=sys.stderr)
+    return 1 if errors else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
