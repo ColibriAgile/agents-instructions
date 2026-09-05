@@ -1,6 +1,6 @@
 ---
 name: no-workarounds
-description: Fix problems at their root cause instead of patching symptoms. Use when debugging, fixing bugs, resolving test failures, planning a solution, or reviewing a change — especially where a fix would silence a signal (type assertion, lint suppression, swallowed error, timing hack, monkey patch) rather than repair its source. Not for formatting- or docs-only edits.
+description: No workarounds. Use when debugging code or test failures, planning a fix, or reviewing changes that may hide a defect, including .NET/C# nullability, async, dependency injection, and EF Core issues. Not for formatting- or docs-only edits.
 metadata:
   author: Pedro Nauck
   github: https://github.com/pedronauck
@@ -9,36 +9,41 @@ metadata:
 
 # No Workarounds
 
-A workaround is any change that makes a problem stop manifesting without addressing why it exists. It makes the symptom disappear while the disease spreads — a deferred failure that compounds. **Fix the source, not the signal.**
+A workaround makes a failure disappear while leaving its cause intact. **Fix the source, not the signal.** Judge the violated contract and the evidence, not syntax alone: casts, null checks, retries, and framework initialization can be legitimate. Apply this distinction when reading the catalogs too.
 
-## The gate — run before any fix
+## The gate: run before any fix
 
 ```
-1. State the problem, then trace it to its root cause (use the systematic-debugging skill).
-2. Does the fix repair that root cause, or only stop the symptom from showing?
-3. Am I silencing a signal, or fixing a source?
+1. Capture the failing behavior or diagnostic and the expected contract.
+2. Trace the relevant data flow, lifecycle, or configuration to a cause supported by evidence.
+3. Check that the proposed fix repairs that cause while preserving valid behavior.
 
-Silencing a signal → redesign the fix against the root cause.
-Root cause is external or genuinely unfixable → take the escape valve.
+Silencing a signal -> redesign the fix against the root cause.
+Cause still unknown -> gather evidence; do not present a hypothesis as a verified fix.
+Root cause is external -> evaluate the escape valve.
 ```
 
-The fix is done when it would have been unnecessary had the code been correct in the first place — and it needs no cast, suppression, delay, or empty catch to pass.
+Complete the fix when the original reproduction passes, relevant regression checks preserve the contract, and no remaining suppression or fallback conceals the defect. For a plan or review, identify the causal evidence and the checks required to verify the proposed fix; distinguish these from checks actually run.
 
 ## The seven signals
 
-Each row is the compiler, linter, runtime, or reviewer telling you something true. Fix what it points at.
+Use these signals to investigate a possible workaround. Confirm the defect before changing a valid language or framework idiom.
 
-| Category | The signal it silences | Fix the source by… |
+| Category | Suspected hidden defect | Fix the source by |
 |---|---|---|
-| **TYPE** — `as`, `any`, `!`, `as unknown as` | The type system found the code wrong | Making types truthful: correct the definition, or validate genuinely-unknown data at the boundary (Zod / Schema / type guard) |
-| **LINT** — `eslint-disable`, `@ts-ignore`, `@ts-expect-error` | Static analysis found a real problem | Fixing what the rule flagged; if the rule is truly wrong for this repo, disable it in config, not inline |
-| **SWALLOW** — empty catch, `.catch(() => null)`, catch-and-default | Something failed and the code pretends it didn't | Handling each error: log with context, then re-throw or map it to a typed result |
-| **TIMING** — `setTimeout`, `sleep`, blind retry loops | Code runs in the wrong order | Coordinating on the real readiness event; in tests, wait on a condition, not the clock |
-| **PATCH** — prototype / global / library-internal mutation | The API doesn't do what the code needs | Composing around it: wrapper, adapter, or the library's official extension point |
-| **SCATTER** — deep `?.` / `??`, fallback chains | The data is unreliable at its source | Validating once at the boundary, then trusting the shape everywhere downstream |
-| **CLONE** — copy-and-tweak of similar code | An abstraction doesn't fit but gets forced | Extracting the shared pattern, or writing purpose-built code |
+| **TYPE**: forced assertions, `dynamic`, unjustified `!` | Types conceal invalid or absent data | Correcting the contract, initialization, or boundary validation |
+| **LINT**: diagnostic suppression, disabled analyzers | A real warning is hidden | Fixing the finding; for a proven false positive, documenting a narrowly scoped suppression instead of disabling checks broadly |
+| **SWALLOW**: empty catch, catch-and-default | Failure becomes apparent success | Handling expected errors explicitly and propagating unexpected failures; preserving context at the responsible error boundary |
+| **TIMING**: arbitrary delay, blocking async, blind retries | Ordering or ownership is wrong | Awaiting completion or coordinating readiness; retrying only identified transient failures with bounded, cancellation-aware policies |
+| **PATCH**: global or library-internal mutation | A missing API contract is bypassed | Using a supported extension point, adapter, or upstream correction |
+| **SCATTER**: fallback chains for required data | Invalid input escapes its boundary | Validating required data at entry; retaining null handling for genuinely optional values |
+| **CLONE**: copy-and-tweak | A forced abstraction spreads the defect | Sharing behavior with the same contract, or separating distinct responsibilities |
 
-**When any category's signal fires, read `references/workaround-catalog.md` in full before choosing the fix** — 30+ named patterns (W-01…W-30) with before/after code, including environment, build, test, and architecture workarounds beyond the seven above.
+## Select the relevant reference
+
+- **For .NET/C# fixes or reviews, read [references/dotnet-csharp.md](references/dotnet-csharp.md) in full before choosing the fix.** It covers runtime and SDK compatibility, nullable contracts, async, DI, EF Core, configuration, and verification.
+- For JavaScript/TypeScript signals, read [references/workaround-catalog.md](references/workaround-catalog.md) in full before choosing the fix. It contains W-01 through W-30 with examples. In mixed repositories, load both only when the defect crosses those stacks.
+- For other stacks, apply the gate and seven signals directly; use the ecosystem's supported contracts and diagnostics.
 
 ## The escape valve
 
@@ -48,16 +53,16 @@ Not every root cause is yours to fix. A workaround is allowed only when ALL hold
 1. The root cause is in external code the team does not control.
 2. The proper fix needs upstream changes on an uncertain timeline.
 3. The business cost of not shipping exceeds the debt incurred.
-4. The workaround is isolated — it does not leak into other code.
+4. The workaround is isolated; it does not leak into other code.
 ```
 
 When all four hold, contain it:
 
 ```
-1. Mark it: // WORKAROUND: [reason] — see [issue-link]
-2. File a tracking issue for its removal.
+1. Mark it: // WORKAROUND: [reason]; see [issue-link or local tracking path]
+2. Record an owner and removal condition locally; create an external issue only when authorized.
 3. Add a test that pins the current behavior.
-4. Add a canary test that FAILS once the upstream fix lands.
+4. Add a focused upstream probe that detects when the workaround can be removed.
 5. Set a review date (max 90 days).
 ```
 
@@ -65,4 +70,6 @@ If any condition fails, fix the root cause. No exceptions.
 
 ## Foundations & rationalizations
 
-The principle converges from Toyota's Jidoka, Fowler's debt quadrant, Torvalds' "good taste," and Broken Windows — and every excuse for skipping it has a known answer. Read `references/philosophical-foundations.md`.
+When discussing the rationale or pressure to skip a root-cause fix, read [references/philosophical-foundations.md](references/philosophical-foundations.md). Treat its analogies as rationale, not evidence for a particular defect.
+
+For provenance and upstream maintenance, read [NOTICE.md](NOTICE.md).
