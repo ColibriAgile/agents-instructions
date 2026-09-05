@@ -2,3 +2,4 @@ bundles:
   - core
   - authoring
   - kb
+  - sdd
