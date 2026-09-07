@@ -7,13 +7,13 @@ description: Fluxo SDD para conduzir uma feature com subagentes e HIL ou retomar
 
 Coordene contratos, execução e aceite. O coordenador mantém estado e decisões humanas; subagentes produzem artefatos e código em escopos exclusivos.
 
-1. **Preparar ou retomar.** Leia integralmente [references/estado-hil.md](references/estado-hil.md) e detecte `tasks/prd-[slug]/checkpoint.json` antes de iniciar trabalho. Com feature explícita, consulte somente sua pasta; sem ela, selecione o único checkpoint pendente ou solicite escolha se houver vários. Retome automaticamente o checkpoint válido da feature selecionada, sem exigir flag especial. Sem checkpoint, reconcilie artefatos existentes antes de criar estado.
+1. **Preparar ou retomar.** Leia integralmente [references/estado-hil.md](references/estado-hil.md) e detecte `tasks/prd-[slug]/checkpoint.json` antes de iniciar trabalho. Com feature explícita, consulte somente sua pasta; sem ela, selecione o único checkpoint pendente ou solicite escolha se houver vários. Retome automaticamente o checkpoint válido da feature selecionada, sem exigir flag especial. Sem checkpoint, reconcilie artefatos existentes antes de criar estado; em pedido amplo ainda sem recorte, fixe os slugs no passo 2 antes de abrir estado.
    Localize as skills da tabela abaixo no catálogo instalado ou em `SKILLS/`; deixe o corpo de cada etapa ao agente responsável. Antes de delegar, leia integralmente [references/delegacao.md](references/delegacao.md). Carregue na retomada só o índice, decisões pertinentes e fontes necessárias à próxima etapa.
    Confira worktree, instruções locais, ferramentas de subagentes e fontes existentes. Registre base Git como commit resolvido e mudanças preexistentes; sem Git, registre limites de escopo. Exija as dependências da próxima fase; skill ausente bloqueia só essa fase, sem inventar execução equivalente. Preserve políticas de invocação existentes: passe nome e caminho exato explicitamente ao subagente.
    **Saída:** estado reconciliado, autorização conhecida e próxima etapa identificada. Sem subagentes, prepare fontes/estado e informe a limitação; solicite escolha antes de substituir o fluxo pedido por execução local.
-2. **Produto.** Delegue criação/atualização do PRD; reutilize artefato válido existente. Para refatoração expressamente pedida, delegue `sdd-planejar-refatoracao` e use seu PRD no mesmo gate, mantendo a TechSpec como rascunho até HIL técnico.
-   Confira cobertura do pedido e apresente o PRD gravado no **HIL 1**, com decisões de produto e pendências. Reuse aprovação existente somente se corresponder ao conteúdo/escopo atual.
-   **Saída:** PRD aprovado e decisões registradas; pendência bloqueante impede fases dependentes.
+2. **Produto.** Delegue criação/atualização do PRD; reutilize artefato válido existente. Para refatoração expressamente pedida, delegue `sdd-planejar-refatoracao` e use seu PRD no mesmo gate, mantendo a TechSpec como rascunho até HIL técnico. Com mais de um resultado principal no pedido, delegue antes `sdd-orquestrar-prds`: ela aprova o recorte com o usuário e grava um PRD por recorte sob prefixo comum; registre o recorte aprovado como decisão em `workflow.md`.
+   Confira cobertura do pedido e apresente o PRD gravado no **HIL 1**, com decisões de produto e pendências. Com recorte, apresente o conjunto num só HIL 1, abra um checkpoint por recorte aprovado e conduza cada recorte como feature própria a partir do passo 3, na ordem de dependência. Reuse aprovação existente somente se corresponder ao conteúdo/escopo atual.
+   **Saída:** PRD aprovado e decisões registradas; com recorte, cada recorte tem PRD aprovado ou adiamento explícito. Pendência bloqueante impede fases dependentes.
 3. **Projeto e plano.** Delegue TechSpec, confira cobertura do PRD e depois delegue planejamento de tasks. Identifique stack por alvo; em desktop C#/.NET, omita E2E e mantenha unitários, integração e aceite manual pertinente. Exija comandos que excluam E2E também de suítes agregadas. Preserve comportamento do produto ao escolher verificações.
    Apresente TechSpec + DAG + tasks concretas no **HIL 2**: arquitetura, limites, ambientes necessários, aceite manual e autorização para implementação/correções dentro desses contratos. Corrija os documentos antes de solicitar decisão; perguntas intermediárias somente para informação indispensável.
    **Saída:** plano rastreável e executável aprovado; nenhum escritor de código iniciou antes da autorização necessária.
@@ -33,6 +33,7 @@ Salve checkpoint antes de cada pergunta HIL, após registrar sua resposta, entre
 | Entrada disponível | Skill responsável | Artefato/resultado |
 | --- | --- | --- |
 | Pedido | `sdd-criar-prd` | `prd.md` |
+| Pedido com mais de um resultado principal | `sdd-orquestrar-prds` | um `prd.md` por recorte sob prefixo comum |
 | Refatoração solicitada | `sdd-planejar-refatoracao` | `prd.md`, `techspec.md` |
 | PRD aprovado | `sdd-criar-techspec` | `techspec.md` |
 | PRD + TechSpec | `sdd-planejar-tasks` | `tasks.md`, `task_*.md` |

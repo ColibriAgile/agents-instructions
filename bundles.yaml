@@ -57,6 +57,7 @@ bundles:
       - sdd-executar-correcoes
       - sdd-executar-task
       - sdd-orquestrar-fluxo
+      - sdd-orquestrar-prds
       - sdd-orquestrar-tasks
       - sdd-planejar-correcoes
       - sdd-planejar-refatoracao
