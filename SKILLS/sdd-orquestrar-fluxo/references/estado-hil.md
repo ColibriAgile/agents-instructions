@@ -14,6 +14,7 @@ Ao criar o primeiro checkpoint, leia integralmente [../assets/checkpoint.templat
 | `status`, `safe_to_stop` | `ativo`, `aguardando-hil`, `pausado`, `bloqueado` ou `concluido`; seguro para troca somente sem escritores/processos pendentes e com persistência conferida |
 | `objective`, `constraints` | Resultado pedido e invariantes curtos indispensáveis, incluindo política desktop .NET quando aplicável; detalhes por referência |
 | `sources` | Caminhos relativos à pasta da feature, ou `null`; nenhum caminho de artefato fora dela |
+| `review_status` | Status literal do último `codereview.md` (`APROVADO`, `APROVADO COM RESSALVAS`, `REPROVADO`), ou `null` antes da primeira revisão; `APROVADO` sem alteração posterior de código dispensa nova revisão |
 | `approved_sources` | Itens `{path, sha256, decision_id}` ligando conteúdo aprovado à decisão humana em `workflow.md` |
 | `decisions_to_read` | IDs de decisões relevantes à próxima ação; cada registro contém decisão, escopo, texto humano pertinente e proveniência disponível |
 | `git_base`, `worktree_evidence` | Commit resolvido ou `null`; referência à evidência de alterações preexistentes/não commitadas no workflow ou handoff, pois HEAD sozinho não identifica o estado |
@@ -41,7 +42,8 @@ Mantenha o índice preferencialmente abaixo de 8 KiB: mova detalhes para fontes 
 | HIL 1 | PRD com escopo, aceite e premissas | Aprovar produto ou corrigir requisitos |
 | HIL 2 | TechSpec, DAG, tasks, riscos e validações | Aprovar solução e execução, incluindo correções dentro do contrato |
 | Exceção | Evidência, impacto e proposta concreta | Resolver desvio de escopo/arquitetura, ambiente indispensável, risco irreversível ou estagnação |
-| HIL 3 | Revisão final, testes, pendências e aceite manual | Aceitar entrega atual e decidir ressalvas opcionais |
+| Ressalvas | Resumo dos itens ressalvados na revisão, com impacto e esforço | Corrigir os itens escolhidos ou finalizar a feature |
+| HIL 3 | Revisão final, testes, pendências e aceite manual | Aceitar entrega atual |
 
 Use ferramenta de pergunta disponível ou pergunta textual. Pare só o trabalho dependente da resposta; silêncio, tempo decorrido ou aprovação produzida por subagente não equivalem a consentimento. Explique qual gate falta e aponte os artefatos. Reuse autorização já dada para o mesmo escopo; não peça duas vezes para gravar um rascunho e depois executá-lo.
 
