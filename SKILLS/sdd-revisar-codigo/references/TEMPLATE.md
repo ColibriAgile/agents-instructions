@@ -27,6 +27,15 @@
 | --- | --- | --- |
 | [nome] | OK/NOK/N/A | `[arquivo:linha ou comando]` |
 
+## Perfil de qualidade
+
+| ID | Regra | Classe | Comando | Hits | Estado |
+| --- | --- | --- | --- | --- | --- |
+| QA-01 | [regra] | bloqueante/ressalva | `[comando]` | [n ou 0] | OK/NOK/justificado por `DEC-NN` |
+
+- Ressalvas acumuladas na feature: [n]
+- Escalonamento sugerido: [skill e gatilho contado, ou `nenhum gatilho disparado`]
+
 ## Aderência à TechSpec
 
 | Decisão ou contrato | Estado | Evidência |

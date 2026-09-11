@@ -56,6 +56,17 @@
 | --- | --- | --- | --- | --- | --- |
 | TC-01 | RF-01 | [nível permitido pelo perfil] | [cenário] | [resultado] | `[comando ou roteiro]` |
 
+## Perfil de qualidade
+
+Regras que esta feature pode violar. Bloqueante impede conclusão da task e reprova a revisão; ressalva vira melhoria opcional e conta para o escalonamento. Hit coberto por `DEC-NN` é esperado, não achado.
+
+| ID | Regra | Classe | Comando de verificação | Justificativa prévia |
+| --- | --- | --- | --- | --- |
+| QA-01 | [regra] | bloqueante/ressalva | `[comando rg escopado ao diff]` | `DEC-NN` ou — |
+
+- Escopo da verificação: [arquivos do diff da task]
+- Gatilho de escalonamento: [8+ ressalvas, arquivo acima de 500 linhas, ou duplicação em 3+ pontos]
+
 ## Observabilidade e rollout
 
 - Sinais: [logs, métricas ou health checks aplicáveis]

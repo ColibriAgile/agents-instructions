@@ -14,8 +14,9 @@ argument-hint: --task tasks/prd-nome/task_01.md
    **Saída:** implementação limitada ao contrato, sem estado global alterado.
 4. Aplique o perfil da TechSpec. Em desktop C#/.NET, omita E2E, inclusive quando comando legado os incluir: selecione projetos/filtros sem E2E e registre a divergência. Preserve aceite com unitários, integração e roteiro manual pertinente; manual não executado permanece pendente. Se disponível, use `dotnet-efficient-validation` para runner e reutilização de build.
    Execute as verificações necessárias ao diff; reúse evidência somente do mesmo código, configuração e ambiente. Zero testes ou listagem não são sucesso. Registre falhas preexistentes separadamente.
-   **Saída:** cada aceite tem evidência ou bloqueio reproduzível.
-5. Atualize um único `## Handoff`: resultado, arquivos, comandos, resultados, versão validada e pendências. Retorne resumo curto e caminho para revisão independente; em retry, altere a mesma seção e preserve evidências válidas.
+   Rode também os comandos do perfil de qualidade da TechSpec, escopados aos arquivos que você tocou. Saída vazia encerra o assunto. Hit bloqueante sem `DEC-NN` que o cubra é defeito seu: corrija antes do handoff, não o reporte como pendência. Hit de ressalva permanece e vai ao handoff com arquivo e linha. Perfil ausente na TechSpec é registrado como lacuna, não suprido por conta própria.
+   **Saída:** cada aceite tem evidência ou bloqueio reproduzível; nenhum hit bloqueante não justificado sobrevive no diff.
+5. Atualize um único `## Handoff`: resultado, arquivos, comandos, resultados, versão validada, hits de ressalva do perfil de qualidade e pendências. Retorne resumo curto e caminho para revisão independente; em retry, altere a mesma seção e preserve evidências válidas.
    **Saída:** handoff suficiente para o chamador revisar diff, testes e aceite; task permanece na raiz até aprovação.
 
 ## Decisões e falhas
