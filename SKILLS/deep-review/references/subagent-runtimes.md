@@ -14,10 +14,12 @@ How Step 3 review agents (defect cohorts, polish cohorts, sweeps) execute. `nati
 
 The stage scripts already materialized every prompt (schema + output contract embedded — external runtimes have no schema-enforcement layer, so the output-file contract replaces it). Execute a stage's jobs with the bundled runner from the repo root:
 
-```bash
-python3 <skill-dir>/scripts/run_jobs.py --out <out> [--jobs-file <out>/<stage>-jobs.json] \
-  --command "compozy exec <runtime flags from the map> --format json --timeout 30m --prompt-file {prompt}"
+```powershell
+py -3 "$skill/scripts/run_jobs.py" --out $out --command "compozy exec $runtimeFlags --format json --timeout 30m --prompt-file {prompt}"
+# optional: --jobs-file "$out/<stage>-jobs.json"
 ```
+
+`$runtimeFlags` are the flags for the chosen runtime from the map above. `{prompt}` is the runner's own placeholder — it stays literal, so keep the `--command` value in double quotes and let PowerShell interpolate only `$runtimeFlags`.
 
 The runner owns bounded concurrency (`--workers`, default 4 — each invocation is a full ACP session, not a thread), per-attempt event/err logs under `<out>/runs/`, output validation with one built-in retry, provider-block detection, the source-freeze check, and resume (valid outputs are never re-run). Each job's output file is the agent's only product; the JSONL/stderr logs are operational evidence — never parse them as review output.
 

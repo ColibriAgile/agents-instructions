@@ -41,17 +41,19 @@ Sweeps are bare keys from the table below (built-in lens text) or `{key, lens}` 
 
 ## Sweep triggers
 
-Sweeps are **opt-in and rare** — default to none. Each sweep is one extra agent that sees the manifest, not one cohort; include it only when its trigger clearly fires, and prefer at most one or two per round:
+Sweeps are **opt-in and rare** — default to none. Each sweep is one extra agent that sees the manifest, not one cohort; include it only when its trigger clearly fires, and prefer at most one or two per round. The last two are stack-specific: they arm only when Step 2 recorded C# in the selection, and what the `dotnet build` lane already reported is a `linter-overlap` suppression rather than a sweep result.
 
 | Key | Trigger | Looks for |
 | --- | --- | --- |
 | `contracts` | exported/wire/API symbol changed contract | breaking changes, drift between spec/impl/clients, missing codegen co-ship |
 | `security` | new endpoint/input path/authz surface/secret handling | injection, missing authn/authz, secret leakage, cross-tenant access |
-| `migrations` | schema/migration files in diff | destructive ops, missing migration for model change, ordering/identity hazards |
+| `migrations` | schema/migration files in diff | destructive ops, missing migration for model change, ordering/identity hazards; with EF Core also a model change shipped without its migration, and cascade-delete behavior altered by a relationship edit |
 | `tests` | any behavior change | new behavior without a failing-capable test, tests asserting mocks, weakened assertions |
 | `consistency` | renames or repeated patterns in diff | incomplete renames, sibling paths not mirroring a fix, duplicated logic |
 | `config` | config keys/flags/env vars changed | unwired or undocumented keys, dead flags, default mismatches |
 | `spec-parity` | `--spec` provided (always included then) | field-by-field conformance with every artifact in the context pack's Spec contract section |
+| `async-concurrency` | C# selection changes `async`/`await`/`Task`, locking, or shared state | `async void` outside an event handler, blocking on `.Result`/`.Wait()`/`GetAwaiter().GetResult()`, an I/O path that accepts no `CancellationToken`, a `Task` left unobserved, `ConfigureAwait` missing in library code, state mutated without synchronization under concurrent requests |
+| `di-lifetime` | C# selection changes DI registrations (`AddScoped`/`AddSingleton`/`AddTransient`/`AddHostedService`/`TryAdd*`) | captive dependency — a singleton capturing a scoped service, a `DbContext` held past its scope — plus a lifetime silently changed for an existing registration, a duplicate registration that shadows another, and `GetRequiredService` standing in for constructor injection |
 
 ## Engines
 

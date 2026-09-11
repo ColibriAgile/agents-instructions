@@ -1,5 +1,9 @@
 SKILLS/.system/
 
+# Bytecode das skills com scripts Python (deep-review)
+__pycache__/
+*.pyc
+
 # Artefatos gerados por `npx skills add` (Install-Skills.ps1) — reproduzíveis a
 # partir de skills.yaml + bundles.yaml, não são fonte de verdade.
 .agents/

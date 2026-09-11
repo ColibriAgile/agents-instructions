@@ -89,6 +89,21 @@ DEFAULT_LENSES = {
         "FOCUS: names, types, defaults, requiredness, shapes, topology, and behavior. REPORT GATE: cite the exact "
         "artifact field and contradictory implementation path."
     ),
+    "async-concurrency": (
+        "MISSION: prove the changed C# asynchrony and shared state survive concurrent execution. FOCUS: async void "
+        "outside event handlers, blocking on .Result/.Wait()/GetAwaiter().GetResult(), I/O paths that accept no "
+        "CancellationToken, unobserved Tasks, missing ConfigureAwait in library code, and state mutated without "
+        "synchronization under concurrent requests. REPORT GATE: name the caller or request interleaving that "
+        "deadlocks, loses the exception, or reads torn state. What the dotnet build lane already reported is a "
+        "linter-overlap suppression, not a finding."
+    ),
+    "di-lifetime": (
+        "MISSION: prove every changed DI registration resolves with a sound lifetime. FOCUS: captive dependencies "
+        "(a singleton capturing a scoped service, a DbContext held past its scope), a lifetime silently changed on "
+        "an existing registration, a duplicate registration shadowing another, and GetRequiredService standing in "
+        "for constructor injection. REPORT GATE: name the resolution path and the request or scope at which the "
+        "instance outlives or contends with its owner."
+    ),
 }
 
 SPEC_EXTRA = (

@@ -10,9 +10,8 @@ fp = first 16 hex of sha256("<result-kind>|<file>|<category>|<normalized title>"
 
 `normalized title` = lowercase, alphanumerics and single spaces only. Line numbers are deliberately excluded — anchors drift between pushes; identity must survive that. The single implementation is `fingerprint()` in `scripts/_common.py` (applied by merge_findings.py); compute one by hand only when recovering fingerprints from a PR thread:
 
-```bash
-printf '%s' "defect|internal/store/queue.go|potential-issue|dont hard fail preferredmodel when config options are unrelated" \
-  | shasum -a 256 | cut -c1-16
+```powershell
+py -3 -c "import hashlib,sys;print(hashlib.sha256(sys.argv[1].encode()).hexdigest()[:16])" "defect|internal/store/queue.go|potential-issue|dont hard fail preferredmodel when config options are unrelated"
 ```
 
 ## state.json (per target, in `<out>/`)

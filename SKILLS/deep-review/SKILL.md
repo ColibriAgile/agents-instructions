@@ -11,7 +11,14 @@ Review at CodeRabbit grade with no file cap and one assertive posture: funnel th
 
 Steps 1–4 drive an idempotent artifact pipeline under `<out>`: every stage gate is a bundled-script exit 0, valid agent outputs are never re-run, and an interrupted round resumes by re-running the same commands.
 
-`<skill-dir>` below means the directory containing this SKILL.md; run every bundled command from the repo root.
+Commands are PowerShell, run from the repo root. Set these once per round — `$skill` is the directory containing this SKILL.md, `$out` the artifact directory:
+
+```powershell
+$skill = 'C:/path/to/this/skill'   # directory containing this SKILL.md
+$out   = '.deep-review/my-target'  # the --out value
+```
+
+The bundled CLIs run on `py -3`, the Windows Python launcher; on POSIX substitute `python3`. Bare `python3` on Windows resolves to the Microsoft Store stub and exits 9009 without running anything. Quote `"$skill"` and `$out` in every invocation, and keep flag values in variables — an unquoted `<placeholder>` is a PowerShell parse error, not a prompt to fill in.
 
 ## Inputs (all optional)
 
@@ -59,9 +66,10 @@ The manifest builder resolves `path_filters` into manifest.json; the knowledge s
 
 1. Run the bundled manifest builder (bootstrap helper; reads the repo and `gh`, writes only under `--out`):
 
-   ```bash
-   python3 <skill-dir>/scripts/build_manifest.py --out <out> \
-     [--pr N | --base REF | --staged | --worktree] [--files p1,p2] [--full]
+   ```powershell
+   py -3 "$skill/scripts/build_manifest.py" --out $out --base $base
+   # scope alternatives: --pr $n | --staged | --worktree
+   # optional: --files $paths  --full
    ```
 
    It resolves repo path filters, detects generated / trivial / renamed files, scopes to the incremental delta when prior state exists, and pins the source-freeze snapshot.
@@ -71,31 +79,38 @@ The manifest builder resolves `path_filters` into manifest.json; the knowledge s
 
 **Step 2: Knowledge + plan — project rules, cohorts, walkthrough**
 
-1. STOP. Read `<skill-dir>/references/context-pack.md` and `<skill-dir>/references/taxonomy.md` in full before extracting rules or defining reviewer lanes. Run the bootstrap helper (reads the repo, writes only under `<out>`):
+1. STOP. Read `$skill/references/context-pack.md` and `$skill/references/taxonomy.md` in full before extracting rules or defining reviewer lanes. Run the bootstrap helper (reads the repo, writes only under `<out>`):
 
-   ```bash
-   python3 <skill-dir>/scripts/build_knowledge.py --out <out>
+   ```powershell
+   py -3 "$skill/scripts/build_knowledge.py" --out $out
    ```
 
    Read every source left pending in `<out>/rules.template.json` in full, including direct references of selected project skills. Write `<out>/rules.json` with every source marked applied or not-applicable (reason required), then extract verdict-bearing rules verbatim with scope globs. Assemble `<out>/context-pack.md` and run/fold the detected linter lanes.
-2. Read `<skill-dir>/references/orchestration.md` (cohort rules, sweep triggers) and `<skill-dir>/references/output-contracts.md` (walkthrough anatomy, effort scale) in full. Write `<out>/plan.json` — cohorts of up to `<max-cohort-files>` files (default 100) / ~6,000 changed lines plus any sweep whose trigger fires — and `<out>/walkthrough.md`.
-3. Run the bootstrap plan gate (reads repo artifacts, writes only under `<out>`):
+2. Read the stacks off the **selection**, not the repo, and record every one present — a diff is routinely polyglot:
 
-   ```bash
-   python3 <skill-dir>/scripts/build_jobs.py --out <out> \
-     [--max-cohort-files N]
+   ```powershell
+   py -3 -c "import json,collections,sys,pathlib as p;f=json.load(open(sys.argv[1]))['files'];print(collections.Counter(p.Path(r['path']).suffix for r in f if r['disposition']=='selected').most_common())" "$out/manifest.json"
+   ```
+
+   Stack picks the linter lanes in context-pack.md §3 and arms the stack-specific sweep triggers in orchestration.md — a .NET selection owes the `dotnet` lanes and their sweeps, a TypeScript one owes `tsc`. It never narrows which files are reviewed: every selected file keeps its defect and polish owner whatever language it is in.
+3. Read `$skill/references/orchestration.md` (cohort rules, sweep triggers) and `$skill/references/output-contracts.md` (walkthrough anatomy, effort scale) in full. Write `<out>/plan.json` — cohorts of up to `<max-cohort-files>` files (default 100) / ~6,000 changed lines plus any sweep whose trigger fires — and `<out>/walkthrough.md`.
+4. Run the bootstrap plan gate (reads repo artifacts, writes only under `<out>`):
+
+   ```powershell
+   py -3 "$skill/scripts/build_jobs.py" --out $out
+   # optional: --max-cohort-files $n
    ```
 
    It rejects incomplete source accounting, proves defect ownership, derives smaller polish cohorts (≤20 files / 1,200 changed lines), injects bound rules into every lane and sweep, and materializes `<out>/jobs.json`.
 
-*Done when:* build_jobs.py exits 0, every discovered source has an audited decision in rules.json, context-pack.md lists applied source/rule and linter outcomes without copying the full registry, and walkthrough.md satisfies its contract.
+*Done when:* build_jobs.py exits 0, every discovered source has an audited decision in rules.json, every stack present in the selection has its lanes either run or recorded unavailable, context-pack.md lists applied source/rule and linter outcomes without copying the full registry, and walkthrough.md satisfies its contract.
 
 **Step 3: Fan-out — parallel review**
 
-Execute `<out>/jobs.json` with the mutating runner and engine contract loaded in Step 2. When `--subagent` is not `native`, read `<skill-dir>/references/subagent-runtimes.md` in full before execution. Completion is engine-independent — re-dispatch whatever is listed as pending/invalid until exit 0:
+Execute `<out>/jobs.json` with the mutating runner and engine contract loaded in Step 2. When `--subagent` is not `native`, read `$skill/references/subagent-runtimes.md` in full before execution. Completion is engine-independent — re-dispatch whatever is listed as pending/invalid until exit 0:
 
-```bash
-python3 <skill-dir>/scripts/run_jobs.py --out <out> --validate-only
+```powershell
+py -3 "$skill/scripts/run_jobs.py" --out $out --validate-only
 ```
 
 *Done when:* run_jobs.py `--validate-only` exits 0 — every defect, polish, and sweep output matches the schema and completely accounts for assigned hunks and rules.
@@ -104,10 +119,10 @@ python3 <skill-dir>/scripts/run_jobs.py --out <out> --validate-only
 
 Run the bootstrap merger, mutating state/report renderer, and bootstrap HTML hydrator:
 
-```bash
-python3 <skill-dir>/scripts/merge_findings.py --out <out>
-python3 <skill-dir>/scripts/render_review.py --out <out> [--rework "<structural rationale>"]
-python3 <skill-dir>/scripts/render_html.py --out <out>
+```powershell
+py -3 "$skill/scripts/merge_findings.py" --out $out
+py -3 "$skill/scripts/render_review.py" --out $out    # add --rework "<structural rationale>" when the verdict is REWORK
+py -3 "$skill/scripts/render_html.py" --out $out
 ```
 
 merge_findings.py emits `<out>/findings.json` plus `<out>/review-stats.json`, deduplicates both result classes, reconciles rounds, and fails unless every selected hunk line has defect and polish coverage. render_review.py derives the verdict from defects only. render_html.py shows defects, advisories, suppressions, and coverage separately in `<out>/review.html`.
@@ -118,13 +133,13 @@ When ReportFindings is available, report defects first and every advisory afterw
 
 **Step 5: Publish (only with `--publish`)**
 
-1. Read `<skill-dir>/references/publish-github.md` in full and execute its recipes: upsert the walkthrough, publish every anchorable in-diff defect and advisory inline, keep only unanchorable/outside-diff results in the body, and edit resolved prior-round comments.
+1. Read `$skill/references/publish-github.md` in full and execute its recipes: upsert the walkthrough, publish every anchorable in-diff defect and advisory inline, keep only unanchorable/outside-diff results in the body, and edit resolved prior-round comments.
 
 *Done when:* the PR shows the updated walkthrough and the new review, and both URLs are cited in the final message.
 
 **Step 6: Learnings**
 
-1. state.json was already written at Step 4. When the user — or a PR reply — rebuts or dismisses a result, read `<skill-dir>/references/state-and-learnings.md` in full, distill the correction into `.deep-review/learnings.md`, and mark that fingerprint `dismissed` in the state ledger.
+1. state.json was already written at Step 4. When the user — or a PR reply — rebuts or dismisses a result, read `$skill/references/state-and-learnings.md` in full, distill the correction into `.deep-review/learnings.md`, and mark that fingerprint `dismissed` in the state ledger.
 
 *Done when:* every user correction from the session is captured as a learning or explicitly declined.
 
@@ -146,4 +161,4 @@ With prior state (or fingerprints recovered from the PR thread), Step 1 scopes t
 
 ## Bundled implementation
 
-`assets/PROMPT.md`, `assets/findings.schema.json`, and `assets/REVIEW_UI.html` are author-tooling sources consumed by the bundled scripts; agents use their rendered prompt/schema/report artifacts rather than loading these assets directly. `<skill-dir>/scripts/_common.py` is a read-only library imported by the CLIs and is never invoked directly.
+`assets/PROMPT.md`, `assets/findings.schema.json`, and `assets/REVIEW_UI.html` are author-tooling sources consumed by the bundled scripts; agents use their rendered prompt/schema/report artifacts rather than loading these assets directly. `$skill/scripts/_common.py` is a read-only library imported by the CLIs and is never invoked directly.

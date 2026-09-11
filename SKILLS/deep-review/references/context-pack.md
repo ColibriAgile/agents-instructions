@@ -6,8 +6,8 @@ How to assemble `<out>/context-pack.md` — the shared context every reviewer an
 
 Run the read-only discovery/bootstrap helper after the manifest:
 
-```bash
-python3 <skill-dir>/scripts/build_knowledge.py --out <out>
+```powershell
+py -3 "$skill/scripts/build_knowledge.py" --out $out
 ```
 
 It discovers every repository-local root/nested `AGENTS.md` and `CLAUDE.md`, repo review config/learnings, project `SKILL.md` under conventional local skill roots, and direct markdown references of candidate skills. Nested instructions apply to selected paths in their directory subtree; all ancestors remain applicable and deeper sources have higher precedence.
@@ -58,8 +58,15 @@ Detect what the repo already enforces and run it scoped to selected files; findi
 | `tsconfig.json` | `tsc --noEmit` (project-wide; cheap signal) |
 | `ruff.toml` / pyproject | `ruff check <files>` |
 | `Cargo.toml` | `cargo clippy` |
+| `*.sln` / `*.csproj` | `dotnet build --no-restore -warnaserror` on the changed projects — runs the Roslyn analyzers and nullability diagnostics; the densest .NET lane |
+| `.editorconfig` carrying `dotnet_`/`csharp_` rules | `dotnet format --verify-no-changes --include <changed .cs>` |
+| test project (`Microsoft.NET.Test.Sdk` in a `.csproj`) | `dotnet test --no-build` on the affected test projects |
 
 Record per lane: `ran` (attach findings on selected files, trimmed) or `unavailable` (tool missing/failed — overlap suppression is off for that lane and review.md must say so). Never install tools to fill a lane.
+
+Lanes that compile (`dotnet build`, `dotnet test`, `cargo clippy`, `make`) write build output. The freeze snapshot is taken over tracked files plus `git ls-files --others --exclude-standard`, so `bin/`, `obj/`, and `target/` are invisible to it while the repo ignores them — the normal case. In a repo that does not ignore them, a compiling lane drifts the checkout and the next gate fails: record that lane `unavailable` instead.
+
+The .NET lanes are what makes overlap suppression work on a C# diff: `dotnet build -warnaserror` already reports nullability (CS86xx), unreachable code, unawaited tasks, and every analyzer rule the project enables. Candidates matching those diagnostics are `linter-overlap` suppressions, not review results.
 
 ## 4. PR intent
 
