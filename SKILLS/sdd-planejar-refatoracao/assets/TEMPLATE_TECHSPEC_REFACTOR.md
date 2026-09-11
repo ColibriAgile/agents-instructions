@@ -42,6 +42,17 @@
 - Observabilidade: [sinal de regressão]
 - Rollback: [procedimento]
 
+## Perfil de qualidade
+
+Regras que esta refatoração deve satisfazer ao final. Aqui o baseline é o alvo a reduzir, não a dívida a tolerar: hit pré-existente que a refatoração se propõe a eliminar é obrigação, e hit novo é regressão em qualquer classe.
+
+| ID | Regra | Classe | Comando de verificação | Baseline | Meta |
+| --- | --- | --- | --- | --- | --- |
+| QA-01 | [regra] | bloqueante/ressalva | `[comando rg escopado ao alvo]` | [n hits hoje] | [n hits ao final, ou zero] |
+
+- Medidas do alvo hoje: [linhas, membros públicos, deps no construtor, casos]
+- Medidas esperadas ao final: [as mesmas, após a refatoração]
+
 ## Riscos e pendências
 
 - Risco: [probabilidade, impacto e mitigação]

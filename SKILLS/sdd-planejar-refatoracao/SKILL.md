@@ -15,7 +15,8 @@ disable-model-invocation: true
    Para WinForms/DevExpress, leia integralmente [references/winforms-devexpress.md](references/winforms-devexpress.md). Em qualquer desktop C#/.NET, omita E2E; registre projetos/runner e comandos existentes de unitários/integração, mais roteiro manual para comportamento visual não coberto. Registre ambiente indisponível como pendência.
    **Saída:** cada `R-NN` tem rede de segurança proporcional e sequência segura; comportamento novo separado do escopo.
 4. Ao redigir, leia integralmente [assets/TEMPLATE_PRD_REFACTOR.md](assets/TEMPLATE_PRD_REFACTOR.md) e [assets/TEMPLATE_TECHSPEC_REFACTOR.md](assets/TEMPLATE_TECHSPEC_REFACTOR.md). Grave apenas os dois artefatos: comportamento/aceite no PRD; decisões, componentes, testes e rollback na TechSpec. Referencie IDs sem copiar requisitos.
-   **Saída:** documentos cobrem todos os `R-NN`, sem placeholders, e servem a `sdd-planejar-tasks`.
+   Preencha o perfil de qualidade com medida de hoje e meta ao final — numa refatoração o baseline é o alvo a reduzir, e sem número não há como provar que a estrutura melhorou. Quando esta refatoração prepara terreno para uma feature, a meta é o que torna aquela mudança fácil, não a perfeição do alvo.
+   **Saída:** documentos cobrem todos os `R-NN`, sem placeholders, com perfil medido e meta declarada, e servem a `sdd-planejar-tasks`.
 5. Reporte caminhos, riscos, lacunas e impactos em derivados. Em uso avulso, indique planejamento de tasks; no fluxo orquestrado, devolva para HIL de comportamento antes de decompor.
    **Saída:** contratos revisáveis, sem alteração de código nem promoção silenciosa de decisões.
 

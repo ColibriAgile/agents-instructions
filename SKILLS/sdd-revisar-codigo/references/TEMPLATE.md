@@ -31,8 +31,10 @@
 
 | ID | Regra | Classe | Comando | Hits | Estado |
 | --- | --- | --- | --- | --- | --- |
-| QA-01 | [regra] | bloqueante/ressalva | `[comando]` | [n ou 0] | OK/NOK/justificado por `DEC-NN` |
+| QA-01 | [regra] | bloqueante/ressalva | `[comando]` | [novos/agravados de total] | OK/NOK/justificado por `DEC-NN`/pré-existente |
 
+- Baseline do terreno: [aplicado da TechSpec | ausente — todo hit tratado como novo, ver limitações]
+- Hits descontados por baseline: [n]
 - Ressalvas acumuladas na feature: [n]
 - Escalonamento sugerido: [skill e gatilho contado, ou `nenhum gatilho disparado`]
 

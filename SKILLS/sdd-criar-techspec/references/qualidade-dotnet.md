@@ -13,6 +13,8 @@ Duas classes, com destinos diferentes na revisão:
 
 Uma regra pode ter justificativa prévia registrada na TechSpec (`DEC-NN`): nesse caso o hit correspondente é esperado e não é achado. Justificativa vale para o ponto específico, não para o arquivo inteiro.
 
+Hit já listado no **Baseline do terreno** é dívida anterior à feature e não é achado da task: cobrá-lo do executor pune quem encostou no arquivo por último e transforma o perfil em ruído. Só é achado o hit que a task introduziu, ou o hit pré-existente que ela agravou — mais um caso no `switch` saturado, mais uma dependência no construtor já grande. Arquivo alvo ausente do baseline conta como não medido, e todo hit nele é tratado como novo.
+
 ## Conjunto grepável
 
 Escopado aos arquivos que a task tocou, nunca ao repositório. Defina as exclusões uma vez:

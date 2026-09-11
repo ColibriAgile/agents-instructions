@@ -67,6 +67,16 @@ Regras que esta feature pode violar. Bloqueante impede conclusão da task e repr
 - Escopo da verificação: [arquivos do diff da task]
 - Gatilho de escalonamento: [8+ ressalvas, arquivo acima de 500 linhas, ou duplicação em 3+ pontos]
 
+### Baseline do terreno
+
+Hits que já existiam nos arquivos alvo antes da implementação. Hit listado aqui não é achado da task; hit novo é. Arquivo alvo sem linha nesta tabela conta como não medido, e todo hit nele será tratado como novo.
+
+| Arquivo | Linhas | Membros públicos | Deps no construtor | Casos | Hits pré-existentes | Destino |
+| --- | --- | --- | --- | --- | --- | --- |
+| `[caminho]` | [n] | [n] | [n] | [n] | `QA-NN: arquivo:linha` | registrado / absorvido em `DEC-NN` / refatoração prévia |
+
+- Refatoração preparatória: [não recomendada | recomendada — escopo mínimo, razão e o que ela torna fácil]
+
 ## Observabilidade e rollout
 
 - Sinais: [logs, métricas ou health checks aplicáveis]
