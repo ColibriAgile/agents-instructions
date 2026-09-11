@@ -39,6 +39,22 @@ Se `skills.yaml` não existir e a execução for interativa, `Install-Skills.ps1
 acontece — falha pedindo pra rodar o `Init-Skills.ps1` manualmente primeiro, já que o picker
 fzf precisa de terminal interativo.
 
+### Atualizar todos os projetos de uma vez
+
+Depois de mexer nas skills deste repositório, `Update-AllSkills.ps1` propaga para todos os
+projetos sob uma pasta base — cada pasta com `skills.yaml` recebe um `Install-Skills.ps1`:
+
+```powershell
+pwsh <caminho-local-do-clone>\Update-AllSkills.ps1 -ListOnly   # confere o alcance antes
+pwsh <caminho-local-do-clone>\Update-AllSkills.ps1
+```
+
+O padrão de `-Root` é a pasta que contém este clone. A sincronização do `bundles.yaml`
+(git pull + checagem de push pendente) roda **uma vez**, não por projeto. Falha em um projeto
+não interrompe os demais: o resumo final lista os que falharam com o comando para reproduzir,
+e o script sai com código 1. Use `-Exclude '*\arquivados\*'` para pular caminhos e `-Silent`
+para imprimir só o resumo.
+
 Bundle extra pontual (ex: mexer no CLAUDE.md do projeto), sem alterar o `skills.yaml` commitado:
 
 ```powershell
