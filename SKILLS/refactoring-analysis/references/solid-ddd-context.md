@@ -1,32 +1,36 @@
-# SOLID & DDD Context for Refactoring Analysis
+# SOLID & DDD Context for Refactoring Analysis — .NET / C#
 
 ## Important Disclaimer
 
 SOLID principles have the most impact in **domain-rich, object-oriented codebases** —
 particularly those using Domain-Driven Design (DDD), hexagonal architecture, or clean
-architecture. In simpler projects (CRUD apps, utility libraries, scripts), applying
-SOLID rigorously can lead to over-engineering.
+architecture. In simpler projects (CRUD APIs, utility libraries, worker scripts), applying
+SOLID rigorously leads to over-engineering.
 
 > "SOLID impacta principalmente a inversão de dependência, extensibilidade, substituição
 > sendo algo que vai funcionar em projeto orientado ao domínio, tipo DDD... pelo menos
 > uma arquitetura hexagonal pra poder aplicar DIP... OCP, LSP e ISP muito em domain model."
 > — Rodrigo Branas
 
-**Rule**: Only recommend SOLID-based refactorings when the project has a complex domain
-model with clear bounded contexts, entities, value objects, or domain services. Note
-this context in the report.
+**Rule**: Only recommend SOLID-based refactorings when the solution has a complex domain model
+with clear bounded contexts, entities, value objects, or domain services. Note this context in
+the report.
 
 ---
 
 ## When SOLID Analysis Applies
 
-Perform SOLID analysis when the project exhibits **at least 2** of:
-- Domain entities or value objects (not just DTOs)
-- Bounded contexts or explicit module boundaries
-- Repository pattern or ports/adapters architecture
-- Domain events or event-driven architecture
+Perform SOLID analysis when the solution exhibits **at least 2** of:
+- Domain entities or value objects (not just DTOs and EF Core POCOs)
+- Bounded contexts, or a project-per-context layout in the solution
+- Repository pattern, `IUnitOfWork`, or ports/adapters projects
+- Domain events, MediatR notifications, or an event-driven integration path
 - Aggregate roots or domain services
-- Hexagonal / clean / onion architecture layers
+- Hexagonal / clean / onion layering, visible as `*.Domain`, `*.Application`,
+  `*.Infrastructure` projects whose `ProjectReference` direction points inward
+
+.NET's own DI container is not evidence on its own — every ASP.NET Core template registers
+services. Look for a domain that owns behavior, not merely a container that resolves it.
 
 ---
 
@@ -35,85 +39,99 @@ Perform SOLID analysis when the project exhibits **at least 2** of:
 ### S — Single Responsibility Principle (SRP)
 
 **Detection heuristics**:
-- A class/module changes for multiple unrelated reasons (= Divergent Change smell)
-- File has imports from many unrelated domains
-- Class name includes "And", "Manager", "Handler" doing multiple things
-- >5 public methods that group into 2+ unrelated clusters
+- A class changes for multiple unrelated reasons (= Divergent Change smell)
+- A file's `using` directives span many unrelated domains
+- A name containing "And", or a `Manager`/`Helper`/`Service` doing several jobs
+- >5 public members grouping into 2+ unrelated clusters
+- A constructor injecting 6+ dependencies — the parameter list is the responsibility count
 
-**Refactoring**: Extract Class, Split Phase, Move Function
+**Refactoring**: Extract Class, Split Phase, Move Method
 
 ### O — Open/Closed Principle (OCP)
 
 **Detection heuristics**:
-- Adding a new variant (e.g., payment type, notification channel) requires modifying
-  existing code instead of extending
-- Switch/if chains on type codes that grow with each new variant
-- Core logic mixed with variant-specific behavior
+- Adding a variant (payment type, notification channel, tax regime) means editing existing
+  code instead of adding a type
+- `switch` chains over a type code or `enum` that grow with each new variant
+- Core logic interleaved with variant-specific behavior
 
-**Refactoring**: Replace Conditional with Polymorphism, Strategy Pattern,
-Replace Type Code with Subclasses
+**Refactoring**: Replace Conditional with Polymorphism, Strategy pattern, Replace Type Code
+with Subclasses. In .NET the strategy set is usually registered once
+(`services.AddKeyedScoped<IHandler>(...)` or a `Dictionary<TKey, IHandler>`) and resolved by key.
 
-**Context**: Most valuable in domain layers where new business rules and variants
-are frequently added.
+**Context**: Most valuable in domain layers where new business rules arrive often.
 
 ### L — Liskov Substitution Principle (LSP)
 
 **Detection heuristics**:
-- Subclass overrides a method to throw `NotImplementedError` or return `null`
-  (= Refused Bequest smell)
-- Subclass narrows the contract (rejects inputs the parent accepts)
-- Subclass has side effects the parent doesn't specify
+- An override throwing `NotImplementedException` or `NotSupportedException`, or returning
+  `null` (= Refused Bequest smell)
+- An override narrowing the contract — rejecting inputs the base accepts, or tightening a
+  parameter's nullability
+- An override with side effects the base doesn't specify
+- A `sealed` override that breaks a base-class invariant the callers rely on
 
 **Refactoring**: Replace Subclass with Delegate, Push Down Method, Extract Interface
 
 ### I — Interface Segregation Principle (ISP)
 
 **Detection heuristics**:
-- Interfaces with >7 methods where implementers stub or no-op several of them
-- "Fat" interfaces that force unrelated capabilities together
-- Classes implementing an interface but only using 2-3 of its methods
+- Interfaces with >7 members where implementers stub or throw on several
+- "Fat" interfaces forcing unrelated capabilities together — a single `IRepository<T>`
+  carrying every query the application ever needed
+- Classes implementing an interface but using only 2-3 of its members
+- Default interface members added to avoid breaking existing implementers — a sign the
+  interface is doing too much
 
-**Refactoring**: Extract Interface (split into focused interfaces), Role Interfaces
+**Refactoring**: Extract Interface (split into focused, role-named interfaces)
 
-**Context**: Most relevant in domain model interfaces — repositories, services,
-domain event handlers.
+**Context**: Most relevant in domain interfaces — repositories, domain services, event handlers.
 
 ### D — Dependency Inversion Principle (DIP)
 
 **Detection heuristics**:
-- High-level domain modules directly importing low-level infrastructure
-  (database drivers, HTTP clients, file system)
-- Domain logic coupled to specific framework or library APIs
-- No abstraction layer between domain and infrastructure
-- Tests require spinning up real infrastructure instead of using test doubles
+- A domain project referencing infrastructure: `Microsoft.EntityFrameworkCore`,
+  `Microsoft.AspNetCore.*`, `System.Net.Http`, `System.IO`
+- Domain logic constructing `new HttpClient()`, `new SqlConnection(...)`, or reading
+  `DateTime.Now` instead of taking an injected abstraction
+- No port between domain and infrastructure — the `ProjectReference` arrows point outward
+  from the domain instead of inward toward it
+- Tests requiring a real database or a live endpoint instead of a test double
+- `IServiceProvider.GetRequiredService` inside business code (= Service Locator smell)
 
-**Refactoring**: Extract Interface (port), Inject Dependencies, Introduce Adapter
+**Refactoring**: Extract Interface (port), Inject Dependencies, Introduce Adapter.
+`TimeProvider` and `IHttpClientFactory` are the framework's own answers for the two most
+common offenders.
 
-**Context**: Requires at least hexagonal architecture to apply meaningfully.
-In a flat Express/Next.js handler, DIP may be over-engineering.
+**Context**: Requires at least hexagonal layering to apply meaningfully. In a flat Minimal API
+handler, DIP is usually over-engineering.
 
 ---
 
 ## DDD-Specific Refactoring Opportunities
 
-When the project uses DDD patterns, also evaluate:
+When the solution uses DDD patterns, also evaluate:
 
 ### Aggregate Boundaries
 - Aggregates that are too large (>5 entities) — consider splitting
-- Aggregates that reference other aggregates by object reference instead of ID
-- Cross-aggregate transactions that should be eventual consistency
+- Aggregates referencing other aggregates by navigation property instead of by id — in EF Core
+  this also produces accidental cascade behavior and oversized loads
+- Cross-aggregate changes inside one `SaveChangesAsync` that should be eventual consistency
 
 ### Value Objects
-- Domain concepts represented as primitives that should be Value Objects
-  (= Primitive Obsession, but in DDD context)
-- Mutable objects that should be immutable Value Objects
+- Domain concepts carried as primitives that should be value objects (= Primitive Obsession
+  in DDD clothing) — an id as `Guid`, money as bare `decimal`, a document number as `string`
+- Mutable classes that should be immutable `readonly record struct` value objects
+- Value objects persisted as loose columns where an EF Core owned type or complex type fits
 
 ### Domain Events
-- Direct coupling between bounded contexts that should communicate via events
-- Synchronous calls across context boundaries that should be async
+- Direct project references between bounded contexts that should communicate via events
+- Synchronous calls across context boundaries that should be asynchronous
+- Events raised by the infrastructure layer rather than by the aggregate that owns the change
 
 ### Anti-Corruption Layer
-- External system models leaking into the domain
+- External system models (SOAP proxies, generated API clients, third-party DTOs) leaking into
+  the domain
 - Missing translation layer between contexts
 
 ---
@@ -125,7 +143,7 @@ When SOLID analysis is performed, add a section to the report:
 ```markdown
 ## SOLID Analysis
 
-> **Context**: This project uses [DDD / hexagonal / clean] architecture with
+> **Context**: This solution uses [DDD / hexagonal / clean] architecture with
 > [bounded contexts / domain entities / etc.]. SOLID analysis is applicable.
 
 ### Findings
@@ -145,9 +163,9 @@ If SOLID analysis is NOT applicable, add:
 ```markdown
 ## SOLID Analysis
 
-> **Skipped**: This project does not use domain-driven design or a layered
-> architecture pattern. SOLID-specific analysis was not performed. For projects
-> with complex business domains, consider adopting hexagonal architecture to
-> benefit from SOLID principles — particularly Dependency Inversion (DIP) for
-> testability and Open/Closed (OCP) for extensibility.
+> **Skipped**: This solution does not use domain-driven design or a layered architecture
+> pattern. SOLID-specific analysis was not performed. For projects with complex business
+> domains, consider adopting hexagonal architecture to benefit from SOLID principles —
+> particularly Dependency Inversion (DIP) for testability and Open/Closed (OCP) for
+> extensibility.
 ```

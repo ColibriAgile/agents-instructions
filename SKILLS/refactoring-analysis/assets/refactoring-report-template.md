@@ -15,8 +15,9 @@ BEGIN TEMPLATE:
 > **Date**: {{YYYY-MM-DD}}
 > **Scope**: {{description of what was analyzed — directory, module, feature area}}
 > **Analyzed by**: AI-assisted refactoring analysis (Martin Fowler's catalog)
-> **Language/Stack**: {{e.g., TypeScript, React, Node.js}}
-> **Test Coverage**: {{known / unknown / none — flag risk if none}}
+> **Stack**: {{e.g., .NET 8 / ASP.NET Core / EF Core}}
+> **Projects analyzed**: {{solution or project list}}
+> **Test Coverage**: {{test projects covering the target, or none — flag risk if none}}
 
 ---
 
@@ -52,20 +53,20 @@ impactful findings. Lead with the biggest opportunity.}}
 #### F{{number}}: {{Finding Title}}
 
 - **Smell**: {{smell name from catalog — e.g., Duplicated Code, Feature Envy}}
-- **Category**: {{Bloater / Change Preventer / Dispensable / Coupler / Conditional Complexity / DRY Violation}}
+- **Category**: {{Bloater / Change Preventer / Dispensable / Coupler / Conditional Complexity / DRY Violation / .NET-Specific}}
 - **Location**: `{{file_path}}:{{start_line}}-{{end_line}}`
 - **Severity**: 🔴 Critical
 - **Impact**: {{What maintenance/readability/change-cost problem does this cause?}}
 
 **Current Code** (simplified):
-```{{language}}
+```csharp
 {{relevant code snippet — keep to essential lines, max 20 lines}}
 ```
 
 **Recommended Refactoring**: {{technique name — e.g., Extract Function, Introduce Parameter Object}}
 
 **After** (proposed):
-```{{language}}
+```csharp
 {{refactored code sketch — showing the structural change, not a complete implementation}}
 ```
 
@@ -86,14 +87,14 @@ impactful findings. Lead with the biggest opportunity.}}
 - **Impact**: {{description}}
 
 **Current Code** (simplified):
-```{{language}}
+```csharp
 {{code snippet}}
 ```
 
 **Recommended Refactoring**: {{technique}}
 
 **After** (proposed):
-```{{language}}
+```csharp
 {{refactored sketch}}
 ```
 
@@ -114,14 +115,14 @@ impactful findings. Lead with the biggest opportunity.}}
 - **Impact**: {{description}}
 
 **Current Code** (simplified):
-```{{language}}
+```csharp
 {{code snippet}}
 ```
 
 **Recommended Refactoring**: {{technique}}
 
 **After** (proposed):
-```{{language}}
+```csharp
 {{refactored sketch}}
 ```
 
@@ -141,27 +142,29 @@ impactful findings. Lead with the biggest opportunity.}}
 
 ## Coupling Analysis
 
-### Module Dependency Map
+### Project & Namespace Dependency Map
 
 {{Describe the coupling structure. If helpful, include a Mermaid diagram:}}
 
 ```mermaid
 graph LR
-  A[Module A] --> B[Module B]
-  A --> C[Module C]
-  B --> C
-  C --> D[Module D]
+  Api[Acme.Api] --> App[Acme.Application]
+  App --> Domain[Acme.Domain]
+  Infra[Acme.Infrastructure] --> Domain
+  Api --> Infra
 ```
 
 ### High-Risk Coupling
 
-| Module | Afferent (dependents) | Efferent (dependencies) | Risk |
-|--------|----------------------|------------------------|------|
-| {{module}} | {{n}} | {{n}} | {{high/medium/low}} |
+| Project / Namespace | Afferent (dependents) | Efferent (dependencies) | Risk |
+|---------------------|----------------------|------------------------|------|
+| {{name}} | {{n}} | {{n}} | {{high/medium/low}} |
 
-### Circular Dependencies
+### Dependency Cycles
 
-{{List any circular dependency chains found, or "None detected."}}
+{{List any cycles found at namespace or type level, or "None detected." The compiler rejects
+ProjectReference cycles, so also record the workaround if present: a catch-all Common/Shared
+project that every other project depends on.}}
 
 ---
 
@@ -239,6 +242,7 @@ Recommended sequence based on impact, effort, and dependency between refactoring
 | Couplers | {{n}} | {{%}} |
 | Conditional Complexity | {{n}} | {{%}} |
 | DRY Violations | {{n}} | {{%}} |
+| .NET-Specific | {{n}} | {{%}} |
 | SOLID Violations | {{n}} | {{%}} |
 | **Total** | **{{n}}** | **100%** |
 ```
