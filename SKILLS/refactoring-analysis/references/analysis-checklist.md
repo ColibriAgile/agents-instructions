@@ -6,7 +6,7 @@ Verify each item before finalizing the report.
 
 ## Scope & Context
 
-- [ ] Stack confirmed as .NET/C# in step 0, or the foreign-stack branch was taken with the
+- [ ] Stack confirmed as .NET/C# by the step 1 gate, or the foreign-stack branch was taken with the
       user's consent and its strategy recorded
 - [ ] Analysis target is clearly defined (project, namespace, or feature area)
 - [ ] Target framework(s) recorded

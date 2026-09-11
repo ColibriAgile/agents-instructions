@@ -33,33 +33,33 @@ $ns = 'Acme'       # the solution's root namespace, read from a .csproj in step 
 
 ## Steps
 
-**0. Fix the stack.** Identify the stack from its build manifests before reading any source.
+**1. Scope.** Start from the build manifests: one sweep both names the stack and lists the
+projects the target can be drawn from.
 
 ```powershell
 rtk rg --files -g '*.sln' -g '*.slnx' -g '*.csproj' -g 'Directory.Build.props' -g 'global.json' -g '*.dproj' -g 'package.json' -g 'pyproject.toml' -g 'go.mod' -g 'Cargo.toml' -g 'pom.xml' -g 'build.gradle*' -g 'Gemfile' -g 'composer.json'
 ```
 
-A `.sln`, `.slnx`, or `.csproj` alongside `.cs` sources means **.NET/C#** — continue to step 1.
+A `.sln`, `.slnx`, or `.csproj` alongside `.cs` sources means **.NET/C#** — carry on below.
 Any other stack — or .NET on a non-C# language such as F# or VB.NET — falls outside this
 skill's calibration: name the stack you found, name the mismatch, and ask the user whether to
 continue anyway. On a yes, read `references/foreign-stack-adaptation.md` in full and follow it;
-it rebuilds steps 1–5 around the detected stack and ends by offering to save that strategy as
-`refactoring-analysis-<stack>`. *Done when:* the stack is named, and either it is .NET/C# or
-the user has answered the continue question.
+it rebuilds the sweeps in steps 1–5 around the detected stack and ends by offering to save that
+strategy as `refactoring-analysis-<stack>`.
 
-**1. Scope.** Fix the target — project, namespace, feature area, or whole solution; ask if the
+On .NET/C#, fix the target — project, namespace, feature area, or whole solution; ask if the
 user did not say. Record the target frameworks and whether the codebase is domain-rich or
 procedural, which calibrates step 5. Test coverage decides how safe any recommendation is, so
 find the test projects now.
 
 ```powershell
-rtk rg --files -g '*.csproj' $target
 (rtk rg --files -g '*.cs' @src $target | Measure-Object).Count
 rtk rg -n -g '*.csproj' 'Microsoft.NET.Test.Sdk|xunit|NUnit|MSTest|<TargetFramework'
 ```
 
-If the target exceeds ~50 files, ask to narrow or confirm a sampled scan. *Done when:* target,
-target framework, paradigm, and test-project inventory are recorded.
+If the target exceeds ~50 files, ask to narrow or confirm a sampled scan. *Done when:* the
+stack is named and either it is .NET/C# or the user has answered the continue question, and
+target, target framework, paradigm, and test-project inventory are recorded.
 
 **2. Detect smells.** Scan for every category in `references/code-smells-catalog.md`, using its
 heuristics and its C# thresholds: Bloaters, Change Preventers, Dispensables, Couplers,
@@ -140,6 +140,6 @@ complexity tier (trivial / moderate / significant) for each. Ask which refactori
 - `references/solid-ddd-context.md` — the SOLID applicability gate and per-principle heuristics
   for .NET; read in step 5.
 - `references/foreign-stack-adaptation.md` — the non-.NET branch: build a stack-specific
-  strategy, run it, and offer to save it as a derived skill. Reached only from step 0.
+  strategy, run it, and offer to save it as a derived skill. Reached only from the stack gate in step 1.
 - `references/analysis-checklist.md` — the exit audit walked in step 7.
 - `assets/refactoring-report-template.md` — the report written in step 6.

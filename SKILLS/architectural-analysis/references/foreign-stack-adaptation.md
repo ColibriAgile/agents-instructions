@@ -1,10 +1,10 @@
 # Foreign Stack Adaptation
 
-Reached from step 0 when the detected stack is not .NET/C# and the user chose to continue. The six detection dimensions still hold — dead code, duplication, anti-patterns, type safety, code smells, and the report — but their evidence, their exclusions, and their thresholds are stack-specific. Build that calibration first, run the audit with it, then offer to keep it.
+Reached from the stack gate in step 1 when the detected stack is not .NET/C# and the user chose to continue. The six detection dimensions still hold — dead code, duplication, anti-patterns, type safety, code smells, and the report — but their evidence, their exclusions, and their thresholds are stack-specific. Build that calibration first, run the audit with it, then offer to keep it.
 
 ## 1. Pin the dialect
 
-Name the stack down to the level that changes the commands: not "JavaScript" but "TypeScript / React / pnpm monorepo"; not "Delphi" but "Delphi VCL with DUnitX tests". Read the build manifests you found in step 0 plus any repository instruction file (`CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`) before deciding — they usually name the architecture the project believes it has.
+Name the stack down to the level that changes the commands: not "JavaScript" but "TypeScript / React / pnpm monorepo"; not "Delphi" but "Delphi VCL with DUnitX tests". Read the build manifests the step 1 sweep returned plus any repository instruction file (`CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`) before deciding — they usually name the architecture the project believes it has.
 
 **Done when** the stack, its framework, its test framework, and its package manager are recorded.
 
@@ -41,7 +41,7 @@ Ask the user whether to save the strategy as a project skill named `architectura
 
 On a yes, create `SKILLS/architectural-analysis-<stack>/` (or the path this repository already uses for skills) with:
 
-- `SKILL.md` — this skill's step sequence with the stack's commands in place of the .NET ones, `name` and directory matching, and step 0 inverted to detect that stack and hand a foreign stack back to `architectural-analysis`.
+- `SKILL.md` — this skill's step sequence with the stack's commands in place of the .NET ones, `name` and directory matching, and the step 1 stack gate inverted to detect that stack and hand a foreign stack back to `architectural-analysis`.
 - `references/detection-catalog.md` — the `detection-catalog.md` sections rewritten from the strategy table: that stack's "Not dead" list, its duplication classes, its live anti-patterns, its escape hatches, its thresholds.
 - `assets/report-template.md` and `assets/summary-template.md` — copied, with the example paths and section names redone in that stack's idiom.
 

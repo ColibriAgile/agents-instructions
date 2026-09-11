@@ -1,6 +1,6 @@
 # Foreign Stack Adaptation
 
-Reached from step 0 when the detected stack is not .NET/C# and the user chose to continue.
+Reached from the stack gate in step 1 when the detected stack is not .NET/C# and the user chose to continue.
 Fowler's catalog is language-agnostic by design — the smells and the techniques survive the
 move. What does not survive is the calibration: the thresholds, the idiomatic fixes, the
 patterns that look like smells but are the framework working as intended. Build that
@@ -10,7 +10,7 @@ calibration first, run the audit with it, then offer to keep it.
 
 Name the stack down to the level that changes the analysis: not "JavaScript" but
 "TypeScript / React / pnpm monorepo"; not "Delphi" but "Delphi VCL with DUnitX tests"; not
-"Python" but "Python / FastAPI / SQLAlchemy". Read the build manifests you found in step 0 plus
+"Python" but "Python / FastAPI / SQLAlchemy". Read the build manifests the step 1 sweep returned plus
 any repository instruction file (`CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`)
 before deciding — they usually name the architecture the project believes it has.
 
@@ -61,8 +61,8 @@ On a yes, create `SKILLS/refactoring-analysis-<stack>/` (or the path this reposi
 uses for skills) with:
 
 - `SKILL.md` — this skill's step sequence with the stack's commands and thresholds in place of
-  the .NET ones, `name` and directory matching, and step 0 inverted to detect that stack and
-  hand a foreign stack back to `refactoring-analysis`.
+  the .NET ones, `name` and directory matching, and the step 1 stack gate inverted to detect
+  that stack and hand a foreign stack back to `refactoring-analysis`.
 - `references/code-smells-catalog.md` — Fowler's taxonomy kept, with this stack's heuristics,
   thresholds, idiomatic examples, and its false-positive cautions.
 - `references/refactoring-techniques.md` — the technique catalog with this stack's canonical

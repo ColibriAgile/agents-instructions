@@ -18,25 +18,19 @@ $src = @('-g','!**/bin/**','-g','!**/obj/**','-g','!**/*.g.cs','-g','!**/*.Desig
 
 ## Steps
 
-### 0. Fix the stack
-Identify the stack from its build manifests before reading any source.
+### 1. Map the codebase
+Start from the build manifests: one sweep both names the stack and lists the projects.
 ```powershell
 rtk rg --files -g '*.sln' -g '*.slnx' -g '*.csproj' -g 'Directory.Build.props' -g 'global.json' -g '*.dproj' -g 'package.json' -g 'pyproject.toml' -g 'go.mod' -g 'Cargo.toml' -g 'pom.xml' -g 'build.gradle*' -g 'Gemfile' -g 'composer.json'
 ```
-A `.sln`, `.slnx`, or `.csproj` alongside `.cs` sources means **.NET/C#** — continue to step 1.
+A `.sln`, `.slnx`, or `.csproj` alongside `.cs` sources means **.NET/C#** — carry on below. Any other stack — or .NET on a non-C# language such as F# or VB.NET — falls outside this skill's calibration: name the stack you found, name the mismatch, and ask the user whether to continue anyway. On a yes, read `references/foreign-stack-adaptation.md` in full and follow it; it rebuilds the sweeps in steps 1–6 around the detected stack and ends by offering to save that strategy as `architectural-analysis-<stack>`.
 
-Any other stack — or .NET on a non-C# language such as F# or VB.NET — falls outside this skill's calibration: name the stack you found, name the mismatch, and ask the user whether to continue anyway. On a yes, read `references/foreign-stack-adaptation.md` in full and follow it; it rebuilds steps 1–6 around the detected stack and ends by offering to save that strategy as `architectural-analysis-<stack>`.
-
-**Done when** the stack is named, and either it is .NET/C# or the user has answered the continue question.
-
-### 1. Map the codebase
-List the projects, count the compilable sources, then build a todo with one item per `.cs` file. Note the entry points that anchor usage tracing: `Program`/`Startup`, DI registration extensions, controllers and minimal-API endpoint maps, `BackgroundService`/`IHostedService`, each class library's public surface, CLI verbs, test projects.
+On .NET/C#, count the compilable sources and build a todo with one item per `.cs` file. Note the entry points that anchor usage tracing: `Program`/`Startup`, DI registration extensions, controllers and minimal-API endpoint maps, `BackgroundService`/`IHostedService`, each class library's public surface, CLI verbs, test projects.
 ```powershell
-rtk rg --files -g '*.sln' -g '*.slnx' -g '*.csproj'
 (rtk rg --files -g '*.cs' @src | Measure-Object).Count
 rtk rg -n --type cs @src 'class Program|static.*Main\(|MapGet|MapPost|MapControllers|ControllerBase|BackgroundService|IHostedService|AddScoped|AddSingleton|AddTransient'
 ```
-**Done when** every source file has a todo entry and the entry-point list is recorded.
+**Done when** the stack is named and either it is .NET/C# or the user has answered the continue question, every source file has a todo entry, and the entry-point list is recorded.
 
 ### 2. Detect dead code
 For each file in the todo: list the types and members it declares, then search each name for references elsewhere.
@@ -96,6 +90,6 @@ Populate `assets/summary-template.md` and emit it inline in chat, linking to the
 
 ## Bundled files
 - `references/detection-catalog.md` — .NET/C# classification depth for the five detection dimensions; each of steps 2–6 names its section.
-- `references/foreign-stack-adaptation.md` — the non-.NET branch: build a stack-specific strategy, run it, and offer to save it as a derived skill. Reached only from step 0.
+- `references/foreign-stack-adaptation.md` — the non-.NET branch: build a stack-specific strategy, run it, and offer to save it as a derived skill. Reached only from the stack gate in step 1.
 - `assets/report-template.md` — the full report written in step 7.
 - `assets/summary-template.md` — the chat summary emitted in step 8.
