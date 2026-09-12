@@ -59,6 +59,7 @@ bundles:
       - sdd-orquestrar-fluxo
       - sdd-orquestrar-prds
       - sdd-orquestrar-tasks
+      - sdd-planejar-auditoria
       - sdd-planejar-correcoes
       - sdd-planejar-refatoracao
       - sdd-planejar-tasks

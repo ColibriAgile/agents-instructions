@@ -66,7 +66,7 @@ O perfil nunca dispara auditoria pesada dentro do ciclo. Ele acumula contagem pa
 - um arquivo tocado que cruzou 500 linhas, ou
 - o mesmo símbolo ou bloco duplicado em três ou mais pontos do diff.
 
-Nomeie a skill correspondente ao sinal quando ela estiver instalada: duplicação e acoplamento vão para `refactoring-analysis`; código morto e dependências entre projetos vão para `architectural-analysis`; revisão completa do diff vai para `deep-review`. Sem gatilho disparado, não sugira nenhuma.
+Nomeie a skill correspondente ao sinal quando ela estiver instalada: duplicação e acoplamento vão para `refactoring-analysis`; código morto e dependências entre projetos vão para `architectural-analysis`, cujo relatório `sdd-planejar-auditoria` converte em frentes planejadas; revisão completa do diff vai para `deep-review`. Sem gatilho disparado, não sugira nenhuma.
 
 ## Registro na TechSpec
 
