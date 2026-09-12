@@ -104,3 +104,8 @@ bundles:
     skills:
       - kb
       - kb-yt-channel
+
+  orchestration:
+    description: Skills especializadas em orquestração
+    skills:
+      - herdr-orchestration
