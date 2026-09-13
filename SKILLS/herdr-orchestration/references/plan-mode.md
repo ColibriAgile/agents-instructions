@@ -1,4 +1,4 @@
-# Plan Mode Launch & Acceptance (Claude Code & Codex)
+# Plan Mode Launch & Acceptance (Claude Code, Codex & Antigravity)
 
 Mechanics to run a worker through an interactive planning phase before a
 hands-off implementation: launch the TUI in plan mode, submit the delegation
@@ -6,28 +6,30 @@ packet, watch and answer clarifying questions, review the plan, accept it, and
 supervise hands-off until the worker reports done. Plan-first is opt-in — the
 parent skill's activation gate (explicit user ask or `--plan-mode`) decides
 whether this flow runs at all. The parent `herdr-orchestration` SKILL.md
-carries the transport verbs and the workers-are-TUIs rule — both TUIs here get
-their own named tab and launch through `herdr agent start`, never a headless
+carries the transport verbs and the workers-are-TUIs rule — every TUI here gets
+its own named tab and launches through `herdr agent start`, never a headless
 runner. All commands are `rtk`-prefixed. Scope everything to the caller
 workspace; never change focus.
 
 ## Contents
 
-- Shared rules (both TUIs)
+- Shared rules (all TUIs)
 - Claude Code: launch in plan mode
 - Claude Code: accept the plan
 - Codex: launch and enter Plan mode
 - Codex: accept the plan
+- Antigravity: launch in plan mode
+- Antigravity: accept the plan
 - Watch plan mode & answer questions
 - Hands-off monitoring & completion
 
-## Shared rules (both TUIs)
+## Shared rules (all TUIs)
 
 - TUI strings (status lines, acceptance menus, option labels) are
   build-specific. Verify them with `agent read` on first use against the
-  installed version (`rtk claude --version` / `rtk codex --version`). If a
-  newer build renames a mode or menu, adapt the keys/labels before relying on
-  the flow rather than failing mid-loop.
+  installed version (`rtk claude --version` / `rtk codex --version` /
+  `rtk agy --version`). If a newer build renames a mode or menu, adapt the
+  keys/labels before relying on the flow rather than failing mid-loop.
 - Submit inside a running TUI per the parent skill's *Sending prompts to
   running TUIs* rule: `agent prompt` submits text plus Enter atomically; a
   trailing `\n` alone never submits.
@@ -156,6 +158,55 @@ rtk herdr agent send-keys audit-auth enter
 
 Confirm the status line no longer shows `Plan mode` and the worker is
 `Working`. To reject, select option 3 and send feedback via `agent prompt`.
+
+## Antigravity: launch in plan mode
+
+`agy` has a first-class flag: `--mode plan`. The flag holds one value, so it
+replaces the direct launch's `--mode accept-edits`; it composes with
+`--dangerously-skip-permissions` (mandatory for workers). Plan mode prefixes
+prompts with `/plan`: the worker investigates with read-only tools and
+presents an implementation plan for approval before writing code.
+
+Create the named tab, then pass the packet through `-i`
+(`--prompt-interactive`) — the session starts planning immediately:
+
+```bash
+rtk herdr tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" \
+  --label "gemini: map docs (plan)" --no-focus
+
+rtk herdr agent start map-docs --kind agy --pane <root_pane_id> -- \
+  --dangerously-skip-permissions --mode plan -i "<packet, single block>"
+```
+
+Confirm plan mode via `agent read <name> --source visible`: the status bar
+must show `[plan]`. If a session is already running outside plan mode,
+**shift+tab** cycles the execution modes (default → accept-edits → plan →
+default) — press and re-check until `[plan]` shows:
+
+```bash
+rtk herdr agent send-keys map-docs shift+tab
+```
+
+## Antigravity: accept the plan
+
+No approval-prompt title is pinned for agy, and herdr reads agy state from the
+screen alone, so a `blocked` wait may miss the prompt. At every check-in, read
+the screen (`agent read <name> --source visible`) as well as waiting on
+`blocked`; once the installed build's prompt title is confirmed, pin later
+waits to it with `pane wait-output --match`.
+
+Review the plan first, then approve. agy approves a proposed tool, command, or
+artifact with `y` and rejects with `n`:
+
+```bash
+rtk herdr agent send-keys map-docs y
+```
+
+If the screen shows a numbered menu instead, highlight the option that
+proceeds without per-edit review and press Enter. Confirm via `agent read`
+that the worker is executing — edits or commands appear. A worker still idle
+under `[plan]` after approval is an unconfirmed acceptance: a stop condition.
+To reject, send `n`, then feedback via `agent prompt`.
 
 ## Watch plan mode & answer questions
 

@@ -1,6 +1,6 @@
 ---
 name: herdr-orchestration
-description: Orchestrate Claude and Codex worker TUIs from a controller agent — one worker per named herdr tab, driven over the herdr socket CLI.
+description: Orchestrate Claude, Codex, and Antigravity (agy) worker TUIs from a controller agent — one worker per named herdr tab, driven over the herdr socket CLI.
 disable-model-invocation: true
 metadata:
   author: Pedro Nauck
@@ -32,24 +32,26 @@ the caller.
 Two names per worker, both required at launch:
 
 - **tab label** — `<model>: <slice>`, e.g. `opus: fix loops`,
-  `codex: audit auth`. Free text; keep it short, tab bars truncate.
+  `codex: audit auth`, `gemini: map docs`. Free text; keep it short, tab bars
+  truncate.
 - **agent name** — the slice as a slug, e.g. `fix-loops`. Must match
   `[a-z][a-z0-9_-]{0,31}` and be unique among live agents. Every `agent …` verb
   accepts it in place of a pane id.
 
 ## Workers are TUIs — no headless runners
 
-A worker is an interactive TUI — `claude` or `codex` — started with
-`herdr agent start`, which validates the agent's identity and returns only once
-herdr sees it ready for input. herdr's agent-state integrations hook those
-TUIs, so `agent wait`, `agent list`, and blocked/done detection exist only
-while a real TUI is on screen.
+A worker is an interactive TUI — `claude`, `codex`, or `agy` (Antigravity CLI)
+— started with `herdr agent start`, which validates the agent's identity and
+returns only once herdr sees it ready for input. herdr's agent-state
+integrations hook those TUIs, so `agent wait`, `agent list`, and blocked/done
+detection exist only while a real TUI is on screen.
 
-Headless runners — `claude -p`, `codex exec`, anything that
-streams JSON events into a pane — never report state, so waits never fire and
-the delegation dies silently. A worker tab filling with raw JSON event lines is
-a broken delegation: interrupt it (`rtk herdr pane send-keys <pane_id> ctrl+c`)
-and relaunch through `agent start`.
+Headless runners — `claude -p`, `codex exec`, `agy -p` (and its aliases
+`--print` and `--prompt`), anything that streams JSON events into a pane —
+never report state, so waits never fire and the delegation dies silently. A
+worker tab filling with raw JSON event lines is a broken delegation: interrupt
+it (`rtk herdr pane send-keys <pane_id> ctrl+c`) and relaunch through
+`agent start`.
 
 ## Invariants
 
@@ -76,9 +78,10 @@ rtk herdr pane current --current # caller pane / tab / workspace ids
 rtk herdr agent list             # agents already running
 ```
 
-Check/install only the integration for each selected runtime. Reuse this
-preflight in the same workspace while the daemon and integrations are unchanged;
-a new packet alone does not require repeating it.
+Check/install only the integration for each selected runtime — `integration
+status` lists the `agy` kind as `antigravity-cli`. Reuse this preflight in the
+same workspace while the daemon and integrations are unchanged; a new packet
+alone does not require repeating it.
 
 ## Launch workers
 
@@ -96,15 +99,20 @@ rtk herdr agent start fix-loops --kind claude --pane <root_pane_id> -- \
 
 rtk herdr agent start audit-auth --kind codex --pane <root_pane_id> -- \
   --yolo
+
+rtk herdr agent start map-docs --kind agy --pane <root_pane_id> -- \
+  --dangerously-skip-permissions --mode accept-edits -i "<packet>"
 ```
 
 Capture `tab_id`, `pane_id`, and the agent name in the registry — retiring and
 screen reads need all three.
 
-Claude always launches with `--dangerously-skip-permissions` and Codex with
-`--yolo` — workers run unattended and must not stall on permission prompts.
-Plan-first runs add Claude's `--permission-mode plan`; the flags compose (see
-Plan-first delegation).
+Claude and Antigravity always launch with `--dangerously-skip-permissions`,
+Codex with `--yolo` — workers run unattended and must not stall on permission
+prompts. Antigravity also takes `--mode accept-edits`, which drops its default
+mode's per-file diff review and overrides any `agentMode` saved in its
+settings, and receives its packet through `-i` (`--prompt-interactive`).
+Plan-first runs swap in each TUI's plan mode (see Plan-first delegation).
 
 `agent start` returns success only after herdr detects the agent ready, so a
 non-zero exit is the launch failure — read the tab's root pane
@@ -187,6 +195,11 @@ rtk herdr worktree create --workspace "$HERDR_WORKSPACE_ID" \
 Create the worker's tab inside that workspace (`tab create --workspace
 <worktree_workspace_id>`) so its cwd is the isolated checkout.
 
+Antigravity trusts only the directories listed under `trustedWorkspaces` in
+`~/.gemini/antigravity-cli/settings.json`. If an agy pane opens on a trust
+prompt for a fresh worktree, read it and grant trust only to a checkout this
+controller created.
+
 ## Track workers
 
 Orchestrations are long-running — worker slices take minutes to hours, and a
@@ -205,8 +218,10 @@ Controller reads never mark a tab seen, so an unfocused worker settles as
 never a deadline on the worker. On expiry, read the screen
 (`rtk herdr agent read fix-loops --source recent-unwrapped --lines 120`) and
 re-enter the wait — loop until the worker reaches a terminal state, asks a
-question, or a stop condition fires. When a reported status looks wrong, debug
-detection with `rtk herdr agent explain <pane_id> --json`.
+question, or a stop condition fires. When a reported status looks wrong —
+likeliest on agy workers, whose state herdr reads from the screen alone (the
+`antigravity-cli` hook reports only the session) — debug detection with
+`rtk herdr agent explain <pane_id> --json`.
 
 Maintain a compact registry in the existing task notes or handoff: controller
 identity; worker agent name, tab label, role, model; workspace/tab/pane ids;

@@ -1,6 +1,6 @@
 interface:
   display_name: "herdr Orchestration"
-  short_description: "Coordinate Claude and Codex worker TUIs in herdr"
+  short_description: "Coordinate Claude, Codex, and Antigravity worker TUIs in herdr"
   default_prompt: "Use $herdr-orchestration to coordinate worker TUIs with their configured models for this task."
 policy:
   allow_implicit_invocation: false
