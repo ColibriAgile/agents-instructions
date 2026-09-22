@@ -48,6 +48,8 @@ bundles:
     description: Interfaces web / UI.
     skills:
       - frontend-design
+      - impeccable
+      - ui-craft     
 
   sdd:
     description: Fluxo SDD completo — PRD -> TechSpec -> tasks -> execução -> revisão.

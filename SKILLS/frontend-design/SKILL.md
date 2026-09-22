@@ -4,7 +4,7 @@ description: Create distinctive, production-grade frontend interfaces with high 
 license: Complete terms in LICENSE.txt
 ---
 
-Use this skill to design and implement bold, production-ready frontends when the request involves UI. Combine it with repository UI/UX requirements (`docs/ui/requirements.md`) and existing design systems.
+Use this skill to design and implement bold, production-ready frontends when the request involves UI. Combine it with repository existing design systems.
 
 ## Design Thinking
 
