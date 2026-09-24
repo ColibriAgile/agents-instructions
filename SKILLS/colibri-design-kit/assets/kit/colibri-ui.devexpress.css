@@ -1,0 +1,34 @@
+/*
+ * Colibri UI — adaptador de tipografia para DevExpress (Blazor) e DevExtreme (React).
+ * Opcional: carregue depois do tema DevExpress/DevExtreme e de colibri-ui.css (usa --cm-font e --cm-mono).
+ * Objetivo: todo texto interno dos componentes — calendário e relógio do editor de data/hora, listas
+ * suspensas, cabeçalhos e filtros de grade, paginador, dicas, mensagens de validação, notificações —
+ * usa a mesma família tipográfica da aplicação. Popups são renderizados fora da árvore da página;
+ * por isso as regras ficam em :root e nas classes raiz dos componentes, nunca num contêiner da página.
+ * Remova os blocos da biblioteca que o projeto não usa.
+ */
+
+/* ---------- DevExpress Blazor — temas Fluent (variáveis públicas --dxds-*) ---------- */
+:root {
+    --dxds-font-family-sans-serif: var(--cm-font);
+    --dxds-font-family-mono: var(--cm-mono);
+}
+
+/* ---------- DevExpress Blazor — temas clássicos e Bootstrap externo (Bootstrap 5) ---------- */
+:root {
+    --bs-font-sans-serif: var(--cm-font);
+    --bs-font-monospace: var(--cm-mono);
+    --bs-body-font-family: var(--cm-font);
+}
+
+/* ---------- DevExtreme (React, Angular, Vue, jQuery) ---------- */
+/* .dx-widget é a raiz de cada componente; .dx-overlay-wrapper envolve popups, calendários e listas
+   suspensas anexados ao <body>. Campos nativos não herdam fonte, por isso são listados. */
+.dx-widget,
+.dx-widget input,
+.dx-widget textarea,
+.dx-widget button,
+.dx-overlay-wrapper,
+.dx-overlay-wrapper input,
+.dx-overlay-wrapper textarea,
+.dx-overlay-wrapper button { font-family: var(--cm-font); }

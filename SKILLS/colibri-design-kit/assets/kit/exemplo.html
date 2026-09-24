@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Colibri UI — exemplo</title>
+    <link rel="stylesheet" href="icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="colibri-ui.css">
+    <style>
+        /* Apenas para esta página de exemplo */
+        .demo-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; align-items: start; }
+        .demo-table { --cm-cols: minmax(200px, 2fr) minmax(110px, .8fr) minmax(100px, .8fr) minmax(120px, 1fr) 104px; }
+        .demo-dialog { max-width: 520px; }
+    </style>
+</head>
+<body>
+<div class="cm-shell" id="shell">
+    <div class="cm-shell__backdrop" onclick="toggleSidebar()"></div>
+
+    <aside class="cm-sidebar" id="navigation">
+        <div class="cm-sidebar__head">
+            <a href="#" class="cm-sidebar__brand">Colibri Produto</a>
+            <button type="button" class="cm-sidebar__collapse" onclick="toggleSidebar()" title="Recolher navegação" aria-label="Recolher navegação">
+                <i class="bi bi-layout-sidebar" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <nav class="cm-nav" aria-label="Navegação">
+            <a class="cm-nav__link is-active" href="#"><i class="bi bi-house-door" aria-hidden="true"></i><span>Início</span></a>
+            <div class="cm-nav__section is-open">
+                <button type="button" class="cm-nav__section-toggle" aria-expanded="true"><span>Operação</span><i class="bi bi-chevron-down" aria-hidden="true"></i></button>
+                <div class="cm-nav__list">
+                    <a class="cm-nav__link" href="#"><i class="bi bi-receipt" aria-hidden="true"></i><span>Consulta</span></a>
+                    <a class="cm-nav__link" href="#"><i class="bi bi-box-seam" aria-hidden="true"></i><span>Extensões</span><small class="cm-nav__badge cm-nav__badge--alert">3</small></a>
+                </div>
+            </div>
+            <div class="cm-nav__section is-open">
+                <button type="button" class="cm-nav__section-toggle" aria-expanded="true"><span>Configurações</span><i class="bi bi-chevron-down" aria-hidden="true"></i></button>
+                <div class="cm-nav__list">
+                    <a class="cm-nav__link" href="#"><i class="bi bi-calendar-event" aria-hidden="true"></i><span>Agendamento</span></a>
+                    <a class="cm-nav__link" href="#"><i class="bi bi-database" aria-hidden="true"></i><span>Bancos de dados</span></a>
+                    <a class="cm-nav__link" href="#" target="_blank"><i class="bi bi-file-earmark-text" aria-hidden="true"></i><span>Log</span><i class="bi bi-box-arrow-up-right cm-nav__external" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="cm-sidebar__foot">Versão 1.0.0.0</div>
+    </aside>
+
+    <div class="cm-main">
+        <header class="cm-topbar">
+            <button type="button" class="cm-topbar__menu" id="menuToggle" onclick="toggleSidebar()" style="display: none;" aria-label="Abrir navegação">
+                <i class="bi bi-list" aria-hidden="true"></i>
+            </button>
+            <h1 class="cm-topbar__title">Página de exemplo</h1>
+            <div class="cm-topbar__aside">
+                <button type="button" class="cm-topbar__action" aria-label="Idioma">
+                    <i class="bi bi-translate" aria-hidden="true"></i><span>PT</span><i class="bi bi-chevron-down cm-topbar__caret" aria-hidden="true"></i>
+                </button>
+                <span class="cm-topbar__divider" aria-hidden="true"></span>
+                <button type="button" class="cm-topbar__action">
+                    <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Entrar</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="cm-scroll">
+            <div class="cm-banner cm-banner--warning" role="alert">
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                <div class="cm-banner__text"><strong>Atenção</strong><span>Aviso global exibido logo abaixo da barra superior.</span></div>
+            </div>
+
+            <div class="cm-content">
+                <div class="cm-page" id="page">
+                    <!-- Toolbar: busca à esquerda; estado e grupo de ações à direita -->
+                    <div class="cm-toolbar">
+                        <label class="cm-search">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                            <input type="text" placeholder="Buscar" aria-label="Buscar">
+                        </label>
+                        <div class="cm-toolbar__end">
+                            <div class="cm-notice cm-notice--success" role="status">
+                                <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                                <span>Conexão <strong>OK</strong></span>
+                            </div>
+                            <div class="cm-btn-group" role="group">
+                                <button type="button" class="cm-btn" onclick="toggleDrawer()">Histórico</button>
+                                <button type="button" class="cm-btn">Procurar atualizações</button>
+                                <button type="button" class="cm-btn cm-btn--primary">Aplicar todos</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cartões: pequenos e informativos -->
+                    <div class="cm-cards">
+                        <a class="cm-card" href="#">
+                            <div class="cm-card__head">
+                                <i class="bi bi-box-seam cm-card__icon" aria-hidden="true"></i>
+                                <h2 class="cm-card__title">Extensões</h2>
+                                <span class="cm-tag cm-tag--warning">3 pendentes</span>
+                                <i class="bi bi-chevron-right cm-card__go" aria-hidden="true"></i>
+                            </div>
+                            <div class="cm-card__value">51<small>instaladas</small></div>
+                            <div class="cm-card__meta">Última instalação em 23/09/26 04:02</div>
+                        </a>
+                        <a class="cm-card" href="#">
+                            <div class="cm-card__head">
+                                <i class="bi bi-gear-wide-connected cm-card__icon" aria-hidden="true"></i>
+                                <h2 class="cm-card__title">Serviços</h2>
+                                <span class="cm-tag cm-tag--success">Operando</span>
+                                <i class="bi bi-chevron-right cm-card__go" aria-hidden="true"></i>
+                            </div>
+                            <div class="cm-card__value">15/16<small>em execução</small></div>
+                            <div class="cm-card__meta">Parados: 1</div>
+                        </a>
+                        <div class="cm-card">
+                            <div class="cm-card__head">
+                                <i class="bi bi-shield-check cm-card__icon" aria-hidden="true"></i>
+                                <h2 class="cm-card__title">Ambiente</h2>
+                                <span class="cm-tag cm-tag--success">Estável</span>
+                            </div>
+                            <div class="cm-card__value cm-card__value--text">Back Office + POS</div>
+                        </div>
+                    </div>
+
+                    <!-- Tabela: colunas compartilhadas via --cm-cols -->
+                    <section>
+                        <div class="cm-section__head">
+                            <h2 class="cm-section__title">Itens monitorados</h2>
+                            <span class="cm-section__count">3</span>
+                            <div class="cm-section__tools">
+                                <button type="button" class="cm-tag cm-tag--success cm-tag-filter">Ativos 2</button>
+                                <button type="button" class="cm-tag cm-tag--warning cm-tag-filter is-active">Requer atenção 1 <i class="bi bi-x-lg" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+                        <div class="cm-table demo-table">
+                            <div class="cm-table__head">
+                                <button type="button" class="cm-sort is-active" aria-pressed="true"><span>Nome</span><i class="bi bi-arrow-up cm-sort__icon" aria-hidden="true"></i></button>
+                                <button type="button" class="cm-sort"><span>Status</span><i class="bi bi-arrow-down-up cm-sort__icon" aria-hidden="true"></i></button>
+                                <span>Versão</span>
+                                <span>Modificado em</span>
+                                <span class="cm-cell--end">Ações</span>
+                            </div>
+                            <div class="cm-table__item">
+                                <div class="cm-table__row">
+                                    <div class="cm-cell cm-cell--main">
+                                        <button type="button" class="cm-disclosure is-open" aria-expanded="true" aria-label="Ocultar detalhes"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+                                        <div class="cm-cell__text"><div class="cm-cell__title">Serviço de integração</div><div class="cm-cell__sub">servico_integracao</div></div>
+                                    </div>
+                                    <div class="cm-cell"><span class="cm-tag cm-tag--success">Ativado</span></div>
+                                    <div class="cm-cell cm-mono">2.3.0.177</div>
+                                    <div class="cm-cell cm-mono">23/09/26 04:02</div>
+                                    <div class="cm-cell cm-cell--actions">
+                                        <div class="cm-icon-group" role="group">
+                                            <button type="button" class="cm-icon-btn" title="Executar" aria-label="Executar"><i class="bi bi-play-circle" aria-hidden="true"></i></button>
+                                            <button type="button" class="cm-icon-btn" title="Editar" aria-label="Editar"><i class="bi bi-pencil-square" aria-hidden="true"></i></button>
+                                            <button type="button" class="cm-icon-btn cm-icon-btn--danger" title="Excluir" aria-label="Excluir"><i class="bi bi-trash3" aria-hidden="true"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cm-table__detail">
+                                    <div class="cm-tags"><span class="cm-tag cm-tag--muted">modulo-a</span><span class="cm-tag cm-tag--muted">modulo-b</span><span class="cm-tag">chave-liberada</span></div>
+                                </div>
+                            </div>
+                            <div class="cm-table__item">
+                                <div class="cm-table__row">
+                                    <div class="cm-cell cm-cell--main">
+                                        <button type="button" class="cm-disclosure" aria-expanded="false" aria-label="Exibir detalhes"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+                                        <div class="cm-cell__text"><div class="cm-cell__title">Serviço de relatórios</div><div class="cm-cell__sub">servico_relatorios</div></div>
+                                    </div>
+                                    <div class="cm-cell"><span class="cm-tag cm-tag--warning">Desativado</span></div>
+                                    <div class="cm-cell cm-mono">1.0.1.36</div>
+                                    <div class="cm-cell cm-mono">22/09/26 23:03</div>
+                                    <div class="cm-cell cm-cell--actions">
+                                        <div class="cm-icon-group" role="group">
+                                            <button type="button" class="cm-icon-btn" title="Executar" aria-label="Executar"><i class="bi bi-play-circle" aria-hidden="true"></i></button>
+                                            <button type="button" class="cm-icon-btn" title="Editar" aria-label="Editar"><i class="bi bi-pencil-square" aria-hidden="true"></i></button>
+                                            <button type="button" class="cm-icon-btn cm-icon-btn--danger" disabled title="Excluir" aria-label="Excluir"><i class="bi bi-trash3" aria-hidden="true"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="demo-row">
+                        <!-- Formulário -->
+                        <form class="cm-panel cm-form" onsubmit="return false">
+                            <fieldset class="cm-fieldset">
+                                <legend class="cm-section__title">Configuração</legend>
+                                <div class="cm-field">
+                                    <label class="cm-field__label" for="url">Endereço</label>
+                                    <div class="cm-input-group">
+                                        <span class="cm-input-addon cm-mono">https://</span>
+                                        <input id="url" class="cm-input cm-mono" value="minha-loja">
+                                        <span class="cm-input-addon cm-mono">.colibricloud.com/</span>
+                                    </div>
+                                    <span class="cm-field__hint">Informe apenas o subdomínio.</span>
+                                </div>
+                                <div class="cm-form-row">
+                                    <div class="cm-field">
+                                        <label class="cm-field__label" for="usuario">Usuário</label>
+                                        <input id="usuario" class="cm-input" value="sa">
+                                    </div>
+                                    <div class="cm-field is-invalid">
+                                        <label class="cm-field__label" for="senha">Senha</label>
+                                        <input id="senha" type="password" class="cm-input">
+                                        <div class="cm-field__error"><span>Campo obrigatório</span></div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <div class="cm-choices">
+                                <label class="cm-choice is-active"><input type="radio" name="modo" checked><span class="cm-choice__body"><strong>Automático</strong><span>Aplica assim que baixar.</span></span></label>
+                                <label class="cm-choice"><input type="radio" name="modo"><span class="cm-choice__body"><strong>Manual</strong><span>Aplica quando o usuário decidir.</span></span></label>
+                            </div>
+                            <div class="cm-field">
+                                <span class="cm-field__label">Dias da semana</span>
+                                <div class="cm-btn-group cm-btn-group--compact cm-toggles" role="group" aria-label="Dias da semana">
+                                    <label class="cm-btn cm-toggle"><input type="checkbox" class="cm-toggle__input" checked><span>Seg</span></label>
+                                    <label class="cm-btn cm-toggle"><input type="checkbox" class="cm-toggle__input" checked><span>Ter</span></label>
+                                    <label class="cm-btn cm-toggle"><input type="checkbox" class="cm-toggle__input" checked><span>Qua</span></label>
+                                    <label class="cm-btn cm-toggle"><input type="checkbox" class="cm-toggle__input"><span>Qui</span></label>
+                                    <label class="cm-btn cm-toggle"><input type="checkbox" class="cm-toggle__input"><span>Sex</span></label>
+                                </div>
+                            </div>
+                            <div class="cm-check-list">
+                                <label class="cm-check"><input type="checkbox" checked><span>Executar quando o agendamento for perdido</span></label>
+                                <label class="cm-check cm-check--nested"><input type="checkbox" disabled><span>Somente no dia atual</span></label>
+                            </div>
+                            <div class="cm-form__actions">
+                                <div class="cm-btn-group" role="group">
+                                    <button type="button" class="cm-btn">Cancelar</button>
+                                    <button type="submit" class="cm-btn cm-btn--primary">Salvar</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="cm-page">
+                            <div class="cm-alert" role="alert">
+                                <i class="bi bi-exclamation-octagon" aria-hidden="true"></i>
+                                <div><p><strong>Erro</strong></p><p>Mensagem de erro bloqueante com a causa e o próximo passo.</p></div>
+                            </div>
+                            <div class="cm-panel">
+                                <div class="cm-empty cm-empty--success">
+                                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                                    <div><strong>Nenhuma pendência</strong><span>Quando algo precisar de atenção, aparecerá aqui.</span></div>
+                                </div>
+                            </div>
+                            <!-- Diálogo (exibido no fluxo apenas para demonstração) -->
+                            <div class="cm-dialog demo-dialog" role="dialog" aria-labelledby="dlg-title">
+                                <div class="cm-dialog__head">
+                                    <button type="button" class="cm-dialog__close" aria-label="Fechar">&times;</button>
+                                    <h2 class="cm-dialog__title" id="dlg-title">Confirmar aplicação</h2>
+                                </div>
+                                <div class="cm-dialog__body">Deseja aplicar a extensão agora?</div>
+                                <div class="cm-dialog__foot">
+                                    <button type="button" class="cm-btn">Não</button>
+                                    <button type="button" class="cm-btn cm-btn--primary">Sim</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Painel lateral: alterne .is-open para abrir e fechar com animação -->
+<div class="cm-drawer" id="drawer" role="dialog" aria-label="Histórico">
+    <div class="cm-drawer__head">
+        <h5>Histórico</h5>
+        <button type="button" class="cm-icon-btn cm-drawer__close" onclick="toggleDrawer()" aria-label="Fechar"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+    </div>
+    <div class="cm-drawer__body">
+        <div class="cm-drawer__item">
+            <div class="cm-drawer__item-meta"><div class="cm-drawer__item-title">admin</div><div class="cm-drawer__item-time">23/09/2026 04:10:22</div></div>
+            <div class="cm-drawer__item-text">Alterou a porta do serviço para 6500.</div>
+        </div>
+        <div class="cm-drawer__item">
+            <div class="cm-drawer__item-meta"><div class="cm-drawer__item-title">admin</div><div class="cm-drawer__item-time">22/09/2026 18:02:10</div></div>
+            <div class="cm-drawer__item-text">Aplicou a extensão 7.0.0.180.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleSidebar() {
+        var shell = document.getElementById('shell');
+        if (window.innerWidth <= 920) {
+            shell.classList.toggle('cm-shell--overlay-open');
+        } else {
+            shell.classList.toggle('cm-shell--collapsed');
+        }
+        document.getElementById('menuToggle').style.display =
+            (shell.classList.contains('cm-shell--collapsed') || window.innerWidth <= 920) ? '' : 'none';
+    }
+    function toggleDrawer() {
+        document.getElementById('drawer').classList.toggle('is-open');
+    }
+    if (window.innerWidth <= 920) { document.getElementById('menuToggle').style.display = ''; }
+    if (location.hash === '#historico') { toggleDrawer(); }
+    // Na aplicação, cm-page--home fica só na página inicial; aqui é ligada por #inicio.
+    if (location.hash === '#inicio') { document.getElementById('page').classList.add('cm-page--home'); }
+</script>
+</body>
+</html>
