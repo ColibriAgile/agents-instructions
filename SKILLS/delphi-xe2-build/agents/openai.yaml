@@ -1,0 +1,4 @@
+interface:
+  display_name: "Compilação Delphi XE2"
+  short_description: "Compila projetos Delphi XE2 com MSBuild sem sobrescrever a instalação"
+  default_prompt: "Use $delphi-xe2-build para compilar o projeto Delphi XE2 e verificar o resultado."
