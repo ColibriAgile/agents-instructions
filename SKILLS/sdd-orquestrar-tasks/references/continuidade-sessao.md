@@ -8,12 +8,12 @@ Roda em cada **fronteira** que a skill chamadora indicar (entre tasks, recortes 
 
 ### Medir o contexto
 
-O **limiar** é 65% da janela de contexto, início da segunda metade da zona amarela (65–75%): parar ali deixa folga para gravar o snapshot e perguntar antes da zona vermelha.
+O **limiar** é 65% da janela de contexto, onde começa a zona `RED` do ContextBrake. Parar ali deixa folga para gravar o snapshot e perguntar antes de `CRITICAL` (75%), onde o ContextBrake bloqueia toda tool exceto seus comandos de plano, checkpoint, validação e git, e o snapshot não pode mais ser gravado.
 
-- **Telemetria.** Quando o retorno de uma tool trouxer o cabeçalho do context-brake, com percentual de contexto usado e zona, ou o harness reportar o uso, use a leitura mais recente: é medida e vence a estimativa. Zona `vermelha` sem percentual atinge o limiar; `amarela` sem percentual cai na estimativa.
+- **Telemetria.** Quando o retorno de uma tool trouxer o bloco do ContextBrake (`[ContextBrake vN] … usage=<p>% … zone=<ZONA> …`), ou o harness reportar o uso, use a leitura mais recente: é medida e vence a estimativa. `zone=RED` ou `zone=CRITICAL` atinge o limiar com qualquer `usage`.
 - **Estimativa.** Sem telemetria, some o que entrou no contexto desde o início da sessão ou da última compactação: carga fixa de sistema e ferramentas (cerca de 20 mil tokens), skills e fontes lidas, saídas de tools, diffs e o texto que você escreveu, a cerca de 4 caracteres por token, contra a janela do modelo (200 mil tokens quando desconhecida). Parta da estimativa anunciada na fronteira anterior e some só o que veio depois; na dúvida, arredonde para cima. Compactação nesta sessão ou aviso de contexto baixo do harness atinge o limiar.
 
-Dentro de uma unidade, continue trabalhando até a zona vermelha (75% ou mais). Ao chegar nela, leve a unidade ao próximo ponto consistente, registre estado parcial e pendências no handoff, aguarde exploradores e processos e faça a pausa por contexto com essa unidade como próximo passo.
+Dentro de uma unidade, o limiar não interrompe o trabalho: termine a unidade sem abrir explorações grandes novas. Quando ela não couber antes de `CRITICAL`, pare no próximo ponto consistente, registre estado parcial e pendências no handoff, aguarde exploradores e processos e faça a pausa por contexto com essa unidade como próximo passo.
 
 ### Destinos
 
@@ -29,7 +29,7 @@ A pergunta vem sempre depois do snapshot gravado e relido. Use a tool de pergunt
 
 | Opção | Recomende quando | Efeito |
 | --- | --- | --- |
-| Encerrar e retomar em nova sessão | Limiar atingido ou regra de independência | Encerre o turno; o comando de retomada já está impresso |
+| Encerrar e retomar em nova sessão | Limiar atingido ou regra de independência | Encerre o turno; o comando de retomada já está impresso. Com o ContextBrake ativo, termine a resposta com `[REQUEST_SESSION_RESET]` |
 | Continuar nesta sessão | Parada obrigatória abaixo do limiar | Prossiga; acima do limiar, a pausa por contexto se repete na próxima fronteira |
 
 - **Independência.** Quando o próximo passo é `sdd-revisar-codigo` e esta sessão escreveu ou alterou código que a revisão vai julgar, pare qualquer que seja o uso e diga por que recomenda encerrar: a revisão precisa de uma sessão que não é autora do código. Se o usuário continuar mesmo assim, registre a limitação onde o chamador guarda decisões (`workflow.md` sob `sdd-orquestrar-fluxo`) e nas limitações do relatório.
@@ -101,7 +101,7 @@ Entrada sem gatilho que case não é carregada para esta unidade. O leitor decid
 
 ### Protocolo de gravação
 
-Grave somente com a unidade registrada (artefato gravado, task movida, manifesto ou mapa consistentes), ou, na pausa em zona vermelha, com o estado parcial registrado no handoff, e nenhum explorador ou processo em execução.
+Grave somente com a unidade registrada (artefato gravado, task movida, manifesto ou mapa consistentes), ou, na pausa dentro de uma unidade, com o estado parcial registrado no handoff, e nenhum explorador ou processo em execução.
 
 1. Parta do snapshot anterior, se existir. Descarte cada entrada expirada, substituída, contrária às fontes atuais ou promovida a arquivo durável que o próximo passo lerá de qualquer forma. Mantenha os IDs das que sobreviverem.
 2. Acrescente o que esta sessão produziu: decisões, aprendizados, conclusões de exploradores ainda válidas no head atual e pendências. Escreva cada resumo acionável sem a conversa: o fato e sua consequência, não a história.
