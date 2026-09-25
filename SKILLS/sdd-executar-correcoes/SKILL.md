@@ -11,7 +11,7 @@ A sessão que executa esta skill é a única escritora: implementa cada task de 
 
 Se o chamador limitar a execução a uma task, devolva após o passo 6 em vez de fazer a pausa de sessão: `task-concluida` com os próximos IDs elegíveis, ou `bloqueado` com evidências. Quando todas as tasks estiverem concluídas, execute o passo 7 antes de retornar. Retorno de task não encerra a revisão.
 
-1. **Retomar.** Leia integralmente `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks` uma vez por sessão: sua medição de contexto vale em toda task. Se `tasks/prd-[slug]/snapshot-contexto.md` existir, aplique o protocolo de carga, validando `cobre_ate` contra a pasta da revisão.
+1. **Retomar.** Leia integralmente `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks` uma vez por sessão: sua medição de contexto vale em toda task. Se `tasks/prd-[slug]/snapshot-contexto.md` existir, carregue-o pelo ramo Carregar da skill `sdd-snapshot`, validando `cobre_ate` contra a pasta da revisão.
    **Saída:** snapshot aplicado, parcialmente confiável com as entradas suspeitas nomeadas, ou ausente.
 2. Fixe uma revisão por argumento, snapshot ou contexto e exija `codereview.md`. Inventarie tasks da raiz e `done/` por ID, achados, aceite, dependências e arquivos. Se ambígua, solicite escolha; se faltar plano, direcione a `sdd-planejar-correcoes`.
    **Saída:** revisão exata, sem duplicatas ou dependências ausentes/circulares. Se todas concluídas, siga ao passo 7.

@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # Planejar tasks SDD
 
-1. Resolva `tasks/prd-[slug]/`. Quando `snapshot-contexto.md` existir ali, aplique antes o protocolo de carga de `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks`. Exija e leia `prd.md` e `techspec.md`, nessa ordem, uma vez por versão. Depois inventarie `tasks.md`, `task_*.md` e `done/task_*.md`. Reutilize plano existente sem sobrescrever; para atualização autorizada, preserve IDs, handoffs e tasks concluídas.
+1. Resolva `tasks/prd-[slug]/`. Quando `snapshot-contexto.md` existir ali, carregue-o antes pelo ramo Carregar da skill `sdd-snapshot`. Exija e leia `prd.md` e `techspec.md`, nessa ordem, uma vez por versão. Depois inventarie `tasks.md`, `task_*.md` e `done/task_*.md`. Reutilize plano existente sem sobrescrever; para atualização autorizada, preserve IDs, handoffs e tasks concluídas.
    **Saída:** fontes e estado reconciliados; links quebrados ou IDs conflitantes bloqueiam apenas a atualização afetada.
 2. Extraia em uma passagem obrigações, decisões, componentes, riscos e testes. Preserve IDs; para fontes legadas, atribua IDs locais e seção de origem. Mapeie cada item a entrega e evidência, ou pendência que altere escopo/aceite.
    **Saída:** inventário completo e rastreável, incluindo limites fora de escopo.

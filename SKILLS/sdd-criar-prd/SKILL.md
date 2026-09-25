@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # Criar PRD SDD
 
-1. Extraia problema, resultado e slug do pedido. Resolva `tasks/prd-[slug]/prd.md`; se existir, reutilize sem sobrescrever. Atualize apenas quando autorizado; preserve IDs inalterados. Quando `tasks/prd-[slug]/snapshot-contexto.md` existir, aplique o protocolo de carga de `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks` antes de ler fontes.
+1. Extraia problema, resultado e slug do pedido. Resolva `tasks/prd-[slug]/prd.md`; se existir, reutilize sem sobrescrever. Atualize apenas quando autorizado; preserve IDs inalterados. Quando `tasks/prd-[slug]/snapshot-contexto.md` existir, carregue-o pelo ramo Carregar da skill `sdd-snapshot` antes de ler fontes.
    **Saída:** destino e operação inequívocos; solicite apenas a informação ausente que impeça identificá-los.
 2. Inventarie usuários, jornadas, métricas, RF, RNF, restrições, dependências, acessibilidade e fora de escopo. Consulte evidência local antes de pesquisar regras públicas ou integrações em fontes primárias; envie exploradores somente leitura só quando a evidência local se espalhar por muitos arquivos. Registre origem e diferencie fato, premissa e decisão de produto; pergunte apenas sobre lacunas que mudem escopo ou aceite.
    **Saída:** cada obrigação tem evidência ou premissa explícita; decisões bloqueantes estão identificadas.

@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # Planejar correções SDD
 
-1. Fixe uma única `tasks/prd-[slug]/codereview_[num]/` por argumento ou contexto. Quando `tasks/prd-[slug]/snapshot-contexto.md` existir, aplique antes o protocolo de carga de `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks`. Busque somente valores ausentes; múltiplas candidatas exigem escolha. Exija e leia `codereview.md` uma vez; preserve-o.
+1. Fixe uma única `tasks/prd-[slug]/codereview_[num]/` por argumento ou contexto. Quando `tasks/prd-[slug]/snapshot-contexto.md` existir, carregue-o antes pelo ramo Carregar da skill `sdd-snapshot`. Busque somente valores ausentes; múltiplas candidatas exigem escolha. Exija e leia `codereview.md` uma vez; preserve-o.
    **Saída:** revisão exata e legível, sem misturar IDs entre relatórios.
 2. Classifique todo item como acionável, informativo ou pendente. Em `APROVADO`, planeje só o solicitado; em `APROVADO COM RESSALVAS`, melhorias exigem escopo autorizado; em `REPROVADO`, cubra violações, incompletude e falhas. Status desconhecido permite somente achados explicitamente acionáveis.
    Preserve `CR-NN`; no legado sem IDs, atribua ID local por ordem e seção. Inventarie metadados da raiz e `done/` para reaproveitar tasks; identidade do achado é caminho da revisão + ID.

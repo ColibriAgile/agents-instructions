@@ -1,6 +1,6 @@
 # Snapshot de contexto — [slug da feature]
 
-> Pistas para a próxima sessão, não autoridade: artefatos, manifestos, handoffs, relatórios e código vencem em conflito. Protocolo: `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks`.
+> Pistas para a próxima sessão, não autoridade: artefatos, manifestos, handoffs, relatórios e código vencem em conflito. Protocolo: skill `sdd-snapshot`.
 
 ## Cabeçalho
 
