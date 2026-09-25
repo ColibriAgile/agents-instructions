@@ -1,6 +1,7 @@
 ---
 name: sdd-orquestrar-fluxo
 description: Fluxo SDD para conduzir uma feature na sessão, com exploradores somente leitura e HIL, ou retomar seu checkpoint em nova sessão; não substitui uma etapa avulsa.
+argument-hint: [--prd nome-da-feature]
 ---
 
 # Orquestrar o fluxo SDD
@@ -19,7 +20,7 @@ Coordene contratos, execução e aceite. A sessão coordenadora executa cada eta
    Apresente TechSpec + DAG + tasks concretas no **HIL 2**: arquitetura, limites, ambientes necessários, aceite manual e autorização para implementação/correções dentro desses contratos. Corrija os documentos antes de solicitar decisão; perguntas intermediárias somente para informação indispensável.
    **Saída:** plano rastreável e executável aprovado, com refatoração preparatória decidida uma única vez; nenhum código escrito antes da autorização necessária.
 4. **Implementar.** Execute `sdd-orquestrar-tasks` nesta sessão: ela implementa cada task, usa subagentes só como exploradores somente leitura e é dona do manifesto e dos movimentos enquanto estiver ativa.
-   Limite cada execução a uma task e receba handoff e estado antes da próxima. Salve o checkpoint e faça a pausa de sessão, para que uma pergunta cubra a continuidade; quando a resposta gravar o snapshot, inclua-o em `sources.snapshot` e `next_action.read`. Depois da última task, o próximo passo é a revisão, e a pausa de sessão recomenda encerrar esta sessão pela regra de independência. Trate desvios pelo **HIL de exceção**.
+   Limite cada execução a uma task e receba handoff e estado antes da próxima. Salve o checkpoint e faça a pausa de sessão: no destino `Seguir`, inicie a próxima task sem perguntar; quando ela parar, inclua o snapshot gravado em `sources.snapshot` e `next_action.read`. Depois da última task, o próximo passo é a revisão, e a pausa de sessão recomenda encerrar esta sessão pela regra de independência. Trate desvios pelo **HIL de exceção**.
    **Saída:** todas as tasks aprovadas com evidência integrada ou bloqueios identificados; pasta `done/` sozinha não prova conclusão.
 5. **Revisar e corrigir.** Rode a revisão global com `sdd-revisar-codigo`, base Git e artefatos atuais numa sessão que não é autora do código revisado, normalmente a sessão retomada após o passo 4 ou após correções. Se o usuário continuar na sessão autora mesmo assim, registre essa limitação em `workflow.md` e nas limitações do relatório. Leia o status literal do `codereview.md` recebido, grave-o em `review_status` e siga exatamente um destino:
    - `APROVADO` encerra o ciclo de revisão: siga ao passo 6 com esse relatório como evidência de aceite.

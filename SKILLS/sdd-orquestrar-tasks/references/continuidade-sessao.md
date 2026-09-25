@@ -1,21 +1,40 @@
 # Continuidade de sessão
 
-As skills SDD gravam artefatos e código na sessão que as executa; subagentes são exploradores somente leitura. O trabalho acumula num único contexto, e este protocolo permite ao usuário encerrar a sessão em pontos seguros sem perder o que ela aprendeu. Tem duas partes: a pausa de sessão e o snapshot de contexto que a pausa pode gravar.
+As skills SDD gravam artefatos e código na sessão que as executa; subagentes são exploradores somente leitura. O trabalho acumula num único contexto, e este protocolo segue sozinho entre unidades até o contexto encher, gravando o que a sessão aprendeu antes de sugerir uma sessão nova. Tem duas partes: a pausa de sessão e o snapshot de contexto que ela grava.
 
 ## Pausa de sessão
 
-Pergunte nos pontos que a skill chamadora indicar (entre tasks, entre recortes ou frentes, nos gates HIL e antes da revisão), somente com gravações persistidas e nenhum explorador ou processo em execução. Use a tool de perguntas do host (`AskUserQuestion` no Claude Code) ou pergunta textual quando não houver. Informe em uma linha o que acabou de terminar, o próximo passo e, quando houver telemetria de contexto visível (bloco ContextBrake ou uso reportado pelo harness), a zona atual; sem telemetria, estime pelo volume de trabalho acumulado na sessão. Coloque a opção recomendada primeiro, marcada `(Recomendado)`:
+Roda em cada **fronteira** que a skill chamadora indicar (entre tasks, recortes ou frentes, nos gates HIL, antes da revisão e ao fim de uso avulso), somente com gravações persistidas e nenhum explorador ou processo em execução.
 
-| Opção | Quando recomendar | Efeito |
+### Medir o contexto
+
+O **limiar** é 65% da janela de contexto, início da segunda metade da zona amarela (65–75%): parar ali deixa folga para gravar o snapshot e perguntar antes da zona vermelha.
+
+- **Telemetria.** Quando o retorno de uma tool trouxer o cabeçalho do context-brake, com percentual de contexto usado e zona, ou o harness reportar o uso, use a leitura mais recente: é medida e vence a estimativa. Zona `vermelha` sem percentual atinge o limiar; `amarela` sem percentual cai na estimativa.
+- **Estimativa.** Sem telemetria, some o que entrou no contexto desde o início da sessão ou da última compactação: carga fixa de sistema e ferramentas (cerca de 20 mil tokens), skills e fontes lidas, saídas de tools, diffs e o texto que você escreveu, a cerca de 4 caracteres por token, contra a janela do modelo (200 mil tokens quando desconhecida). Parta da estimativa anunciada na fronteira anterior e some só o que veio depois; na dúvida, arredonde para cima. Compactação nesta sessão ou aviso de contexto baixo do harness atinge o limiar.
+
+Dentro de uma unidade, continue trabalhando até a zona vermelha (75% ou mais). Ao chegar nela, leve a unidade ao próximo ponto consistente, registre estado parcial e pendências no handoff, aguarde exploradores e processos e faça a pausa por contexto com essa unidade como próximo passo.
+
+### Destinos
+
+Em cada fronteira, siga exatamente um destino:
+
+| Destino | Quando | Efeito |
 | --- | --- | --- |
-| Continuar nesta sessão | Zona verde e o próximo passo aproveita a maior parte do contexto carregado | Prossiga |
-| Snapshot e continuar | Zona verde ou amarela, mas a sessão produziu decisões ou aprendizados que valem proteger da compactação | Grave o snapshot e prossiga |
-| Snapshot e encerrar sessão | Zona amarela ou vermelha, uma unidade longa acabou, o próximo passo exige outra parte do código, ou vale a regra de independência abaixo | Grave o snapshot, informe a instrução de retomada e encerre o turno |
-| Encerrar sem snapshot | Nada aprendido além do que artefatos, handoffs e manifestos já registram | Informe a instrução de retomada e encerre o turno |
+| Seguir | Abaixo do limiar e sem parada obrigatória | Informe em uma linha a unidade concluída, o uso (`58% medido` ou `~40% estimado`) e a próxima unidade; comece-a sem perguntar |
+| Pausa por contexto | Limiar atingido | Grave o snapshot e pergunte |
+| Parada obrigatória | Gate HIL, regra de independência, bloqueio sem outra unidade elegível ou fim de uso avulso | Grave o snapshot e pergunte |
 
-- **Independência.** Quando o próximo passo é `sdd-revisar-codigo` e esta sessão escreveu ou alterou código que a revisão vai julgar, recomende **Snapshot e encerrar sessão** qualquer que seja a zona e diga por quê: a revisão precisa de uma sessão que não é autora do código. Se o usuário continuar mesmo assim, registre a limitação onde o chamador guarda decisões (`workflow.md` sob `sdd-orquestrar-fluxo`) e nas limitações do relatório.
+A pergunta vem sempre depois do snapshot gravado e relido. Use a tool de perguntas do host (`AskUserQuestion` no Claude Code) ou pergunta textual quando não houver. Informe em uma linha o que terminou, o próximo passo, o uso de contexto e caminho e tamanho do snapshot; depois imprima o comando de retomada. Coloque a opção recomendada primeiro, marcada `(Recomendado)`:
+
+| Opção | Recomende quando | Efeito |
+| --- | --- | --- |
+| Encerrar e retomar em nova sessão | Limiar atingido ou regra de independência | Encerre o turno; o comando de retomada já está impresso |
+| Continuar nesta sessão | Parada obrigatória abaixo do limiar | Prossiga; acima do limiar, a pausa por contexto se repete na próxima fronteira |
+
+- **Independência.** Quando o próximo passo é `sdd-revisar-codigo` e esta sessão escreveu ou alterou código que a revisão vai julgar, pare qualquer que seja o uso e diga por que recomenda encerrar: a revisão precisa de uma sessão que não é autora do código. Se o usuário continuar mesmo assim, registre a limitação onde o chamador guarda decisões (`workflow.md` sob `sdd-orquestrar-fluxo`) e nas limitações do relatório.
 - **Gates.** Num gate HIL, faça juntas a pergunta do gate e a da sessão. Encerrar a sessão não aprova o gate, e aprovar não escolhe a sessão.
-- **Instrução de retomada.** `Use $<skill> para continuar <feature ou unidade> neste repositório.`, nomeando a skill dona do próximo passo; sob `sdd-orquestrar-fluxo`, é sempre o fluxo. Ao encerrar, não inicie trabalho, explorador ou processo depois da resposta. Silêncio não inicia nada.
+- **Comando de retomada.** Em toda pergunta desta pausa, imprima antes dela, sozinho num bloco de código, o comando que continua o trabalho depois de `/clear` ou numa sessão nova: prefixo de invocação do host (`/` no Claude Code, `$` no Codex), skill dona do próximo passo e os argumentos do `argument-hint` dela preenchidos com os valores atuais, sem placeholders. Exemplo: `/sdd-orquestrar-fluxo --prd loja-01-checkout`. Sob `sdd-orquestrar-fluxo`, a skill é sempre o fluxo. Ao encerrar, não inicie trabalho, explorador ou processo depois da resposta. Silêncio não inicia nada.
 
 ## Snapshot de contexto
 
@@ -82,7 +101,7 @@ Entrada sem gatilho que case não é carregada para esta unidade. O leitor decid
 
 ### Protocolo de gravação
 
-Grave somente com a unidade registrada (artefato gravado, task movida, manifesto ou mapa consistentes) e nenhum explorador ou processo em execução.
+Grave somente com a unidade registrada (artefato gravado, task movida, manifesto ou mapa consistentes), ou, na pausa em zona vermelha, com o estado parcial registrado no handoff, e nenhum explorador ou processo em execução.
 
 1. Parta do snapshot anterior, se existir. Descarte cada entrada expirada, substituída, contrária às fontes atuais ou promovida a arquivo durável que o próximo passo lerá de qualquer forma. Mantenha os IDs das que sobreviverem.
 2. Acrescente o que esta sessão produziu: decisões, aprendizados, conclusões de exploradores ainda válidas no head atual e pendências. Escreva cada resumo acionável sem a conversa: o fato e sua consequência, não a história.
