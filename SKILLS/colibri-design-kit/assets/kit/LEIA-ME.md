@@ -7,7 +7,7 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 | Arquivo | Para quê |
 |---|---|
 | `DESIGN.md` | Regras visuais da linha Colibri: cores, tipografia, estrutura da aplicação, anatomia de página e componentes. Copie para a raiz do repositório. |
-| `PRODUCT.template.md` | Modelo de `PRODUCT.md` (usuários, propósito, princípios). Copie para a raiz como `PRODUCT.md` e preencha os trechos entre colchetes. |
+| `PRODUCT.template.md` | Modelo de `PRODUCT.md` (usuários, propósito, contexto, compromissos da marca, princípios), no schema de produto do impeccable 4.x. Copie para a raiz como `PRODUCT.md` e preencha os trechos entre colchetes. |
 | `colibri-ui.css` | Implementação de referência em CSS puro (prefixo `cm-`), sem dependência de framework. |
 | `colibri-ui.bootstrap3.css` | Adaptador opcional para projetos com Bootstrap 3, AngularJS, angular-growl ou Dropzone. |
 | `colibri-ui.devexpress.css` | Adaptador opcional de tipografia para DevExpress Blazor (temas Fluent, clássicos e Bootstrap externo) e DevExtreme (React etc.): leva a fonte do kit aos elementos internos e popups dos componentes. |
@@ -36,5 +36,6 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **26/09/2026:** `PRODUCT.template.md` no schema de produto 1 do impeccable 4.x: sem `## Register`; personalidade e antirreferências em `## Brand Commitments`; princípios em `## Product Principles`; cenário de uso em `## Operating Context`; operação sem internet em `## Capabilities and Constraints`. Regras visuais sem mudança.
 - **25/09/2026:** foco interno em todo botão (`outline-offset: -3px`), com o focado acima dos vizinhos e do principal em grupos e rodapés de diálogo, e contorno claro no principal e no destrutivo (`DESIGN.md` seção 2, `colibri-ui.css`, `colibri-ui.bootstrap3.css`); regra do botão padrão do diálogo (`DESIGN.md` seção 7, "Camadas").
 - **24/09/2026:** primeira versão.

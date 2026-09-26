@@ -1,12 +1,11 @@
 # [Nome do produto — ex.: Colibri Nota Fiscal]
 
-<!-- Modelo de PRODUCT.md para aplicações Colibri. Copie para a raiz do repositório como PRODUCT.md
-     e substitua os trechos entre colchetes. As seções já preenchidas valem para toda a linha Colibri;
-     ajuste somente se o produto tiver uma necessidade diferente. -->
+<!-- impeccable:product-schema 1 -->
 
-## Register
-
-product
+<!-- Modelo de PRODUCT.md para aplicações Colibri, no formato do impeccable 4.x. Copie para a raiz do
+     repositório como PRODUCT.md e substitua os trechos entre colchetes. As seções já preenchidas valem
+     para toda a linha Colibri; ajuste somente se o produto tiver uma necessidade diferente. Mantenha o
+     comentário impeccable:product-schema acima; remova este. -->
 
 ## Platform
 
@@ -14,7 +13,7 @@ web
 
 ## Users
 
-[Quem usa, em que contexto e com que frequência. Ex.: equipes de suporte e implantação, administradores e operadores da loja; estações Windows, às vezes com a janela reduzida até a largura de um tablet.]
+[Quem usa, em que contexto e com que frequência. Ex.: equipes de suporte e implantação, administradores e operadores da loja.]
 
 ## Product Purpose
 
@@ -24,17 +23,28 @@ web
 
 [Uma frase: o lugar onde [quem] faz [o quê].]
 
-## Brand Personality
+## Operating Context
 
-Sóbrio, preciso e discreto. A linguagem é direta e operacional; informação e ação têm prioridade sobre ornamentação.
+Estações Windows, à luz de escritório, muitas vezes com a janela reduzida até a largura de um tablet. [Fluxos, ferramentas e rotinas do produto em que a aplicação é usada.]
 
-## Anti-references
+## Capabilities and Constraints
+
+- A aplicação precisa funcionar sem acesso à internet: fontes, ícones e estilos são servidos por ela mesma.
+- [Funcionalidades confirmadas, restrições técnicas e termos do produto.]
+
+## Brand Commitments
+
+Linha visual Colibri ("Mesa de operação"), definida pelo Colibri Design Kit e registrada em `DESIGN.md`, com a marca-d'água do colibri colorido na página inicial.
+
+Personalidade: sóbrio, preciso e discreto. A linguagem é direta e operacional; informação e ação têm prioridade sobre ornamentação.
+
+Anti-references:
 
 - Painel que parece uma página promocional, com heroes grandes e decorativos.
 - Excesso de cartões ou cartões dentro de cartões para apresentar dados comparáveis.
 - Interface espaçosa a ponto de ocultar informação operacional útil na primeira tela.
 
-## Design Principles
+## Product Principles
 
 - Mostrar estado, pendências e ações possíveis antes de contexto repetido.
 - [Reservar a maior área útil e o caminho mais curto para a página mais usada: …]
