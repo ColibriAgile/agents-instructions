@@ -1,6 +1,6 @@
 # Kit de design Colibri
 
-Kit para iniciar a refatoração visual de outras aplicações Colibri na mesma linha do Colibri Master.
+Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma delas ou atualizar a versão já adotada.
 
 ## Conteúdo
 
@@ -16,7 +16,7 @@ Kit para iniciar a refatoração visual de outras aplicações Colibri na mesma 
 | `fonts/` | Google Sans Flex e Google Sans Mono (WOFF2), servidas localmente. |
 | `icons/` | Bootstrap Icons 1.13.1 (fonte local). Em projetos com npm, prefira `npm install bootstrap-icons`. |
 
-## Como adotar em outro repositório
+## Como adotar em um repositório
 
 1. Copie `DESIGN.md` para a raiz e `PRODUCT.template.md` para a raiz como `PRODUCT.md`; preencha o `PRODUCT.md` e a seção 9 do `DESIGN.md` ("Implementação neste projeto").
 2. Copie `colibri-ui.css`, `fonts/`, `logos/` e os ícones para a pasta de estáticos do projeto, mantendo `fonts/` e `logos/` ao lado do CSS (os caminhos são relativos).
@@ -31,4 +31,10 @@ Kit para iniciar a refatoração visual de outras aplicações Colibri na mesma 
 - Tudo funciona sem internet; não troque fontes ou ícones por versões hospedadas em CDN.
 - A lateral e a barra superior dependem de pequenos comportamentos em JavaScript (recolher, abrir sobre o conteúdo até 920 px, menus). `exemplo.html` traz uma versão mínima; reimplemente no framework do projeto com Esc para fechar e retorno de foco.
 - Menus suspensos (`.cm-menu`) têm só o visual; abrir/fechar é responsabilidade do projeto (no Bootstrap 3, use `.dropdown-menu` junto).
-- Origem: `colibri-ui.css`, `colibri-ui.bootstrap3.css` e `logos/` gerados a partir de `src/frontend/` do Colibri Master em 24/09/2026 (`node temp/gerar-colibri-design-kit.js`); `colibri-ui.devexpress.css` é mantido à mão.
+
+## Versões
+
+Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
+
+- **25/09/2026:** foco interno em todo botão (`outline-offset: -3px`), com o focado acima dos vizinhos e do principal em grupos e rodapés de diálogo, e contorno claro no principal e no destrutivo (`DESIGN.md` seção 2, `colibri-ui.css`, `colibri-ui.bootstrap3.css`); regra do botão padrão do diálogo (`DESIGN.md` seção 7, "Camadas").
+- **24/09/2026:** primeira versão.

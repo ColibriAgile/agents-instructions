@@ -109,9 +109,14 @@ textarea.form-control { height: auto; padding: 8px 10px; }
 .modal-footer > .btn + .btn { margin-left: -1px; }
 .modal-footer > .btn:first-child { border-top-left-radius: var(--cm-btn-radius); border-bottom-left-radius: var(--cm-btn-radius); }
 .modal-footer > .btn:last-child { border-top-right-radius: var(--cm-btn-radius); border-bottom-right-radius: var(--cm-btn-radius); }
-.modal-footer > .btn:hover,
-.modal-footer > .btn:focus-visible { z-index: 1; }
+.modal-footer > .btn:hover { z-index: 1; }
 .modal-footer > .btn-primary { z-index: 2; }
+/* Foco interno em todo botão (DESIGN.md, seção 2): no grupo, o focado fica acima do principal. */
+.btn:focus-visible { position: relative; outline-offset: -3px; z-index: 3; }
+.btn-primary:focus-visible,
+.btn-danger:focus-visible { outline-color: rgba(255, 255, 255, .7) !important; }
+.btn-group > .btn:focus-visible,
+.modal-footer > .btn:focus-visible { z-index: 3; }
 @media (max-width: 480px) {
     .modal-footer > .btn { flex: 1 1 0; min-width: 0; }
 }

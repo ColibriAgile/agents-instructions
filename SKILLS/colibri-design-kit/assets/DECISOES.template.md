@@ -4,7 +4,7 @@ Registro das decisões de design do projeto na adoção da linha visual Colibri.
 
 ## [AAAA-MM-DD] Adoção do Colibri Design Kit
 
-- **Versão do kit:** [data da linha "Origem" do LEIA-ME.md do kit]
+- **Versão do kit:** [data da entrada mais recente de "Versões" do LEIA-ME.md do kit]
 - **Stack:** [framework e versão; biblioteca de componentes, tema e versão]
 - **Arquivos do kit:** [pasta com colibri-ui.css, fonts/, logos/, icons/ ou pacote bootstrap-icons]
 - **Adaptadores:** [nenhum | colibri-ui.bootstrap3.css | colibri-ui.devexpress.css, com os blocos mantidos]

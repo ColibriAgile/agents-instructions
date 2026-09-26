@@ -1,6 +1,6 @@
 ---
 name: colibri-design-kit
-description: 'Colibri Design Kit adota a linha visual das aplicações Colibri (a mesma do Colibri Master) em outro repositório: copia CSS, fontes, ícones e logo do kit, aciona a skill impeccable (init e document) para gerar PRODUCT.md, DESIGN.md e os arquivos de controle em .impeccable/, e registra as decisões de design do projeto. Use para iniciar ou retomar a refatoração visual de um frontend Colibri, alinhar um projeto ao kit ou atualizar a versão do kit adotada. Não use para refatorar páginas depois da adoção (use impeccable craft/polish com o DESIGN.md gerado), para projetos fora da linha Colibri nem para backend.'
+description: 'Colibri Design Kit adota a linha visual das aplicações Colibri em um repositório: copia CSS, fontes, ícones e logo do kit, aciona a skill impeccable (init e document) para gerar PRODUCT.md, DESIGN.md e os arquivos de controle em .impeccable/, e registra as decisões de design do projeto. Use para iniciar ou retomar a refatoração visual de um frontend Colibri, alinhar um projeto ao kit ou atualizar a versão do kit adotada. Não use para refatorar páginas depois da adoção (use impeccable craft/polish com o DESIGN.md gerado), para projetos fora da linha Colibri nem para backend.'
 argument-hint: 'Caminho do frontend no repositório (opcional) e framework, ex.: "src/web, Blazor DevExpress"'
 ---
 
@@ -19,7 +19,7 @@ Leva a linha visual Colibri ("Mesa de operação") a um repositório e deixa o p
 
 ## Fonte da verdade
 
-O kit em [`./assets/kit/`](./assets/kit/) é normativo. [`./assets/kit/DESIGN.md`](./assets/kit/DESIGN.md) define cores, tipografia, estrutura, anatomia de página e componentes; [`./assets/kit/LEIA-ME.md`](./assets/kit/LEIA-ME.md) define a ordem de carga e a versão do kit (linha "Origem"). Leia os dois antes do passo 1.
+O kit em [`./assets/kit/`](./assets/kit/) é normativo. [`./assets/kit/DESIGN.md`](./assets/kit/DESIGN.md) define cores, tipografia, estrutura, anatomia de página e componentes; [`./assets/kit/LEIA-ME.md`](./assets/kit/LEIA-ME.md) define a ordem de carga e a versão do kit (seção "Versões"). Leia os dois antes do passo 1.
 
 Quando o impeccable propuser algo que contraria o kit, **o kit vence**. Em especial, dentro deste fluxo:
 
@@ -93,7 +93,7 @@ No passo 3 do document (linguagem qualitativa), não abra perguntas: apresente a
 
 ### 6. Registrar as decisões (`docs/design/DECISOES.md`)
 
-Crie o arquivo a partir de [`./assets/DECISOES.template.md`](./assets/DECISOES.template.md) (ou acrescente uma entrada, se já existir). Registre: versão do kit (data da linha "Origem" do `LEIA-ME.md`), framework e biblioteca com versão, adaptadores, onde ficam os arquivos, página inicial, cada desvio do kit com o motivo, e a lista de páginas a refatorar com a mais usada primeiro.
+Crie o arquivo a partir de [`./assets/DECISOES.template.md`](./assets/DECISOES.template.md) (ou acrescente uma entrada, se já existir). Registre: versão do kit (data da entrada mais recente de "Versões" do `LEIA-ME.md`), framework e biblioteca com versão, adaptadores, onde ficam os arquivos, página inicial, cada desvio do kit com o motivo, e a lista de páginas a refatorar com a mais usada primeiro.
 
 ### 7. Validar e relatar
 
@@ -110,6 +110,15 @@ Relate ao usuário: arquivos criados/alterados, desvios registrados, o que ficou
 - `impeccable critique <página>` para medir antes/depois;
 - `impeccable live` para iterar no navegador (se o live foi configurado).
 
-## Atualizar o kit desta skill
+## Evoluir o kit desta skill
 
-Os arquivos em `./assets/kit/` são gerados a partir de `src/frontend/` do Colibri Master (`node temp/gerar-colibri-design-kit.js <saída>`), exceto `colibri-ui.devexpress.css`, mantido à mão. Ao atualizar: regenere para `./assets/kit/`, confira a linha "Origem" do `LEIA-ME.md` e, se o `DESIGN.md` do kit mudou de estrutura, revise a tabela e o checklist de `./references/mapeamento-impeccable.md`. Nos projetos que já adotaram o kit, rode esta skill de novo: é o fluxo de atualização do passo 1.
+O kit em `./assets/kit/` é mantido diretamente nesta skill e é a fonte da verdade da linha visual Colibri: nenhuma aplicação serve de matriz nem gera o kit. Mudança de design nasce aqui e chega às aplicações pelo fluxo de atualização.
+
+Ao alterar o kit:
+
+- Mude a regra e a implementação juntas: `DESIGN.md` e `colibri-ui.css`, mais os adaptadores afetados (`colibri-ui.bootstrap3.css`, `colibri-ui.devexpress.css`) e a marcação de `exemplo.html` quando o componente aparece nela.
+- Regra nova ou alterada entra no checklist de `./references/mapeamento-impeccable.md` (e na tabela, se o `DESIGN.md` mudou de estrutura); comportamento por framework vai para `./references/adocao-por-framework.md`.
+- Acrescente no topo de "Versões" do `LEIA-ME.md` uma entrada com a data e o que mudou.
+- Ajuste descoberto numa aplicação que vale para todas volta para cá; não fica só no projeto.
+
+Nas aplicações que já adotaram o kit, rode esta skill de novo: é o fluxo de atualização do passo 1.

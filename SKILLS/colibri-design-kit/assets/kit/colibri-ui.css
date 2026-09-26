@@ -1,5 +1,5 @@
 /*
- * Colibri UI — base visual das aplicações Colibri (linha "Colibri Master").
+ * Colibri UI — base visual das aplicações Colibri.
  * CSS puro, sem dependência de framework. Prefixo `cm-`.
  * Requisitos: pastas fonts/ e logos/ ao lado deste arquivo e Bootstrap Icons (classe .bi) para os ícones.
  * Regras de uso: ver DESIGN.md do kit.
@@ -549,11 +549,12 @@ pre.log,
 .cm-btn-group--compact .cm-btn:hover,
 .cm-btn-group--compact .cm-btn:focus { min-width: 0; }
 .cm-btn-group > .cm-btn + .cm-btn { margin-left: -1px; }
-.cm-btn-group .cm-btn:hover,
-.cm-btn-group .cm-btn:focus-visible { z-index: 1; }
+/* Foco interno em todo botão: no grupo, o vizinho e o principal (que fica por cima) não encobrem o contorno. */
+.cm-btn:focus-visible { outline-offset: -3px; z-index: 3; }
+.cm-btn--primary:focus-visible { outline-color: rgba(255, 255, 255, .7) !important; }
+.cm-btn-group .cm-btn:hover { z-index: 1; }
 .cm-btn-group .cm-btn--primary { z-index: 2; }
-.cm-btn-group .cm-btn:focus-visible { outline-offset: -3px; }
-.cm-btn-group .cm-btn--primary:focus-visible { outline-color: rgba(255, 255, 255, .7) !important; }
+.cm-btn-group .cm-btn:focus-visible { z-index: 3; }
 .cm-icon-btn {
     display: inline-flex;
     align-items: center;
@@ -1778,9 +1779,9 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
 }
 .cm-dialog__foot > .cm-btn:first-child { border-top-left-radius: var(--cm-btn-radius); border-bottom-left-radius: var(--cm-btn-radius); }
 .cm-dialog__foot > .cm-btn:last-child { border-top-right-radius: var(--cm-btn-radius); border-bottom-right-radius: var(--cm-btn-radius); }
-.cm-dialog__foot > .cm-btn:hover,
-.cm-dialog__foot > .cm-btn:focus-visible { z-index: 1; }
+.cm-dialog__foot > .cm-btn:hover { z-index: 1; }
 .cm-dialog__foot > .cm-btn--primary { z-index: 2; }
+.cm-dialog__foot > .cm-btn:focus-visible { z-index: 3; }
 .cm-dialog {
     background: var(--cm-surface);
     border: 1px solid var(--cm-line);
@@ -1873,7 +1874,7 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
     border-radius: 0 0 var(--cm-radius) var(--cm-radius);
 }
 
-/* ---------- Complementos do kit (no Master vinham do Bootstrap) ---------- */
+/* ---------- Complementos do kit (normalização que não depende de framework) ---------- */
 *, *::before, *::after { box-sizing: border-box; }
 button, input, select, textarea { font: inherit; color: inherit; }
 label { font-weight: inherit; }
