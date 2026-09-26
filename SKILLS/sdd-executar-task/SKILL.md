@@ -6,7 +6,7 @@ argument-hint: --task tasks/prd-nome/task_01.md
 
 # Executar uma task SDD
 
-1. Resolva uma única `tasks/prd-[slug]/task_[num].md`. Exija PRD, TechSpec e manifesto da feature. Quando `snapshot-contexto.md` existir na pasta da feature e nenhum orquestrador desta sessão já o tiver carregado, aplique o protocolo de carga de `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks`. Leia fontes estáveis uma vez por versão na ordem PRD, TechSpec, task; consulte estado depois. Confirme dependências concluídas e task pendente. Task em `done/` é apenas reportada.
+1. Resolva uma única `tasks/prd-[slug]/task_[num].md`. Exija PRD, TechSpec e manifesto da feature. Quando `snapshot-contexto.md` existir na pasta da feature e nenhum orquestrador desta sessão já o tiver carregado, carregue-o pelo ramo Carregar da skill `sdd-snapshot`. Leia fontes estáveis uma vez por versão na ordem PRD, TechSpec, task; consulte estado depois. Confirme dependências concluídas e task pendente. Task em `done/` é apenas reportada.
    **Saída:** contrato exato, dependências satisfeitas e escopo de escrita identificado.
 2. Leia instruções locais e somente skills pertinentes à mudança. Inspecione worktree, callers e testes afetados; preserve alterações preexistentes. Responda perguntas pontuais com buscas diretas; envie subagente explorador somente leitura só para varreduras em muitos arquivos e confira as linhas que ele citar antes de editar. Mapeie todo aceite a implementação e evidência.
    **Saída:** pontos de mudança conhecidos; conflitos de fontes ou de escrita levantados antes da mutação.

@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # Planejar refatoração SDD
 
-1. Fixe alvo, limites e slug. Resolva `tasks/prd-[slug]/prd.md` e `techspec.md`. Quando `snapshot-contexto.md` existir ali, aplique antes o protocolo de carga de `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks`. Preserve os dois documentos se existirem sem autorização de atualização; com ela, leia as versões atuais e mantenha IDs.
+1. Fixe alvo, limites e slug. Resolva `tasks/prd-[slug]/prd.md` e `techspec.md`. Quando `snapshot-contexto.md` existir ali, carregue-o antes pelo ramo Carregar da skill `sdd-snapshot`. Preserve os dois documentos se existirem sem autorização de atualização; com ela, leia as versões atuais e mantenha IDs.
    **Saída:** operação inequívoca sem sobrescrita implícita.
 2. Rastreie entradas, saídas, erros, efeitos, callers, persistência, integrações e bordas do alvo. Use código, testes, logs e contratos como evidência. Quando o alvo tiver muitos callers ou integrações, envie exploradores somente leitura em paralelo, uma pergunta cada, e confira as linhas que citarem. Numere comportamentos `R-01`, `R-02`; diferencie intenção, defeito aparente e lacuna.
    **Saída:** todo comportamento no escopo tem origem e verificação ou pergunta concreta que altere aceite.

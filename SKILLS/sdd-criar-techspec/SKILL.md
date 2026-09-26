@@ -6,7 +6,7 @@ argument-hint: --prd nome-da-feature [--atualizar]
 
 # Criar TechSpec SDD
 
-1. Resolva `tasks/prd-[slug]/prd.md` e `techspec.md`. Quando `snapshot-contexto.md` existir ali, aplique antes o protocolo de carga de `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks`. Exija PRD; se faltar, indique `sdd-criar-prd`. Leia o PRD uma vez por versão. Reutilize TechSpec existente; atualize somente quando autorizado, preservando IDs.
+1. Resolva `tasks/prd-[slug]/prd.md` e `techspec.md`. Quando `snapshot-contexto.md` existir ali, carregue-o antes pelo ramo Carregar da skill `sdd-snapshot`. Exija PRD; se faltar, indique `sdd-criar-prd`. Leia o PRD uma vez por versão. Reutilize TechSpec existente; atualize somente quando autorizado, preservando IDs.
    **Saída:** fontes e destino exatos, sem sobrescrita implícita.
 2. Mapeie cada obrigação do PRD para consequência técnica. Inspecione apenas módulos, callers, contratos, persistência, erros, testes e configuração envolvidos. Quando essa inspeção abranger muitos módulos, envie exploradores somente leitura em paralelo, uma pergunta cada, e confira as linhas que citarem; esta sessão redige a TechSpec. Reuse padrões existentes; justifique dependências e componentes novos com lacuna comprovada. Consulte documentação primária para dúvidas técnicas externas.
    Meça o terreno onde a mudança vai pousar: leia integralmente [references/refatoracao-preparatoria.md](references/refatoracao-preparatoria.md) e aplique suas medidas aos arquivos que a feature vai modificar. O resultado é o baseline dos hits pré-existentes e, quando dívida estrutural e contato coincidirem, uma recomendação de refatoração preparatória com escopo mínimo. Código existente que a feature apenas lê não gera recomendação.

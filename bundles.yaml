@@ -68,6 +68,7 @@ bundles:
       - sdd-planejar-refatoracao
       - sdd-planejar-tasks
       - sdd-revisar-codigo
+      - sdd-snapshot
 
   code-review:
     description: Revisão de código e execução das correções apontadas.

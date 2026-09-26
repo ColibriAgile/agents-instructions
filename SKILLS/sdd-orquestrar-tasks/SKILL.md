@@ -1,17 +1,17 @@
 ---
 name: sdd-orquestrar-tasks
-description: DAG SDD quando PRD, TechSpec e tasks já estão aprovados e precisam ser executados; implementa cada task nesta sessão com exploradores somente leitura e pausa entre tasks. Para o ciclo desde PRD, use sdd-orquestrar-fluxo.
+description: DAG SDD quando PRD, TechSpec e tasks já estão aprovados e precisam ser executados; implementa cada task nesta sessão com exploradores somente leitura e segue entre tasks até o limiar de contexto. Para o ciclo desde PRD, use sdd-orquestrar-fluxo.
 argument-hint: --prd nome-da-feature [--budget economico|medio|alto]
 disable-model-invocation: true
 ---
 
 # Orquestrar tasks SDD
 
-A sessão que executa esta skill é a única escritora: implementa cada task ela mesma, seguindo `sdd-executar-task`, e é dona do manifesto e dos movimentos. Subagentes são exploradores somente leitura; nunca editam arquivos, rodam build ou testes que escrevam em `bin/`, `obj/` ou fixtures, nem falam com o usuário. A execução é uma task por vez, com pausa após cada task. Esta sessão não emite a revisão global do código que escreveu.
+A sessão que executa esta skill é a única escritora: implementa cada task ela mesma, seguindo `sdd-executar-task`, e é dona do manifesto e dos movimentos. Subagentes são exploradores somente leitura; nunca editam arquivos, rodam build ou testes que escrevam em `bin/`, `obj/` ou fixtures, nem falam com o usuário. A execução é uma task por vez; entre tasks a sessão segue sozinha até a pausa de sessão mandar parar. Esta sessão não emite a revisão global do código que escreveu.
 
-Se o chamador limitar a execução a uma task, devolva após o passo 7 em vez de perguntar: `task-concluida` com os próximos IDs elegíveis, ou `bloqueado` com evidências. Quando todas as tasks estiverem concluídas, execute o passo 8 antes de retornar. Retorno de task não significa conclusão da feature.
+Se o chamador limitar a execução a uma task, devolva após o passo 7 em vez de fazer a pausa de sessão: `task-concluida` com os próximos IDs elegíveis, ou `bloqueado` com evidências. Quando todas as tasks estiverem concluídas, execute o passo 8 antes de retornar. Retorno de task não significa conclusão da feature.
 
-1. **Retomar.** Procure `tasks/prd-[slug]/snapshot-contexto.md`. Se existir, leia integralmente [references/continuidade-sessao.md](references/continuidade-sessao.md) e aplique seu protocolo de carga antes de qualquer outra coisa: valide o cabeçalho contra manifesto e Git, carregue a camada `agora` e guarde as demais camadas para seus gatilhos. Snapshot obsoleto ou inválido é pista, nunca autoridade.
+1. **Retomar.** Leia integralmente [references/continuidade-sessao.md](references/continuidade-sessao.md) uma vez por sessão: sua medição de contexto vale em toda task. Procure `tasks/prd-[slug]/snapshot-contexto.md`; se existir, carregue-o pelo ramo Carregar da skill `sdd-snapshot` antes de qualquer outra coisa.
    **Saída:** snapshot aplicado, parcialmente confiável com as entradas suspeitas nomeadas, ou ausente.
 2. **Reconciliar.** Resolva a feature e confira `prd.md`, `techspec.md`, `tasks.md`, raiz e `done/`. Leia fontes uma vez por versão, depois metadados de tasks. Confirme autorização para implementar e registre alterações preexistentes para preservá-las.
    Se houver evidência de conclusão incorreta, reabra a task: registre motivo, revisão e handoff anterior em `Problemas e soluções`, mova de `done/` à raiz e atualize link/estado para pendente. Preserve contrato e IDs; revalide dependentes afetadas. Isso não autoriza regenerar tasks concluídas para mudar seu escopo.
@@ -26,13 +26,13 @@ Se o chamador limitar a execução a uma task, devolva após o passo 7 em vez de
    Rode os comandos bloqueantes do perfil sobre o diff da task: é uma varredura de custo proporcional aos hits, não uma auditoria. Desconte o que o Baseline do terreno já registrava. Hit novo ou agravado, sem `DEC-NN` que o cubra, impede a conclusão mesmo com aceite e testes conformes. Acumule os hits de ressalva por feature para o gatilho de escalonamento, sem tratá-los como bloqueio. Com budget `alto` ou risco real, acrescente um explorador somente leitura que confere o diff contra os critérios de aceite e devolve lacunas com evidência; seus achados são insumo, não aprovação.
    Corrija os achados e revise de novo. Após duas tentativas sem progresso, registre bloqueio e siga para trabalho independente.
    **Saída:** task aprovada por evidência ou pendente com causa concreta; nenhuma task concluída com hit bloqueante não justificado.
-7. **Registrar e pausar.** Mova a task aprovada para `done/`, verificando que origem/destino resolvidos estão dentro da feature. Atualize link e estado no manifesto e confira os dois. Registre problemas/soluções relevantes na cauda do manifesto. Recalcule o DAG. Em interrupção entre movimento e atualização, reconcilie usando handoff e revisão, sem presumir aprovação pela localização.
-   Depois aguarde processos em segundo plano e exploradores terminarem e faça a pausa de sessão de [references/continuidade-sessao.md](references/continuidade-sessao.md) com etapa `tasks`, `autoria_codigo: sim` e a próxima task elegível como próximo passo. Task bloqueada recebe a mesma pergunta, com o bloqueio resumido. Não inicie a próxima task antes da resposta.
-   **Saída:** arquivo, link e estado consistentes; escolha do usuário aplicada.
+7. **Registrar e seguir.** Mova a task aprovada para `done/`, verificando que origem/destino resolvidos estão dentro da feature. Atualize link e estado no manifesto e confira os dois. Registre problemas/soluções relevantes na cauda do manifesto. Recalcule o DAG. Em interrupção entre movimento e atualização, reconcilie usando handoff e revisão, sem presumir aprovação pela localização.
+   Depois aguarde processos em segundo plano e exploradores terminarem e faça a pausa de sessão de [references/continuidade-sessao.md](references/continuidade-sessao.md) com etapa `tasks`, `autoria_codigo: sim` e a próxima task elegível como próximo passo; no destino `Seguir`, volte ao passo 3. Task bloqueada fica registrada e a execução segue pela próxima elegível; sem elegíveis, siga ao passo 8.
+   **Saída:** arquivo, link e estado consistentes; próxima task iniciada, ou snapshot gravado antes da pergunta e escolha do usuário aplicada.
 8. **Encerrar.** Quando não restarem elegíveis, confira todas as obrigações e a validação do conjunto integrado, serializando build e testes compartilhados. Reporte conclusão das tasks ou bloqueios; a revisão global pertence a `sdd-revisar-codigo`, numa sessão que não escreveu este código. Faça a pausa de sessão com `sdd-revisar-codigo` como próximo passo, o que recomenda encerrar esta sessão.
    **Saída:** todas concluídas e evidência integrada válida, ou pendências enumeradas; nenhuma alegação de feature aprovada apenas por tarefas movidas.
 
-Sob `sdd-orquestrar-fluxo`, o chamador faz a pausa de sessão e usa a própria instrução de retomada; em uso avulso, a instrução é `Use $sdd-orquestrar-tasks para continuar a feature <slug> neste repositório.`
+Sob `sdd-orquestrar-fluxo`, o chamador faz a pausa de sessão e imprime o próprio comando de retomada.
 
 ## Budget
 
