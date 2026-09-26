@@ -36,6 +36,7 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **26/09/2026 (lateral):** a lateral cresce até o rótulo mais longo, em qualquer idioma; 230 px (`--cm-sidebar-w`) passa a ser o mínimo. Rótulos sempre completos e em uma linha, nunca reticências, quebra ou abreviação (`DESIGN.md` seção 5, `colibri-ui.css`). Correção: grupo recolhido com `hidden` não escondia a lista, porque o `display: flex` do kit anulava o atributo; agora a lista some sem mudar a largura. `exemplo.html` recolhe os grupos. Vinda do Colibri Revendas.
 - **26/09/2026:** `PRODUCT.template.md` no schema de produto 1 do impeccable 4.x: sem `## Register`; personalidade e antirreferências em `## Brand Commitments`; princípios em `## Product Principles`; cenário de uso em `## Operating Context`; operação sem internet em `## Capabilities and Constraints`. Regras visuais sem mudança.
 - **25/09/2026:** foco interno em todo botão (`outline-offset: -3px`), com o focado acima dos vizinhos e do principal em grupos e rodapés de diálogo, e contorno claro no principal e no destrutivo (`DESIGN.md` seção 2, `colibri-ui.css`, `colibri-ui.bootstrap3.css`); regra do botão padrão do diálogo (`DESIGN.md` seção 7, "Camadas").
 - **24/09/2026:** primeira versão.

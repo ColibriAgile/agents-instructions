@@ -156,9 +156,10 @@ pre.log,
 }
 
 /* ---------- Shell ---------- */
+/* A lateral cresce até o rótulo mais longo, em uma linha e sem reticências; --cm-sidebar-w é o mínimo. */
 .cm-shell {
     display: grid;
-    grid-template-columns: var(--cm-sidebar-w) minmax(0, 1fr);
+    grid-template-columns: minmax(var(--cm-sidebar-w), max-content) minmax(0, 1fr);
     height: 100vh;
     overflow: hidden;
     color: var(--cm-ink);
@@ -235,6 +236,13 @@ pre.log,
     flex-direction: column;
     gap: 3px;
 }
+/* Grupo recolhido: altura zero e invisível (fora da leitura e do Tab), mas continua contando na
+   largura da lateral, que não muda ao recolher. Sem esta regra, o display: flex anula o [hidden]. */
+.cm-nav__list[hidden] {
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+}
 .cm-nav__link,
 .cm-nav__link:hover,
 .cm-nav__link:focus {
@@ -258,12 +266,7 @@ pre.log,
     line-height: 1;
     text-align: center;
 }
-.cm-nav__link > span {
-    min-width: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
+.cm-nav__link > span { white-space: nowrap; }
 .cm-nav__link:hover { color: #fff !important; background: rgba(255, 255, 255, .1); }
 .cm-nav__link.is-active,
 .cm-nav__link.is-active:hover {
@@ -1703,7 +1706,9 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
         top: 0;
         bottom: 0;
         left: 0;
-        width: var(--cm-sidebar-w);
+        width: max-content;
+        min-width: var(--cm-sidebar-w);
+        max-width: 100vw;
         visibility: hidden;
         transform: translateX(-100%);
         transition: transform 200ms var(--cm-ease), visibility 0s linear 200ms;

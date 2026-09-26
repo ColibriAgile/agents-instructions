@@ -27,7 +27,7 @@ Em qualquer biblioteca de terceiros, a fonte vai em `:root`/`body` e nas classes
 O CSS do kit só entrega o visual; reimplemente no framework do projeto (o `exemplo.html` traz uma versão mínima em JavaScript puro):
 
 - **Lateral:** acima de 920 px, o botão alterna `.cm-shell--collapsed`; até 920 px, alterna `.cm-shell--overlay-open` (abre sobre o conteúdo com `.cm-shell__backdrop`). Esc fecha, o foco entra no menu ao abrir e volta ao botão ao fechar; clicar no fundo fecha.
-- **Grupos da lateral** (`.cm-nav__section`): recolher/expandir com `aria-expanded`.
+- **Grupos da lateral** (`.cm-nav__section`): recolher/expandir alternando `.is-open`, `aria-expanded` no botão e o atributo `hidden` na `.cm-nav__list`. O CSS do kit mantém a lista recolhida contando na largura, para a lateral não mudar de tamanho. Não esconda a lista com `display: none` próprio.
 - **Menus suspensos** (`.cm-menu`): abrir/fechar, Esc, clique fora e retorno de foco.
 - **Painel lateral** (`.cm-drawer`): `.is-open`; Esc fecha e devolve o foco a quem abriu.
 - **Diálogos:** Tab circula dentro, Enter aciona o botão padrão, Esc cancela. O botão padrão é sempre o principal, inclusive em exclusões (regra em `DESIGN.md`, "Camadas"):

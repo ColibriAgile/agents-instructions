@@ -295,6 +295,16 @@
         document.getElementById('menuToggle').style.display =
             (shell.classList.contains('cm-shell--collapsed') || window.innerWidth <= 920) ? '' : 'none';
     }
+    // Grupos da lateral: .is-open, aria-expanded e hidden na lista (o CSS mantém a largura).
+    document.querySelectorAll('.cm-nav__section-toggle').forEach(function (botao) {
+        botao.addEventListener('click', function () {
+            var secao = botao.closest('.cm-nav__section');
+            var aberto = !secao.classList.contains('is-open');
+            secao.classList.toggle('is-open', aberto);
+            botao.setAttribute('aria-expanded', aberto);
+            secao.querySelector('.cm-nav__list').hidden = !aberto;
+        });
+    });
     function toggleDrawer() {
         document.getElementById('drawer').classList.toggle('is-open');
     }

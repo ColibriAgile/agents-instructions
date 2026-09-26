@@ -111,8 +111,9 @@ Os valores exatos estão no frontmatter e nos tokens `--cm-*` de `colibri-ui.css
 
 ## 5. Estrutura da aplicação
 
-- **Shell** (`.cm-shell`): lateral (`.cm-sidebar`, 230 px) + área principal (`.cm-main`) com barra superior (`.cm-topbar`, 56 px) e área rolável (`.cm-scroll` > `.cm-content`).
+- **Shell** (`.cm-shell`): lateral (`.cm-sidebar`, no mínimo 230 px) + área principal (`.cm-main`) com barra superior (`.cm-topbar`, 56 px) e área rolável (`.cm-scroll` > `.cm-content`).
 - **Lateral:** nome do produto no topo, sem ícone e sem versão, com botão de recolher à direita; navegação (`.cm-nav`) com ícone por item e grupos recolhíveis (`.cm-nav__section`); versão no rodapé (`.cm-sidebar__foot`). Até 920 px a lateral abre sobre o conteúdo com fundo escurecido; Esc fecha e o foco volta ao botão.
+- **Rótulos da lateral:** sempre completos e em uma linha. A lateral cresce até o rótulo mais longo, em qualquer idioma da aplicação, e 230 px é o mínimo. Nunca use reticências, quebra de linha ou texto abreviado só para caber. Recolher um grupo esconde a lista (atributo `hidden`) sem mudar a largura da lateral.
 - **Barra superior:** título da página (`.cm-topbar__title`) à esquerda; à direita, idioma (menu `.cm-menu`), divisor e "Entrar" ou nome do usuário com opção de sair.
 - **Avisos globais:** `.cm-banner--danger` / `--warning` logo abaixo da barra superior.
 
