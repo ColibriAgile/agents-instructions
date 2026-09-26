@@ -54,6 +54,9 @@
             </button>
             <h1 class="cm-topbar__title">Página de exemplo</h1>
             <div class="cm-topbar__aside">
+                <button type="button" class="cm-topbar__action" id="themeToggle" onclick="toggleTheme()" aria-label="Usar tema escuro" title="Usar tema escuro">
+                    <i class="bi bi-moon" aria-hidden="true"></i>
+                </button>
                 <button type="button" class="cm-topbar__action" aria-label="Idioma">
                     <i class="bi bi-translate" aria-hidden="true"></i><span>PT</span><i class="bi bi-chevron-down cm-topbar__caret" aria-hidden="true"></i>
                 </button>
@@ -305,6 +308,27 @@
             secao.querySelector('.cm-nav__list').hidden = !aberto;
         });
     });
+    // Tema: data-theme no <html>. Segue o sistema até a pessoa escolher; a escolha fica gravada.
+    function applyTheme(tema) {
+        document.documentElement.setAttribute('data-theme', tema);
+        var escuro = tema === 'dark';
+        var botao = document.getElementById('themeToggle');
+        var rotulo = escuro ? 'Usar tema claro' : 'Usar tema escuro';
+        botao.setAttribute('aria-label', rotulo);
+        botao.title = rotulo;
+        botao.querySelector('.bi').className = escuro ? 'bi bi-sun' : 'bi bi-moon';
+    }
+    function toggleTheme() {
+        var tema = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        try { localStorage.setItem('cm-theme', tema); } catch (e) { /* armazenamento indisponível */ }
+        applyTheme(tema);
+    }
+    (function () {
+        var salvo = null;
+        try { salvo = localStorage.getItem('cm-theme'); } catch (e) { /* armazenamento indisponível */ }
+        var sistema = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        applyTheme(location.hash === '#escuro' ? 'dark' : (salvo || sistema));
+    })();
     function toggleDrawer() {
         document.getElementById('drawer').classList.toggle('is-open');
     }

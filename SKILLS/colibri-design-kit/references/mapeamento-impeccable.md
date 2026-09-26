@@ -60,6 +60,7 @@ O formato antigo tinha seis H2 numerados (`## 1. Overview` … `## 6. Do's and D
 | Plano por padrão (seção 4) | `**The Flat-By-Default Rule.**` | Elevation & Depth |
 | Regra dos botões adjacentes | `**The Adjacent Buttons Rule.**` | Components |
 | Marca na página inicial | `**The Home Watermark Rule.**` | Components |
+| Regra do tema por token | `**The Token Theme Rule.**` | Colors |
 
 ## Frontmatter
 
@@ -72,6 +73,7 @@ Demais regras:
 
 - `name`: nome do produto. `description`: `"Linha visual Colibri — mesa de operação compacta, sóbria e precisa"` ou equivalente confirmado.
 - `colors`: as chaves e os valores do kit, sem renomear, em hex (não converta para OKLCH). Os degradês da lateral ficam como string CSS (`linear-gradient(...)`), que a spec aceita. Acrescente as variantes de estado `*-soft`/`*-line`, `muted-soft` e `button-hover` com os valores de `colibri-ui.css`: o detector do impeccable acusa como "fora do DESIGN.md" toda cor usada no CSS que não esteja no frontmatter.
+- Tema escuro: as chaves `dark-*` do kit ficam no mesmo grupo `colors` (a spec não tem grupo por tema), mais `dark-success-soft`, `dark-warning-soft`, `dark-danger-soft`, os `-line` e `dark-muted-soft` com os valores do bloco `:root[data-theme="dark"]` de `colibri-ui.css`. Em `## Colors`, elas ficam na subseção `### Tema escuro`, no mesmo formato de item. Projeto que não oferece o tema escuro omite as `dark-*` e registra isso em `DECISOES.md`.
 - `typography`: os papéis do kit, com `fontFamily` completo como no CSS: `"Google Sans Flex, Segoe UI, Arial, sans-serif"` e `"Google Sans Mono, Consolas, monospace"`. No papel `data`, pode acrescentar `fontFeature: "\"tnum\" 1"` (algarismos tabulares do CSS).
 - `rounded`: os quatro do kit (`control`, `small`, `surface`, `tag`).
 - `spacing`: só se houver escala reutilizada no `colibri-ui.css`; não invente.
@@ -88,6 +90,8 @@ Correspondência entre chaves do frontmatter e variáveis de `colibri-ui.css` (u
 | `focus` | `--cm-focus` (halo: `--cm-focus-ring`) |
 | `success`, `warning`, `danger`, `muted-soft` | `--cm-success`, `--cm-warning`, `--cm-danger` (+ `-soft`, `-line`), `--cm-muted-soft` |
 | `sidebar`, `sidebar-head`, `sidebar-ink` | `--cm-sidebar-bg`, `--cm-sidebar-head-bg`, `--cm-nav-ink` |
+| `action` como texto, link e ícone | `--cm-accent-ink` (igual a `action` no tema claro) |
+| `dark-*` | os mesmos tokens, redefinidos em `:root[data-theme="dark"]`: `dark-page` → `--cm-bg`, `dark-topbar` → `--cm-topbar-bg`, `dark-surface` → `--cm-surface`, `dark-action-ink` → `--cm-accent-ink`, `dark-button-ink` → `--cm-btn-ink` etc. |
 | `rounded.control`, `rounded.small`, `rounded.surface` | `--cm-btn-radius`, `--cm-radius-sm`, `--cm-radius` |
 | `control-height`, `topbar-height`, `sidebar-width` | `--cm-control-h`, `--cm-topbar-h`, `--cm-sidebar-w` |
 | fontes | `--cm-font`, `--cm-mono`; easing `--cm-ease` |
@@ -98,7 +102,7 @@ Se o `colibri-ui.css` do projeto divergir dessa tabela (kit mais novo), o CSS co
 
 Siga o schema `schemaVersion: 2` do `reference/document.md` do impeccable, com:
 
-- `colorMeta`: uma entrada por cor do frontmatter; `role` `primary`, `neutral` ou `status`; `displayName` igual ao nome em negrito usado em `## Colors` ("Azul de ação", "Plano de trabalho", "Superfície", "Texto principal", "Texto de apoio", "Divisor", "Foco", "Sucesso", "Aviso", "Erro", "Degradê azul Colibri" etc.); `canonical` no mesmo valor do frontmatter; `tonalRamp` de 8 passos (nos degradês, a partir da cor final).
+- `colorMeta`: uma entrada por cor do frontmatter (nas `dark-*`, o nome da cor clara seguido de "(escuro)", ex.: "Plano de trabalho (escuro)"); `role` `primary`, `neutral` ou `status`; `displayName` igual ao nome em negrito usado em `## Colors` ("Azul de ação", "Plano de trabalho", "Superfície", "Texto principal", "Texto de apoio", "Divisor", "Foco", "Sucesso", "Aviso", "Erro", "Degradê azul Colibri" etc.); `canonical` no mesmo valor do frontmatter; `tonalRamp` de 8 passos (nos degradês, a partir da cor final).
 - `typographyMeta`: `purpose` de cada papel conforme a seção 3 do kit.
 - `shadows`: as sombras funcionais de `colibri-ui.css` (menu suspenso, painel lateral, diálogo, hover de cartão-link), com o valor exato copiado do CSS.
 - `motion`: `--cm-ease`, estado 120–200 ms, painel lateral 260–280 ms, e a regra de `prefers-reduced-motion`.
@@ -117,6 +121,7 @@ O `document` pede essas respostas em duas rodadas de perguntas. Apresente ao usu
 | Nomes das cores | Os nomes da seção 2 do kit (tabela do sidecar acima). |
 | Filosofia de elevação | Plano por padrão; sombra só funcional, em camadas flutuantes. |
 | Filosofia dos componentes | Compacto e preciso: 32 px, cantos de 3 px, botões adjacentes sempre agrupados. |
+| Tema escuro | Mesmo sistema com outros valores de token: neutros em azul petróleo profundo, lateral igual, alternância na barra superior, segue o sistema até a pessoa escolher. |
 
 ## Checklist de fidelidade
 
@@ -124,13 +129,14 @@ Antes de concluir, confirme que o DESIGN.md gerado contém cada item. Faltou alg
 
 - [ ] Oito H2 na ordem e com os nomes exatos, sem número; nenhum H2 extra; `**Creative North Star: "Mesa de operação"**` presente.
 - [ ] Frontmatter sem `sizes` nem `motion`; `components` só com as 8 propriedades; valores idênticos ao kit.
-- [ ] As seis regras nomeadas da tabela, cada uma na sua seção.
+- [ ] As sete regras nomeadas da tabela, cada uma na sua seção.
+- [ ] Tema escuro: `### Tema escuro` em Colors com as cores `dark-*` no formato de item; `data-theme="dark"` no `<html>`; neutros em azul petróleo profundo (nunca preto nem cinza neutro); lateral igual; preenchimento em `action` e texto azul em `--cm-accent-ink`; estados sobre o `-soft` escuro; sombras mais densas; texto de apoio com 4,5:1; alternância na barra superior seguindo o sistema até a escolha gravada, aplicada antes de pintar; bibliotecas acompanhando o tema; marca-d'água igual; regra do tema por token. Projeto sem tema escuro registra a omissão em `DECISOES.md`.
 - [ ] Cores: uma por item com o valor entre parênteses; acento só para ação e seleção; texto de apoio nunca mais claro que `ink-3`; estado sempre com rótulo ou ícone; detalhes da lateral (degradê, cabeçalho mais escuro, itens `#d7d7d7`, ativo branco sobre `rgba(255,255,255,.36)`, separadores a 16%, versão 11 px a 60%); foco de 2 px e halo dos campos; foco dos botões interno, focado acima dos vizinhos do grupo e claro no principal.
 - [ ] Tipografia: linhas `**Body Font:**` e `**Data Font:**` no formato da convenção; Google Sans Flex/Mono locais; mono com algarismos tabulares para versões, datas, horários, contagens, identificadores e logs; maior texto é o título da barra superior (18 px); títulos em conteúdo rico até 16 px; 65–80 caracteres por linha; subseção de bibliotecas completa (família, como aplicar, popups fora da página, tamanho e peso, fontes locais, verificação obrigatória).
 - [ ] Layout: shell (lateral com mínimo de 230 px que cresce até o rótulo mais longo, 56 px, área rolável, avisos abaixo da barra); primeira tela com conteúdo útil; 920 px, colunas secundárias perto do tablet e blocos com rótulos abaixo de 760 px; conferência em 1440, 1920 e ~900 px; anatomia: página não repete título; toolbar com busca/contexto à esquerda e estado + grupo de ações à direita; cabeçalho de seção com título, contagem e ferramentas; `.cm-notice` × `.cm-alert`; contagens como `.cm-tag`/`.cm-tag-filter`, nunca cartões de métrica; cartões só na inicial e em resumos, cartão-link inteiro com chevron.
 - [ ] Elevation & Depth: sem sombra decorativa; sombras funcionais com valor exato; hover muda superfície, não levanta nem desloca.
 - [ ] Shapes: 3 / 4 / 6 / 10 px com onde cada um se aplica, rádio circular, bordas de 1 px, cantos só nas extremidades de grupos.
-- [ ] Shell e navegação: lateral com nome do produto sem ícone e sem versão, botão de recolher, grupos recolhíveis (recolher não muda a largura), versão no rodapé; rótulos completos e em uma linha, nunca reticências, quebra ou abreviação; até 920 px sobreposta com fundo escurecido, Esc fecha e foco volta ao botão; barra superior com título, idioma, divisor e acesso.
+- [ ] Shell e navegação: lateral com nome do produto sem ícone e sem versão, botão de recolher, grupos recolhíveis (recolher não muda a largura), versão no rodapé; rótulos completos e em uma linha, nunca reticências, quebra ou abreviação; até 920 px sobreposta com fundo escurecido, Esc fecha e foco volta ao botão; barra superior com título, alternância de tema, idioma, divisor e acesso.
 - [ ] Marca da página inicial com todos os subitens (SVG sem alteração, `position: fixed`, 12%, até 540 px/42%, decorativa, ancestrais sem `transform`/`filter`/`contain`, caminho relativo); vazio e carregamento.
 - [ ] Botões: 32 px, 13 px regular `#495057`, borda `#d7dee7`, 3 px; principal `#1b6ec2`/`#0f5aa6`; `--sm` 28 px; ações de linha só ícone com `title` e `aria-label`, destrutivas por último e vermelhas só no hover, indisponíveis desabilitadas (não somem); os cinco itens da regra dos botões adjacentes.
 - [ ] Tabelas: superfície única, grid com `--cm-cols`, ações com largura fixa à direita; ordenação com uma única seta só na coluna ativa; chevron na linha do título; listas de configuração com valor mono e ação "Alterar"; etiquetas.
@@ -138,5 +144,5 @@ Antes de concluir, confirme que o DESIGN.md gerado contém cada item. Faltou alg
 - [ ] Camadas: diálogo (título 16 px, corpo 16 px de respiro, rodapé `surface-2`, Tab circula, Enter aciona o padrão, Esc cancela; botão padrão é o principal, inclusive em exclusões; foco inicial no primeiro campo ou, sem campos, no principal); painel lateral 420 px com cabeçalho de 56 px; notificações no canto superior direito abaixo da barra; menu com itens de 32 px e item atual com marca.
 - [ ] Ícones: Bootstrap Icons locais, um por item/ação, 15–16 px na navegação e ações, 14 px em botões, nada de PNG/GIF.
 - [ ] Movimento: 120–200 ms / 260–280 ms com `--cm-ease` e alternativa de movimento reduzido.
-- [ ] Do's e Don'ts: os 6 "Faça" e os 7 "Não faça" do kit, mais as três antirreferências do `PRODUCT.md` com as mesmas palavras.
+- [ ] Do's e Don'ts: os 7 "Faça" e os 8 "Não faça" do kit, mais as três antirreferências do `PRODUCT.md` com as mesmas palavras.
 - [ ] `### Implementação neste projeto` preenchida com dados reais do projeto (nada entre colchetes).

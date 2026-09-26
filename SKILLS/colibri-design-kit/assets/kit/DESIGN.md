@@ -25,6 +25,24 @@ colors:
   sidebar: "linear-gradient(180deg, #043355 0%, #2aa3e7 100%)"
   sidebar-head: "linear-gradient(180deg, #043354 0%, #0b2a41 100%)"
   sidebar-ink: "#d7d7d7"
+  dark-page: "#0b1822"
+  dark-topbar: "#0e1d29"
+  dark-surface: "#11222f"
+  dark-surface-2: "#152838"
+  dark-hover: "#193044"
+  dark-ink: "#e3eaf0"
+  dark-ink-2: "#adbac7"
+  dark-ink-3: "#8b9cac"
+  dark-line: "#223a4d"
+  dark-line-strong: "#2e4a60"
+  dark-action-ink: "#5fa9ec"
+  dark-action-soft: "#12395a"
+  dark-action-line: "#1f5485"
+  dark-button-ink: "#cfd9e3"
+  dark-focus: "#5fa9ec"
+  dark-success: "#4cc38a"
+  dark-warning: "#e2ae4a"
+  dark-danger: "#f27d89"
 typography:
   page-title: { fontFamily: "Google Sans Flex", fontSize: "18px", fontWeight: 700, lineHeight: 1.2, letterSpacing: "-0.01em" }
   dialog-title: { fontFamily: "Google Sans Flex", fontSize: "16px", fontWeight: 650, lineHeight: 1.3 }
@@ -69,7 +87,7 @@ Ao adotar em um repositório, copie este arquivo para a raiz como `DESIGN.md`, e
 - Linhas e colunas para itens comparáveis; uma única superfície por lista, com divisores internos.
 - Lateral de navegação em degradê azul Colibri, compacta e recolhível.
 - Barra superior com o título da página selecionada, idioma e acesso (login ou usuário).
-- Tema claro. Cor contida: o degradê fica na lateral e o azul de ação é reservado para ações e seleção.
+- Tema claro e tema escuro em azul petróleo profundo, com a mesma lateral nos dois. Cor contida: o degradê fica na lateral e o azul de ação é reservado para ações e seleção.
 - Tudo funciona sem internet: fontes e ícones são servidos pela própria aplicação.
 
 ## 2. Cores
@@ -83,6 +101,22 @@ Os valores exatos estão no frontmatter e nos tokens `--cm-*` de `colibri-ui.css
 - **Foco:** contorno azul-claro (`focus`) de 2 px em botões e links; em campos, borda `focus` com halo `0 0 0 3px rgba(96,165,232,.22)`. Em botões o contorno é **interno** (`outline-offset: -3px`), sozinho ou em grupo: o botão focado sobe acima dos vizinhos, inclusive do principal, e nada encobre o contorno. No botão principal e no destrutivo o contorno é claro (`rgba(255,255,255,.7)`). Links mantêm o contorno externo.
 
 **Regra da ação rara.** O acento indica ação ou seleção; não colore painéis grandes nem seções inativas.
+
+### Tema escuro
+
+O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, medida ou componente muda. Liga com `data-theme="dark"` no `<html>`; `colibri-ui.css` troca os tokens `--cm-*` e declara `color-scheme: dark`.
+
+- **Neutros em azul petróleo profundo**, no matiz do cabeçalho da lateral (`#043354`), nunca preto nem cinza neutro: plano de trabalho `dark-page`, barra superior `dark-topbar`, superfícies `dark-surface` e `dark-surface-2`, hover `dark-hover`, divisores `dark-line` e `dark-line-strong`, textos `dark-ink`, `dark-ink-2` e `dark-ink-3`. A diferença entre as camadas é sutil, como no tema claro.
+- **Lateral igual nos dois temas:** o mesmo degradê, cabeçalho, itens e rodapé. O tema escuro não ganha degradê novo; o suave de `.cm-scroll` apenas acompanha os neutros.
+- **Azul de ação:** o preenchimento (botão principal, caixa marcada, barra de progresso) continua `action` com texto branco. Texto, link, ícone e item ativo em azul usam `--cm-accent-ink` (`dark-action-ink` no escuro, igual a `action` no claro), porque `action` sobre a superfície escura não atinge o contraste de texto. Seleção em `dark-action-soft` com borda `dark-action-line`.
+- **Estados:** `dark-success`, `dark-warning` e `dark-danger` como texto sobre o `-soft` escuro de cada um, com a mesma regra de rótulo ou ícone.
+- **Sombras** das camadas flutuantes ficam mais densas (preto com opacidade), porque a sombra azulada do tema claro some no fundo escuro.
+- **Contraste:** texto de apoio (`dark-ink-3`) com no mínimo 4,5:1 sobre plano, superfícies e hover; `dark-action-ink` com 4,5:1 também sobre `dark-action-soft`.
+- **Escolha da pessoa:** a alternância fica na barra superior. Enquanto a pessoa não escolhe, segue `prefers-color-scheme`; a escolha fica gravada no navegador e vale na próxima visita. A aplicação aplica o atributo antes de pintar, para não piscar o tema claro.
+- **Bibliotecas de componentes** acompanham o tema: o modo escuro do tema da biblioteca (paleta `dark` no MUI, tema *dark* do DevExtreme) ou os componentes vestidos com os tokens `--cm-*`. Nenhum componente fica claro dentro do tema escuro.
+- A marca-d'água da página inicial não muda (mesmo SVG, mesma opacidade).
+
+**Regra do tema por token.** Cor de tema escuro só existe como token `--cm-*`. Nenhuma tela escreve cor própria para o escuro nem testa o tema no código para escolher cor; o que muda de um tema para outro é o valor do token.
 
 ## 3. Tipografia
 
@@ -114,7 +148,7 @@ Os valores exatos estão no frontmatter e nos tokens `--cm-*` de `colibri-ui.css
 - **Shell** (`.cm-shell`): lateral (`.cm-sidebar`, no mínimo 230 px) + área principal (`.cm-main`) com barra superior (`.cm-topbar`, 56 px) e área rolável (`.cm-scroll` > `.cm-content`).
 - **Lateral:** nome do produto no topo, sem ícone e sem versão, com botão de recolher à direita; navegação (`.cm-nav`) com ícone por item e grupos recolhíveis (`.cm-nav__section`); versão no rodapé (`.cm-sidebar__foot`). Até 920 px a lateral abre sobre o conteúdo com fundo escurecido; Esc fecha e o foco volta ao botão.
 - **Rótulos da lateral:** sempre completos e em uma linha. A lateral cresce até o rótulo mais longo, em qualquer idioma da aplicação, e 230 px é o mínimo. Nunca use reticências, quebra de linha ou texto abreviado só para caber. Recolher um grupo esconde a lista (atributo `hidden`) sem mudar a largura da lateral.
-- **Barra superior:** título da página (`.cm-topbar__title`) à esquerda; à direita, idioma (menu `.cm-menu`), divisor e "Entrar" ou nome do usuário com opção de sair.
+- **Barra superior:** título da página (`.cm-topbar__title`) à esquerda; à direita, alternância de tema (`.cm-topbar__action` só com ícone, `bi-moon` no claro e `bi-sun` no escuro, com `aria-label` e `title` dizendo o tema que vai ligar), idioma (menu `.cm-menu`), divisor e "Entrar" ou nome do usuário com opção de sair.
 - **Avisos globais:** `.cm-banner--danger` / `--warning` logo abaixo da barra superior.
 
 ## 6. Anatomia de página
@@ -186,6 +220,7 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Exibir a marca-d'água do colibri (`.cm-page--home`) na página inicial.
 - Aplicar a tipografia do kit também aos elementos internos e popups de bibliotecas de componentes (DevExpress, DevExtreme etc.).
 - Conferir alinhamento em 1440, 1920 e ~900 px de largura antes de concluir uma página.
+- Conferir cada página nos dois temas, inclusive popups e componentes de bibliotecas.
 
 **Não faça**
 
@@ -196,6 +231,7 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Fontes, estilos ou ícones hospedados fora da aplicação.
 - Repetir a marca-d'água do colibri em outras páginas ou aumentar sua opacidade a ponto de competir com os dados.
 - Deixar calendário, seletor de hora, listas suspensas, grades ou dicas de uma biblioteca na fonte padrão do tema dela.
+- Tema escuro em preto ou cinza neutro, com degradê fora da lateral ou com cor escrita na tela em vez de token.
 
 ## 9. Implementação neste projeto
 
