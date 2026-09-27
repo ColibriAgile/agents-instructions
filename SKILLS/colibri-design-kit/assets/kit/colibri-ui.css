@@ -1910,6 +1910,8 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
     letter-spacing: 0;
     text-transform: none;
 }
+/* Em .cm-field o espaço entre rótulo e controle vem do gap; a margem acima é para rótulo solto. */
+.cm-dialog__body .cm-field__label { margin: 0; }
 .cm-dialog__body .cm-check {
     margin: 0;
     color: var(--cm-ink);
