@@ -34,7 +34,7 @@ Cada ponto nomeia etapa, momento, chamada e destino. Nomes de argumento são exa
   - `request` = objetivo e critérios de aceite literais da task.
   - `diff` = saída literal de `git diff` do escopo da task contra a base registrada, incluindo arquivos novos: antes do `git diff`, marque-os com `git add -N <arquivos>` (intenção de adicionar, sem conteúdo no stage). Resumo, paráfrase, trecho montado à mão ou lista de arquivos não é diff: sem o diff literal, registre `falha-operacional` e não conte o gate.
   - `claims` (até 16) = uma por critério de aceite (`Critério <n> é atendido: <texto>`), depois as linhas de resultado do `## Handoff`. Com mais de 16, priorize critérios.
-  - `evidence` = itens `testes` (saída real dos comandos rodados, com o nome de cada teste que cobre um critério seguido do critério ou `TC-NN` que ele comprova), `build` (saída de build completo, não incremental, com os avisos), e `perfil-qualidade` (saída dos comandos do perfil sobre os arquivos tocados, vazia inclusive). O `## Handoff` fornece claims, nunca evidência: claim conferida contra a afirmação do próprio autor não prova nada.
+  - `evidence` = itens `codigo` (o mesmo diff literal do campo `diff`, ou suas partes: o gate julga as claims só contra `evidence`, e sem o código ali toda claim sobre código sai `unsupported`), `testes` (saída real dos comandos rodados, com o nome de cada teste que cobre um critério seguido do critério ou `TC-NN` que ele comprova), `build` (saída de build completo, não incremental, com os avisos), e `perfil-qualidade` (saída dos comandos do perfil sobre os arquivos tocados, vazia inclusive). O `## Handoff` fornece claims, nunca evidência: claim conferida contra a afirmação do próprio autor não prova nada.
   - `tests` = a mesma saída de testes.
 - **Limites:** `diff` acima de 50.000 caracteres é truncado e nunca volta `auto`. Divida por arquivo ou grupo de arquivos até cada parte caber: `jev_review` por parte e um `jev_verify` com as mesmas `claims` e `evidence`, registrados como uma unidade. Evidência inventada para satisfazer o gate invalida a task.
 - **Registro:** grave `safe_to_apply`, o composto, as notas da rubrica e a confiança de cada claim; sem esses números os limiares não podem ser calibrados.
@@ -49,6 +49,7 @@ Cada ponto nomeia etapa, momento, chamada e destino. Nomes de argumento são exa
 
 ## J5 — Severidade dos achados
 
+- **Quando:** só com ao menos um `CR-NN` no relatório; sem achados, o `J5` não roda. A tool é `jev_classify`: `jev_review` julga diff, não severidade.
 - **Entrada:** `items` = um por `CR-NN` (fato, impacto e evidência em até 2.000 caracteres), `id` = `CR-NN`. `classes`:
   - `bloqueante`: obrigação não conforme, teste obrigatório falhando, evidência essencial ausente ou hit bloqueante do perfil sem `DEC-NN`. Precede `ressalva`.
   - `ressalva`: custo de manutenção sem falha demonstrada, incluindo hit de ressalva do perfil.

@@ -19,6 +19,7 @@
 | `numeros` | Em `J3`: `safe_to_apply`, composto, notas da rubrica e confiança por claim; nos demais pontos, a confiança de cada item sinalizado |
 | `usage` | `input_tokens` e `output_tokens` devolvidos |
 | `corrige` | Opcional: número da linha que este registro corrige |
+| `controle` | `ausente` quando a revisão roda na sessão autora; omitido quando é independente |
 
 ## Resumo no aceite
 
@@ -37,5 +38,7 @@ Grave `tasks/prd-[slug]/jev-resumo.md` a partir do log, dos handoffs e dos relat
 4. **Fluxo.** Status da primeira revisão, rodadas até `APROVADO` ou ressalvas decididas e tasks reabertas.
 5. **Custo.** Tokens por ponto e total; duração quando o host expuser. Sem telemetria de duração, declare-a não medida.
 6. **Baseline.** Das features do mesmo repositório sem jev: fração com primeira revisão `REPROVADO` e média de rodadas, contadas nos `codereview_*/codereview.md`. Declare amostra pequena como limitação.
+
+Com `controle: ausente`, a feature entra só nos itens 4 (Fluxo) e 5 (Custo), com a ausência declarada no topo; acertos, alarmes, omissões e concordâncias ficam fora das contagens.
 
 O resumo informa; a adoção de um ponto em `ativo` ou a remoção do modo é decisão humana registrada em `workflow.md`.
