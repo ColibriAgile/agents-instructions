@@ -60,6 +60,7 @@ bundles:
       - sdd-criar-techspec
       - sdd-executar-correcoes
       - sdd-executar-task
+      - sdd-jev
       - sdd-orquestrar-fluxo
       - sdd-orquestrar-prds
       - sdd-orquestrar-tasks
@@ -69,6 +70,7 @@ bundles:
       - sdd-planejar-tasks
       - sdd-revisar-codigo
       - sdd-snapshot
+      - sdd-triar
 
   code-review:
     description: Revisão de código e execução das correções apontadas.

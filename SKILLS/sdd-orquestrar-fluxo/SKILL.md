@@ -1,14 +1,15 @@
 ---
 name: sdd-orquestrar-fluxo
 description: Fluxo SDD para conduzir uma feature na sessão, com exploradores somente leitura e HIL, ou retomar seu checkpoint em nova sessão; não substitui uma etapa avulsa.
-argument-hint: [--prd nome-da-feature]
+argument-hint: [--prd nome-da-feature] [--jev off|sombra|ativo]
 ---
 
 # Orquestrar o fluxo SDD
 
 Coordene contratos, execução e aceite. A sessão coordenadora executa cada etapa seguindo sua skill, mantém estado e decisões humanas e grava todos os artefatos e todo o código; subagentes são exploradores somente leitura. A revisão roda numa sessão que não é autora do código julgado, por isso o fluxo recomenda encerrar a sessão nessa fronteira.
 
-1. **Preparar ou retomar.** Leia integralmente [references/estado-hil.md](references/estado-hil.md) e detecte `tasks/prd-[slug]/checkpoint.json` antes de iniciar trabalho. Com feature explícita, consulte somente sua pasta; sem ela, selecione o único checkpoint pendente ou solicite escolha se houver vários. Retome automaticamente o checkpoint válido da feature selecionada, sem exigir flag especial. Sem checkpoint, reconcilie artefatos existentes antes de criar estado; em pedido amplo ainda sem recorte, fixe os slugs no passo 2 antes de abrir estado.
+1. **Preparar ou retomar.** Leia integralmente [references/estado-hil.md](references/estado-hil.md) e detecte `tasks/prd-[slug]/checkpoint.json` antes de iniciar trabalho. Com feature explícita, consulte somente sua pasta; sem ela, selecione o único checkpoint pendente ou solicite escolha se houver vários. Retome automaticamente o checkpoint válido da feature selecionada, sem exigir flag especial. Sem checkpoint, reconcilie artefatos existentes antes de criar estado; em pedido amplo ainda sem recorte, fixe os slugs no passo 2 antes de abrir estado. Em pedido novo, sem checkpoint nem artefatos, execute antes `sdd-triar`, salvo quando o usuário já tiver escolhido o nível: `pontual` encerra este fluxo e `sdd-enxuto` segue com as paradas fundidas que a triagem registrou.
+   Leia o modo `jev` do checkpoint, ou `--jev` ao criá-lo (padrão `off`); com `sombra` ou `ativo`, leia integralmente a skill `sdd-jev` e aplique seus pontos em todas as etapas desta sessão.
    Leia integralmente `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks`; quando `snapshot-contexto.md` existir na pasta da feature, carregue-o pelo ramo Carregar da skill `sdd-snapshot` depois do checkpoint, que vence em conflito. Localize as skills da tabela abaixo no catálogo instalado ou em `SKILLS/` e leia a skill de cada etapa só quando ela começar. Antes de enviar um explorador, leia integralmente [references/delegacao.md](references/delegacao.md). Carregue na retomada só o índice, decisões pertinentes, entradas do snapshot que casam e fontes necessárias à próxima etapa.
    Confira worktree, instruções locais, disponibilidade de exploradores e fontes existentes. Registre base Git como commit resolvido e mudanças preexistentes; sem Git, registre limites de escopo. Exija as dependências da próxima fase; skill ausente bloqueia só essa fase, sem inventar execução equivalente. Skills de etapa com invocação implícita desativada continuam sendo seguidas aqui, pelo nome exato, porque o fluxo as nomeia explicitamente.
    **Saída:** estado reconciliado, autorização conhecida e próxima etapa identificada. Sem subagentes, explore com buscas diretas; isso muda o custo, não o fluxo.
@@ -40,6 +41,7 @@ Toda etapa roda na sessão coordenadora; a última coluna diz qual sessão pode 
 
 | Entrada disponível | Skill responsável | Artefato/resultado | Sessão |
 | --- | --- | --- | --- |
+| Pedido novo sem checkpoint | `sdd-triar` | nível decidido no HIL 0, linha em `tasks/triagem-log.jsonl` | qualquer |
 | Pedido | `sdd-criar-prd` | `prd.md` | qualquer |
 | Pedido com mais de um resultado principal | `sdd-orquestrar-prds` | um `prd.md` por recorte sob prefixo comum | qualquer |
 | Refatoração solicitada | `sdd-planejar-refatoracao` | `prd.md`, `techspec.md` | qualquer |

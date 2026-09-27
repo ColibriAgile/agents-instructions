@@ -15,6 +15,7 @@ Ao criar o primeiro checkpoint, leia integralmente [../assets/checkpoint.templat
 | `objective`, `constraints` | Resultado pedido e invariantes curtos indispensáveis, incluindo política desktop .NET quando aplicável; detalhes por referência |
 | `sources` | Caminhos relativos à pasta da feature, ou `null`, incluindo `snapshot` para `snapshot-contexto.md`; nenhum caminho de artefato fora dela |
 | `review_status` | Status literal do último `codereview.md` (`APROVADO`, `APROVADO COM RESSALVAS`, `REPROVADO`), ou `null` antes da primeira revisão; `APROVADO` sem alteração posterior de código dispensa nova revisão |
+| `jev` | `off`, `sombra` ou `ativo`, conforme a skill `sdd-jev`; muda só por decisão humana registrada em `workflow.md` |
 | `approved_sources` | Itens `{path, sha256, decision_id}` ligando conteúdo aprovado à decisão humana em `workflow.md` |
 | `decisions_to_read` | IDs de decisões relevantes à próxima ação; cada registro contém decisão, escopo, texto humano pertinente e proveniência disponível |
 | `git_base`, `worktree_evidence` | Commit resolvido ou `null`; referência à evidência de alterações preexistentes/não commitadas no workflow ou handoff, pois HEAD sozinho não identifica o estado |
@@ -39,6 +40,7 @@ Mantenha o índice preferencialmente abaixo de 8 KiB: mova detalhes para fontes 
 
 | Gate | Material já preparado | Decisão necessária |
 | --- | --- | --- |
+| HIL 0 | Sinais, rubrica e recomendação de `sdd-triar`; precede o checkpoint, e seu registro é a linha em `tasks/triagem-log.jsonl` mais a decisão gravada em `workflow.md` ao abrir estado | Escolher `sdd-completo`, `sdd-enxuto` ou `pontual` |
 | HIL 1 | PRD com escopo, aceite e premissas | Aprovar produto ou corrigir requisitos |
 | HIL 2 | TechSpec, DAG, tasks, riscos e validações | Aprovar solução e execução, incluindo correções dentro do contrato |
 | Exceção | Evidência, impacto e proposta concreta | Resolver desvio de escopo/arquitetura, ambiente indispensável, risco irreversível ou estagnação |
