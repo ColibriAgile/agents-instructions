@@ -6,7 +6,7 @@
 
 | Campo | Conteúdo |
 | --- | --- |
-| `ts` | Data e hora ISO 8601 |
+| `ts` | Data e hora reais da chamada em ISO 8601, lidas do sistema (ex.: `Get-Date -Format o`), nunca um horário fixo: a duração do piloto sai desses valores |
 | `modo` | `sombra` ou `ativo` |
 | `sessao` | `autora` ou `revisora` |
 | `ponto` | `J0` a `J7` |

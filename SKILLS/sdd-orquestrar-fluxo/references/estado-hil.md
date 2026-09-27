@@ -40,7 +40,7 @@ Mantenha o índice preferencialmente abaixo de 8 KiB: mova detalhes para fontes 
 
 | Gate | Material já preparado | Decisão necessária |
 | --- | --- | --- |
-| HIL 0 | Sinais, rubrica e recomendação de `sdd-triar`; precede o checkpoint, e seu registro é a linha em `tasks/triagem-log.jsonl` mais a decisão gravada em `workflow.md` ao abrir estado | Escolher `sdd-completo`, `sdd-enxuto` ou `pontual` |
+| HIL 0 | Sinais, rubrica e recomendação de `sdd-triar`; precede o checkpoint, e seu registro é a linha em `tasks/triagem-log.jsonl` mais a decisão gravada em `workflow.md` ao abrir estado | Escolher `sdd-completo`, `sdd-enxuto` ou `pontual` e, com tools jev e sem `--jev`, o modo jev |
 | HIL 1 | PRD com escopo, aceite e premissas | Aprovar produto ou corrigir requisitos |
 | HIL 2 | TechSpec, DAG, tasks, riscos e validações | Aprovar solução e execução, incluindo correções dentro do contrato |
 | Exceção | Evidência, impacto e proposta concreta | Resolver desvio de escopo/arquitetura, ambiente indispensável, risco irreversível ou estagnação |
