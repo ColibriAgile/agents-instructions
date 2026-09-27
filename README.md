@@ -39,6 +39,14 @@ Se `skills.yaml` não existir e a execução for interativa, `Install-Skills.ps1
 acontece — falha pedindo pra rodar o `Init-Skills.ps1` manualmente primeiro, já que o picker
 fzf precisa de terminal interativo.
 
+### Testar skills de uma branch
+
+Com a cópia local numa branch já enviada ao remoto, `Install-Skills.ps1` instala as skills
+de agents-instructions dessa branch (`owner/repo#branch` no `npx skills add`) e avisa que não
+é a padrão; `-Ref <branch>` escolhe outra explicitamente. Para voltar, faça checkout da branch
+padrão e rode o script de novo. `Update-AllSkills.ps1` fora da branch padrão exige
+`-Ref <branch>`, para que a branch de teste não chegue a todos os projetos por engano.
+
 ### Atualizar todos os projetos de uma vez
 
 Depois de mexer nas skills deste repositório, `Update-AllSkills.ps1` propaga para todos os
