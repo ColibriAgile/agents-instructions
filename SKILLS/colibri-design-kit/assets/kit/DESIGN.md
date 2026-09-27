@@ -73,7 +73,7 @@ motion:
 
 # Colibri UI — linha visual das aplicações Colibri
 
-Este documento descreve a linha visual comum das aplicações Colibri e orienta a refatoração visual de cada uma delas. A implementação de referência está em `colibri-ui.css` (CSS puro, prefixo `cm-`); `colibri-ui.bootstrap3.css` e `colibri-ui.devexpress.css` são adaptadores opcionais; `logos/colibri-colorido.svg` é a marca da página inicial; `exemplo.html` mostra a marcação de cada componente.
+Este documento descreve a linha visual comum das aplicações Colibri e orienta a refatoração visual de cada uma delas. A implementação de referência está em `colibri-ui.css` (CSS puro, prefixo `cm-`); `colibri-ui.bootstrap3.css` e `colibri-ui.devexpress.css` são adaptadores opcionais; `logos/colibri-colorido.svg` é a marca da página inicial; `logos/colibri.ico` é o ícone da aba; `exemplo.html` mostra a marcação de cada componente.
 
 Ao adotar em um repositório, copie este arquivo para a raiz como `DESIGN.md`, escreva o `PRODUCT.md` do produto (modelo em `PRODUCT.template.md`) e registre na seção "Implementação neste projeto" onde o CSS e os componentes ficam.
 
@@ -150,6 +150,10 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 - **Rótulos da lateral:** sempre completos e em uma linha. A lateral cresce até o rótulo mais longo, em qualquer idioma da aplicação, e 230 px é o mínimo. Nunca use reticências, quebra de linha ou texto abreviado só para caber. Recolher um grupo esconde a lista (atributo `hidden`) sem mudar a largura da lateral.
 - **Barra superior:** título da página (`.cm-topbar__title`) à esquerda; à direita, alternância de tema (`.cm-topbar__action` só com ícone, `bi-moon` no claro e `bi-sun` no escuro, com `aria-label` e `title` dizendo o tema que vai ligar), idioma (menu `.cm-menu`), divisor e "Entrar" ou nome do usuário com opção de sair.
 - **Avisos globais:** `.cm-banner--danger` / `--warning` logo abaixo da barra superior.
+- **Ícone da aba:** toda aplicação Colibri usa `logos/colibri.ico` (colibri branco sobre o degradê azul da lateral, de 16 a 256 px no mesmo arquivo) como ícone da aba e dos atalhos, declarado na entrada HTML com `<link rel="icon" href="…/colibri.ico">`. É o mesmo nos dois temas e em todos os produtos.
+  - Use o arquivo do kit sem alterar cores, recorte ou tamanhos; não troque pelo ícone padrão do framework (React, Blazor, Angular), por um ícone da identidade anterior nem pelo de outro produto.
+  - O ícone é pedido pelo navegador direto da entrada HTML, fora do CSS: sirva o arquivo de uma pasta pública do projeto, no caminho que o `<link>` aponta.
+  - Ao trocar um ícone antigo, mude o nome do arquivo ou acrescente versão ao endereço (`?v=`), porque o navegador guarda o ícone em cache por muito tempo.
 
 ## 6. Anatomia de página
 
@@ -221,6 +225,7 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Aplicar a tipografia do kit também aos elementos internos e popups de bibliotecas de componentes (DevExpress, DevExtreme etc.).
 - Conferir alinhamento em 1440, 1920 e ~900 px de largura antes de concluir uma página.
 - Conferir cada página nos dois temas, inclusive popups e componentes de bibliotecas.
+- Usar o ícone da aba do kit (`logos/colibri.ico`).
 
 **Não faça**
 
@@ -232,7 +237,8 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Repetir a marca-d'água do colibri em outras páginas ou aumentar sua opacidade a ponto de competir com os dados.
 - Deixar calendário, seletor de hora, listas suspensas, grades ou dicas de uma biblioteca na fonte padrão do tema dela.
 - Tema escuro em preto ou cinza neutro, com degradê fora da lateral ou com cor escrita na tela em vez de token.
+- Ícone da aba padrão do framework, da identidade anterior ou de outro produto.
 
 ## 9. Implementação neste projeto
 
-_Preencher ao adotar:_ onde está o CSS (`colibri-ui.css` e, se usados, os adaptadores), onde ficam fontes, ícones e `logos/`, qual página recebe `.cm-page--home`, a biblioteca de componentes e o tema usados (com versão) e como cada componente é implementado no framework do projeto (componentes, diretivas, templates).
+_Preencher ao adotar:_ onde está o CSS (`colibri-ui.css` e, se usados, os adaptadores), onde ficam fontes, ícones e `logos/`, de onde a entrada HTML serve o ícone da aba, qual página recebe `.cm-page--home`, a biblioteca de componentes e o tema usados (com versão) e como cada componente é implementado no framework do projeto (componentes, diretivas, templates).

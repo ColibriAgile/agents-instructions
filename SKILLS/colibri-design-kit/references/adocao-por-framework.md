@@ -11,6 +11,15 @@ Complementa o passo 3 do `SKILL.md`. A marcação de cada componente está em `.
 
 `fonts/` e `logos/` ficam ao lado de `colibri-ui.css` (`url('fonts/…')` e `url('logos/…')` são relativos ao CSS). Se um bundler reescrever caminhos, confira que as WOFF2 e o SVG são emitidos e resolvem. Nada de fontes ou ícones por CDN: tudo precisa funcionar sem internet.
 
+## Ícone da aba (todos os frameworks)
+
+`logos/colibri.ico` é pedido pelo navegador a partir do `<link rel="icon">` da entrada HTML, não pelo CSS, então precisa estar numa pasta que o servidor entrega no caminho do `<link>`:
+
+- **Create React App / Vite:** copie para `public/` (ex.: `public/static/colibri.ico`) e use `href="%PUBLIC_URL%/static/colibri.ico"` (CRA) ou `href="/colibri.ico"` (Vite). O que fica em `src/` só é servido quando importado pelo código.
+- **Blazor / ASP.NET:** em `wwwroot/` (ex.: `wwwroot/colibri-ui/logos/colibri.ico`), com `<link rel="icon" href="colibri-ui/logos/colibri.ico">` em `App.razor`, `_Host.cshtml` ou `index.html`; remova o `favicon.png`/`favicon.ico` do modelo do projeto.
+- **AngularJS / páginas servidas pelo backend:** no mesmo diretório de estáticos do `colibri-ui/`, com o caminho que o template do backend gera.
+- Substituindo um ícone antigo, mude o nome ou acrescente `?v=` ao `href`: o navegador mantém o anterior em cache. Se a entrada HTML passa por um motor de templates (Jinja, Razor), confira que o caminho sai certo depois da renderização.
+
 ## Por framework
 
 | Stack | Como aplicar |
