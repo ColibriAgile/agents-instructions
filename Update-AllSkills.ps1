@@ -36,6 +36,11 @@
 .PARAMETER NoPull
     Pula a sincronização inicial da cópia local de agents-instructions.
 
+.PARAMETER Ref
+    Branch de agents-instructions a instalar em todos os projetos. Com a cópia local fora da
+    branch padrão, é obrigatório repetir aqui o nome dessa branch, para que uma branch de teste
+    não se espalhe para todos os projetos por engano.
+
 .PARAMETER BundlesPath
     Caminho do bundles.yaml central. Padrão: bundles.yaml ao lado deste script.
 
@@ -56,6 +61,7 @@ param(
     [switch]$Detailed,
     [switch]$NoReconcile,
     [switch]$NoPull,
+    [string]$Ref,
     [string]$BundlesPath = (Join-Path $PSScriptRoot 'bundles.yaml')
 )
 
@@ -128,10 +134,16 @@ if ($ListOnly) {
 
 # ---------- sincronização única do catálogo ----------
 
+. (Join-Path $PSScriptRoot 'Skills.Common.ps1')
 if (-not $NoPull) {
-    . (Join-Path $PSScriptRoot 'Skills.Common.ps1')
     Sync-BundlesRepo -BundlesPath $BundlesPath -Quiet:$Silent
     Assert-BundlesRepoPushed -BundlesPath $BundlesPath
+}
+
+$skillsRef = Resolve-SkillsRef -BundlesPath $BundlesPath -Ref $Ref -SkipRemoteCheck:$NoPull
+if ($skillsRef -and -not $PSBoundParameters.ContainsKey('Ref')) {
+    Write-Error "A cópia local de agents-instructions está na branch '$skillsRef'. Update-AllSkills a instalaria em todos os projetos: volte para a branch padrão ou confirme com -Ref $skillsRef."
+    exit 1
 }
 
 # ---------- execução ----------
@@ -140,6 +152,7 @@ if (-not $NoPull) {
 $childArgs = @{ NoPull = $true }
 if ($Detailed) { $childArgs['Detailed'] = $true } else { $childArgs['Silent'] = $true }
 if ($NoReconcile) { $childArgs['NoReconcile'] = $true }
+if ($skillsRef) { $childArgs['Ref'] = $skillsRef }
 
 $results = [System.Collections.Generic.List[object]]::new()
 $total = $projects.Count

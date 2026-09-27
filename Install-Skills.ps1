@@ -21,6 +21,13 @@
     Pula o `git pull` automático e a checagem de commit/push pendente na cópia local de
     agents-instructions antes de ler bundles.yaml.
 
+.PARAMETER Ref
+    Branch do repositório do catálogo de onde instalar as skills (ex: feat/minha-skill),
+    para testar skills antes do merge. Sem -Ref, usa a branch atual da cópia local de
+    agents-instructions; na branch padrão, instala da padrão como antes. A branch precisa
+    ter sido enviada ao remoto; detectada automaticamente, também precisa estar sem push
+    pendente. Skills de outros repositórios em sources continuam na branch padrão deles.
+
 .PARAMETER BundlesPath
     Caminho local do bundles.yaml central. Padrão: bundles.yaml ao lado deste script
     (ou seja, na sua cópia local clonada de agents-instructions). Para atualizar o
@@ -31,6 +38,7 @@
     ./Install-Skills.ps1 -Silent
     ./Install-Skills.ps1 -Detailed
     ./Install-Skills.ps1 -NoReconcile
+    ./Install-Skills.ps1 -Ref feat/minha-skill
 #>
 [CmdletBinding()]
 param(
@@ -39,6 +47,7 @@ param(
     [switch]$Detailed,
     [switch]$NoReconcile,
     [switch]$NoPull,
+    [string]$Ref,
     [string]$BundlesPath = (Join-Path $PSScriptRoot 'bundles.yaml')
 )
 
@@ -52,6 +61,12 @@ if ($Silent -and $Detailed) {
 if (-not $NoPull) {
     Sync-BundlesRepo -BundlesPath $BundlesPath -Quiet:$Silent
     Assert-BundlesRepoPushed -BundlesPath $BundlesPath
+}
+
+$skillsRef = Resolve-SkillsRef -BundlesPath $BundlesPath -Ref $Ref -SkipRemoteCheck:$NoPull
+$refRepo = if ($skillsRef) { (Get-BundlesCatalog -FilePath $BundlesPath).Repo } else { $null }
+if ($skillsRef) {
+    Write-Warning "Instalando skills de $refRepo pela branch '$skillsRef', não pela branch padrão."
 }
 
 if (-not (Test-Path $Path)) {
@@ -116,7 +131,9 @@ foreach ($source in $sources) {
         Write-Host "         $($source.Skills -join ', ')" -ForegroundColor DarkGray
     }
 
-    $npxArgs = @('--yes', 'skills', 'add', $source.Repo, '-s') + $source.Skills + @('-y')
+    # `owner/repo#branch` é a forma que o `npx skills add` resolve com branch contendo '/'.
+    $package = if ($skillsRef -and $source.Repo -eq $refRepo) { "$($source.Repo)#$skillsRef" } else { $source.Repo }
+    $npxArgs = @('--yes', 'skills', 'add', $package, '-s') + $source.Skills + @('-y')
     $itemSw = [System.Diagnostics.Stopwatch]::StartNew()
 
     if ($Detailed) {

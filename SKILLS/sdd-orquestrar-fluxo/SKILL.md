@@ -1,7 +1,7 @@
 ---
 name: sdd-orquestrar-fluxo
 description: Fluxo SDD para conduzir uma feature na sessão, com exploradores somente leitura e HIL, ou retomar seu checkpoint em nova sessão; não substitui uma etapa avulsa.
-argument-hint: [--prd nome-da-feature] [--jev off|sombra|ativo]
+argument-hint: "[--prd nome-da-feature] [--jev off|sombra|ativo]"
 ---
 
 # Orquestrar o fluxo SDD
