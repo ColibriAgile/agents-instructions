@@ -45,6 +45,7 @@ Mantenha o índice preferencialmente abaixo de 8 KiB: mova detalhes para fontes 
 | HIL 2 | TechSpec, DAG, tasks, riscos e validações | Aprovar solução e execução, incluindo correções dentro do contrato |
 | Exceção | Evidência, impacto e proposta concreta | Resolver desvio de escopo/arquitetura, ambiente indispensável, risco irreversível ou estagnação |
 | Ressalvas | Resumo dos itens ressalvados na revisão, com impacto e esforço | Corrigir os itens escolhidos ou finalizar a feature |
+| Conferência visual | Roteiro de aceite manual e aplicação rodando, em feature com interface visual, antes da revisão | Aprovar o visual ou pedir ajustes dentro do contrato |
 | HIL 3 | Revisão final, testes, pendências e aceite manual | Aceitar entrega atual |
 
 Use ferramenta de pergunta disponível ou pergunta textual, precedida do comando de retomada da pausa de sessão. Pare só o trabalho dependente da resposta; silêncio, tempo decorrido ou conclusão de explorador não equivalem a consentimento. Explique qual gate falta e aponte os artefatos. Reuse autorização já dada para o mesmo escopo; não peça duas vezes para gravar um rascunho e depois executá-lo.
