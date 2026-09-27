@@ -27,7 +27,7 @@ O modo vem de `--jev` na primeira invocação de `sdd-orquestrar-fluxo` ou de de
 3. **Chamar.** Monte a entrada somente com o que o ponto nomeia, sem segredos nem strings de conexão. Faça uma chamada por unidade e versão da entrada; nova chamada exige entrada alterada (diff, artefato, evidência). O veredito de uma entrada inalterada vale: reformular para obter outro resultado invalida a medição. Agrupe itens do mesmo ponto numa chamada, dentro dos limites do ponto.
    **Saída:** resultado com `status`, veredito, distribuição e `usage`.
 4. **Destinar.** Separe falha operacional de veredito:
-   - Falha operacional (erro de transporte, `status: invalid_response`, entrada truncada): registre e siga o passo original da etapa. Não é aprovação nem bloqueio.
+   - Falha operacional (erro de transporte, timeout, `status: invalid_response`, entrada truncada): timeout ou erro de transporte admite uma única nova tentativa com a mesma entrada; persistindo, ou nos demais casos, registre e siga o passo original da etapa. Não é aprovação nem bloqueio.
    - Veredito real: em `sombra`, só registre; em `ativo`, aplique o destino do ponto. `contradicted` ou `escalate` confiante em `ativo` é achado a corrigir ou decisão ao humano, nunca absorvido pelo caminho sem jev.
    Leia a distribuição, não só o rótulo: `supports: 0,94` difere de um empate 0,51/0,49, que vale como `review`.
    **Saída:** destino aplicado conforme o modo.

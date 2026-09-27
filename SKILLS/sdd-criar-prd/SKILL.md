@@ -10,6 +10,7 @@ disable-model-invocation: true
 1. Extraia problema, resultado e slug do pedido. Resolva `tasks/prd-[slug]/prd.md`; se existir, reutilize sem sobrescrever. Atualize apenas quando autorizado; preserve IDs inalterados. Quando `tasks/prd-[slug]/snapshot-contexto.md` existir, carregue-o pelo ramo Carregar da skill `sdd-snapshot` antes de ler fontes.
    **Saída:** destino e operação inequívocos; solicite apenas a informação ausente que impeça identificá-los.
 2. Inventarie usuários, jornadas, métricas, RF, RNF, restrições, dependências, acessibilidade e fora de escopo. Consulte evidência local antes de pesquisar regras públicas ou integrações em fontes primárias; envie exploradores somente leitura só quando a evidência local se espalhar por muitos arquivos. Registre origem e diferencie fato, premissa e decisão de produto; pergunte apenas sobre lacunas que mudem escopo ou aceite.
+   Com a skill `sdd-jev` em `sombra` ou `ativo`, aplique o ponto `J0` a todo conteúdo buscado fora do repositório antes de usá-lo.
    **Saída:** cada obrigação tem evidência ou premissa explícita; decisões bloqueantes estão identificadas.
 3. Ao redigir, leia integralmente [assets/prd.template.md](assets/prd.template.md). Use IDs estáveis `RF-01`, `RNF-01`, `US-01` e aceite observável. Mantenha arquitetura e sequenciamento na TechSpec. Registre restrições de stack fornecidas sem presumir que todo repositório seja desktop.
    **Saída:** todas as seções aplicáveis preenchidas; IDs únicos; nenhum requisito sem aceite.

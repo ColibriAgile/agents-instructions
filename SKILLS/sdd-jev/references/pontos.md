@@ -11,7 +11,7 @@ Cada ponto nomeia etapa, momento, chamada e destino. Nomes de argumento são exa
 | J4 | `sdd-revisar-codigo` passo 3 (`ativo`) ou depois de gravar `codereview.md` (`sombra`) | `jev_verify` |
 | J5 | `sdd-revisar-codigo` passo 5 (`ativo`) ou depois de gravar `codereview.md` (`sombra`) | `jev_classify` |
 | J6 | `sdd-planejar-correcoes` passo 2 | `jev_classify` |
-| J7 | `sdd-orquestrar-fluxo` passo 3 (refatoração preparatória) e HIL de ressalvas do passo 5 | `jev_decide` |
+| J7 | `sdd-orquestrar-fluxo` passo 3 (refatoração preparatória) e HIL de ressalvas do passo 5: antes do HIL (`ativo`) ou depois de registrar a resposta (`sombra`) | `jev_decide` |
 
 ## J0 — Conteúdo externo
 
@@ -32,11 +32,12 @@ Cada ponto nomeia etapa, momento, chamada e destino. Nomes de argumento são exa
 
 - **Entrada:**
   - `request` = objetivo e critérios de aceite literais da task.
-  - `diff` = diff do escopo da task contra a base registrada, incluindo arquivos novos.
+  - `diff` = saída literal de `git diff` do escopo da task contra a base registrada, incluindo arquivos novos. Resumo, paráfrase ou lista de arquivos não é diff: sem o diff literal, registre `falha-operacional` e não conte o gate.
   - `claims` (até 16) = uma por critério de aceite (`Critério <n> é atendido: <texto>`), depois as linhas de resultado do `## Handoff`. Com mais de 16, priorize critérios.
-  - `evidence` = itens `testes` (saída real dos comandos rodados), `perfil-qualidade` (saída dos comandos do perfil sobre os arquivos tocados, vazia inclusive) e `handoff` (seção literal).
+  - `evidence` = itens `testes` (saída real dos comandos rodados, com o nome de cada teste que cobre um critério seguido do critério ou `TC-NN` que ele comprova), `build` (saída de build completo, não incremental, com os avisos), `perfil-qualidade` (saída dos comandos do perfil sobre os arquivos tocados, vazia inclusive) e `handoff` (seção literal).
   - `tests` = a mesma saída de testes.
-- **Limites:** `diff` acima de 50.000 caracteres é truncado e nunca volta `auto`. Divida por arquivo: `jev_review` por parte e `jev_verify` com as mesmas `claims` e `evidence`. Evidência inventada para satisfazer o gate invalida a task.
+- **Limites:** `diff` acima de 50.000 caracteres é truncado e nunca volta `auto`. Divida por arquivo ou grupo de arquivos até cada parte caber: `jev_review` por parte e um `jev_verify` com as mesmas `claims` e `evidence`, registrados como uma unidade. Evidência inventada para satisfazer o gate invalida a task.
+- **Registro:** grave `safe_to_apply`, o composto, as notas da rubrica e a confiança de cada claim; sem esses números os limiares não podem ser calibrados.
 - **Sombra:** rode depois de fechar o `## Handoff` e siga direto ao registro da task, sem abrir o resultado para decidir. Se o diff mudar depois da chamada, registre `efeito: diff-alterado` e uma nova linha `J3` sobre o diff novo.
 - **Ativo:** `auto` → siga ao registro da task. `review` → confira nas linhas cada claim `unsupported` e cada rubrica baixa; corrija ou registre justificativa no `## Handoff`. `escalate` ou claim `contradicted` → trate como achado da releitura: corrija e rode o gate de novo sobre o diff novo. Duas chamadas sem progresso seguem a regra de bloqueio após duas tentativas da skill de etapa.
 
@@ -66,3 +67,4 @@ Cada ponto nomeia etapa, momento, chamada e destino. Nomes de argumento são exa
 
 - **Entrada:** `decision` = a pergunta do HIL; `candidates` = alternativas concretas, incluindo seguir sem mudança; `evidence` = medidas do baseline, hits e esforço estimado; `priorities` = restrições da TechSpec e preferências humanas registradas; `requirements` (até 3) = propriedades testáveis, uma por item.
 - **Ativo:** acrescente ao material do HIL a recomendação com probabilidades, `checks` e `warnings`. `escaped: true` → apresente as alternativas sem recomendação jev. O humano decide.
+- **Sombra:** chame depois de registrar a resposta humana, com o mesmo material apresentado, e registre a concordância; a recomendação do HIL é preparada sem o jev.

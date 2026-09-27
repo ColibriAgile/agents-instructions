@@ -19,6 +19,7 @@ disable-model-invocation: true
 5. Ao gerar contratos, leia integralmente [assets/tasks.template.md](assets/tasks.template.md) e [assets/task.template.md](assets/task.template.md). Grave o rascunho revisável antes de pedir HIL. Use `tasks.md` como fonte do DAG, links e estado; copie apenas invariantes curtos nas tasks e referencie detalhes da TechSpec.
    **Saída:** manifesto e tasks existem; links resolvem; IDs únicos; nenhum placeholder fora do handoff inicial.
 6. Confira cobertura, rastreabilidade, DAG, atomicidade, comandos, ambiente e idempotência. Apresente o plano com riscos e pendências. Devolva ao HIL do orquestrador; em uso avulso, obtenha aprovação antes da implementação apenas se ela ainda não estiver autorizada, e faça a pausa de sessão desse protocolo com `sdd-orquestrar-tasks` como próximo passo.
+   Com a skill `sdd-jev` em `sombra` ou `ativo`, aplique o ponto `J2` antes de apresentar o plano.
    **Saída:** plano pronto para execução no escopo aprovado ou bloqueios associados a IDs concretos.
 
 Se uma fonte mudar durante o planejamento, reconcilie o inventário e invalide apenas os derivados afetados. Falta de PRD/TechSpec direciona à skill criadora correspondente. Estado mutável fica depois das fontes; leia somente o código necessário para resolver caminhos ou comandos.

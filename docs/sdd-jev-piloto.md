@@ -4,6 +4,7 @@
 
 - `SKILLS/sdd-jev`: pontos de juízo `J0`–`J7` nas etapas SDD, ligados pelo campo `jev` do checkpoint (`off` padrão, `sombra`, `ativo`). Sem tools jev no host, o fluxo registra a indisponibilidade e segue como antes.
 - `SKILLS/sdd-triar`: HIL 0 antes do fluxo, com recomendação `sdd-completo`, `sdd-enxuto` ou `pontual` a partir dos sinais S1–S8; usa `jev_decide` quando disponível.
+- Skills de etapa (`sdd-criar-prd`, `sdd-criar-techspec`, `sdd-planejar-tasks`, `sdd-orquestrar-tasks`, `sdd-executar-correcoes`, `sdd-revisar-codigo`, `sdd-planejar-correcoes`, `sdd-orquestrar-fluxo`): uma frase condicional no passo de cada ponto, para que o ponto não dependa de a sessão lembrar do complemento.
 - `sdd-orquestrar-fluxo`: passo 1 chama a triagem em pedido novo e carrega `sdd-jev` conforme o modo; `checkpoint.template.json` e `estado-hil.md` ganharam o campo `jev` e o HIL 0.
 
 ## Como rodar
@@ -19,6 +20,6 @@ Sugestão para decisão humana depois de pelo menos duas features em `sombra`: p
 
 ## Alvos de remoção ao encerrar o piloto
 
-- Adotado: mover os pontos aprovados para as skills de etapa, remover os valores `sombra` e `ativo`, `jev-log.jsonl`, `metricas.md` e este documento; manter apenas o caminho sem jev registrado como indisponibilidade.
-- Rejeitado: remover `SKILLS/sdd-jev`, o campo `jev` do template e de `estado-hil.md`, o trecho do passo 1 de `sdd-orquestrar-fluxo` e a entrada em `bundles.yaml`.
+- Adotado: mover os pontos aprovados para as skills de etapa no lugar das frases condicionais, remover os valores `sombra` e `ativo`, `jev-log.jsonl`, `metricas.md` e este documento; manter apenas o caminho sem jev registrado como indisponibilidade.
+- Rejeitado: remover `SKILLS/sdd-jev`, as frases `Com a skill sdd-jev…` das skills de etapa, o campo `jev` do template e de `estado-hil.md`, o trecho do passo 1 de `sdd-orquestrar-fluxo` e a entrada em `bundles.yaml`.
 - `sdd-triar` é avaliada à parte pelo log de triagem.
