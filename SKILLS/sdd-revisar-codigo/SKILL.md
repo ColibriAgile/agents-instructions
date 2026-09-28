@@ -1,12 +1,12 @@
 ---
 name: sdd-revisar-codigo
-description: Revisão SDD quando é preciso auditar implementação contra PRD, TechSpec e tasks, numa sessão que não escreveu esse código; não corrige achados.
+description: Revisão SDD quando é preciso auditar implementação contra PRD, TechSpec e tasks, numa sessão ou subagente de contexto novo que não escreveu esse código; não corrige achados.
 argument-hint: --prd nome-da-feature [--base referencia-git]
 ---
 
 # Revisar código SDD
 
-Execute numa sessão que não escreveu nem alterou o código em revisão. Esta sessão consolida a matriz e grava o relatório; subagentes são exploradores somente leitura para inspeções disjuntas. Se esta sessão escreveu qualquer parte desse código, pare antes do passo 1 e faça a pausa de sessão de `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks`, que recomenda encerrar a sessão; se o usuário continuar mesmo assim, registre a falta de independência nas limitações do relatório.
+Execute numa sessão que não escreveu nem alterou o código em revisão, ou como revisor delegado: subagente de contexto novo que a sessão autora lança pelo protocolo de [references/revisao-delegada.md](references/revisao-delegada.md) e cujo contrato vale junto desta skill. Esta sessão consolida a matriz e grava o relatório; seus subagentes são exploradores somente leitura para inspeções disjuntas. Se esta sessão escreveu qualquer parte desse código, pare antes do passo 1 e aplique a regra de independência de `references/continuidade-sessao.md` da skill `sdd-orquestrar-tasks`, que delega a revisão ou recomenda encerrar a sessão; se o usuário continuar mesmo assim na sessão autora, registre a falta de independência nas limitações do relatório.
 
 1. Exija `prd.md`, `techspec.md` e `tasks.md` em `tasks/prd-[slug]/`. Quando `snapshot-contexto.md` existir, carregue-o pelo ramo Carregar da skill `sdd-snapshot` como etapa independente. Leia PRD e TechSpec uma vez por versão; depois manifesto, tasks e handoffs. Confira todos os links, arquivos extras, IDs, estados e dependências.
    **Saída:** cada task tem localização e estado comprovados; fonte ausente bloqueia revisão com caminho exato.
@@ -24,7 +24,7 @@ Execute numa sessão que não escreveu nem alterou o código em revisão. Esta s
    Com a skill `sdd-jev` em `ativo`, aplique o ponto `J5` aqui; em `sombra`, só depois de gravar o relatório no passo 6.
    **Saída:** achados acionáveis distintos de melhorias opcionais; todos verificáveis sem histórico da conversa; escalonamento sugerido apenas com gatilho contado.
 6. Leia integralmente [references/TEMPLATE.md](references/TEMPLATE.md) ao emitir relatório. Reserve o próximo sufixo numérico livre em `codereview_[num]/`, considerando todas as pastas existentes. Grave novo `codereview.md`; preserve código, tasks e relatórios anteriores.
-   Em uso avulso, faça a pausa de sessão; um snapshot gravado nela registra etapa `revisao`, o relatório em `cobre_ate`, `autoria_codigo: nao` e o status como pendência aberta. Como esta sessão não alterou código, ela pode seguir para `sdd-planejar-correcoes`.
+   Como revisor delegado, grave na pasta reservada pelo chamador em vez de reservar outra, registre a execução como `revisor delegado` e devolva pelo contrato, sem pausa de sessão. Em uso avulso, faça a pausa de sessão; um snapshot gravado nela registra etapa `revisao`, o relatório em `cobre_ate`, `autoria_codigo: nao` e o status como pendência aberta. Como esta sessão não alterou código, ela pode seguir para `sdd-planejar-correcoes`.
    **Saída:** relatório imutável com matriz, achados, validações, limitações e status abaixo; informe caminho e bloqueios.
 
 ## Status

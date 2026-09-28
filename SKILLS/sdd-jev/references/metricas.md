@@ -19,7 +19,7 @@
 | `numeros` | Em `J3`: `safe_to_apply`, composto, notas da rubrica e confiança por claim; nos demais pontos, a confiança de cada item sinalizado |
 | `usage` | `input_tokens` e `output_tokens` devolvidos |
 | `corrige` | Opcional: número da linha que este registro corrige |
-| `controle` | `ausente` quando a revisão roda na sessão autora; omitido quando é independente |
+| `controle` | `ausente` quando a revisão roda na sessão autora; `delegada` quando roda num revisor delegado de contexto novo; omitido quando roda em sessão nova |
 
 ## Resumo no aceite
 

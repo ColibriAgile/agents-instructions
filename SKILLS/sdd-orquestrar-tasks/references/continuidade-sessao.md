@@ -1,6 +1,6 @@
 # Continuidade de sessão
 
-As skills SDD gravam artefatos e código na sessão que as executa; subagentes são exploradores somente leitura. O trabalho acumula num único contexto, e este protocolo segue sozinho entre unidades até o contexto encher, gravando o que a sessão aprendeu antes de sugerir uma sessão nova. O snapshot que a pausa grava pertence à skill `sdd-snapshot`: toda gravação segue o ramo Gravar dela.
+As skills SDD gravam artefatos e código na sessão que as executa; subagentes são exploradores somente leitura, exceto o revisor delegado da revisão. O trabalho acumula num único contexto, e este protocolo segue sozinho entre unidades até o contexto encher, gravando o que a sessão aprendeu antes de sugerir uma sessão nova. O snapshot que a pausa grava pertence à skill `sdd-snapshot`: toda gravação segue o ramo Gravar dela.
 
 ## Pausa de sessão
 
@@ -23,15 +23,15 @@ Em cada fronteira, siga exatamente um destino:
 | --- | --- | --- |
 | Seguir | Abaixo do limiar e sem parada obrigatória | Informe em uma linha a unidade concluída, o uso (`58% medido` ou `~40% estimado`) e a próxima unidade; comece-a sem perguntar |
 | Pausa por contexto | Limiar atingido | Grave o snapshot e pergunte |
-| Parada obrigatória | Gate HIL, regra de independência, bloqueio sem outra unidade elegível ou fim de uso avulso | Grave o snapshot e pergunte |
+| Parada obrigatória | Gate HIL, regra de independência sem revisor delegado, bloqueio sem outra unidade elegível ou fim de uso avulso | Grave o snapshot e pergunte |
 
 A pergunta vem sempre depois do snapshot gravado e relido por `sdd-snapshot`. Use a tool de perguntas do host (`AskUserQuestion` no Claude Code) ou pergunta textual quando não houver. Informe em uma linha o que terminou, o próximo passo, o uso de contexto e caminho e tamanho do snapshot; depois imprima o comando de retomada. Coloque a opção recomendada primeiro, marcada `(Recomendado)`:
 
 | Opção | Recomende quando | Efeito |
 | --- | --- | --- |
-| Encerrar e retomar em nova sessão | Limiar atingido ou regra de independência | Encerre o turno; o comando de retomada já está impresso. Com o ContextBrake ativo, termine a resposta com `[REQUEST_SESSION_RESET]` |
+| Encerrar e retomar em nova sessão | Limiar atingido ou regra de independência sem revisor delegado | Encerre o turno; o comando de retomada já está impresso. Com o ContextBrake ativo, termine a resposta com `[REQUEST_SESSION_RESET]` |
 | Continuar nesta sessão | Parada obrigatória abaixo do limiar | Prossiga; acima do limiar, a pausa por contexto se repete na próxima fronteira |
 
-- **Independência.** Quando o próximo passo é `sdd-revisar-codigo` e esta sessão escreveu ou alterou código que a revisão vai julgar, pare qualquer que seja o uso e diga por que recomenda encerrar: a revisão precisa de uma sessão que não é autora do código. Se o usuário continuar mesmo assim, registre a limitação onde o chamador guarda decisões (`workflow.md` sob `sdd-orquestrar-fluxo`) e nas limitações do relatório.
+- **Independência.** Quando o próximo passo é `sdd-revisar-codigo` e esta sessão escreveu ou alterou código que a revisão vai julgar, a revisão precisa de um contexto que não é autor do código. Com subagente elegível, delegue-a pelo protocolo de `references/revisao-delegada.md` da skill `sdd-revisar-codigo`, sem perguntar: a delegação satisfaz esta regra, e o destino desta fronteira se decide depois de receber o relatório. Com o limiar atingido, grave o snapshot antes de delegar. Sem subagente elegível, com delegação que falhou duas vezes, ou quando o usuário pediu revisão em sessão nova, pare qualquer que seja o uso e diga por que recomenda encerrar. Se o usuário continuar mesmo assim na sessão autora, registre a limitação onde o chamador guarda decisões (`workflow.md` sob `sdd-orquestrar-fluxo`) e nas limitações do relatório.
 - **Gates.** Num gate HIL, faça juntas a pergunta do gate e a da sessão. Encerrar a sessão não aprova o gate, e aprovar não escolhe a sessão.
 - **Comando de retomada.** Em toda pergunta desta pausa, imprima antes dela o comando de retomada definido em `sdd-snapshot`. Ao encerrar, não inicie trabalho, explorador ou processo depois da resposta. Silêncio não inicia nada.

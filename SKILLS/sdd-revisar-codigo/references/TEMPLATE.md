@@ -3,6 +3,7 @@
 ## Resumo
 
 - Status: APROVADO / APROVADO COM RESSALVAS / REPROVADO
+- Execução: sessão independente / revisor delegado / sessão autora — ver limitações
 - Escopo Git: `[base..estado atual]` ou `Não delimitado — ver limitações`
 - Revisão anterior: `[caminho ou —]`
 

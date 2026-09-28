@@ -9,7 +9,7 @@
 
 ## Como rodar
 
-1. Numa feature nova: `sdd-orquestrar-fluxo --jev sombra`. A revisão continua sendo o grupo de controle; em `sombra` ela roda os pontos `J4`/`J5` só depois de gravar `codereview.md`.
+1. Numa feature nova: `sdd-orquestrar-fluxo --jev sombra`. A revisão continua sendo o grupo de controle, normalmente num revisor delegado de contexto novo (`controle: delegada` no log); em `sombra` ela roda os pontos `J4`/`J5` só depois de gravar `codereview.md`.
 2. No HIL 3, `jev-resumo.md` compara o gate por task (`J3`) com a primeira revisão: acertos, alarmes falsos, omissões, rodadas e tokens.
 3. Copie `jev-resumo.md` e `jev-log.jsonl` de cada feature para `docs/` do projeto antes de qualquer limpeza de `tasks/prd-*/`, para que a decisão final compare as features do piloto.
 4. Cada triagem acrescenta uma linha a `tasks/triagem-log.jsonl`, que calibra os limiares da rubrica.

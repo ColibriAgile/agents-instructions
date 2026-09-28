@@ -36,8 +36,8 @@ O modo vem de `--jev` na primeira invocação de `sdd-orquestrar-fluxo` ou de de
 
 ## Independência e autoridade
 
-- `auto` significa limiares atingidos, não task aprovada nem revisão dispensada. `sdd-revisar-codigo` continua rodando numa sessão não autora e emite o parecer pelas próprias regras.
-- Em `sombra`, a sessão de revisão não abre `jev-log.jsonl` e roda seus pontos só depois de gravar `codereview.md`: a revisão é o grupo de controle do piloto.
+- `auto` significa limiares atingidos, não task aprovada nem revisão dispensada. `sdd-revisar-codigo` continua rodando num contexto não autor, revisor delegado ou sessão nova, e emite o parecer pelas próprias regras.
+- Em `sombra`, a sessão de revisão não abre `jev-log.jsonl` e roda seus pontos só depois de gravar `codereview.md`: a revisão é o grupo de controle do piloto. O coordenador não envia log nem vereditos ao revisor delegado.
 - Em `ativo`, a revisão aplica os próprios pontos, mas não usa vereditos de gate das tasks como evidência de conformidade.
-- Revisão feita na sessão autora não é grupo de controle: registre `controle: ausente` em cada linha dessa revisão e no topo do resumo.
+- Revisão feita na sessão autora não é grupo de controle: registre `controle: ausente` em cada linha dessa revisão e no topo do resumo. Revisor delegado de contexto novo é sessão revisora com `controle: delegada`, declarado também no topo do resumo, para que as métricas o separem de sessões novas.
 - Nenhum veredito concede autorização, muda escopo, aprova HIL ou muda o modo; isso continua sendo dado da conversa humana.

@@ -1,13 +1,13 @@
 ---
 name: sdd-executar-correcoes
-description: Execução SDD quando há tasks de uma revisão a corrigir; implementa cada correção nesta sessão com exploradores somente leitura e segue entre tasks até o limiar de contexto; não cria nem reclassifica achados.
+description: Execução SDD quando há tasks de uma revisão a corrigir; implementa cada correção nesta sessão com exploradores somente leitura e segue entre tasks até o limiar de contexto e delega a re-revisão a um subagente de contexto novo; não cria nem reclassifica achados.
 argument-hint: --prd nome-da-feature --num numero-da-revisao
 disable-model-invocation: true
 ---
 
 # Executar correções SDD
 
-A sessão que executa esta skill é a única escritora: implementa cada task de correção ela mesma e é dona dos movimentos dentro da pasta da revisão. Subagentes são exploradores somente leitura; nunca editam arquivos, rodam build ou testes que escrevam em recursos compartilhados, nem falam com o usuário. A execução é uma task por vez; entre tasks a sessão segue sozinha até a pausa de sessão mandar parar. A sessão que corrige o código não emite a re-revisão.
+A sessão que executa esta skill é a única escritora: implementa cada task de correção ela mesma e é dona dos movimentos dentro da pasta da revisão. Subagentes são exploradores somente leitura; nunca editam arquivos, rodam build ou testes que escrevam em recursos compartilhados, nem falam com o usuário. A exceção é o revisor delegado do passo 7, com contrato próprio. A execução é uma task por vez; entre tasks a sessão segue sozinha até a pausa de sessão mandar parar. A sessão que corrige o código não emite a re-revisão: ela a delega.
 
 Se o chamador limitar a execução a uma task, devolva após o passo 6 em vez de fazer a pausa de sessão: `task-concluida` com os próximos IDs elegíveis, ou `bloqueado` com evidências. Quando todas as tasks estiverem concluídas, execute o passo 7 antes de retornar. Retorno de task não encerra a revisão.
 
@@ -25,7 +25,7 @@ Se o chamador limitar a execução a uma task, devolva após o passo 6 em vez de
    **Saída:** aceite da task comprovado ou pendência específica; manual essencial não executado impede aprovação.
 6. Mova a task aprovada para `done/`, preservando o nome e verificando caminhos absolutos dentro da revisão. Preserve relatório imutável. Recalcule DAG pelos arquivos restantes. Depois, sem explorador ou processo em execução, faça a pausa de sessão de `continuidade-sessao.md` com etapa `correcoes`, `autoria_codigo: sim` e a próxima task elegível como próximo passo; no destino `Seguir`, volte ao passo 3.
    **Saída:** task aprovada movida, pendentes na raiz; próxima task iniciada, ou snapshot gravado antes da pergunta e escolha do usuário aplicada. Em interrupção, confira revisão/handoff antes de inferir conclusão pela pasta.
-7. Valide o conjunto integrado sem repetir comandos já válidos. Confira todo achado acionável e sua evidência. A re-revisão roda numa sessão que não fez estas correções: no fluxo orquestrado, devolva relatório de execução para o chamador agendar `sdd-revisar-codigo`; em uso avulso, faça a pausa de sessão com `sdd-revisar-codigo` como próximo passo, o que recomenda encerrar esta sessão.
-   **Saída:** tasks concluídas com evidência integrada e re-revisão deixada a uma sessão independente ou explicitamente entregue ao chamador; achados persistentes/novos permanecem abertos até decisão.
+7. Valide o conjunto integrado sem repetir comandos já válidos. Confira todo achado acionável e sua evidência. A re-revisão roda num contexto que não fez estas correções: no fluxo orquestrado, devolva relatório de execução para o chamador delegar `sdd-revisar-codigo`; em uso avulso, aplique a regra de independência da pausa de sessão: delegue a re-revisão pelo protocolo de `references/revisao-delegada.md` da skill `sdd-revisar-codigo`, com esta revisão como anterior, leia o status no relatório novo e faça a pausa de sessão de fim de uso avulso com o próximo passo que ele indica. Sem revisor elegível, a pausa nomeia `sdd-revisar-codigo` e recomenda encerrar esta sessão.
+   **Saída:** tasks concluídas com evidência integrada e re-revisão delegada e recebida, deixada a uma sessão independente ou explicitamente entregue ao chamador; achados persistentes/novos permanecem abertos até decisão.
 
 Se ambiente impedir aceite, mantenha task pendente com comando, erro e impacto. Alterações preexistentes ou alheias que colidam com os arquivos da task param a task até serem reconciliadas.

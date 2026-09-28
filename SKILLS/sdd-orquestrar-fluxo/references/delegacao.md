@@ -2,7 +2,7 @@
 
 ## Contrato do explorador
 
-Subagentes são exploradores somente leitura. Nunca editam arquivos, rodam comandos que escrevam em `bin/`, `obj/`, fixtures ou estado do repositório, executam skill de etapa nem fazem perguntas ao usuário. A sessão coordenadora grava todos os artefatos e todo o código.
+Subagentes são exploradores somente leitura. Nunca editam arquivos, rodam comandos que escrevam em `bin/`, `obj/`, fixtures ou estado do repositório, executam skill de etapa nem fazem perguntas ao usuário. A sessão coordenadora grava todos os artefatos e todo o código. A única exceção é o revisor delegado, que roda `sdd-revisar-codigo` e grava só o relatório, pelo contrato de `references/revisao-delegada.md` da skill `sdd-revisar-codigo`; as regras abaixo valem para exploradores.
 
 Envie um explorador só quando responder exigir varrer muitos arquivos, diretórios ou convenções e apenas a conclusão importar; responda perguntas pontuais com buscas diretas. Envie a cada explorador a pergunta exata, os caminhos ou símbolos de partida, a restrição de somente leitura, as fontes que pode ler e o formato de retorno: conclusão, evidência `caminho:linha` e o que não conseguiu confirmar. Confira as linhas citadas antes que código ou artefato dependa delas.
 
@@ -16,7 +16,7 @@ Somente o coordenador pergunta ao usuário e registra aprovações. Explorador d
 - Prefira modelo herdado e configuração estável; maior orçamento não autoriza trocar modelo. Reutilize um explorador para desdobramento da mesma pergunta; abra outro para pergunta independente ou contexto desatualizado.
 - No worktree compartilhado, o diff inclui mudanças preexistentes e alheias: compare apenas o escopo da unidade contra o baseline registrado. Builds/testes com `bin/`, `obj/` ou fixtures comuns ficam serializados.
 - Aguarde/pesquise o handle real de explorador ou processo em curso. Timeout de observação não significa término; não pause a sessão nem inicie trabalho dependente até confirmar estado terminal ou ausência do handle.
-- A revisão roda numa sessão que não é autora do código julgado. Essa sessão pode enviar exploradores para inspeções disjuntas, mas consolida uma matriz completa; ausência de achados num recorte não aprova a feature inteira.
+- A revisão roda num contexto que não é autor do código julgado: revisor delegado ou sessão nova. Esse contexto pode enviar exploradores para inspeções disjuntas, quando o host permitir, mas consolida uma matriz completa; ausência de achados num recorte não aprova a feature inteira.
 
 ## Tokens e cache
 
