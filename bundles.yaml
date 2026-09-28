@@ -50,7 +50,6 @@ bundles:
     description: Interfaces web / UI.
     skills:
       - colibri-design-kit     
-      - frontend-design
       - impeccable
       - ui-craft     
 
