@@ -1,0 +1,16 @@
+{
+	"view": "vw1",
+	"titulo_aba": "Vendas",
+	"abas_detalhe": "topo",
+	"area_agrupamento": true,
+	"linha_filtro": false,
+	"bandas": ["Venda", "Valores"],
+	"colunas": [
+		{ "campo": "venda_id", "editor": "texto", "visivel": false, "largura": 60 },
+		{ "campo": "dia", "editor": "inteiro", "visivel": false, "largura": 40 },
+		{ "campo": "Dt. contábil", "editor": "data", "largura": 80, "agrupar": 0 },
+		{ "campo": "Ticket", "editor": "texto", "largura": 70 },
+		{ "campo": "Modo de venda", "editor": "texto", "largura": 110 },
+		{ "campo": "Total", "editor": "moeda", "banda": 1, "largura": 90, "total": "soma", "total_grupo": true, "estilo": "Negrito" }
+	]
+}

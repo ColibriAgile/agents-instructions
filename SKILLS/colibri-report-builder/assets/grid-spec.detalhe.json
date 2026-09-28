@@ -1,0 +1,11 @@
+{
+	"view": "itens",
+	"titulo_aba": "Itens",
+	"colunas": [
+		{ "campo": "codigo", "titulo": "Código", "editor": "texto", "largura": 70 },
+		{ "campo": "material", "titulo": "Material", "editor": "texto", "largura": 200 },
+		{ "campo": "qtd", "titulo": "Qtd", "editor": "decimal", "formato": "quantidade", "largura": 60, "total": "soma" },
+		{ "campo": "vl_total", "titulo": "Total", "editor": "moeda", "largura": 80, "total": "soma" },
+		{ "campo": "lancado_em", "titulo": "Lançado em", "editor": "data", "formato": "datahora", "largura": 100 }
+	]
+}
