@@ -183,6 +183,50 @@
     color: var(--cm-ink);
     background-color: var(--cm-surface);
 }
+/* Itens de lista: o tema fixa texto preto (rgba(0,0,0,.87)), fundo cinza no foco e na seleção e divisor
+   #e0e0e0 abaixo de "Selecionar todos", que somem ou saltam no tema escuro. */
+.dx-list .dx-list-item,
+.dx-list .dx-empty-message { color: var(--cm-ink); }
+.dx-list .dx-list-item.dx-state-hover,
+.dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused {
+    color: var(--cm-ink);
+    background-color: var(--cm-hover);
+}
+.dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-list-item-selected,
+.dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-list-item-selected.dx-state-hover:not(.dx-state-focused),
+.dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused.dx-list-item-selected {
+    color: var(--cm-ink);
+    background-color: var(--cm-accent-soft);
+}
+.dx-list-select-all::after { background-color: var(--cm-line); }
+/* Filtro de cabeçalho como camada do kit (menu): borda de 1 px, cantos de 6 px, sombra de menu e o
+   divisor do rodapé em --cm-line, no lugar da sombra pesada e do #e0e0e0 do Material. */
+.dx-header-filter-menu .dx-overlay-content {
+    border: 1px solid var(--cm-line);
+    border-radius: var(--cm-radius);
+    box-shadow: var(--cm-shadow-menu);
+}
+.dx-header-filter-menu .dx-popup-content { border-bottom-color: var(--cm-line); }
+/* Indicador de carregamento no azul de ação, não no destaque do tema. */
+.dx-loadindicator-segment-inner { border-color: var(--cm-accent) var(--cm-accent) transparent; }
+.dx-list-select-all-checkbox { box-shadow: none; }
+/* Botões de texto do rodapé dos popups (OK e Cancelar do filtro de cabeçalho): sem caixa alta e sem o
+   destaque do tema; o padrão em --cm-accent-ink, o outro em --cm-ink-2, hover troca a superfície. */
+.dx-popup-wrapper .dx-popup-bottom .dx-button-mode-text {
+    color: var(--cm-ink-2);
+    border-radius: var(--cm-btn-radius);
+}
+.dx-popup-wrapper .dx-popup-bottom .dx-button-mode-text.dx-button-default { color: var(--cm-accent-ink); }
+.dx-popup-wrapper .dx-popup-bottom .dx-button-mode-text .dx-button-text {
+    color: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: none;
+}
+.dx-popup-wrapper .dx-popup-bottom .dx-button-mode-text.dx-state-hover,
+.dx-popup-wrapper .dx-popup-bottom .dx-button-mode-text.dx-state-focused { background-color: var(--cm-hover); }
+.dx-popup-wrapper .dx-popup-bottom .dx-button-mode-text.dx-button-default.dx-state-hover,
+.dx-popup-wrapper .dx-popup-bottom .dx-button-mode-text.dx-button-default.dx-state-focused { background-color: var(--cm-accent-soft); }
 
 /* ---------- DevExtreme — caixa de seleção com o visual da caixa do kit ----------
    16 px, borda de 1 px em --cm-line-strong e cantos de 3 px; marcada em --cm-accent com o mesmo traço
