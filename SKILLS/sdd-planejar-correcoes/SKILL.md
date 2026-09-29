@@ -11,7 +11,6 @@ disable-model-invocation: true
    **Saída:** revisão exata e legível, sem misturar IDs entre relatórios.
 2. Classifique todo item como acionável, informativo ou pendente. Em `APROVADO`, planeje só o solicitado; em `APROVADO COM RESSALVAS`, melhorias exigem escopo autorizado; em `REPROVADO`, cubra violações, incompletude e falhas. Status desconhecido permite somente achados explicitamente acionáveis.
    Preserve `CR-NN`; no legado sem IDs, atribua ID local por ordem e seção. Inventarie metadados da raiz e `done/` para reaproveitar tasks; identidade do achado é caminho da revisão + ID.
-   Com a skill `sdd-jev` em `sombra` ou `ativo`, aplique o ponto `J6` sobre esta classificação.
    **Saída:** todos os itens destinados; nenhum achado duplicado nem decisão inventada.
 3. Confira evidências no menor trecho de código/TechSpec necessário; envie exploradores somente leitura em paralelo só quando vários achados exigirem, cada um, varredura em muitos arquivos. Agrupe só mesma causa com um resultado revisável. Modele DAG acíclico, limites, arquivos e testes; numere novas tasks após o maior número na raiz e `done/`.
    Para desktop C#/.NET, omita E2E; preserve obrigação com unitários, integração ou aceite manual pertinente. Ambiente/decisão ausente vira pendência explícita, não achado descartado.

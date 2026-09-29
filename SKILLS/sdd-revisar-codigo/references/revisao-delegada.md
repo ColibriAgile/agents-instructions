@@ -28,7 +28,6 @@ Envie só dados, em caminhos, nesta ordem:
 - `--base` como commit resolvido (`git_base` do checkpoint ou a base registrada pelo chamador);
 - a pasta reservada `codereview_[num]/` e, em re-revisão, o caminho da revisão anterior e a pasta das correções;
 - com `snapshot-contexto.md` na pasta, o caminho de `references/carga.md` da skill `sdd-snapshot`;
-- o modo `jev` e, com `sombra` ou `ativo`, o caminho da skill `sdd-jev`;
 - o contrato abaixo e o formato de retorno.
 
 Não envie conversa, diffs que você analisou, resumos de handoff, justificativas, vereditos jev nem avaliação de prontidão ("está pronto", "falta só revisar"). O revisor lê handoffs como parte das fontes, pelas regras da skill.
@@ -36,9 +35,9 @@ Não envie conversa, diffs que você analisou, resumos de handoff, justificativa
 ### Contrato do revisor
 
 - Execute `sdd-revisar-codigo` integralmente, na ordem dos passos, como sessão independente. Carregue o snapshot, se houver, pelo filtro de etapa independente de `references/carga.md` da skill `sdd-snapshot`.
-- Grave somente `codereview_[num]/codereview.md` na pasta reservada. Com jev em `sombra` ou `ativo`, acrescente linhas a `jev-log.jsonl` como `sessao: revisora` e `controle: delegada`, sem ler as linhas existentes.
+- Grave somente `codereview_[num]/codereview.md` na pasta reservada. Não leia `jev-log.jsonl` nem chame o jev: com jev em `sombra` ou `ativo`, esta revisão é o grupo de controle do ponto `J3`.
 - Pode rodar build, testes e comandos do perfil de qualidade que a revisão exige, mesmo os que escrevem em `bin/`, `obj/` ou fixtures. Não edita código, tasks, manifesto, handoffs, `workflow.md`, checkpoint nem snapshot, e não faz commit, stash, checkout ou limpeza no worktree.
-- Não pergunta ao usuário e não faz pausa de sessão. Fonte ausente, ambiente indisponível, jev indisponível ou dúvida viram limitação ou bloqueio no relatório, inclusive o que a skill mandaria registrar em `workflow.md`.
+- Não pergunta ao usuário e não faz pausa de sessão. Fonte ausente, ambiente indisponível ou dúvida viram limitação ou bloqueio no relatório, inclusive o que a skill mandaria registrar em `workflow.md`.
 - Não delega a outro revisor. Explorador somente leitura só se o host permitir a este subagente; sem isso, buscas diretas.
 - Retorne: caminho do relatório, status literal e uma linha por bloqueio ou limitação. Nada além disso.
 
@@ -48,7 +47,7 @@ A sessão autora não grava nada no repositório nem roda build ou teste: qualqu
 
 ## Receber
 
-1. Com o estado terminal confirmado, atualize `active_work` e confira o worktree contra o registrado em Preparar. São esperados a pasta `codereview_[num]/`, linhas acrescentadas a `jev-log.jsonl` e saídas de build, testes e fixtures dos comandos que o relatório registra. Mudança em código, tasks, manifesto, handoffs, `workflow.md`, checkpoint, snapshot ou outro artefato SDD, ou em arquivo que nenhum comando registrado explica, é revisão contaminada: não a use como evidência nem reverta por conta própria; registre em `workflow.md`, ou no handoff em uso avulso, e leve ao **HIL de exceção** com os caminhos.
+1. Com o estado terminal confirmado, atualize `active_work` e confira o worktree contra o registrado em Preparar. São esperados a pasta `codereview_[num]/` e saídas de build, testes e fixtures dos comandos que o relatório registra. Mudança em código, tasks, manifesto, handoffs, `workflow.md`, checkpoint, snapshot ou outro artefato SDD, ou em arquivo que nenhum comando registrado explica, é revisão contaminada: não a use como evidência nem reverta por conta própria; registre em `workflow.md`, ou no handoff em uso avulso, e leve ao **HIL de exceção** com os caminhos.
 2. Leia `codereview_[num]/codereview.md` do disco. O retorno do subagente é pista; o relatório é a fonte. Confira que o status é exatamente `APROVADO`, `APROVADO COM RESSALVAS` ou `REPROVADO` e que o relatório registra `Execução: revisor delegado`.
 3. Sem relatório, com relatório incompleto ou com status irreconhecível, delegue uma única vez de novo, a um revisor novo, reservando o próximo sufixo e registrando a pasta incompleta como interrompida, sem apagá-la. Persistindo a falha, siga a regra de independência como sem subagente elegível.
 4. Grave o status e o caminho onde o chamador guarda o resultado da revisão (`review_status` e `sources.review` sob o fluxo) e siga o destino do chamador.

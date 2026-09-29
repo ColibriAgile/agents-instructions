@@ -6,39 +6,41 @@
 
 | Campo | Conteúdo |
 | --- | --- |
-| `ts` | Data e hora reais da chamada em ISO 8601, lidas do sistema (ex.: `Get-Date -Format o`), nunca um horário fixo: a duração do piloto sai desses valores |
+| `ts` | Data e hora reais da chamada em ISO 8601 com o offset local, lidas do sistema (ex.: `Get-Date -Format o`), nunca um horário fixo nem UTC |
 | `modo` | `sombra` ou `ativo` |
-| `sessao` | `autora` ou `revisora` |
-| `ponto` | `J0` a `J7` |
 | `etapa` | Skill e passo, ex. `sdd-orquestrar-tasks#6` |
-| `unidade` | Task, revisão ou artefato julgado, ex. `task_03`, `codereview_1` |
-| `tool`, `status` | Tool chamada e `status` devolvido |
-| `acao` | `auto`, `review`, `escalate`, `pass`, `block`, `skip` ou recomendação de `jev_decide` |
-| `sinalizados` | IDs com veredito diferente de `verified`/`auto` e seu veredito, ex. `{"RF-03": "unsupported"}` |
+| `unidade` | Task julgada, ex. `task_03` ou `codereview_1/task_04` |
+| `status` | `status` devolvido, ou `nao-chamado` com o motivo em `nota` |
+| `sinalizados` | Critérios com veredito diferente de `verified` em confiança de `auto`, com o veredito, ex. `{"criterio-2": "unsupported"}` |
+| `confiancas` | Confiança de cada claim, por critério |
 | `efeito` | `nenhum` (sombra), `diff-alterado` (sombra com mudança depois da chamada), `corrigido`, `justificado`, `bloqueou` ou `falha-operacional` |
-| `numeros` | Em `J3`: `safe_to_apply`, composto, notas da rubrica e confiança por claim; nos demais pontos, a confiança de cada item sinalizado |
+| `chars_enviados` | Soma dos caracteres de `claims` e `evidence`: estima os tokens que o próprio agente escreveu para montar a chamada |
 | `usage` | `input_tokens` e `output_tokens` devolvidos |
 | `corrige` | Opcional: número da linha que este registro corrige |
-| `controle` | `ausente` quando a revisão roda na sessão autora; `delegada` quando roda num revisor delegado de contexto novo; omitido quando roda em sessão nova |
+| `nota` | Opcional: motivo de falha, divisão da chamada ou tamanho do diff |
 
 ## Resumo no aceite
 
-Grave `tasks/prd-[slug]/jev-resumo.md` a partir do log, dos handoffs e dos relatórios, com contagem e IDs:
+Grave `tasks/prd-[slug]/jev-resumo.md` a partir do log, dos handoffs e dos relatórios. No topo: modo, controle da primeira revisão (`sessao-nova`, `delegada` ou `ausente`) e o modelo que conduziu a sessão autora, quando conhecido.
 
-1. **Gate por task (`J3`) contra a primeira revisão.** Atribua cada `CR-NN` de `codereview_1` à task dona dos arquivos e ao critério de aceite ou `TC-NN` que ele afeta. O gate devolve notas e confiança por claim, não causas; classifique por critério:
-   - *acerto*: claim do critério sinalizada (`unsupported`, `contradicted` ou confiança abaixo de `auto_accept`) e a revisão achou `CR-NN` nesse critério;
+1. **`J3` contra a primeira revisão.** Atribua cada `CR-NN` de `codereview_1` à task dona dos arquivos e ao critério de aceite ou `TC-NN` que ele afeta. Por critério:
+   - *acerto*: claim sinalizada e `CR-NN` no critério;
    - *alarme falso*: claim sinalizada sem `CR-NN` no critério;
-   - *omissão*: claim `verified` com confiança de `auto` e `CR-NN` no critério;
-   - *acerto confirmado pelo autor*: claim sinalizada e diff alterado antes de `done/` (`diff-alterado` ou `corrigido`), contado à parte porque a revisão já não pode achar o que foi corrigido;
-   - *sinal inespecífico*: `review` ou `escalate` só pela rubrica, sem claim sinalizada; conte à parte, sem acerto nem alarme.
+   - *omissão*: claim `verified` em confiança de `auto` e `CR-NN` no critério;
+   - *acerto confirmado pelo autor*: claim sinalizada e diff alterado antes de `done/` (`diff-alterado` ou `corrigido`), contado à parte porque a revisão já não pode achar o que foi corrigido.
 
-   Gate com `falha-operacional`, inclusive por diff resumido, fica fora das contagens. Liste `safe_to_apply` e composto por task para calibrar limiares. Em `ativo`, conte também as correções feitas por causa do gate.
-2. **Cobertura (`J1`, `J2`).** Lacunas sinalizadas, quantas o humano ou a revisão confirmaram e quantas a revisão achou sem sinalização.
-3. **Revisão (`J4`, `J5`, `J6`).** Concordância por linha da matriz, severidade e destino, com as divergências listadas.
-4. **Fluxo.** Status da primeira revisão, rodadas até `APROVADO` ou ressalvas decididas e tasks reabertas.
-5. **Custo.** Tokens por ponto e total; duração quando o host expuser. Sem telemetria de duração, declare-a não medida.
-6. **Baseline.** Das features do mesmo repositório sem jev: fração com primeira revisão `REPROVADO` e média de rodadas, contadas nos `codereview_*/codereview.md`. Declare amostra pequena como limitação.
+   Chamada com `falha-operacional` ou `nao-chamado` fica fora das contagens; liste a task e o motivo. Marque os achados que levaram a primeira revisão a `REPROVADO`.
+2. **Fluxo.** Status da primeira revisão, rodadas até `APROVADO` ou ressalvas decididas e tasks reabertas.
+3. **Custo.** Tokens devolvidos pelo jev e `chars_enviados` total, com a estimativa de tokens escritos pelo agente (caracteres ÷ 4). Duração quando o host expuser; sem telemetria, declare-a não medida.
+4. **Baseline.** Das features do mesmo repositório sem jev: fração com primeira revisão `REPROVADO` e média de rodadas, contadas nos `codereview_*/codereview.md`. Declare amostra pequena como limitação.
 
-Com `controle: ausente`, a feature entra só nos itens 4 (Fluxo) e 5 (Custo), com a ausência declarada no topo; acertos, alarmes, omissões e concordâncias ficam fora das contagens.
+Com controle `ausente`, a feature entra só nos itens 2 e 3, com a ausência declarada no topo.
 
-O resumo informa; a adoção de um ponto em `ativo` ou a remoção do modo é decisão humana registrada em `workflow.md`.
+## Critério de parada
+
+Contam as features com o `J3` por critério e controle `sessao-nova` ou `delegada`. O resumo de cada feature soma as anteriores e diz em que ponto o critério está:
+
+- **Encerrar e remover o jev do SDD** quando, somadas as features contadas, nenhum achado que levou uma primeira revisão a `REPROVADO` teve acerto ou acerto confirmado pelo autor, ou quando os alarmes falsos passaram de um por task em média. A conta vale depois de duas features com ao menos um desses achados; sem achado desse tipo, conte até quatro features e, com quatro sem nenhum, encerre também.
+- **Passar o `J3` a `ativo`** quando houver ao menos um acerto ou acerto confirmado pelo autor num desses achados, com os alarmes falsos dentro do limite.
+
+A decisão é humana e fica registrada em `workflow.md`. Alvos de remoção ao encerrar: a skill `sdd-jev`, as frases `Com a skill sdd-jev…` das skills de etapa, a pergunta de modo jev no HIL 0 de `sdd-triar`, o campo `jev` do checkpoint e de `estado-hil.md` e o trecho do passo 1 de `sdd-orquestrar-fluxo`.

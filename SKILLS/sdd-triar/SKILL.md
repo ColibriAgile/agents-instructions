@@ -20,7 +20,7 @@ A triagem gasta pouco para evitar gastar muito: levanta sinais com evidência, a
 
    | Sinal | Pergunta |
    | --- | --- |
-   | S1 Contrato público | Altera API/OpenAPI, DTO serializado, schema ou script de banco, formato de arquivo ou configuração? |
+   | S1 Contrato público | Altera o que um consumidor envia ou recebe: rota ou payload de API, DTO serializado, schema ou script de banco, formato de arquivo ou configuração? Mudança só em texto de documentação (descrição, exemplo, agrupamento) conta como ausente. |
    | S2 Área crítica | Toca área que as instruções locais declaram crítica ou que exige skill de risco (ex.: caixa, vendas, pagamento, fiscal, autenticação, bloqueios)? |
    | S3 Concorrência | Envolve transação, bloqueio, idempotência, fila ou estado compartilhado? |
    | S4 Raio de impacto | Quantos arquivos de produção, módulos e callers transitivos mudam de comportamento? |
@@ -35,9 +35,8 @@ A triagem gasta pouco para evitar gastar muito: levanta sinais com evidência, a
    - `pontual` quando todos valem: um módulo, até três arquivos de produção, nenhum de S1, S2, S3, S5 ou S8, comportamento esperado inequívoco e teste de regressão viável (S7).
    - `sdd-enxuto` nos demais casos.
    Sinal `não medido` que decidiria o nível conta como presente.
-   Depois de preencher todos os sinais, inclusive com evidência fornecida pelo usuário (imagens, exemplos, respostas), e quando o host expuser `jev_decide`, faça uma chamada: `decision` = qual nível de processo este pedido merece; `candidates` = os três níveis com a descrição da tabela; `evidence` = a tabela de sinais com evidências; `priorities` = qualidade inegociável em contrato público, área crítica e dado persistido, velocidade quando a mudança é localizada e reversível, somadas às prioridades das instruções locais; `requirements` = `mantém revisão independente quando há contrato público ou área crítica`, `custo de processo proporcional às obrigações e arquivos`, `leva decisão de produto aberta a um HIL antes do código`. `escaped: true` deixa só a rubrica. Uma chamada por pedido inalterado.
-   **Saída:** nível da rubrica com os sinais decisivos, e nível jev com probabilidades e `warnings` quando houver.
-4. **HIL 0.** Apresente o nível recomendado, que é o da rubrica quando S1, S5 ou S8 estiverem presentes, os sinais decisivos com evidência, a recomendação jev como segunda opinião quando divergir da rubrica e o que cada nível custa em artefatos, HILs e revisão. Pergunte com a ferramenta de pergunta disponível, recomendado primeiro. Quando o host expuser as tools jev e `--jev` não tiver sido informado, pergunte na mesma chamada o modo jev do fluxo (`off`, `sombra`, `ativo`), válido só para `sdd-completo` e `sdd-enxuto`. Silêncio mantém a decisão pendente. Acrescente uma linha a `tasks/triagem-log.jsonl` com data, pedido resumido, sinais, nível da rubrica, nível jev, decisão humana e modo jev.
+   **Saída:** nível da rubrica com os sinais decisivos.
+4. **HIL 0.** Apresente o nível que a rubrica recomenda, os sinais decisivos com evidência e o que cada nível custa em artefatos, HILs e revisão. Pergunte com a ferramenta de pergunta disponível, recomendado primeiro. Quando o host expuser as tools jev e `--jev` não tiver sido informado, pergunte na mesma chamada o modo jev do fluxo (`off`, `sombra`, `ativo`), válido só para `sdd-completo` e `sdd-enxuto`. Silêncio mantém a decisão pendente. Acrescente uma linha a `tasks/triagem-log.jsonl` com data, pedido resumido, sinais, nível da rubrica, decisão humana e modo jev.
    **Saída:** nível decidido pelo humano e registrado; modo jev conhecido para os níveis SDD.
 5. **Seguir.** `sdd-completo` e `sdd-enxuto` voltam a `sdd-orquestrar-fluxo` com o modo jev decidido, que ela grava no checkpoint e registra junto da triagem como decisão em `workflow.md`; em `sdd-enxuto`, registre também a fusão de HIL 1 e HIL 2 como modificação de paradas. `pontual` segue o ramo abaixo.
    **Saída:** próximo passo iniciado no caminho decidido.
@@ -48,7 +47,7 @@ A triagem gasta pouco para evitar gastar muito: levanta sinais com evidência, a
    **Saída:** mudança aplicada e teste com resultado registrado antes e depois.
 2. **Alarme.** Pare e volte ao passo 2 com a evidência nova quando o diff passar do limite de arquivos decidido no HIL 0 (padrão: três de produção), tocar S1, S2, S3 ou S8, ou surgir decisão de produto. A mudança feita permanece no worktree como evidência; descartá-la é decisão humana.
    **Saída:** diff conferido dentro do limite, ou triagem reaberta com a evidência nova.
-3. **Revisar.** Revise o diff com a skill de revisão do repositório ou a revisão nativa do host. Quando o host expuser `jev_review`, chame-o com o pedido em `request`, o diff e a saída dos testes em `tests`: `escalate` é corrigido ou levado ao humano.
+3. **Revisar.** Revise o diff com a skill de revisão do repositório ou a revisão nativa do host.
    **Saída:** achados da revisão corrigidos ou levados ao humano.
 4. **Entregar.** Faça commit só quando pedido, pela skill `commit`.
    **Saída:** entrega no estado pedido, com teste de regressão e revisão como evidência.
