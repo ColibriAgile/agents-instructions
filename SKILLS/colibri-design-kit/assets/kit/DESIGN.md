@@ -206,7 +206,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 
 ### Formulários
 
-- Painel `.cm-panel.cm-form`, grupos em `.cm-fieldset` (legenda = título de seção), campos em `.cm-field` com rótulo sempre visível (`.cm-field__label`), controle `.cm-input` (32 px) e erro associado (`.cm-field__error`). Pares lado a lado em `.cm-form-row`; rótulo à esquerda em `.cm-form-grid`.
+- Painel `.cm-panel.cm-form`, grupos em `.cm-fieldset` (legenda = título de seção), campos em `.cm-field` com rótulo sempre visível (`.cm-field__label`), controle `.cm-input` (32 px) e erro associado (`.cm-field__error`). Campo somente leitura em `surface-2` com texto `ink-2`; campo desabilitado (depende de uma opção desmarcada) em `surface-2`, texto e borda apagados e rótulo em `ink-3`, sem sumir. Pares lado a lado em `.cm-form-row`; rótulo à esquerda em `.cm-form-grid`.
 - Campo + botão ou prefixo/sufixo unidos: `.cm-input-group` com `.cm-input-addon`.
 - Opções exclusivas com descrição: `.cm-choices` / `.cm-choice` (lado a lado, a escolhida em azul-claro).
 - **Caixas de seleção e rádios:** 16 px, borda `#c7d0da`, cantos de 3 px (rádio circular); marcados preenchidos com o azul de ação e marca branca; foco com o halo azul-claro; opção dependente recuada (`.cm-check--nested`) e apagada quando desabilitada. Escolhas múltiplas curtas e relacionadas (ex.: dias da semana) usam grupo de alternância `.cm-toggles` / `.cm-toggle`.

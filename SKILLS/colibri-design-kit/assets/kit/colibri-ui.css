@@ -1326,6 +1326,15 @@ label.cm-field__label {
 .cm-input.cm-mono { font-family: var(--cm-mono); }
 .cm-input:focus { border-color: var(--cm-focus); box-shadow: var(--cm-focus-ring); }
 .cm-input[readonly] { color: var(--cm-ink-2); background: var(--cm-surface-2); }
+/* Desabilitado (campo que depende de uma opção desmarcada): apagado e sem foco, com o rótulo junto. */
+.cm-input:disabled {
+    color: var(--cm-disabled-ink);
+    background: var(--cm-surface-2);
+    border-color: var(--cm-line);
+    cursor: not-allowed;
+}
+.cm-input:disabled::placeholder { color: var(--cm-disabled-ink); }
+.cm-field:has(.cm-input:disabled) .cm-field__label { color: var(--cm-ink-3); }
 .cm-input--sm { max-width: 120px; }
 .cm-input-group {
     display: flex;
