@@ -1,10 +1,12 @@
 /*
- * Colibri UI — adaptador de tipografia para DevExpress (Blazor) e DevExtreme (React).
- * Opcional: carregue depois do tema DevExpress/DevExtreme e de colibri-ui.css (usa --cm-font e --cm-mono).
- * Objetivo: todo texto interno dos componentes — calendário e relógio do editor de data/hora, listas
+ * Colibri UI — adaptador para DevExpress (Blazor) e DevExtreme (React).
+ * Opcional: carregue depois do tema DevExpress/DevExtreme e de colibri-ui.css (usa os tokens --cm-*).
+ * Tipografia: todo texto interno dos componentes — calendário e relógio do editor de data/hora, listas
  * suspensas, cabeçalhos e filtros de grade, paginador, dicas, mensagens de validação, notificações —
  * usa a mesma família tipográfica da aplicação. Popups são renderizados fora da árvore da página;
  * por isso as regras ficam em :root e nas classes raiz dos componentes, nunca num contêiner da página.
+ * Grade e caixa de seleção do DevExtreme: mesma anatomia e mesmos tokens de .cm-table e da caixa de
+ * seleção do kit, nos dois temas (DESIGN.md, seção 7, "Regra da grade como tabela").
  * Remova os blocos da biblioteca que o projeto não usa.
  */
 
@@ -32,3 +34,187 @@
 .dx-overlay-wrapper input,
 .dx-overlay-wrapper textarea,
 .dx-overlay-wrapper button { font-family: var(--cm-font); }
+
+/* ---------- DevExtreme — DataGrid com a anatomia de .cm-table ----------
+   Superfície única; cabeçalho de 36 px em surface-2 com rótulo de 12 px peso 600; linhas de no mínimo
+   42 px mais o divisor, com 5 px de respiro e texto de 13 px; divisor de 1 px em --cm-line; sem zebra e sem linhas de
+   coluna; hover troca a superfície. Recuo de 16 px na primeira coluna, 12 px na última e 16 px entre
+   colunas, como em .cm-table__row. Os temas Material e Generic são claros ou escuros por arquivo e não
+   expõem variáveis para a grade: as regras usam as classes do tema (conferidas no DevExtreme 22.2) e
+   vencem por especificidade igual, carregadas depois dele. Revise ao atualizar o DevExtreme. */
+.dx-datagrid {
+    color: var(--cm-ink);
+    background-color: var(--cm-surface);
+    font-size: 13px;
+}
+/* A moldura e os cantos são do .cm-panel que envolve a grade (showBorders desligado). */
+.cm-panel:has(.dx-datagrid) { overflow: hidden; }
+.dx-datagrid .dx-datagrid-header-panel {
+    padding: 8px 12px 0;
+    background-color: var(--cm-surface);
+    border-bottom: 0;
+}
+/* .dx-datagrid-borders fica no mesmo elemento que .dx-datagrid. */
+.dx-datagrid-borders > .dx-datagrid-headers,
+.dx-datagrid-borders > .dx-datagrid-rowsview,
+.dx-datagrid-borders > .dx-datagrid-total-footer,
+.dx-datagrid-borders > .dx-datagrid-filter-panel,
+.dx-datagrid .dx-datagrid-headers .dx-datagrid-table .dx-row > td,
+.dx-datagrid .dx-datagrid-rowsview .dx-datagrid-table .dx-row > td { border-color: var(--cm-line); }
+.dx-datagrid .dx-datagrid-headers {
+    color: var(--cm-ink-2);
+    background-color: var(--cm-surface-2);
+    border-bottom: 1px solid var(--cm-line);
+}
+/* 36 px com o divisor, como .cm-table__head. */
+.dx-datagrid .dx-datagrid-headers .dx-header-row > td {
+    height: 36px;
+    padding: 0 8px;
+    color: var(--cm-ink-2);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    vertical-align: middle;
+}
+.dx-datagrid .dx-datagrid-headers .dx-header-row > td:first-child { padding-left: 16px; }
+.dx-datagrid .dx-datagrid-headers .dx-header-row > td:last-child { padding-right: 12px; }
+.dx-datagrid .dx-sort,
+.dx-datagrid .dx-sort-indicator { color: var(--cm-ink-2); }
+.dx-datagrid .dx-header-filter { color: var(--cm-ink-3); }
+.dx-datagrid .dx-header-filter:not(.dx-header-filter-empty) { color: var(--cm-accent-ink); }
+/* Linha de filtro: mesma superfície das linhas, editores sem moldura, na fonte e na cor do texto. */
+.dx-datagrid .dx-datagrid-headers .dx-datagrid-filter-row,
+.dx-datagrid .dx-datagrid-headers .dx-datagrid-filter-row > td { background-color: var(--cm-surface); }
+.dx-datagrid .dx-texteditor-input { color: var(--cm-ink); }
+.dx-datagrid .dx-placeholder::before { color: var(--cm-ink-3); }
+.dx-datagrid .dx-datagrid-filter-row .dx-menu-item .dx-icon,
+.dx-datagrid .dx-editor-cell .dx-dropdowneditor-icon { color: var(--cm-ink-3); }
+.dx-datagrid .dx-datagrid-rowsview,
+.dx-datagrid .dx-datagrid-rowsview .dx-row > td { background-color: var(--cm-surface); }
+/* 43 px com o divisor = linha de 42 px + 1 px, o passo de .cm-table__item. */
+.dx-datagrid .dx-datagrid-rowsview .dx-data-row > td {
+    height: 43px;
+    padding: 5px 8px;
+    color: var(--cm-ink);
+    font-size: 13px;
+    line-height: 1.3;
+    vertical-align: middle;
+}
+.dx-datagrid .dx-datagrid-rowsview .dx-data-row > td:first-child { padding-left: 16px; }
+.dx-datagrid .dx-datagrid-rowsview .dx-data-row > td:last-child { padding-right: 12px; }
+.dx-datagrid .dx-datagrid-rowsview .dx-row-lines > td { border-bottom: 1px solid var(--cm-line); }
+/* Sem zebra e sem linhas de coluna, mesmo com rowAlternationEnabled ou showColumnLines ligados. */
+.dx-datagrid .dx-datagrid-rowsview .dx-row-alt > td,
+.dx-datagrid .dx-datagrid-rowsview .dx-row-alt > tr > td {
+    background-color: var(--cm-surface);
+    border-top-color: var(--cm-line);
+    border-bottom-color: var(--cm-line);
+}
+.dx-datagrid .dx-column-lines > td {
+    border-left-color: transparent;
+    border-right-color: transparent;
+}
+/* O tema encadeia seis :not() no hover; o kit pede só a troca de superfície. */
+.dx-datagrid .dx-datagrid-rowsview .dx-data-row.dx-state-hover:not(.dx-selection) > td {
+    color: var(--cm-ink) !important;
+    background-color: var(--cm-hover) !important;
+}
+.dx-datagrid .dx-datagrid-rowsview .dx-selection > td {
+    color: var(--cm-ink) !important;
+    background-color: var(--cm-accent-soft) !important;
+}
+/* Linha selecionada ou em edição: o tema troca o divisor por um cinza fixo (#e0e0e0). */
+.dx-datagrid .dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused).dx-row-lines > td,
+.dx-datagrid .dx-datagrid-rowsview .dx-row.dx-edit-row > td { border-color: var(--cm-line); }
+.dx-datagrid .dx-datagrid-rowsview .dx-group-row > td {
+    color: var(--cm-ink);
+    background-color: var(--cm-surface-2);
+    font-weight: 600;
+}
+.dx-datagrid .dx-datagrid-rowsview .dx-master-detail-row > .dx-master-detail-cell {
+    background-color: var(--cm-surface-2);
+    border-color: var(--cm-line);
+}
+.dx-datagrid .dx-datagrid-total-footer {
+    color: var(--cm-ink-2);
+    background-color: var(--cm-surface-2);
+}
+.dx-datagrid .dx-datagrid-nodata { color: var(--cm-ink-2); font-size: 13px; }
+.dx-datagrid-focus-overlay::after { background-color: var(--cm-focus); }
+/* Dados (versões, datas, contagens) em mono: cssClass="cm-mono" na coluna. O DevExtreme também põe a
+   classe no cabeçalho e na linha de filtro, que continuam na fonte de texto. */
+.dx-datagrid .dx-datagrid-rowsview .dx-data-row > td.cm-mono { font-size: 12px; }
+.dx-datagrid .dx-datagrid-headers .dx-row > td.cm-mono { font-family: var(--cm-font); }
+.dx-datagrid .dx-datagrid-headers .dx-datagrid-filter-row > td.cm-mono { font-size: 13px; }
+/* Botões da coluna de comandos (edição em linha) como .cm-icon-btn: ícones Bootstrap Icons
+   (icon="bi bi-..."), no lugar da fonte de ícones do tema; cssClass="cm-icon-btn--danger" na ação
+   destrutiva. */
+.dx-datagrid .dx-command-edit-with-icons { white-space: nowrap; }
+.dx-datagrid .dx-command-edit-with-icons .dx-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    margin: 0 1px;
+    color: var(--cm-ink-2);
+    border-radius: var(--cm-radius-sm);
+    font-size: 16px;
+    line-height: 1;
+    text-decoration: none;
+    vertical-align: middle;
+    transition: background-color 150ms var(--cm-ease), color 150ms var(--cm-ease);
+}
+.dx-datagrid .dx-command-edit-with-icons .dx-link::before { width: auto; height: auto; font-size: 16px; line-height: 1; }
+.dx-datagrid .dx-command-edit-with-icons .dx-link:hover { color: var(--cm-accent-ink); background: var(--cm-accent-soft); }
+.dx-datagrid .dx-command-edit-with-icons .dx-link.cm-icon-btn--danger:hover { color: var(--cm-danger); background: var(--cm-danger-soft); }
+.dx-datagrid .dx-command-edit-with-icons .dx-link:focus-visible { outline: 2px solid var(--cm-focus); outline-offset: -3px; }
+.dx-datagrid .dx-command-edit-with-icons .dx-link.dx-state-disabled,
+.dx-datagrid .dx-command-edit-with-icons .dx-link.dx-state-disabled:hover {
+    color: var(--cm-disabled-ink);
+    background: transparent;
+    opacity: 1;
+    cursor: not-allowed;
+}
+/* Popups da grade (filtro de cabeçalho, escolha de colunas) e listas suspensas na superfície do tema. */
+.dx-overlay-wrapper .dx-overlay-content.dx-popup-normal,
+.dx-overlay-wrapper .dx-list,
+.dx-overlay-wrapper .dx-popup-content {
+    color: var(--cm-ink);
+    background-color: var(--cm-surface);
+}
+
+/* ---------- DevExtreme — caixa de seleção com o visual da caixa do kit ----------
+   16 px, borda de 1 px em --cm-line-strong e cantos de 3 px; marcada em --cm-accent com o mesmo traço
+   branco; sem a onda do Material; foco pelo teclado com o anel do kit. Somente leitura (valor booleano
+   na grade) mantém a cor; desabilitada esmaece como no kit. */
+.dx-checkbox-icon {
+    width: 16px;
+    height: 16px;
+    background: var(--cm-surface) no-repeat center / 12px 12px;
+    border: 1px solid var(--cm-line-strong);
+    border-radius: 3px;
+    transition: background-color 120ms var(--cm-ease), border-color 120ms var(--cm-ease), box-shadow 120ms var(--cm-ease);
+}
+.dx-checkbox-icon::after { content: none; }
+.dx-checkbox.dx-state-hover:not(.dx-state-readonly):not(.dx-state-disabled) .dx-checkbox-icon { border-color: var(--cm-check-hover); }
+.dx-checkbox.dx-checkbox-checked .dx-checkbox-icon,
+.dx-checkbox.dx-checkbox-indeterminate .dx-checkbox-icon,
+.dx-checkbox.dx-checkbox-checked.dx-state-readonly .dx-checkbox-icon,
+.dx-checkbox.dx-checkbox-checked.dx-state-disabled .dx-checkbox-icon,
+.dx-checkbox.dx-checkbox-indeterminate.dx-state-readonly .dx-checkbox-icon,
+.dx-checkbox.dx-checkbox-indeterminate.dx-state-disabled .dx-checkbox-icon {
+    background-color: var(--cm-accent);
+    border: 1px solid var(--cm-accent);
+}
+.dx-checkbox.dx-checkbox-checked .dx-checkbox-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' d='M3.5 8.4l3 3 6-6.6'/%3E%3C/svg%3E");
+}
+.dx-checkbox.dx-checkbox-indeterminate .dx-checkbox-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' d='M4 8h8'/%3E%3C/svg%3E");
+}
+.dx-checkbox.dx-checkbox-checked .dx-checkbox-icon::before,
+.dx-checkbox.dx-checkbox-indeterminate .dx-checkbox-icon::before { content: none; }
+.dx-checkbox:focus-visible .dx-checkbox-icon { border-color: var(--cm-focus); box-shadow: var(--cm-focus-ring); }
+.dx-checkbox.dx-state-disabled { opacity: .45; }
+.dx-invalid .dx-checkbox-icon { border-color: var(--cm-danger); }

@@ -133,7 +133,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 - **Família:** Google Sans Flex (`--cm-font`) em todo texto; Google Sans Mono (`--cm-mono`) só onde o kit já usa dados (versões, identificadores, logs, colunas de data/hora e contagens em grades). O calendário e o relógio do editor de data/hora usam `--cm-font`.
 - **Como aplicar:** carregue `colibri-ui.devexpress.css` depois do tema da biblioteca e de `colibri-ui.css`. Ele redefine as variáveis públicas de fonte (`--dxds-font-family-*` nos temas Fluent do DevExpress Blazor; `--bs-*` nos temas clássicos e Bootstrap externo) e fixa a fonte nas raízes do DevExtreme (`.dx-widget` e `.dx-overlay-wrapper`, que contém os popups). Prefira sempre variáveis públicas do tema; use classes internas (`--dxbl-*`, `.dxbl-*`) só quando não houver alternativa e registre o motivo na seção 9, pois mudam entre versões.
 - **Popups ficam fora da página.** Calendários, listas suspensas e diálogos das bibliotecas costumam ser anexados ao `<body>`, fora do contêiner da aplicação. Por isso a fonte é definida em `:root`/`body` e nas classes raiz dos componentes — nunca apenas num contêiner como `.cm-page` ou `.app`.
-- **Tamanho e peso também seguem a escala** (13 px corpo, 12 px rótulos e legendas, 600 em títulos de linha, 32 px de altura de controle). No DevExpress Blazor, escolha o `SizeMode` mais próximo da escala e ajuste o restante por variáveis `--dxds-font-size-*`; no DevExtreme, prefira os temas *compact*.
+- **Tamanho e peso também seguem a escala** (13 px corpo, 12 px rótulos e legendas, 600 em títulos de linha, 32 px de altura de controle; grades pela regra da grade como tabela, seção 7). No DevExpress Blazor, escolha o `SizeMode` mais próximo da escala e ajuste o restante por variáveis `--dxds-font-size-*`; no DevExtreme, prefira os temas *compact*.
 - **Fontes locais:** não carregue a fonte do tema da biblioteca (Roboto, Inter, Segoe via CDN ou pacote); as WOFF2 do kit bastam.
 - **Verificação obrigatória:** abra o calendário e o seletor de hora de um campo de data/hora, uma lista suspensa, uma dica e uma mensagem de validação, e confira nas ferramentas do navegador (aba *Computed*, `font-family` e a fonte efetivamente renderizada) que todos usam Google Sans Flex. Repita ao atualizar a versão da biblioteca ou trocar o tema.
 
@@ -193,6 +193,17 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 - **Etiquetas** (`.cm-tag`, variantes de estado e `--muted`): estado curto, módulos, chaves; listas de etiquetas em `.cm-tags`.
 - **Responsivo:** perto da largura de tablet, esconder colunas secundárias; abaixo de 760 px, linhas viram blocos com rótulos (`.cm-cell__label`), preservando ações.
 
+**Regra da grade como tabela.** Grades de bibliotecas de componentes (DataGrid do DevExtreme, DxGrid do DevExpress Blazor e similares) têm a mesma anatomia e os mesmos tokens da `.cm-table`; lado a lado, não se distingue uma da outra:
+
+- cabeçalho de 36 px em `surface-2`, rótulo de 12 px peso 600 em `ink-2`;
+- linhas de no mínimo 42 px mais o divisor, com 5 px de respiro e texto de 13 px; recuo de 16 px na primeira coluna, 12 px na última e 16 px entre colunas;
+- superfície única: sem linhas alternadas (zebra) e sem linhas de coluna; divisor de 1 px em `line`, também na linha selecionada e na linha em edição; hover troca a superfície; seleção em `action-soft`;
+- a moldura e os cantos são do `.cm-panel` que envolve a grade, sem sombra; a borda própria da grade fica desligada;
+- versões, datas e contagens em mono de 12 px; o rótulo do cabeçalho continua na fonte de texto;
+- caixas de seleção e ações de linha com o visual do kit (caixa de 16 px, `.cm-icon-btn`), nunca na cor de destaque do tema da biblioteca.
+
+`colibri-ui.devexpress.css` aplica a regra ao DevExtreme (no React: `showBorders={false}`, sem `rowAlternationEnabled`, `cssClass="cm-mono"` nas colunas de dados). No DevExpress Blazor, aplique pelas variáveis `--dxbl-grid-*` do tema e registre na seção 9.
+
 ### Formulários
 
 - Painel `.cm-panel.cm-form`, grupos em `.cm-fieldset` (legenda = título de seção), campos em `.cm-field` com rótulo sempre visível (`.cm-field__label`), controle `.cm-input` (32 px) e erro associado (`.cm-field__error`). Pares lado a lado em `.cm-form-row`; rótulo à esquerda em `.cm-form-grid`.
@@ -236,6 +247,7 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Fontes, estilos ou ícones hospedados fora da aplicação.
 - Repetir a marca-d'água do colibri em outras páginas ou aumentar sua opacidade a ponto de competir com os dados.
 - Deixar calendário, seletor de hora, listas suspensas, grades ou dicas de uma biblioteca na fonte padrão do tema dela.
+- Grade de biblioteca com as linhas altas, a zebra, as bordas ou a cor de destaque do tema dela.
 - Tema escuro em preto ou cinza neutro, com degradê fora da lateral ou com cor escrita na tela em vez de token.
 - Ícone da aba padrão do framework, da identidade anterior ou de outro produto.
 
