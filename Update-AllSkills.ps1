@@ -9,8 +9,10 @@
     projeto com -NoPull, evitando repetir a sincronização N vezes.
 
     Cada projeto é processado no seu próprio diretório, porque `npx skills add` instala no
-    diretório atual. Falha em um projeto não interrompe os demais: o resumo final lista
-    todos e o script sai com código 1 se algum falhou.
+    diretório atual. Até -ThrottleLimit projetos rodam ao mesmo tempo, cada um num processo
+    pwsh separado; a saída de cada projeto aparece de uma vez quando ele termina. Falha em um
+    projeto não interrompe os demais: o resumo final lista todos e o script sai com código 1
+    se algum falhou.
 
 .PARAMETER Root
     Pasta base onde procurar projetos. Padrão: a pasta que contém este repositório.
@@ -27,8 +29,13 @@
 .PARAMETER Silent
     Imprime somente o resumo final. Sem esta opção, imprime uma linha por projeto.
 
+.PARAMETER ThrottleLimit
+    Quantos projetos atualizar em paralelo. Padrão: 4. Use 1 para rodar em sequência.
+
 .PARAMETER Detailed
     Repassa -Detailed ao Install-Skills.ps1, mostrando a saída completa de cada fonte.
+    Roda os projetos em sequência, para a saída ao vivo e o prompt de reconciliação não
+    se misturarem entre projetos.
 
 .PARAMETER NoReconcile
     Repassa -NoReconcile ao Install-Skills.ps1, pulando a detecção de skills fora do manifesto.
@@ -49,6 +56,7 @@
     ./Update-AllSkills.ps1
     ./Update-AllSkills.ps1 -Root D:\Projetos -Exclude '*\arquivados\*'
     ./Update-AllSkills.ps1 -Silent
+    ./Update-AllSkills.ps1 -ThrottleLimit 6
 #>
 [CmdletBinding()]
 param(
@@ -58,6 +66,8 @@ param(
     [string[]]$Exclude = @(),
     [switch]$ListOnly,
     [switch]$Silent,
+    [ValidateRange(1, 16)]
+    [int]$ThrottleLimit = 4,
     [switch]$Detailed,
     [switch]$NoReconcile,
     [switch]$NoPull,
@@ -148,11 +158,14 @@ if ($skillsRef -and -not $PSBoundParameters.ContainsKey('Ref')) {
 
 # ---------- execução ----------
 
-# Splatting de hashtable: array passaria '-Silent' como argumento posicional, não como switch.
-$childArgs = @{ NoPull = $true }
-if ($Detailed) { $childArgs['Detailed'] = $true } else { $childArgs['Silent'] = $true }
-if ($NoReconcile) { $childArgs['NoReconcile'] = $true }
-if ($skillsRef) { $childArgs['Ref'] = $skillsRef }
+# -Detailed precisa do console só para si (saída ao vivo + prompt de reconciliação), e
+# ForEach-Object -Parallel só existe no PowerShell 7+.
+if ($Detailed -or $PSVersionTable.PSVersion.Major -lt 7) {
+    if ($PSBoundParameters.ContainsKey('ThrottleLimit') -and $ThrottleLimit -gt 1) {
+        Write-Warning "-ThrottleLimit ignorado: $(if ($Detailed) { '-Detailed roda em sequência' } else { 'paralelismo exige PowerShell 7+' })."
+    }
+    $ThrottleLimit = 1
+}
 
 $results = [System.Collections.Generic.List[object]]::new()
 $total = $projects.Count
@@ -160,48 +173,113 @@ $i = 0
 $sw = [System.Diagnostics.Stopwatch]::StartNew()
 
 if (-not $Silent) {
+    $mode = if ($ThrottleLimit -gt 1) { ", $ThrottleLimit por vez" } else { '' }
     Write-Host ""
-    Write-Host "Atualizando skills em $total projeto(s) sob $Root..." -ForegroundColor Cyan
+    Write-Host "Atualizando skills em $total projeto(s) sob $Root$mode..." -ForegroundColor Cyan
     Write-Host ""
 }
 
-foreach ($project in $projects) {
-    $i++
-    $name = Split-Path -Leaf $project
+if ($ThrottleLimit -gt 1) {
+    # Execuções simultâneas de `npx --yes` com o pacote fora do cache disputam o mesmo
+    # diretório _npx; uma chamada antes do paralelismo deixa o pacote em cache.
+    & npx --yes skills list --json *> $null
 
-    if (-not $Silent) {
-        Write-Progress -Activity "Atualizando skills" -Status "[$i/$total] $name" -PercentComplete (100 * ($i - 1) / $total)
-        Write-Host ("  [{0,2}/{1}] " -f $i, $total) -ForegroundColor DarkGray -NoNewline
-        Write-Host $name.PadRight(28) -ForegroundColor White -NoNewline
-    }
+    $pwsh = [Environment]::ProcessPath
+    $childArgs = @('-NoPull', '-Silent')
+    if ($NoReconcile) { $childArgs += '-NoReconcile' }
+    if ($skillsRef) { $childArgs += @('-Ref', $skillsRef) }
 
-    $itemSw = [System.Diagnostics.Stopwatch]::StartNew()
-    Push-Location -LiteralPath $project
-    try {
-        & $installScript -Path (Join-Path $project 'skills.yaml') @childArgs
-        $exitCode = $LASTEXITCODE
-    }
-    catch {
-        $exitCode = 1
-        Write-Warning "Erro inesperado em ${project}: $_"
-    }
-    finally {
-        Pop-Location
-    }
-    $itemSw.Stop()
+    # Um processo pwsh por projeto: isola diretório atual, `exit` e saída de cada instalação.
+    $projects | ForEach-Object -ThrottleLimit $ThrottleLimit -Parallel {
+        $project = $_
+        $pwsh = $using:pwsh
+        $pwshArgs = @(
+            '-NoProfile', '-NonInteractive', '-WorkingDirectory', $project,
+            '-File', $using:installScript, '-Path', (Join-Path $project 'skills.yaml')
+        ) + $using:childArgs
 
-    $ok = ($exitCode -eq 0)
-    $results.Add([pscustomobject]@{
-        Projeto  = $name
-        Caminho  = $project
-        Ok       = $ok
-        Segundos = [math]::Round($itemSw.Elapsed.TotalSeconds, 1)
-    })
+        $itemSw = [System.Diagnostics.Stopwatch]::StartNew()
+        try {
+            $output = @(& $pwsh @pwshArgs 2>&1 | ForEach-Object { "$_" })
+            $exitCode = $LASTEXITCODE
+        }
+        catch {
+            $output = @("Erro inesperado: $_")
+            $exitCode = 1
+        }
+        $itemSw.Stop()
 
-    if (-not $Silent) {
-        if ($ok) { Write-Host "OK" -ForegroundColor Green -NoNewline }
-        else { Write-Host "FALHA" -ForegroundColor Red -NoNewline }
-        Write-Host (" ({0:n1}s)" -f $itemSw.Elapsed.TotalSeconds) -ForegroundColor DarkGray
+        [pscustomobject]@{
+            Projeto  = Split-Path -Leaf $project
+            Caminho  = $project
+            Ok       = ($exitCode -eq 0)
+            Segundos = [math]::Round($itemSw.Elapsed.TotalSeconds, 1)
+            Saida    = @($output | Where-Object { $_.Trim() })
+        }
+    } | ForEach-Object {
+        # Roda no runspace principal, na ordem em que os projetos terminam.
+        $i++
+        $results.Add($_)
+
+        if (-not $Silent) {
+            Write-Progress -Activity "Atualizando skills" -Status "$i/$total concluído(s)" -PercentComplete (100 * $i / $total)
+        }
+        # Em -Silent, o projeto só aparece se a instalação disse algo (avisos, extras, erros).
+        if (-not $Silent -or $_.Saida.Count -gt 0) {
+            Write-Host ("  [{0,2}/{1}] " -f $i, $total) -ForegroundColor DarkGray -NoNewline
+            Write-Host $_.Projeto.PadRight(28) -ForegroundColor White -NoNewline
+            if ($_.Ok) { Write-Host "OK" -ForegroundColor Green -NoNewline }
+            else { Write-Host "FALHA" -ForegroundColor Red -NoNewline }
+            Write-Host (" ({0:n1}s)" -f $_.Segundos) -ForegroundColor DarkGray
+            $_.Saida | ForEach-Object { Write-Host "         $_" }
+        }
+    }
+}
+else {
+    # Splatting de hashtable: array passaria '-Silent' como argumento posicional, não como switch.
+    $childArgs = @{ NoPull = $true }
+    if ($Detailed) { $childArgs['Detailed'] = $true } else { $childArgs['Silent'] = $true }
+    if ($NoReconcile) { $childArgs['NoReconcile'] = $true }
+    if ($skillsRef) { $childArgs['Ref'] = $skillsRef }
+
+    foreach ($project in $projects) {
+        $i++
+        $name = Split-Path -Leaf $project
+
+        if (-not $Silent) {
+            Write-Progress -Activity "Atualizando skills" -Status "[$i/$total] $name" -PercentComplete (100 * ($i - 1) / $total)
+            Write-Host ("  [{0,2}/{1}] " -f $i, $total) -ForegroundColor DarkGray -NoNewline
+            Write-Host $name.PadRight(28) -ForegroundColor White -NoNewline
+        }
+
+        $itemSw = [System.Diagnostics.Stopwatch]::StartNew()
+        Push-Location -LiteralPath $project
+        try {
+            & $installScript -Path (Join-Path $project 'skills.yaml') @childArgs
+            $exitCode = $LASTEXITCODE
+        }
+        catch {
+            $exitCode = 1
+            Write-Warning "Erro inesperado em ${project}: $_"
+        }
+        finally {
+            Pop-Location
+        }
+        $itemSw.Stop()
+
+        $ok = ($exitCode -eq 0)
+        $results.Add([pscustomobject]@{
+            Projeto  = $name
+            Caminho  = $project
+            Ok       = $ok
+            Segundos = [math]::Round($itemSw.Elapsed.TotalSeconds, 1)
+        })
+
+        if (-not $Silent) {
+            if ($ok) { Write-Host "OK" -ForegroundColor Green -NoNewline }
+            else { Write-Host "FALHA" -ForegroundColor Red -NoNewline }
+            Write-Host (" ({0:n1}s)" -f $itemSw.Elapsed.TotalSeconds) -ForegroundColor DarkGray
+        }
     }
 }
 
