@@ -127,6 +127,54 @@ function Assert-BundlesRepoPushed {
     }
 }
 
+# Devolve a branch de onde instalar as skills do repositório do catálogo, ou $null para a
+# branch padrão do remoto. Sem -Ref, usa a branch atual da cópia local; HEAD destacado
+# cai na padrão. Branch fora da padrão precisa existir em origin e, quando detectada,
+# estar no mesmo commit do HEAD local.
+function Resolve-SkillsRef {
+    param([string]$BundlesPath, [string]$Ref, [switch]$SkipRemoteCheck)
+
+    $repoRoot = Split-Path -Parent $BundlesPath
+    $isGit = Test-Path (Join-Path $repoRoot '.git')
+    $explicit = -not [string]::IsNullOrWhiteSpace($Ref)
+    $current = if ($isGit) { "$(git -C $repoRoot branch --show-current)".Trim() } else { '' }
+
+    if (-not $explicit) {
+        if (-not $current) { return $null }
+        $Ref = $current
+    }
+
+    if ($explicit -and $current -and $current -ne $Ref) {
+        Write-Warning "bundles.yaml vem da branch local '$current', mas as skills virão de '$Ref'. Faça checkout de '$Ref' para o catálogo corresponder."
+    }
+
+    if ($isGit) {
+        $default = "$(git -C $repoRoot symbolic-ref --short refs/remotes/origin/HEAD 2>$null)".Trim() -replace '^origin/', ''
+        if ($default -and $default -eq $Ref) { return $null }
+    }
+
+    if ($SkipRemoteCheck -or -not $isGit) { return $Ref }
+
+    $remote = git -C $repoRoot ls-remote --heads origin "refs/heads/$Ref" 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Não foi possível consultar origin para a branch '$Ref'.`n$remote"
+        exit 1
+    }
+    if (-not $remote) {
+        Write-Error "Branch '$Ref' não existe em origin. Dê git push -u origin $Ref antes de instalar."
+        exit 1
+    }
+    if (-not $explicit) {
+        $remoteSha = ("$remote".Trim() -split '\s+')[0]
+        $localSha = "$(git -C $repoRoot rev-parse HEAD)".Trim()
+        if ($remoteSha -ne $localSha) {
+            Write-Error "HEAD local de '$Ref' ($($localSha.Substring(0, 7))) difere de origin/$Ref ($($remoteSha.Substring(0, 7))). Dê git push ou git pull antes de instalar."
+            exit 1
+        }
+    }
+    return $Ref
+}
+
 function Add-SkillSet {
     param([hashtable]$Table, [string]$Repo, [string[]]$Skills)
     if (-not $Table.ContainsKey($Repo)) {
