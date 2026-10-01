@@ -21,7 +21,6 @@ Se o chamador limitar a execução a uma task, devolva após o passo 6 em vez de
    Atualize somente a task e seu único `## Handoff` com resultado, arquivos, comandos, versão validada e pendências. Preserve relatório, outras tasks e estado global.
    **Saída:** implementação/evidência ou bloqueio reproduzível.
 5. Releia diff e handoff contra achado, aceite e regras como se outro autor os tivesse escrito. Reuse testes comprovados do mesmo estado; execute apenas verificações faltantes/invalidadas. Corrija o que falhar; após duas tentativas sem evidência nova, registre bloqueio e avance nas independentes. Arquitetura/escopo divergente exige HIL quando não coberto por autorização existente.
-   Com a skill `sdd-jev` em `sombra` ou `ativo`, aplique o ponto `J3` depois desta releitura e antes do passo 6.
    **Saída:** aceite da task comprovado ou pendência específica; manual essencial não executado impede aprovação.
 6. Mova a task aprovada para `done/`, preservando o nome e verificando caminhos absolutos dentro da revisão. Preserve relatório imutável. Recalcule DAG pelos arquivos restantes. Depois, sem explorador ou processo em execução, faça a pausa de sessão de `continuidade-sessao.md` com etapa `correcoes`, `autoria_codigo: sim` e a próxima task elegível como próximo passo; no destino `Seguir`, volte ao passo 3.
    **Saída:** task aprovada movida, pendentes na raiz; próxima task iniciada, ou snapshot gravado antes da pergunta e escolha do usuário aplicada. Em interrupção, confira revisão/handoff antes de inferir conclusão pela pasta.

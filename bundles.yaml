@@ -60,7 +60,6 @@ bundles:
       - sdd-criar-techspec
       - sdd-executar-correcoes
       - sdd-executar-task
-      - sdd-jev
       - sdd-orquestrar-fluxo
       - sdd-orquestrar-prds
       - sdd-orquestrar-tasks

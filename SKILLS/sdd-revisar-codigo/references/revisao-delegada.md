@@ -30,12 +30,12 @@ Envie só dados, em caminhos, nesta ordem:
 - com `snapshot-contexto.md` na pasta, o caminho de `references/carga.md` da skill `sdd-snapshot`;
 - o contrato abaixo e o formato de retorno.
 
-Não envie conversa, diffs que você analisou, resumos de handoff, justificativas, vereditos jev nem avaliação de prontidão ("está pronto", "falta só revisar"). O revisor lê handoffs como parte das fontes, pelas regras da skill.
+Não envie conversa, diffs que você analisou, resumos de handoff, justificativas nem avaliação de prontidão ("está pronto", "falta só revisar"). O revisor lê handoffs como parte das fontes, pelas regras da skill.
 
 ### Contrato do revisor
 
 - Execute `sdd-revisar-codigo` integralmente, na ordem dos passos, como sessão independente. Carregue o snapshot, se houver, pelo filtro de etapa independente de `references/carga.md` da skill `sdd-snapshot`.
-- Grave somente `codereview_[num]/codereview.md` na pasta reservada. Não leia `jev-log.jsonl` nem chame o jev: com jev em `sombra` ou `ativo`, esta revisão é o grupo de controle do ponto `J3`.
+- Grave somente `codereview_[num]/codereview.md` na pasta reservada.
 - Pode rodar build, testes e comandos do perfil de qualidade que a revisão exige, mesmo os que escrevem em `bin/`, `obj/` ou fixtures. Não edita código, tasks, manifesto, handoffs, `workflow.md`, checkpoint nem snapshot, e não faz commit, stash, checkout ou limpeza no worktree.
 - Não pergunta ao usuário e não faz pausa de sessão. Fonte ausente, ambiente indisponível ou dúvida viram limitação ou bloqueio no relatório, inclusive o que a skill mandaria registrar em `workflow.md`.
 - Não delega a outro revisor. Explorador somente leitura só se o host permitir a este subagente; sem isso, buscas diretas.

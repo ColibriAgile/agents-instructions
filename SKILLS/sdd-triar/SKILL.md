@@ -1,7 +1,7 @@
 ---
 name: sdd-triar
 description: Triagem SDD que recomenda ao humano o nível de processo de um pedido de feature, correção ou refatoração — SDD completo, SDD enxuto ou ajuste pontual — por sinais de risco com evidência, antes de qualquer artefato. Use ao iniciar sdd-orquestrar-fluxo numa feature sem checkpoint ou quando perguntarem se um pedido vale o fluxo SDD. Não use para retomar feature com checkpoint nem para recortar pedido amplo em vários PRDs (use sdd-orquestrar-prds).
-argument-hint: --prompt "descrição do pedido" [--jev off|sombra|ativo]
+argument-hint: --prompt "descrição do pedido"
 ---
 
 # Triar pedido para SDD
@@ -36,9 +36,9 @@ A triagem gasta pouco para evitar gastar muito: levanta sinais com evidência, a
    - `sdd-enxuto` nos demais casos.
    Sinal `não medido` que decidiria o nível conta como presente.
    **Saída:** nível da rubrica com os sinais decisivos.
-4. **HIL 0.** Apresente o nível que a rubrica recomenda, os sinais decisivos com evidência e o que cada nível custa em artefatos, HILs e revisão. Pergunte com a ferramenta de pergunta disponível, recomendado primeiro. Quando o host expuser as tools jev e `--jev` não tiver sido informado, pergunte na mesma chamada o modo jev do fluxo (`off`, `sombra`, `ativo`), válido só para `sdd-completo` e `sdd-enxuto`. Silêncio mantém a decisão pendente. Acrescente uma linha a `tasks/triagem-log.jsonl` com data, pedido resumido, sinais, nível da rubrica, decisão humana e modo jev.
-   **Saída:** nível decidido pelo humano e registrado; modo jev conhecido para os níveis SDD.
-5. **Seguir.** `sdd-completo` e `sdd-enxuto` voltam a `sdd-orquestrar-fluxo` com o modo jev decidido, que ela grava no checkpoint e registra junto da triagem como decisão em `workflow.md`; em `sdd-enxuto`, registre também a fusão de HIL 1 e HIL 2 como modificação de paradas. `pontual` segue o ramo abaixo.
+4. **HIL 0.** Apresente o nível que a rubrica recomenda, os sinais decisivos com evidência e o que cada nível custa em artefatos, HILs e revisão. Pergunte com a ferramenta de pergunta disponível, recomendado primeiro. Silêncio mantém a decisão pendente. Acrescente uma linha a `tasks/triagem-log.jsonl` com data, pedido resumido, sinais, nível da rubrica e decisão humana.
+   **Saída:** nível decidido pelo humano e registrado.
+5. **Seguir.** `sdd-completo` e `sdd-enxuto` voltam a `sdd-orquestrar-fluxo`, que registra a triagem como decisão em `workflow.md`; em `sdd-enxuto`, registre também a fusão de HIL 1 e HIL 2 como modificação de paradas. `pontual` segue o ramo abaixo.
    **Saída:** próximo passo iniciado no caminho decidido.
 
 ## Ramo pontual
