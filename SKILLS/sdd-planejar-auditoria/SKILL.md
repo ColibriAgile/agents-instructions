@@ -2,7 +2,6 @@
 name: sdd-planejar-auditoria
 description: Auditoria SDD quando um relatório de architectural-analysis precisa virar frentes com TechSpec e tasks; não audita nem implementa.
 argument-hint: --relatorio .audits/architectural-analysis-[timestamp].md [--atualizar]
-disable-model-invocation: true
 ---
 
 # Planejar auditoria SDD

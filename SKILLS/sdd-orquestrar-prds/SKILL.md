@@ -2,7 +2,6 @@
 name: sdd-orquestrar-prds
 description: Recorte SDD quando um pedido amplo deve virar vários PRDs coesos sob um prefixo comum; para um único PRD, use sdd-criar-prd.
 argument-hint: --prompt "descrição ampla" [--prefixo slug-comum]
-disable-model-invocation: true
 ---
 
 # Orquestrar PRDs SDD

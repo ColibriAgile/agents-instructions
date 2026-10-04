@@ -2,7 +2,6 @@
 name: sdd-orquestrar-tasks
 description: DAG SDD quando PRD, TechSpec e tasks já estão aprovados e precisam ser executados; implementa cada task nesta sessão com exploradores somente leitura, segue entre tasks até o limiar de contexto e delega a revisão final a um subagente de contexto novo. Para o ciclo desde PRD, use sdd-orquestrar-fluxo.
 argument-hint: --prd nome-da-feature [--budget economico|medio|alto]
-disable-model-invocation: true
 ---
 
 # Orquestrar tasks SDD

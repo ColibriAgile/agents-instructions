@@ -2,7 +2,6 @@
 name: sdd-planejar-refatoracao
 description: Refatoração SDD quando é preciso planejar mudança estrutural preservando comportamento; não implementa nem adiciona funcionalidade.
 argument-hint: --slug nome-da-refatoracao [--atualizar]
-disable-model-invocation: true
 ---
 
 # Planejar refatoração SDD

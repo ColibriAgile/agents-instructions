@@ -2,7 +2,6 @@
 name: sdd-planejar-tasks
 description: Tasks SDD quando é preciso decompor PRD e TechSpec em um DAG executável; não implementa a feature.
 argument-hint: --prd nome-da-feature [--atualizar]
-disable-model-invocation: true
 ---
 
 # Planejar tasks SDD

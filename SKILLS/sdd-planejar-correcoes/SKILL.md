@@ -2,7 +2,6 @@
 name: sdd-planejar-correcoes
 description: Correções SDD quando um code review precisa virar tasks rastreáveis; não implementa nem altera o relatório.
 argument-hint: --prd nome-da-feature --num numero-da-revisao
-disable-model-invocation: true
 ---
 
 # Planejar correções SDD

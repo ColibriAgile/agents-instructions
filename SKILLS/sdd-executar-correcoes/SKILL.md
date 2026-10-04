@@ -2,7 +2,6 @@
 name: sdd-executar-correcoes
 description: Execução SDD quando há tasks de uma revisão a corrigir; implementa cada correção nesta sessão com exploradores somente leitura e segue entre tasks até o limiar de contexto e delega a re-revisão a um subagente de contexto novo; não cria nem reclassifica achados.
 argument-hint: --prd nome-da-feature --num numero-da-revisao
-disable-model-invocation: true
 ---
 
 # Executar correções SDD

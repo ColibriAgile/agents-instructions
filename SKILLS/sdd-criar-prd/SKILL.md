@@ -2,7 +2,6 @@
 name: sdd-criar-prd
 description: PRD SDD quando solicitado criar ou atualizar requisitos de produto; não define arquitetura nem tasks.
 argument-hint: --prompt "descrição da feature" [--atualizar]
-disable-model-invocation: true
 ---
 
 # Criar PRD SDD
