@@ -1600,7 +1600,11 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
 .cm-check > input { margin-top: 1px; }
 .cm-check--nested { margin-left: 24px; }
 .cm-check:has(input:disabled) { color: var(--cm-ink-3); cursor: not-allowed; }
-.cm-toggles .cm-toggle {
+/* Hover e foco repetem o seletor: .cm-btn-group--compact .cm-btn:hover zeraria o min-width e o botão
+   de um dígito encolheria sob o mouse, perderia o hover e voltaria a crescer (tremor). */
+.cm-toggles .cm-toggle,
+.cm-toggles .cm-toggle:hover,
+.cm-toggles .cm-toggle:focus {
     position: relative;
     min-width: 52px;
     padding: 0 8px;
