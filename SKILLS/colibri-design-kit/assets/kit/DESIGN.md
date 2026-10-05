@@ -63,7 +63,7 @@ sizes:
   control-height: "32px"
   topbar-height: "56px"
   sidebar-width: "230px"
-  row-min-height: "42px"
+  row-min-height: "36px"
   button-group-min-width: "120px"
 motion:
   ease: "cubic-bezier(.22, 1, .36, 1)"
@@ -196,7 +196,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 **Regra da grade como tabela.** Grades de bibliotecas de componentes (DataGrid do DevExtreme, DxGrid do DevExpress Blazor e similares) têm a mesma anatomia e os mesmos tokens da `.cm-table`; lado a lado, não se distingue uma da outra:
 
 - cabeçalho de 36 px em `surface-2`, rótulo de 12 px peso 600 em `ink-2`;
-- linhas de no mínimo 42 px mais o divisor, com 5 px de respiro e texto de 13 px; recuo de 16 px na primeira coluna, 12 px na última e 16 px entre colunas;
+- linhas de no mínimo 36 px mais o divisor, com 2 px de respiro e texto de 13 px (um controle de 32 px na linha, como o campo editável, cabe sem aumentá-la); recuo de 16 px na primeira coluna, 12 px na última e 16 px entre colunas;
 - superfície única: sem linhas alternadas (zebra) e sem linhas de coluna; divisor de 1 px em `line`, também na linha selecionada e na linha em edição; hover troca a superfície; seleção em `action-soft`;
 - a moldura e os cantos são do `.cm-panel` que envolve a grade, sem sombra; a borda própria da grade fica desligada;
 - versões, datas e contagens em mono de 12 px; o rótulo do cabeçalho continua na fonte de texto;

@@ -885,9 +885,9 @@ pre.log,
     font-weight: 600;
 }
 .cm-table__row {
-    min-height: 42px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    min-height: 36px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     font-size: 13px;
 }
 .cm-table__item + .cm-table__item { border-top: 1px solid var(--cm-line); }

@@ -41,7 +41,7 @@
 
 /* ---------- DevExtreme — DataGrid com a anatomia de .cm-table ----------
    Superfície única; cabeçalho de 36 px em surface-2 com rótulo de 12 px peso 600; linhas de no mínimo
-   42 px mais o divisor, com 5 px de respiro e texto de 13 px; divisor de 1 px em --cm-line; sem zebra e sem linhas de
+   36 px mais o divisor, com 2 px de respiro e texto de 13 px; divisor de 1 px em --cm-line; sem zebra e sem linhas de
    coluna; hover troca a superfície. Recuo de 16 px na primeira coluna, 12 px na última e 16 px entre
    colunas, como em .cm-table__row. Os temas Material e Generic são claros ou escuros por arquivo e não
    expõem variáveis para a grade: as regras usam as classes do tema (conferidas no DevExtreme 22.2 e
@@ -67,6 +67,20 @@
 }
 .dx-datagrid .dx-datagrid-group-panel,
 .dx-datagrid .dx-datagrid-group-panel .dx-group-panel-message { color: var(--cm-ink-3); }
+/* Botões da barra (exportar, escolher colunas) como .cm-icon-btn: o tema dá fundo #fff, sombra e ícone
+   preto. */
+.dx-datagrid .dx-datagrid-header-panel .dx-button {
+    color: var(--cm-ink-2);
+    background-color: transparent;
+    border-radius: var(--cm-radius-sm);
+    box-shadow: none;
+}
+.dx-datagrid .dx-datagrid-header-panel .dx-button .dx-icon { color: inherit; }
+.dx-datagrid .dx-datagrid-header-panel .dx-button.dx-state-hover,
+.dx-datagrid .dx-datagrid-header-panel .dx-button.dx-state-focused {
+    color: var(--cm-ink);
+    background-color: var(--cm-hover);
+}
 /* .dx-datagrid-borders fica no mesmo elemento que .dx-datagrid. */
 .dx-datagrid-borders > .dx-datagrid-headers,
 .dx-datagrid-borders > .dx-datagrid-rowsview,
@@ -91,6 +105,10 @@
 }
 .dx-datagrid .dx-datagrid-headers .dx-header-row > td:first-child { padding-left: 16px; }
 .dx-datagrid .dx-datagrid-headers .dx-header-row > td:last-child { padding-right: 12px; }
+/* Colunas fixas (expandir detalhe, comandos à direita): o tema pinta a <col> de #fff, que aparece no
+   cabeçalho como um bloco branco no tema escuro. */
+.dx-datagrid .dx-datagrid-content-fixed .dx-datagrid-table .dx-col-fixed { background-color: var(--cm-surface); }
+.dx-datagrid .dx-datagrid-headers .dx-datagrid-content-fixed .dx-datagrid-table .dx-col-fixed { background-color: var(--cm-surface-2); }
 .dx-datagrid .dx-sort,
 .dx-datagrid .dx-sort-indicator { color: var(--cm-ink-2); }
 /* Coluna ordenada (rótulo e seta) e rótulo sob o mouse em --cm-ink, como .cm-sort.is-active. O tema
@@ -109,10 +127,10 @@
 .dx-datagrid .dx-editor-cell .dx-dropdowneditor-icon { color: var(--cm-ink-3); }
 .dx-datagrid .dx-datagrid-rowsview,
 .dx-datagrid .dx-datagrid-rowsview .dx-row > td { background-color: var(--cm-surface); }
-/* 43 px com o divisor = linha de 42 px + 1 px, o passo de .cm-table__item. */
+/* 37 px com o divisor = linha de 36 px + 1 px, o passo de .cm-table__item. */
 .dx-datagrid .dx-datagrid-rowsview .dx-data-row > td {
-    height: 43px;
-    padding: 5px 8px;
+    height: 37px;
+    padding: 2px 8px;
     color: var(--cm-ink);
     font-size: 13px;
     line-height: 1.3;
