@@ -34,14 +34,19 @@
 .dx-overlay-wrapper input,
 .dx-overlay-wrapper textarea,
 .dx-overlay-wrapper button { font-family: var(--cm-font); }
+/* Campos (caixa de texto, de seleção, de data, de número), dentro ou fora da grade e nos popups: o tema
+   Material escreve o texto em preto (rgba(0,0,0,.87)), que some no tema escuro. */
+.dx-texteditor-input { color: var(--cm-ink); }
+.dx-placeholder::before { color: var(--cm-ink-3); }
 
 /* ---------- DevExtreme — DataGrid com a anatomia de .cm-table ----------
    Superfície única; cabeçalho de 36 px em surface-2 com rótulo de 12 px peso 600; linhas de no mínimo
    42 px mais o divisor, com 5 px de respiro e texto de 13 px; divisor de 1 px em --cm-line; sem zebra e sem linhas de
    coluna; hover troca a superfície. Recuo de 16 px na primeira coluna, 12 px na última e 16 px entre
    colunas, como em .cm-table__row. Os temas Material e Generic são claros ou escuros por arquivo e não
-   expõem variáveis para a grade: as regras usam as classes do tema (conferidas no DevExtreme 22.2) e
-   vencem por especificidade igual, carregadas depois dele. Revise ao atualizar o DevExtreme. */
+   expõem variáveis para a grade: as regras usam as classes do tema (conferidas no DevExtreme 22.2 e
+   19.2) e vencem por especificidade igual ou maior, carregadas depois dele. Revise ao atualizar o
+   DevExtreme. */
 .dx-datagrid {
     color: var(--cm-ink);
     background-color: var(--cm-surface);
@@ -54,6 +59,14 @@
     background-color: var(--cm-surface);
     border-bottom: 0;
 }
+/* Barra acima da grade (busca, agrupamento, escolha de colunas): a .dx-toolbar do tema fica em #fff e a
+   mensagem da área de agrupamento em preto. */
+.dx-datagrid .dx-datagrid-header-panel .dx-toolbar {
+    color: var(--cm-ink);
+    background-color: transparent;
+}
+.dx-datagrid .dx-datagrid-group-panel,
+.dx-datagrid .dx-datagrid-group-panel .dx-group-panel-message { color: var(--cm-ink-3); }
 /* .dx-datagrid-borders fica no mesmo elemento que .dx-datagrid. */
 .dx-datagrid-borders > .dx-datagrid-headers,
 .dx-datagrid-borders > .dx-datagrid-rowsview,
@@ -80,13 +93,18 @@
 .dx-datagrid .dx-datagrid-headers .dx-header-row > td:last-child { padding-right: 12px; }
 .dx-datagrid .dx-sort,
 .dx-datagrid .dx-sort-indicator { color: var(--cm-ink-2); }
+/* Coluna ordenada (rótulo e seta) e rótulo sob o mouse em --cm-ink, como .cm-sort.is-active. O tema
+   escreve preto com seletor de quatro classes, que vence a regra acima e some no tema escuro. */
+.dx-datagrid .dx-datagrid-headers .dx-datagrid-table .dx-row > td .dx-sort,
+.dx-datagrid .dx-datagrid-headers .dx-datagrid-table .dx-row > td .dx-sort-indicator,
+.dx-datagrid .dx-datagrid-headers .dx-datagrid-table .dx-row > td:hover .dx-sort,
+.dx-datagrid .dx-datagrid-headers .dx-datagrid-table .dx-row > td:hover .dx-datagrid-text-content { color: var(--cm-ink); }
 .dx-datagrid .dx-header-filter { color: var(--cm-ink-3); }
 .dx-datagrid .dx-header-filter:not(.dx-header-filter-empty) { color: var(--cm-accent-ink); }
-/* Linha de filtro: mesma superfície das linhas, editores sem moldura, na fonte e na cor do texto. */
+/* Linha de filtro: mesma superfície das linhas, editores sem moldura, na fonte e na cor do texto (campos
+   no início do bloco DevExtreme). */
 .dx-datagrid .dx-datagrid-headers .dx-datagrid-filter-row,
 .dx-datagrid .dx-datagrid-headers .dx-datagrid-filter-row > td { background-color: var(--cm-surface); }
-.dx-datagrid .dx-texteditor-input { color: var(--cm-ink); }
-.dx-datagrid .dx-placeholder::before { color: var(--cm-ink-3); }
 .dx-datagrid .dx-datagrid-filter-row .dx-menu-item .dx-icon,
 .dx-datagrid .dx-editor-cell .dx-dropdowneditor-icon { color: var(--cm-ink-3); }
 .dx-datagrid .dx-datagrid-rowsview,
