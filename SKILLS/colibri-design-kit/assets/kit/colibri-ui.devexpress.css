@@ -202,6 +202,15 @@
     transition: background-color 150ms var(--cm-ease), color 150ms var(--cm-ease);
 }
 .dx-datagrid .dx-command-edit-with-icons .dx-link::before { width: auto; height: auto; font-size: 16px; line-height: 1; }
+/* O tema fixa 16 px e inline-block no botão com um seletor de sete classes (conferido no 19.2), que vence
+   a regra acima; repetir o seletor mantém o botão com o tamanho de .cm-icon-btn. */
+.dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row > td.dx-command-edit.dx-command-edit-with-icons .dx-link {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    margin: 0 1px;
+    line-height: 1;
+}
 .dx-datagrid .dx-command-edit-with-icons .dx-link:hover { color: var(--cm-accent-ink); background: var(--cm-accent-soft); }
 .dx-datagrid .dx-command-edit-with-icons .dx-link.cm-icon-btn--danger:hover { color: var(--cm-danger); background: var(--cm-danger-soft); }
 .dx-datagrid .dx-command-edit-with-icons .dx-link:focus-visible { outline: 2px solid var(--cm-focus); outline-offset: -3px; }
