@@ -1,6 +1,6 @@
 # Adoção por framework
 
-Complementa o passo 3 do `SKILL.md`. A marcação de cada componente está em `../assets/kit/exemplo.html` (`#historico` abre o painel lateral; `#inicio` mostra a marca-d'água).
+Complementa o passo 3 do `SKILL.md`. A marcação de cada componente está em `../assets/kit/exemplo.html` (`#historico` abre o painel lateral; `#inicio` mostra a marca-d'água) e a da tela de entrada em `../assets/kit/exemplo-entrada.html` (`#erro` mostra a página de erro).
 
 ## Ordem de carga (todos os frameworks)
 
@@ -19,17 +19,37 @@ Complementa o passo 3 do `SKILL.md`. A marcação de cada componente está em `.
 - **Blazor / ASP.NET:** em `wwwroot/` (ex.: `wwwroot/colibri-ui/logos/colibri.ico`), com `<link rel="icon" href="colibri-ui/logos/colibri.ico">` em `App.razor`, `_Host.cshtml` ou `index.html`; remova o `favicon.png`/`favicon.ico` do modelo do projeto.
 - **AngularJS / páginas servidas pelo backend:** no mesmo diretório de estáticos do `colibri-ui/`, com o caminho que o template do backend gera.
 - Substituindo um ícone antigo, mude o nome ou acrescente `?v=` ao `href`: o navegador mantém o anterior em cache. Se a entrada HTML passa por um motor de templates (Jinja, Razor), confira que o caminho sai certo depois da renderização.
+- Responda também `/favicon.ico` na raiz com o mesmo arquivo (cópia ou redirecionamento da rota): o navegador pede esse endereço nas páginas sem `<link rel="icon">`, como respostas do backend.
+
+## Tela de entrada e páginas de erro (todos os frameworks)
+
+`logos/colibri-marca.svg` é uma imagem do HTML, não do CSS: sirva-a da mesma pasta pública do `colibri-ui/` e use o caminho na `<img>` da marca. A tela carrega só os ícones e `colibri-ui.css`, sem o CSS do framework nem o legado da aplicação, e aplica o tema gravado (`cm-theme`) antes do primeiro desenho, com o mesmo script da aplicação. Páginas de erro servidas pelo backend (404, 500) costumam não ter o idioma da aplicação: escolha os textos pelo idioma do navegador.
 
 ## Por framework
 
 | Stack | Como aplicar |
 |---|---|
-| Bootstrap 3 / AngularJS | `colibri-ui.css` + `colibri-ui.bootstrap3.css` (cobre `.btn`, `.modal`, `.form-control`, `.form-group`, `.input-group-addon`, `.has-error`, `.checkbox`/`.radio`, angular-growl, Dropzone, `ng-cloak`). Menus: `.cm-menu` junto com `.dropdown-menu`. Diretivas/templates do projeto passam a emitir as classes `cm-`. |
+| Bootstrap 3 / AngularJS | `colibri-ui.css` + `colibri-ui.bootstrap3.css` (cobre `.btn`, `.modal`, `.form-control`, `.form-group`, `.input-group-addon`, `.has-error`, `.checkbox`/`.radio`, angular-growl, pnotify, chosen, Dropzone, `ng-cloak`). Menus: `.cm-menu` junto com `.dropdown-menu`. Diretivas/templates do projeto passam a emitir as classes `cm-`. No rodapé do modal, a ação destrutiva à parte usa `.btn.cm-btn--danger-text.cm-dialog__aside`. Com pnotify, configure posição e largura (abaixo). |
 | Bootstrap 4/5, React, Vue, Blazor sem biblioteca | Não use o adaptador Bootstrap 3. Implemente os componentes com as classes `cm-` ou transponha os tokens `--cm-*` para o tema do framework (ex.: variáveis `--bs-*`), usando o adaptador só como referência. |
 | DevExpress Blazor | `colibri-ui.devexpress.css` depois do tema. Temas Fluent: variáveis `--dxds-font-family-*`; clássicos/Bootstrap externo: `--bs-*`. Escolha o `SizeMode` mais próximo da escala (13 px, controle de 32 px) e ajuste o resto por `--dxds-font-size-*`. Classes internas (`--dxbl-*`, `.dxbl-*`) só sem alternativa, com o motivo em `DECISOES.md`. Grade (`DxGrid`), pela regra da grade como tabela: o adaptador ainda não traz esse bloco, porque não foi conferido numa aplicação Blazor. Parta das variáveis do tema em `.dxbl-grid` (`--dxbl-grid-font-size: 13px`, `--dxbl-grid-bg: var(--cm-surface)`, `--dxbl-grid-color: var(--cm-ink)`, `--dxbl-grid-border-color: var(--cm-line)`, `--dxbl-grid-header-bg: var(--cm-surface-2)`, `--dxbl-grid-header-color: var(--cm-ink-2)`, `--dxbl-grid-hover-bg: var(--cm-hover)`, `--dxbl-grid-selection-bg: var(--cm-accent-soft)`, `--dxbl-grid-selection-color: var(--cm-ink)`, `--dxbl-grid-focus-frame-color: var(--cm-focus)`, `--dxbl-grid-text-cell-padding-x: 8px` e o `--dxbl-grid-text-cell-padding-y` que leve a linha a 36 px com o `--dxbl-grid-line-height` do tema), meça cabeçalho e linha no navegador e, conferido, leve o bloco ao adaptador. |
-| DevExtreme (React, Angular, Vue, jQuery) | `colibri-ui.devexpress.css` fixa a fonte em `.dx-widget` e `.dx-overlay-wrapper` (popups anexados ao `<body>`) e leva a DataGrid e a caixa de seleção à regra da grade como tabela, nos dois temas. Na página, a grade fica num `.cm-panel` com `showBorders={false}`, sem `rowAlternationEnabled` nem `showColumnLines`; colunas de versão, data e contagem recebem `cssClass="cm-mono"`; na coluna de comandos (`type="buttons"`), os botões usam `icon="bi bi-…"` e a ação destrutiva `cssClass="cm-icon-btn--danger"`. Não repita no CSS do projeto o que o adaptador já cobre: ajuste de grade que valha para todas as aplicações volta ao kit. Prefira temas *compact*. Não carregue Roboto/Inter do tema (inclusive `@import` do Google Fonts dentro de CSS gerado pelo ThemeBuilder). Gráficos (`dxChart`, `dxPieChart` etc.) escrevem a fonte como estilo inline no SVG, a partir do tema de visualização, e o adaptador não os alcança: registre um tema de visualização com `font.family` igual a `--cm-font` (`registerTheme`/`currentTheme` de `devextreme/viz/themes`) e confira no navegador. |
+| DevExtreme (React, Angular, Vue, jQuery) | `colibri-ui.devexpress.css` fixa a fonte em `.dx-widget` e `.dx-overlay-wrapper` (popups anexados ao `<body>`) e leva a DataGrid e a caixa de seleção à regra da grade como tabela, nos dois temas. Na página, a grade fica num `.cm-panel` com `showBorders={false}`, sem `rowAlternationEnabled` nem `showColumnLines`; colunas de versão, data e contagem recebem `cssClass="cm-mono"`; na coluna de comandos (`type="buttons"`), os botões usam `icon="bi bi-…"` e a ação destrutiva `cssClass="cm-icon-btn--danger"`; colunas numéricas (código, quantidade, valor) recebem `alignment="right"`, e as que chegam como texto ordenam pelo número com `calculateSortValue`. Em grades que exportam, aplique formatação só de tela (ex.: caixa de frase) com `cellTemplate`/`groupCellTemplate`, não com `customizeText`, que também vai para o arquivo. O TreeList (`dxTreeList`) não é coberto pelo adaptador: prefira uma `.cm-table` com recuo pelo nível. Não repita no CSS do projeto o que o adaptador já cobre: ajuste de grade que valha para todas as aplicações volta ao kit. Prefira temas *compact*. Não carregue Roboto/Inter do tema (inclusive `@import` do Google Fonts dentro de CSS gerado pelo ThemeBuilder). Gráficos (`dxChart`, `dxPieChart` etc.) escrevem a fonte como estilo inline no SVG, a partir do tema de visualização, e o adaptador não os alcança: registre um tema de visualização com `font.family` igual a `--cm-font` (`registerTheme`/`currentTheme` de `devextreme/viz/themes`) e confira no navegador. |
 
 Em qualquer biblioteca de terceiros, a fonte vai em `:root`/`body` e nas classes raiz dos componentes, nunca só num contêiner da página, porque calendários, listas suspensas e diálogos são renderizados fora dele.
+
+### Notificações com pnotify (Bootstrap 3)
+
+O adaptador veste o pnotify 1.2 (`pnotify-colibri`, estilo `bootstrap`) como as notificações do kit, trocando os glyphicons pelos Bootstrap Icons conforme o tipo. Posição e largura são estilo inline do pnotify, que o CSS não alcança: configure no serviço que dispara as notificações, uma vez, com a pilha compartilhada entre elas:
+
+```js
+var pilha = {dir1: 'down', dir2: 'left', push: 'bottom', firstpos1: 64, firstpos2: 16, spacing1: 8, spacing2: 8};
+$.pnotify({
+    title: titulo, text: mensagem, type: tipo,  // 'success', 'info', 'notice' (aviso) ou 'error'
+    width: 'min(calc(100vw - 32px), 380px)',
+    stack: pilha, sticker: false, shadow: false, history: false
+});
+```
+
+`firstpos1: 64` põe a primeira notificação logo abaixo da barra superior de 56 px. Se o serviço passar um ícone próprio (`icon: 'bi bi-…'`), dê também uma classe por tipo (`addclass`) e pinte o ícone pelo token do estado no CSS do projeto.
 
 ## Comportamentos que o projeto precisa implementar
 
@@ -49,6 +69,17 @@ O CSS do kit só entrega o visual; reimplemente no framework do projeto (o `exem
   - **DevExtreme:** o tema Material/Generic é claro ou escuro por arquivo. A grade (com a barra de busca e agrupamento acima dela), a caixa de seleção, o texto e o placeholder dos campos, as listas e o filtro de cabeçalho (itens, divisores, botões OK e Cancelar) e o indicador de carregamento já vêm nos tokens `--cm-*` pelo adaptador; vista os demais componentes usados (paginador, calendário, menus de contexto etc.) com os tokens no CSS do projeto ou carregue o tema *dark* correspondente e troque com `themes.current()`. Registre a escolha em `DECISOES.md`.
   - **DevExpress Blazor:** use a variante escura do tema Fluent junto com o atributo.
 - **Estados de componente:** `.is-active`, `.is-open`, `.is-disabled`, `.is-invalid`, `.is-hidden` são aplicados pelo código do projeto.
+- **Diálogos empilhados no Bootstrap 3** (ex.: seletor de imagens aberto sobre um diálogo de edição, ou o diálogo de carregamento sobre outro): todos os modais têm a mesma camada (`--cm-layer-modal`), então o último no DOM fica por cima; declare o de cima depois do de baixo. Ao fechar qualquer modal, o Bootstrap 3 tira `modal-open` do `<body>` e o diálogo que ficou aberto perde a rolagem: devolva a classe num handler global, testando o estado do próprio Bootstrap (um modal pode ficar com a classe `in` já escondido):
+
+  ```js
+  $(document).on('hidden.bs.modal', '.modal', function () {
+      var aberto = $('.modal').filter(function () {
+          var modal = $(this).data('bs.modal');
+          return modal && modal.isShown;
+      }).length > 0;
+      if (aberto) { $('body').addClass('modal-open'); }
+  });
+  ```
 
 ## Página inicial
 

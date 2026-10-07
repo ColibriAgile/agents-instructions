@@ -272,6 +272,21 @@
 .dx-popup-wrapper .dx-popup-bottom .dx-button-mode-text.dx-state-focused { background-color: var(--cm-hover); }
 .dx-popup-wrapper .dx-popup-bottom .dx-button-mode-text.dx-button-default.dx-state-hover,
 .dx-popup-wrapper .dx-popup-bottom .dx-button-mode-text.dx-button-default.dx-state-focused { background-color: var(--cm-accent-soft); }
+/* Agrupamento: a coluna do expansor de grupo tem 18 px com 12 px de respiro no tema compacto, e a seta (18 px)
+   ficava cortada. A grade mede a largura da coluna pelo CSS: 30 px sem respiro, seta centralizada. */
+.dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row > td.dx-command-expand,
+.dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row > td .dx-datagrid-group-space,
+.dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row > td.dx-datagrid-group-space {
+    width: 30px;
+    min-width: 30px;
+    padding-right: 0;
+    padding-left: 0;
+    text-align: center;
+}
+.dx-datagrid-rowsview td.dx-command-expand > .dx-datagrid-group-closed,
+.dx-datagrid-rowsview td.dx-command-expand > .dx-datagrid-group-opened { margin: 0 auto; }
+/* TreeList (dxTreeList) não é coberto por este adaptador: fica com o visual do tema. Prefira uma lista do kit
+   (.cm-table com recuo pelo nível) ou vista o componente no CSS do projeto e registre em DECISOES.md. */
 
 /* ---------- DevExtreme — caixa de seleção com o visual da caixa do kit ----------
    16 px, borda de 1 px em --cm-line-strong e cantos de 3 px; marcada em --cm-accent com o mesmo traço

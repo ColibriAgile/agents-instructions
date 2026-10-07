@@ -73,7 +73,7 @@ motion:
 
 # Colibri UI — linha visual das aplicações Colibri
 
-Este documento descreve a linha visual comum das aplicações Colibri e orienta a refatoração visual de cada uma delas. A implementação de referência está em `colibri-ui.css` (CSS puro, prefixo `cm-`); `colibri-ui.bootstrap3.css` e `colibri-ui.devexpress.css` são adaptadores opcionais; `logos/colibri-colorido.svg` é a marca da página inicial; `logos/colibri.ico` é o ícone da aba; `exemplo.html` mostra a marcação de cada componente.
+Este documento descreve a linha visual comum das aplicações Colibri e orienta a refatoração visual de cada uma delas. A implementação de referência está em `colibri-ui.css` (CSS puro, prefixo `cm-`); `colibri-ui.bootstrap3.css` e `colibri-ui.devexpress.css` são adaptadores opcionais; `logos/colibri-colorido.svg` é a marca da página inicial; `logos/colibri.ico` é o ícone da aba; `logos/colibri-marca.svg` é a marca da tela de entrada; `exemplo.html` mostra a marcação de cada componente e `exemplo-entrada.html`, a tela de entrada e a página de erro.
 
 Ao adotar em um repositório, copie este arquivo para a raiz como `DESIGN.md`, escreva o `PRODUCT.md` do produto (modelo em `PRODUCT.template.md`) e registre na seção "Implementação neste projeto" onde o CSS e os componentes ficam.
 
@@ -121,7 +121,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 ## 3. Tipografia
 
 - **Texto:** Google Sans Flex (WOFF2 local), fallback Segoe UI. **Dados:** Google Sans Mono (WOFF2 local), fallback Consolas — para versões, datas, horários, contagens, identificadores e logs, com algarismos tabulares.
-- Escala fixa e compacta (ver frontmatter). O maior texto da página é o título da barra superior (18 px). Seções usam 14 px; linhas, 13 px; rótulos, 12 px peso 600 sem caixa alta.
+- Escala fixa e compacta (ver frontmatter). O maior texto da página é o título da barra superior (18 px). Seções usam 14 px; linhas, 13 px; rótulos, 12 px peso 600 sem caixa alta (o rótulo de campo com linha de 14 px, para ficar junto do controle; seção 7, "Formulários").
 - Texto corrido limitado a 65–80 caracteres por linha.
 
 **Regra da informação primeiro.** Nunca use tipografia gigante para uma contagem que pode ficar ao lado do rótulo. Títulos dentro de conteúdo rico (descrições, notas) não passam de 16 px.
@@ -154,6 +154,12 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
   - Use o arquivo do kit sem alterar cores, recorte ou tamanhos; não troque pelo ícone padrão do framework (React, Blazor, Angular), por um ícone da identidade anterior nem pelo de outro produto.
   - O ícone é pedido pelo navegador direto da entrada HTML, fora do CSS: sirva o arquivo de uma pasta pública do projeto, no caminho que o `<link>` aponta.
   - Ao trocar um ícone antigo, mude o nome do arquivo ou acrescente versão ao endereço (`?v=`), porque o navegador guarda o ícone em cache por muito tempo.
+  - Páginas sem `<link rel="icon">` (respostas do backend, documentação da API) fazem o navegador pedir `/favicon.ico` na raiz: responda esse endereço com o mesmo arquivo (cópia ou redirecionamento).
+- **Tela de entrada (login) e páginas de erro** (`.cm-login`): ficam fora do shell, sobre o plano de trabalho (`page`), com a marca acima de um cartão.
+  - **Marca:** `logos/colibri-marca.svg` (o colibri branco sobre o quadrado no degradê azul da lateral, o mesmo desenho do ícone da aba) com 36 px, seguida do nome do produto em 20 px peso 700 (`.cm-login__brand`). Use o SVG do kit sem alterar cores, recorte ou proporção. É a única marca da tela: o nome do produto na lateral continua sem ícone.
+  - **Cartão** (`.cm-panel.cm-form.cm-login__card`, 360 px, 24 px de respiro): título de 18 px (`.cm-login__title`), uma linha de apoio (`.cm-login__text`), campos `.cm-field` e o botão principal na largura do cartão (`.cm-login__submit`). Credencial recusada: `.cm-notice--danger` acima dos campos e o campo marcado como inválido.
+  - **Páginas de erro** (404, 500, ambiente não encontrado, navegador não suportado): o mesmo cartão com `.cm-error`: ícone em `ink-3`, título com o código do erro, uma frase e um link de volta (`.cm-btn.cm-error__back`).
+  - Sem degradê (é da lateral) e sem marca-d'água (é da página inicial). A página carrega só os ícones e `colibri-ui.css` (sem o CSS do framework nem o legado da aplicação) e aplica o tema gravado antes do primeiro desenho, como a aplicação.
 
 ## 6. Anatomia de página
 
@@ -168,6 +174,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
   - A marca é decorativa: nada de texto alternativo, foco ou animação; não pode encobrir cartões nem reduzir o contraste deles.
   - `position: fixed` depende de nenhum ancestral de `.cm-page` ter `transform`, `filter` ou `contain`; se a marca rolar junto com a página ou sumir, confira isso. O caminho `url('logos/…')` é relativo ao CSS: mantenha `logos/` ao lado de `colibri-ui.css`.
 - **Vazio e carregamento:** `.cm-empty` com ícone e uma frase; carregamento com `bi-arrow-repeat cm-spin`.
+- **Listas lado a lado** (seleção numa coluna e resultado na outra): cada coluna ocupa a altura da área e a tabela rola por dentro, com o cabeçalho fixo; as tabelas terminam na mesma linha, mesmo com poucas linhas ou só o estado vazio. Cabeçalhos de seção com a mesma altura, com ou sem botões, e a busca de cada coluna na mesma altura, antes de qualquer alternância (ex.: Grupo | Combo). Abaixo da largura de tablet as colunas empilham.
 
 ## 7. Componentes
 
@@ -175,6 +182,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 
 - 32 px de altura, texto regular de 13 px em `#495057`, fundo branco, borda `#d7dee7`, cantos de 3 px (`.cm-btn`). Principal: `.cm-btn--primary` (`#1b6ec2`, borda `#0f5aa6`). Menor: `.cm-btn--sm` (28 px).
 - **Ações de linha** (`.cm-icon-btn`): somente ícone, sem moldura; `title` e `aria-label` obrigatórios; destrutivas por último, vermelhas só no hover; ações indisponíveis ficam desabilitadas (não somem) para manter o alinhamento das colunas.
+- **Ação destrutiva secundária** (excluir um item dentro do diálogo de edição dele): botão comum com o texto em `danger` (`.cm-btn--danger-text`), à esquerda no rodapé, fora do grupo Cancelar | Confirmar (`.cm-dialog__aside`). O vermelho preenchido fica para quando a destruição é a ação principal.
 
 **Regra dos botões adjacentes (regra geral).** Botões com moldura lado a lado formam sempre um grupo (`.cm-btn-group`), nunca botões soltos com espaço entre eles:
 
@@ -187,10 +195,15 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 ### Navegação e listas
 
 - **Tabela** (`.cm-table`): superfície única, cabeçalho compacto (`.cm-table__head`) e linhas (`.cm-table__item` > `.cm-table__row`) em CSS Grid com as mesmas colunas, definidas por `--cm-cols` no elemento da tabela — assim nada desalinha. Coluna de ações com largura fixa, alinhada à direita.
-- **Ordenação:** cabeçalho ordenável é um botão (`.cm-sort`) com **uma única seta** indicando a direção; a seta só aparece na coluna ativa (e levemente no hover).
+- **Ordenação:** cabeçalho ordenável é um botão (`.cm-sort`) com **uma única seta** indicando a direção; a seta só aparece na coluna ativa (e levemente no hover). A lista abre ordenada pela coluna descritiva (nome, descrição), não pelo código; códigos e demais números ordenam pelo valor numérico (2 antes de 10), mesmo quando chegam como texto.
+- **Colunas numéricas** (código, ordem, quantidade, valor, preço): título e valor alinhados à direita (`.cm-cell--end` no título e na célula). No título que ordena (`.cm-sort.cm-cell--end`), a seta vai à esquerda do rótulo, para o texto terminar na mesma borda dos números, com ou sem seta. Abaixo de 760 px, na linha em bloco, o número volta para junto do rótulo. Identificadores alfanuméricos (código de barras, código externo) e horários ficam como texto, à esquerda.
+- **Ações da entidade da página** (editar, copiar, excluir o registro escolhido no seletor da página): botões no grupo de ações da barra, ao lado de "Novo", nunca escondidas num menu ⋮; o menu fica para ações secundárias. Com alterações pendentes, elas dão lugar a Cancelar | Salvar.
 - **Detalhes:** o chevron (`.cm-disclosure`) fica na mesma linha do título e gira ao abrir; o detalhe (`.cm-table__detail`) fica alinhado ao texto da linha.
+- **Ficha do registro** no detalhe (`.cm-record`): campos agrupados em blocos com título (ex.: identificação, descrições, produção; `.cm-record__data`, até três lado a lado, dois perto da largura de tablet e um abaixo de 760 px), cada bloco com pares rótulo/valor (`.cm-pairs`, um `<dl>`) com divisor discreto entre os pares e o rótulo mais leve que o valor; a imagem do registro, se houver, à direita (`.cm-record__media`); opções e listas relacionadas na largura toda (`.cm-record__wide`), e itens do registro abaixo, depois de um divisor (`.cm-record__section`). Nunca pares soltos numa grade sem agrupamento.
 - **Listas de configuração:** rótulo, valor em fonte mono e ação de ícone "Alterar" por linha — em vez de campo somente-leitura com botão.
 - **Etiquetas** (`.cm-tag`, variantes de estado e `--muted`): estado curto, módulos, chaves; listas de etiquetas em `.cm-tags`.
+- **Opções sim/não** de um registro, como etiquetas: ligada na etiqueta padrão com `bi-check-circle-fill`; desligada em `.cm-tag--off` (apagada, **sem risco**) com `bi-x-circle`. As ligadas vêm primeiro. O texto da etiqueta diz a opção, e o estado vai também para leitores de tela.
+- **Descrições que chegam em maiúsculas** de outro sistema (ex.: cadastro do PDV): nas listas, exiba em caixa de frase ("Molhos e adicionais"), com a primeira letra maiúscula mesmo depois de números. Só a exibição muda: busca, ordenação, edição, campos da ficha e arquivos exportados usam o valor gravado. Nas grades que exportam, aplique no modelo da célula, não na formatação que vai ao arquivo. Textos que reproduzem outro sistema (ex.: botões do PDV) ficam como gravados.
 - **Responsivo:** perto da largura de tablet, esconder colunas secundárias; abaixo de 760 px, linhas viram blocos com rótulos (`.cm-cell__label`), preservando ações.
 
 **Regra da grade como tabela.** Grades de bibliotecas de componentes (DataGrid do DevExtreme, DxGrid do DevExpress Blazor e similares) têm a mesma anatomia e os mesmos tokens da `.cm-table`; lado a lado, não se distingue uma da outra:
@@ -200,25 +213,28 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 - superfície única: sem linhas alternadas (zebra) e sem linhas de coluna; divisor de 1 px em `line`, também na linha selecionada e na linha em edição; hover troca a superfície; seleção em `action-soft`;
 - a moldura e os cantos são do `.cm-panel` que envolve a grade, sem sombra; a borda própria da grade fica desligada;
 - versões, datas e contagens em mono de 12 px; o rótulo do cabeçalho continua na fonte de texto;
-- caixas de seleção e ações de linha com o visual do kit (caixa de 16 px, `.cm-icon-btn`), nunca na cor de destaque do tema da biblioteca.
+- caixas de seleção e ações de linha com o visual do kit (caixa de 16 px, `.cm-icon-btn`), nunca na cor de destaque do tema da biblioteca;
+- colunas numéricas com título e valor à direita, como na `.cm-table`;
+- seta do agrupamento inteira, numa coluna de 30 px.
 
-`colibri-ui.devexpress.css` aplica a regra ao DevExtreme (no React: `showBorders={false}`, sem `rowAlternationEnabled`, `cssClass="cm-mono"` nas colunas de dados). No DevExpress Blazor, aplique pelas variáveis `--dxbl-grid-*` do tema e registre na seção 9.
+`colibri-ui.devexpress.css` aplica a regra ao DevExtreme (no React: `showBorders={false}`, sem `rowAlternationEnabled`, `cssClass="cm-mono"` nas colunas de dados, `alignment="right"` nas numéricas). O TreeList do DevExtreme não é coberto pelo adaptador: prefira uma `.cm-table` com recuo pelo nível. No DevExpress Blazor, aplique pelas variáveis `--dxbl-grid-*` do tema e registre na seção 9.
 
 ### Formulários
 
-- Painel `.cm-panel.cm-form`, grupos em `.cm-fieldset` (legenda = título de seção), campos em `.cm-field` com rótulo sempre visível (`.cm-field__label`), controle `.cm-input` (32 px) e erro associado (`.cm-field__error`). Campo somente leitura em `surface-2` com texto `ink-2`; campo desabilitado (depende de uma opção desmarcada) em `surface-2`, texto e borda apagados e rótulo em `ink-3`, sem sumir. Pares lado a lado em `.cm-form-row`; rótulo à esquerda em `.cm-form-grid`.
+- Painel `.cm-panel.cm-form`, grupos em `.cm-fieldset` (legenda = título de seção), campos em `.cm-field` com rótulo sempre visível (`.cm-field__label`), controle `.cm-input` (32 px) e erro associado (`.cm-field__error`). O rótulo fica junto do controle: linha de 14 px e 2 px entre as caixas, com as letras a cerca de 4 px do controle, dentro e fora de diálogos. Campo somente leitura em `surface-2` com texto `ink-2`; campo desabilitado (depende de uma opção desmarcada) em `surface-2`, texto e borda apagados e rótulo em `ink-3`, sem sumir. Pares lado a lado em `.cm-form-row`; rótulo à esquerda em `.cm-form-grid`.
 - Campo + botão ou prefixo/sufixo unidos: `.cm-input-group` com `.cm-input-addon`.
 - Opções exclusivas com descrição: `.cm-choices` / `.cm-choice` (lado a lado, a escolhida em azul-claro).
 - **Caixas de seleção e rádios:** 16 px, borda `#c7d0da`, cantos de 3 px (rádio circular); marcados preenchidos com o azul de ação e marca branca; foco com o halo azul-claro; opção dependente recuada (`.cm-check--nested`) e apagada quando desabilitada. Escolhas múltiplas curtas e relacionadas (ex.: dias da semana) usam grupo de alternância `.cm-toggles` / `.cm-toggle`.
 - Salvar e Cancelar ficam em grupo à direita, abaixo do formulário (`.cm-form__footer`) ou no rodapé do painel (`.cm-form__actions`).
 - **Assistentes:** `.cm-wizard` com etapas numeradas (`.cm-steps`) à esquerda e o conteúdo da etapa à direita.
+- **Edição em lote** (alterar um campo em vários registros de uma vez): os registros escolhidos numa lista do kit com caixas (em árvore pelo recuo, quando houver hierarquia) e busca; ao lado, cada campo com uma caixa que o inclui na alteração e o controle desabilitado até ela ser marcada; opções sim/não num grupo de alternância "Manter | Sim | Não". Só o que foi marcado muda.
 
 ### Camadas
 
-- **Diálogo** (`.cm-dialog`): cabeçalho branco com título de 16 px e fechar à direita, corpo com 16 px de respiro, rodapé em `surface-2` com botões agrupados. Campos no corpo usam `.cm-field`, com o rótulo a 6 px do controle, como fora do diálogo. Tab circula dentro do diálogo, Enter aciona o botão padrão, Esc cancela. Prefira resolver no próprio conteúdo antes de abrir um diálogo.
+- **Diálogo** (`.cm-dialog`): cabeçalho branco com título de 16 px e fechar à direita, corpo com 16 px de respiro, rodapé em `surface-2` com botões agrupados. Campos no corpo usam `.cm-field`, com o rótulo junto do controle (letras a cerca de 4 px), como fora do diálogo. Tab circula dentro do diálogo, Enter aciona o botão padrão, Esc cancela. Prefira resolver no próprio conteúdo antes de abrir um diálogo.
 - **Botão padrão do diálogo:** é sempre o principal (à direita do grupo), inclusive em confirmações destrutivas (excluir, zerar): o diálogo já é o segundo passo, nomeia o alvo em negrito e Esc cancela. Com campos, o foco inicial vai para o primeiro campo e Enter em qualquer campo aciona o principal (envio do formulário). Sem campos, o principal recebe o foco ao abrir. Diálogo só de leitura, sem ação, não tem botão padrão: Esc fecha.
 - **Painel lateral** (`.cm-drawer`, aberto com `.is-open`): desliza da direita, 420 px, cabeçalho de 56 px, itens separados por divisores.
-- **Notificações:** canto superior direito, abaixo da barra superior; superfície branca, ícone colorido pelo estado, título de 13 px.
+- **Notificações:** canto superior direito, abaixo da barra superior; superfície branca, ícone colorido pelo estado, título de 13 px. Vale para qualquer biblioteca de notificação (angular-growl e pnotify estão no adaptador Bootstrap 3).
 - **Menu suspenso** (`.cm-menu`): superfície branca, itens de 32 px, item atual em azul com marca.
 
 ### Ícones
@@ -237,6 +253,7 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Conferir alinhamento em 1440, 1920 e ~900 px de largura antes de concluir uma página.
 - Conferir cada página nos dois temas, inclusive popups e componentes de bibliotecas.
 - Usar o ícone da aba do kit (`logos/colibri.ico`).
+- Alinhar à direita o título e o valor das colunas numéricas, em tabelas e grades.
 
 **Não faça**
 
@@ -250,6 +267,8 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Grade de biblioteca com as linhas altas, a zebra, as bordas ou a cor de destaque do tema dela.
 - Tema escuro em preto ou cinza neutro, com degradê fora da lateral ou com cor escrita na tela em vez de token.
 - Ícone da aba padrão do framework, da identidade anterior ou de outro produto.
+- Riscar a opção desligada ou mostrá-la só pela cor.
+- Botão vermelho preenchido para excluir um item dentro do diálogo de edição dele.
 
 ## 9. Implementação neste projeto
 
