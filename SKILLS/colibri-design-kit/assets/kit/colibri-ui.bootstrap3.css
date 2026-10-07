@@ -1,5 +1,5 @@
 /*
- * Colibri UI — adaptador para Bootstrap 3, AngularJS, angular-growl e Dropzone.
+ * Colibri UI — adaptador para Bootstrap 3, AngularJS, angular-growl, pnotify (pnotify-colibri 1.2), chosen e Dropzone.
  * Opcional: carregue depois do CSS do Bootstrap e de colibri-ui.css somente se o projeto usar essas bibliotecas.
  * Para Bootstrap 4/5 ou outro framework, use este arquivo como referência dos ajustes necessários.
  */
@@ -110,6 +110,20 @@ textarea.form-control { height: auto; padding: 8px 10px; }
 .modal-footer > .btn:first-child { border-top-left-radius: var(--cm-btn-radius); border-bottom-left-radius: var(--cm-btn-radius); }
 .modal-footer > .btn:last-child { border-top-right-radius: var(--cm-btn-radius); border-bottom-right-radius: var(--cm-btn-radius); }
 .modal-footer > .btn:hover { z-index: 1; }
+/* Ação à parte no rodapé (ex.: excluir no diálogo de edição): à esquerda, fora do grupo Cancelar | Confirmar. */
+.modal-footer > .cm-dialog__aside {
+    margin-right: auto;
+    border-radius: var(--cm-btn-radius);
+}
+.modal-footer > .cm-dialog__aside + .btn {
+    margin-left: 0;
+    border-top-left-radius: var(--cm-btn-radius);
+    border-bottom-left-radius: var(--cm-btn-radius);
+}
+/* Ação destrutiva secundária: botão comum com o texto em vermelho. */
+.btn.cm-btn--danger-text,
+.btn.cm-btn--danger-text:hover,
+.btn.cm-btn--danger-text:focus { color: var(--cm-danger); }
 .modal-footer > .btn-primary { z-index: 2; }
 /* Foco interno em todo botão (DESIGN.md, seção 2): no grupo, o focado fica acima do principal. */
 .btn:focus-visible { position: relative; outline-offset: -3px; z-index: 3; }
@@ -252,7 +266,9 @@ textarea.form-control { height: auto; padding: 8px 10px; }
     font-size: 13px;
     line-height: 1.5;
 }
-.modal-body label,
+/* Rótulo solto e .control-label do Bootstrap; o .cm-field__label fica fora (a margem somava 6 px ao gap do
+   .cm-field e afastava o rótulo do controle). */
+.modal-body label:not(.cm-field__label),
 .modal-body .control-label {
     margin-bottom: 6px;
     color: var(--cm-ink-2);
@@ -326,3 +342,123 @@ textarea.form-control { height: auto; padding: 8px 10px; }
     border-radius: 50%;
     animation: cm-spin 800ms linear infinite;
 }
+
+/* ---------- pnotify 1.2 (pnotify-colibri), estilo "bootstrap" ----------
+ * Mesma notificação do angular-growl: superfície, divisor, ícone colorido pelo estado, título de 13 px e texto
+ * secundário. Os glyphicons dão lugar aos Bootstrap Icons pelo ícone de cada tipo (notice e info são ambos
+ * .alert-info no pnotify; o ícone os diferencia). Posição e largura são estilo inline: configure no projeto
+ * (references/adocao-por-framework.md da skill colibri-design-kit). */
+.ui-pnotify { z-index: var(--cm-layer-toast, 2000); }
+.ui-pnotify .ui-pnotify-container.alert {
+    position: relative;
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    align-items: start;
+    gap: 2px 10px;
+    height: auto;
+    margin: 0;
+    padding: 11px 40px 11px 12px;
+    color: var(--cm-ink);
+    background: var(--cm-surface);
+    border: 1px solid var(--cm-line);
+    border-radius: var(--cm-radius);
+    box-shadow: var(--cm-shadow-menu);
+    font-family: var(--cm-font);
+    text-shadow: none;
+}
+.ui-pnotify .ui-pnotify-icon {
+    grid-row: 1 / span 2;
+    grid-column: 1;
+    float: none;
+    margin: 1px 0 0;
+}
+.ui-pnotify .ui-pnotify-icon > span {
+    display: block;
+    float: none;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1;
+}
+.ui-pnotify .ui-pnotify-icon > .glyphicon::before { font-family: 'bootstrap-icons'; }
+.ui-pnotify .ui-pnotify-icon > .glyphicon-warning-sign::before { content: '\f622'; color: var(--cm-danger); }
+.ui-pnotify .ui-pnotify-icon > .glyphicon-exclamation-sign::before { content: '\f33a'; color: var(--cm-warning); }
+.ui-pnotify .ui-pnotify-icon > .glyphicon-info-sign::before { content: '\f430'; color: var(--cm-accent-ink); }
+.ui-pnotify .ui-pnotify-icon > .glyphicon-ok-sign::before { content: '\f26a'; color: var(--cm-success); }
+.ui-pnotify .ui-pnotify-title,
+.ui-pnotify .ui-pnotify-text { grid-column: 2; margin: 0; }
+.ui-pnotify .ui-pnotify-title {
+    color: var(--cm-ink);
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.35;
+}
+.ui-pnotify .ui-pnotify-text {
+    color: var(--cm-ink-2);
+    font-size: 13px;
+    line-height: 1.45;
+}
+.ui-pnotify .ui-pnotify-closer {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    margin: 0;
+    color: var(--cm-ink-3);
+    border-radius: var(--cm-radius-sm);
+}
+.ui-pnotify .ui-pnotify-closer:hover { color: var(--cm-ink); background: var(--cm-muted-soft); }
+.ui-pnotify .ui-pnotify-closer > .glyphicon { display: none; }
+.ui-pnotify .ui-pnotify-closer::before {
+    content: '\f659';
+    font-family: 'bootstrap-icons';
+    font-size: 14px;
+    line-height: 1;
+}
+.ui-pnotify .ui-pnotify-sticker { display: none; }
+
+/* ---------- chosen (seleção simples e múltipla) ----------
+ * O chosen.css pinta campo, etiquetas e lista em branco e cinza fixos, que ficam claros no tema escuro. Mesmo
+ * campo do .cm-input (borda, raio, foco com o halo azul-claro), opções escolhidas como etiqueta azul e lista
+ * como camada do kit. */
+.chosen-container { color: var(--cm-ink); font-family: var(--cm-font); font-size: 13px; }
+.chosen-container-multi .chosen-choices,
+.chosen-container-single .chosen-single {
+    min-height: var(--cm-control-h);
+    padding: 2px 6px;
+    color: var(--cm-ink);
+    background: var(--cm-surface);
+    border: 1px solid var(--cm-btn-line);
+    border-radius: var(--cm-btn-radius);
+    box-shadow: none;
+}
+.chosen-container-active .chosen-choices,
+.chosen-container-active.chosen-with-drop .chosen-single { border-color: var(--cm-focus); box-shadow: var(--cm-focus-ring); }
+.chosen-container-multi .chosen-choices li.search-field input[type="text"] {
+    height: 26px;
+    color: var(--cm-ink);
+    font-family: var(--cm-font);
+}
+.chosen-container-multi .chosen-choices li.search-choice {
+    margin: 3px 4px 3px 0;
+    padding: 3px 22px 3px 8px;
+    color: var(--cm-accent-ink);
+    background: var(--cm-accent-soft);
+    border: 1px solid var(--cm-accent-line);
+    border-radius: 10px;
+    box-shadow: none;
+    font-size: 12px;
+    line-height: 1.2;
+}
+.chosen-container .chosen-drop {
+    background: var(--cm-surface);
+    border: 1px solid var(--cm-line);
+    border-radius: var(--cm-radius);
+    box-shadow: var(--cm-shadow-menu);
+}
+.chosen-container .chosen-results { color: var(--cm-ink); }
+.chosen-container .chosen-results li.highlighted { color: var(--cm-ink); background: var(--cm-hover); }
+.chosen-container .chosen-results li.no-results { color: var(--cm-ink-3); background: transparent; }
+.chosen-container-multi .chosen-drop .result-selected { color: var(--cm-ink-3); }

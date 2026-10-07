@@ -80,9 +80,10 @@ Para `<estáticos>/colibri-ui/` (ou a pasta confirmada), mantendo `fonts/` e `lo
 
 - `colibri-ui.css`, `fonts/`, `logos/`.
 - `logos/colibri.ico` também numa pasta pública servida pela entrada HTML (quando `colibri-ui/` não for servida diretamente), trocando o ícone da aba do projeto.
+- Com tela de entrada (login) ou páginas de erro: `logos/colibri-marca.svg` na mesma pasta pública, pois é `<img>` do HTML, não `url()` do CSS.
 - `icons/` (Bootstrap Icons 1.13.1 local), ou `npm install bootstrap-icons` quando o projeto usa npm para estáticos.
 - `colibri-ui.bootstrap3.css` somente com Bootstrap 3/AngularJS; `colibri-ui.devexpress.css` somente com DevExpress Blazor ou DevExtreme (remova dele os blocos da biblioteca não usada).
-- Não copie `DESIGN.md`, `PRODUCT.template.md`, `LEIA-ME.md` nem `exemplo.html` para o projeto: os dois primeiros viram arquivos do impeccable nos passos 4–5; os demais são referência da skill.
+- Não copie `DESIGN.md`, `PRODUCT.template.md`, `LEIA-ME.md`, `exemplo.html` nem `exemplo-entrada.html` para o projeto: os dois primeiros viram arquivos do impeccable nos passos 4–5; os demais são referência da skill.
 
 Depois ajuste a carga na entrada HTML, nesta ordem: CSS do framework e tema da biblioteca → `bootstrap-icons.min.css` → `colibri-ui.css` → adaptadores. Remova fontes e ícones de CDN. Detalhes por framework e comportamentos de JavaScript do shell: [`./references/adocao-por-framework.md`](./references/adocao-por-framework.md).
 

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Colibri UI — tela de entrada</title>
+    <link rel="icon" href="logos/colibri.ico">
+    <script>
+        // Mesmo tema da aplicação (chave cm-theme), aplicado antes do primeiro desenho; #escuro força o escuro.
+        (function () {
+            var tema = null;
+            try { tema = localStorage.getItem('cm-theme'); } catch (e) { /* armazenamento indisponível */ }
+            if (location.hash === '#escuro') { tema = 'dark'; }
+            if (tema !== 'dark' && tema !== 'light') {
+                tema = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', tema);
+        })();
+    </script>
+    <!-- Só ícones e o kit: a tela de entrada não carrega o CSS do framework nem o legado da aplicação. -->
+    <link rel="stylesheet" href="icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="colibri-ui.css">
+</head>
+<body class="cm-login">
+<main class="cm-login__area">
+    <div class="cm-login__brand">
+        <img src="logos/colibri-marca.svg" alt="" width="36" height="36">
+        <span>Colibri Produto</span>
+    </div>
+
+    <!-- Entrada: cartão com título, texto, aviso de erro (quando houver), campo e botão principal largo -->
+    <form class="cm-panel cm-form cm-login__card" id="entrada" onsubmit="return false">
+        <div>
+            <h1 class="cm-login__title">Entrar</h1>
+            <p class="cm-login__text">Digite a senha do seu usuário no Colibri.</p>
+        </div>
+        <div class="cm-notice cm-notice--danger" role="alert">
+            <i class="bi bi-exclamation-octagon" aria-hidden="true"></i>
+            <span>A senha que você digitou está incorreta.</span>
+        </div>
+        <div class="cm-field is-invalid">
+            <label class="cm-field__label" for="senha">Senha</label>
+            <input type="password" class="cm-input" id="senha" autocomplete="current-password" aria-invalid="true" autofocus>
+        </div>
+        <button type="submit" class="cm-btn cm-btn--primary cm-login__submit">Entrar</button>
+    </form>
+
+    <!-- Página de erro (404, 500, ambiente não encontrado): mesmo cartão, com ícone, título, texto e volta -->
+    <div class="cm-panel cm-login__card cm-error" id="erro" role="alert" hidden>
+        <i class="bi bi-signpost-split cm-error__icon" aria-hidden="true"></i>
+        <h1 class="cm-login__title">Erro 404</h1>
+        <p class="cm-login__text">Página não encontrada.</p>
+        <a class="cm-btn cm-error__back" href="#">Voltar ao início</a>
+    </div>
+</main>
+<script>
+    if (location.hash === '#erro') {
+        document.getElementById('entrada').hidden = true;
+        document.getElementById('erro').hidden = false;
+    }
+</script>
+</body>
+</html>

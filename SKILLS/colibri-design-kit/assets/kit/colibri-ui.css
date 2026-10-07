@@ -592,6 +592,11 @@ pre.log,
 .cm-btn[disabled],
 .cm-btn[disabled]:hover { opacity: .5; cursor: not-allowed; }
 .cm-btn--primary[disabled]:hover { background: var(--cm-accent); }
+/* Ação destrutiva secundária (ex.: excluir um item dentro do diálogo de edição dele): botão comum com o texto
+   em vermelho. O vermelho preenchido fica para quando a destruição é a ação principal. */
+.cm-btn--danger-text,
+.cm-btn--danger-text:hover,
+.cm-btn--danger-text:focus { color: var(--cm-danger) !important; }
 .cm-btn-group {
     display: inline-flex;
     align-items: stretch;
@@ -717,6 +722,15 @@ pre.log,
     background: var(--cm-muted-soft);
     border-color: var(--cm-line);
 }
+/* Opções sim/não como etiquetas: ligada com bi-check-circle-fill (etiqueta padrão, azul); desligada apagada,
+   sem risco, com bi-x-circle. Ligadas primeiro. */
+.cm-tag--off {
+    color: var(--cm-ink-3);
+    background: var(--cm-muted-soft);
+    border-color: var(--cm-line);
+}
+.cm-tag > .bi-check-circle-fill,
+.cm-tag > .bi-x-circle { font-size: 11px; }
 .cm-mono {
     font-family: var(--cm-mono);
     font-size: 12px;
@@ -923,9 +937,78 @@ pre.log,
 }
 .cm-table__head > .cm-head--indent { padding-left: 28px; }
 .cm-table__head > .cm-cell--end { text-align: right; }
+/* Coluna numérica (código, ordem, quantidade, valor, preço): título e valor à direita com .cm-cell--end. No
+   título que ordena (.cm-sort.cm-cell--end), a seta vai à esquerda do rótulo, para o texto terminar na mesma
+   borda dos números, com ou sem seta. */
+.cm-table__head > .cm-sort.cm-cell--end { flex-direction: row-reverse; justify-content: flex-start; }
 .cm-table__head + .cm-empty { border-bottom: 0; }
 .cm-modal-table { --cm-cols: minmax(0, 1fr) minmax(0, 1.4fr); }
 .cm-modal-table .cm-table__row { padding-right: 16px; }
+
+/* ---------- Ficha do registro (detalhe da linha) ----------
+ * Blocos de pares rótulo/valor (ex.: identificação, descrições, produção) com a imagem à direita; opções e
+ * listas relacionadas ocupam a largura toda. Título de cada bloco sobre um divisor, divisor discreto entre os
+ * pares e rótulo mais leve que o valor, para o olho seguir a linha do rótulo ao valor. */
+.cm-record {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px 32px;
+}
+.cm-record__data {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px 32px;
+    align-items: start;
+}
+.cm-record__wide { grid-column: 1 / -1; }
+.cm-record__title {
+    margin: 0 0 6px;
+    color: var(--cm-ink);
+    font-size: 13px;
+    font-weight: 650;
+}
+.cm-record__data .cm-record__title,
+.cm-record__media .cm-record__title {
+    margin: 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--cm-line-strong);
+}
+/* Seção da largura toda abaixo dos blocos (ex.: itens do registro), separada por um divisor. */
+.cm-record__section {
+    padding-top: 16px;
+    border-top: 1px solid var(--cm-line);
+}
+.cm-pairs {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 16px;
+    margin: 0;
+}
+.cm-pairs > dt,
+.cm-pairs > dd {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--cm-line);
+    line-height: 20px;
+}
+.cm-pairs > dt:last-of-type,
+.cm-pairs > dd:last-of-type { border-bottom: 0; }
+.cm-pairs > dt {
+    color: var(--cm-ink-2);
+    font-size: 12px;
+    font-weight: 400;
+}
+.cm-pairs > dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+.cm-pairs > dd > .cm-tag { vertical-align: middle; }
+@media (max-width: 1100px) {
+    .cm-record__data { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+    .cm-record,
+    .cm-record__data { grid-template-columns: minmax(0, 1fr); }
+}
 
 /* ---------- Página inicial e cartões ---------- */
 .cm-page--home { position: relative; isolation: isolate; }
@@ -1297,9 +1380,14 @@ label.cm-field__label {
     color: var(--cm-ink-2);
     font-size: 12px;
     font-weight: 600;
+    line-height: 14px;
     letter-spacing: 0;
     text-transform: none;
 }
+/* Rótulo junto do controle: a linha de 14 px não deixa espaço vazio sob as letras de 12 px, e a margem negativa
+   reduz o gap de 6 px do .cm-field a 2 px entre as caixas; as letras ficam a cerca de 4 px do controle (com
+   6 px entre as caixas e a linha herdada, ficavam a 10 px). O gap continua valendo entre controle e erro. */
+.cm-field > .cm-field__label { margin-bottom: -4px; }
 .cm-field__hint { color: var(--cm-ink-3); font-size: 12px; }
 .cm-field__error {
     display: flex;
@@ -1820,6 +1908,8 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
     }
     .cm-table__row > .cm-cell--main { grid-column: 1 / -1; }
     .cm-table__row > .cm-cell--actions { grid-column: 2; grid-row: 2; }
+    /* Linha em bloco com rótulos: o número fica junto do rótulo, à esquerda. */
+    .cm-table__row > .cm-cell--end { text-align: left; }
     .cm-cell__label {
         display: inline;
         margin-right: 4px;
@@ -1860,6 +1950,16 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
 .cm-dialog__foot > .cm-btn:hover { z-index: 1; }
 .cm-dialog__foot > .cm-btn--primary { z-index: 2; }
 .cm-dialog__foot > .cm-btn:focus-visible { z-index: 3; }
+/* Ação à parte no rodapé (ex.: excluir no diálogo de edição, com .cm-btn--danger-text): à esquerda, fora do
+   grupo Cancelar | Confirmar. */
+.cm-dialog__foot > .cm-dialog__aside {
+    margin-right: auto;
+    border-radius: var(--cm-btn-radius);
+}
+.cm-dialog__foot > .cm-dialog__aside + .cm-btn {
+    border-top-left-radius: var(--cm-btn-radius);
+    border-bottom-left-radius: var(--cm-btn-radius);
+}
 .cm-dialog {
     background: var(--cm-surface);
     border: 1px solid var(--cm-line);
@@ -1923,8 +2023,10 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
     letter-spacing: 0;
     text-transform: none;
 }
-/* Em .cm-field o espaço entre rótulo e controle vem do gap; a margem acima é para rótulo solto. */
+/* Em .cm-field o espaço entre rótulo e controle vem do gap (com o rótulo junto do controle, como fora do
+   diálogo); a margem acima é para rótulo solto. */
 .cm-dialog__body .cm-field__label { margin: 0; }
+.cm-dialog__body .cm-field > .cm-field__label { margin-bottom: -4px; }
 .cm-dialog__body .cm-check {
     margin: 0;
     color: var(--cm-ink);
@@ -1960,3 +2062,54 @@ button, input, select, textarea { font: inherit; color: inherit; }
 label { font-weight: inherit; }
 .cm-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .cm-drawer__close { color: var(--cm-ink-2); background: transparent; cursor: pointer; }
+
+/* ---------- Tela de entrada (login) e páginas de erro ----------
+ * Fora do shell: plano de trabalho com a marca (logos/colibri-marca.svg, o quadrado azul com o colibri branco,
+ * + nome do produto) acima de um cartão .cm-panel de 360 px. Sem degradê (é da lateral) e sem marca-d'água
+ * (é da página inicial). As páginas de erro usam o mesmo cartão, com ícone, título, texto e link de volta. */
+.cm-login {
+    min-height: 100vh;
+    margin: 0;
+    color: var(--cm-ink);
+    background: var(--cm-bg);
+    font-family: var(--cm-font);
+}
+.cm-login__area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    min-height: 100vh;
+    padding: 24px 16px;
+}
+.cm-login__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--cm-ink);
+    font-size: 20px;
+    font-weight: 700;
+}
+.cm-login__brand > img { flex: 0 0 auto; width: 36px; height: 36px; }
+.cm-login__card {
+    width: min(360px, 100%);
+    padding: 24px;
+    box-shadow: var(--cm-shadow-card);
+}
+.cm-login__title {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 700;
+}
+.cm-login__text { margin: 0; color: var(--cm-ink-2); font-size: 13px; }
+.cm-login__submit { width: 100%; }
+.cm-login__card[hidden] { display: none; }
+.cm-error {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+.cm-error__icon { color: var(--cm-ink-3); font-size: 24px; line-height: 1; }
+.cm-error__back { margin-top: 8px; text-decoration: none; }

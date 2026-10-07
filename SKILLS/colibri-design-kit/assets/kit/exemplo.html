@@ -10,7 +10,7 @@
     <style>
         /* Apenas para esta página de exemplo */
         .demo-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; align-items: start; }
-        .demo-table { --cm-cols: minmax(200px, 2fr) minmax(110px, .8fr) minmax(100px, .8fr) minmax(120px, 1fr) 104px; }
+        .demo-table { --cm-cols: minmax(200px, 2fr) minmax(110px, .8fr) minmax(100px, .8fr) 90px minmax(120px, 1fr) 104px; }
         .demo-dialog { max-width: 520px; }
     </style>
 </head>
@@ -142,6 +142,7 @@
                                 <button type="button" class="cm-sort is-active" aria-pressed="true"><span>Nome</span><i class="bi bi-arrow-up cm-sort__icon" aria-hidden="true"></i></button>
                                 <button type="button" class="cm-sort"><span>Status</span><i class="bi bi-arrow-down-up cm-sort__icon" aria-hidden="true"></i></button>
                                 <span>Versão</span>
+                                <button type="button" class="cm-sort cm-cell--end"><span>Execuções</span><i class="bi bi-arrow-down-up cm-sort__icon" aria-hidden="true"></i></button>
                                 <span>Modificado em</span>
                                 <span class="cm-cell--end">Ações</span>
                             </div>
@@ -153,6 +154,7 @@
                                     </div>
                                     <div class="cm-cell"><span class="cm-tag cm-tag--success">Ativado</span></div>
                                     <div class="cm-cell cm-mono">2.3.0.177</div>
+                                    <div class="cm-cell cm-cell--end cm-mono"><span class="cm-cell__label">Execuções</span>1.204</div>
                                     <div class="cm-cell cm-mono">23/09/26 04:02</div>
                                     <div class="cm-cell cm-cell--actions">
                                         <div class="cm-icon-group" role="group">
@@ -162,8 +164,43 @@
                                         </div>
                                     </div>
                                 </div>
+                                <!-- Ficha do registro: blocos de pares com divisores; opções sim/não, ligadas primeiro -->
                                 <div class="cm-table__detail">
-                                    <div class="cm-tags"><span class="cm-tag cm-tag--muted">modulo-a</span><span class="cm-tag cm-tag--muted">modulo-b</span><span class="cm-tag">chave-liberada</span></div>
+                                    <div class="cm-record">
+                                        <div class="cm-record__data">
+                                            <section>
+                                                <h3 class="cm-record__title">Identificação</h3>
+                                                <dl class="cm-pairs">
+                                                    <dt>Código</dt><dd class="cm-mono">177</dd>
+                                                    <dt>Nome técnico</dt><dd class="cm-mono">servico_integracao</dd>
+                                                    <dt>Status</dt><dd><span class="cm-tag cm-tag--success">Ativado</span></dd>
+                                                </dl>
+                                            </section>
+                                            <section>
+                                                <h3 class="cm-record__title">Execução</h3>
+                                                <dl class="cm-pairs">
+                                                    <dt>Intervalo</dt><dd class="cm-mono">5 min</dd>
+                                                    <dt>Última execução</dt><dd class="cm-mono">23/09/26 04:02</dd>
+                                                </dl>
+                                            </section>
+                                            <section>
+                                                <h3 class="cm-record__title">Módulos</h3>
+                                                <dl class="cm-pairs">
+                                                    <dt>Principal</dt><dd>modulo-a</dd>
+                                                    <dt>Auxiliar</dt><dd>—</dd>
+                                                </dl>
+                                            </section>
+                                        </div>
+                                        <section class="cm-record__wide">
+                                            <h3 class="cm-record__title">Opções</h3>
+                                            <div class="cm-tags">
+                                                <span class="cm-tag"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Chave liberada</span>
+                                                <span class="cm-tag"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Reinício automático</span>
+                                                <span class="cm-tag cm-tag--off"><i class="bi bi-x-circle" aria-hidden="true"></i>Modo de teste</span>
+                                                <span class="cm-tag cm-tag--off"><i class="bi bi-x-circle" aria-hidden="true"></i>Log detalhado</span>
+                                            </div>
+                                        </section>
+                                    </div>
                                 </div>
                             </div>
                             <div class="cm-table__item">
@@ -174,6 +211,7 @@
                                     </div>
                                     <div class="cm-cell"><span class="cm-tag cm-tag--warning">Desativado</span></div>
                                     <div class="cm-cell cm-mono">1.0.1.36</div>
+                                    <div class="cm-cell cm-cell--end cm-mono"><span class="cm-cell__label">Execuções</span>87</div>
                                     <div class="cm-cell cm-mono">22/09/26 23:03</div>
                                     <div class="cm-cell cm-cell--actions">
                                         <div class="cm-icon-group" role="group">
@@ -262,6 +300,24 @@
                                     <button type="button" class="cm-btn cm-btn--primary">Sim</button>
                                 </div>
                             </div>
+                            <!-- Diálogo de edição: excluir é ação à parte, à esquerda, com o texto em vermelho -->
+                            <form class="cm-dialog demo-dialog" role="dialog" aria-labelledby="dlg-edit-title" onsubmit="return false">
+                                <div class="cm-dialog__head">
+                                    <button type="button" class="cm-dialog__close" aria-label="Fechar">&times;</button>
+                                    <h2 class="cm-dialog__title" id="dlg-edit-title">Etapa</h2>
+                                </div>
+                                <div class="cm-dialog__body">
+                                    <div class="cm-field">
+                                        <label class="cm-field__label" for="etapa">Descrição</label>
+                                        <input id="etapa" class="cm-input" value="Conferir integração">
+                                    </div>
+                                </div>
+                                <div class="cm-dialog__foot">
+                                    <button type="button" class="cm-btn cm-btn--danger-text cm-dialog__aside">Excluir</button>
+                                    <button type="button" class="cm-btn">Cancelar</button>
+                                    <button type="submit" class="cm-btn cm-btn--primary">Salvar</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
