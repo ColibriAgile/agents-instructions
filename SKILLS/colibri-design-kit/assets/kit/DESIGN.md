@@ -98,7 +98,7 @@ Os valores exatos estão no frontmatter e nos tokens `--cm-*` de `colibri-ui.css
 - **Neutros:** plano de trabalho (`page`), superfícies (`surface`, `surface-2`), divisores (`line`) e textos (`ink`, `ink-2`, `ink-3`). Texto de apoio nunca fica mais claro que `ink-3`.
 - **Estados** (`success`, `warning`, `danger`, cada um com fundo `-soft` e borda `-line`): sempre acompanhados de rótulo ou ícone, nunca só a cor.
 - **Lateral:** degradê `#043355 → #2aa3e7`; cabeçalho com o nome do produto em retângulo mais escuro (`#043354 → #0b2a41`); itens em `#d7d7d7`, peso regular; item ativo em branco sobre `rgba(255,255,255,.36)`; separadores em branco a 16%; versão no rodapé em 11 px, branco a 60%.
-- **Foco:** contorno azul-claro (`focus`) de 2 px em botões e links; em campos, borda `focus` com halo `0 0 0 3px rgba(96,165,232,.22)`. Em botões o contorno é **interno** (`outline-offset: -3px`), sozinho ou em grupo: o botão focado sobe acima dos vizinhos, inclusive do principal, e nada encobre o contorno. No botão principal e no destrutivo o contorno é claro (`rgba(255,255,255,.7)`). Links mantêm o contorno externo.
+- **Foco:** contorno azul-claro (`focus`) de 2 px em botões e links; em campos, borda `focus` com halo `0 0 0 3px rgba(96,165,232,.22)`. Em botões o contorno é **interno** (`outline-offset: -3px`), sozinho ou em grupo: o botão focado sobe acima dos vizinhos, inclusive do principal, e nada encobre o contorno. No botão principal e no destrutivo o contorno é claro (`rgba(255,255,255,.7)`). Links mantêm o contorno externo. Em campo unido a botão ou a prefixo/sufixo (`.cm-input-group`), o halo contorna o **conjunto**, nunca só o campo: o campo focado fica com a borda `focus`, acima do vizinho na emenda, e o halo envolve campo e botão juntos, sem ser cortado pelo botão nem invadi-lo. O campo com erro também fica acima do vizinho, para a borda `danger` aparecer inteira.
 
 **Regra da ação rara.** O acento indica ação ou seleção; não colore painéis grandes nem seções inativas.
 
@@ -222,7 +222,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 ### Formulários
 
 - Painel `.cm-panel.cm-form`, grupos em `.cm-fieldset` (legenda = título de seção), campos em `.cm-field` com rótulo sempre visível (`.cm-field__label`), controle `.cm-input` (32 px) e erro associado (`.cm-field__error`). O rótulo fica junto do controle: linha de 14 px e 2 px entre as caixas, com as letras a cerca de 4 px do controle, dentro e fora de diálogos. Campo somente leitura em `surface-2` com texto `ink-2`; campo desabilitado (depende de uma opção desmarcada) em `surface-2`, texto e borda apagados e rótulo em `ink-3`, sem sumir. Pares lado a lado em `.cm-form-row`; rótulo à esquerda em `.cm-form-grid`.
-- Campo + botão ou prefixo/sufixo unidos: `.cm-input-group` com `.cm-input-addon`.
+- Campo + botão ou prefixo/sufixo unidos: `.cm-input-group` com `.cm-input-addon`. No foco, o halo contorna o conjunto (seção 2, "Foco"); o botão do conjunto mantém o próprio contorno interno.
 - Opções exclusivas com descrição: `.cm-choices` / `.cm-choice` (lado a lado, a escolhida em azul-claro).
 - **Caixas de seleção e rádios:** 16 px, borda `#c7d0da`, cantos de 3 px (rádio circular); marcados preenchidos com o azul de ação e marca branca; foco com o halo azul-claro; opção dependente recuada (`.cm-check--nested`) e apagada quando desabilitada. Escolhas múltiplas curtas e relacionadas (ex.: dias da semana) usam grupo de alternância `.cm-toggles` / `.cm-toggle`.
 - Salvar e Cancelar ficam em grupo à direita, abaixo do formulário (`.cm-form__footer`) ou no rodapé do painel (`.cm-form__actions`).
@@ -269,6 +269,7 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Ícone da aba padrão do framework, da identidade anterior ou de outro produto.
 - Riscar a opção desligada ou mostrá-la só pela cor.
 - Botão vermelho preenchido para excluir um item dentro do diálogo de edição dele.
+- Halo de foco só no campo de um conjunto unido, cortado pelo botão ou invadindo a borda dele.
 
 ## 9. Implementação neste projeto
 

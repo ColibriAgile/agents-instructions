@@ -308,6 +308,24 @@ textarea.form-control { height: auto; padding: 8px 10px; }
 }
 .modal-body .help-block { color: var(--cm-ink-3); font-size: 12px; }
 .modal-body .has-error .help-block { color: var(--cm-danger); }
+/* Foco dos campos (DESIGN.md, seção 2): borda azul também no diálogo (.modal-body .form-control fixava a
+ * cor, inclusive a vermelha do erro); com erro, borda vermelha e o halo do kit no lugar do brilho do Bootstrap. No .input-group, como no
+ * .cm-input-group, o halo contorna o conjunto e o campo focado sobe acima do botão na emenda. */
+.modal-body .form-control:focus { border-color: var(--cm-focus); }
+.modal-body .has-error .form-control { border-color: var(--cm-danger); }
+.has-error .form-control:focus { border-color: var(--cm-danger); box-shadow: var(--cm-focus-ring); }
+.input-group {
+    border-radius: var(--cm-btn-radius);
+    transition: box-shadow 150ms var(--cm-ease);
+}
+.input-group:has(> .form-control:focus) { box-shadow: var(--cm-focus-ring); }
+.has-error .input-group > .form-control { position: relative; z-index: 2; }
+.input-group > .form-control:focus,
+.has-error .input-group > .form-control:focus {
+    position: relative;
+    z-index: 3;
+    box-shadow: none;
+}
 .modal-footer {
     min-height: 56px;
     padding: 12px 16px;

@@ -1428,13 +1428,20 @@ label.cm-field__label {
     display: flex;
     align-items: stretch;
     max-width: 520px;
+    border-radius: var(--cm-btn-radius);
+    transition: box-shadow 150ms var(--cm-ease);
 }
 .cm-input-group--wide { max-width: 640px; }
 .cm-input-group > * { border-radius: 0; }
 .cm-input-group > * + * { margin-left: -1px; }
 .cm-input-group > :first-child { border-top-left-radius: var(--cm-btn-radius); border-bottom-left-radius: var(--cm-btn-radius); }
 .cm-input-group > :last-child { border-top-right-radius: var(--cm-btn-radius); border-bottom-right-radius: var(--cm-btn-radius); }
-.cm-input-group > .cm-input:focus { position: relative; z-index: 1; }
+/* Foco: o halo contorna o conjunto (no campo, o vizinho o cortaria ou seria invadido por ele); o campo
+ * focado fica só com a borda, acima do vizinho para a emenda aparecer inteira. O campo com erro também
+ * sobe, para a borda vermelha não sumir sob o botão. */
+.cm-input-group:has(> .cm-input:focus) { box-shadow: var(--cm-focus-ring); }
+.cm-field.is-invalid .cm-input-group > .cm-input { position: relative; z-index: 2; }
+.cm-input-group > .cm-input:focus { position: relative; z-index: 3; box-shadow: none; }
 .cm-input-group > .cm-btn { flex: 0 0 auto; }
 .cm-input-addon {
     display: inline-flex;
