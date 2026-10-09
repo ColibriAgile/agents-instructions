@@ -424,7 +424,9 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
-.ct-product__foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 6px; }
+.ct-product__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 6px; }
+/* No cartão, a ação usa o corpo de texto: cabe ao lado do preço em três colunas de tablet. */
+.ct-product__foot .ct-btn { padding: 0 16px; font-size: var(--ct-text); }
 .ct-price { color: var(--ct-brand-ink); font-size: var(--ct-text-xl); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ct-price__from { display: block; color: var(--ct-ink-3); font-size: var(--ct-text-sm); font-weight: 500; }
 /* Linha (formato detalhado): foto à esquerda. */
