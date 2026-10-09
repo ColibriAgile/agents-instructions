@@ -6,10 +6,10 @@ Complementa o passo 3 do `SKILL.md`. A marcação de cada componente está em `.
 
 1. CSS do framework e tema da biblioteca de componentes, se houver.
 2. `icons/bootstrap-icons.min.css` (ou o CSS do pacote npm `bootstrap-icons`).
-3. `colibri-ui.css`.
+3. `colibri-ui.css` (ele traz `colibri-base.css` por `@import`; não carregue a base de novo).
 4. Adaptadores, se usados: `colibri-ui.bootstrap3.css` e/ou `colibri-ui.devexpress.css`.
 
-`fonts/` e `logos/` ficam ao lado de `colibri-ui.css` (`url('fonts/…')` e `url('logos/…')` são relativos ao CSS). Se um bundler reescrever caminhos, confira que as WOFF2 e o SVG são emitidos e resolvem. Nada de fontes ou ícones por CDN: tudo precisa funcionar sem internet.
+`colibri-base.css`, `fonts/` e `logos/` ficam ao lado de `colibri-ui.css` (`@import url('colibri-base.css')`, `url('fonts/…')` e `url('logos/…')` são relativos ao CSS). Com bundler (Vite, webpack), o `@import` é resolvido e embutido no build; sem bundler, o navegador pede `colibri-base.css` ao lado do `colibri-ui.css`. Se um bundler reescrever caminhos, confira que as WOFF2 e o SVG são emitidos e resolvem. Nada de fontes ou ícones por CDN: tudo precisa funcionar sem internet.
 
 ## Ícone da aba (todos os frameworks)
 
@@ -23,7 +23,7 @@ Complementa o passo 3 do `SKILL.md`. A marcação de cada componente está em `.
 
 ## Tela de entrada e páginas de erro (todos os frameworks)
 
-`logos/colibri-marca.svg` é uma imagem do HTML, não do CSS: sirva-a da mesma pasta pública do `colibri-ui/` e use o caminho na `<img>` da marca. A tela carrega só os ícones e `colibri-ui.css`, sem o CSS do framework nem o legado da aplicação, e aplica o tema gravado (`cm-theme`) antes do primeiro desenho, com o mesmo script da aplicação. Páginas de erro servidas pelo backend (404, 500) costumam não ter o idioma da aplicação: escolha os textos pelo idioma do navegador.
+`logos/colibri-marca.svg` é uma imagem do HTML, não do CSS: sirva-a da mesma pasta pública do `colibri-ui/` e use o caminho na `<img>` da marca. A tela carrega só os ícones e `colibri-ui.css` (com a base ao lado), sem o CSS do framework nem o legado da aplicação, e aplica o tema gravado (`cm-theme`) antes do primeiro desenho, com o mesmo script da aplicação. Páginas de erro servidas pelo backend (404, 500) costumam não ter o idioma da aplicação: escolha os textos pelo idioma do navegador.
 
 ## Por framework
 

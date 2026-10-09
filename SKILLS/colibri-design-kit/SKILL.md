@@ -10,7 +10,7 @@ Leva a linha visual Colibri ("Mesa de operação") a um repositório e deixa o p
 
 | Arquivo | Conteúdo | Quem grava |
 |---|---|---|
-| `<estáticos>/colibri-ui/` | `colibri-ui.css`, adaptadores usados, `fonts/`, `logos/`, `icons/` | esta skill |
+| `<estáticos>/colibri-ui/` | `colibri-base.css`, `colibri-ui.css`, adaptadores usados, `fonts/`, `logos/`, `icons/` | esta skill |
 | `PRODUCT.md` | usuários, propósito, contexto, compromissos da marca, princípios (modelo do kit preenchido) | impeccable `init` |
 | `DESIGN.md` | regras visuais do kit no formato do impeccable + implementação no projeto | impeccable `document` |
 | `.impeccable/design.json` | sidecar: metadados de cor, sombras, movimento, breakpoints, componentes | impeccable `document` |
@@ -52,6 +52,7 @@ Rode `<pasta-da-skill-impeccable>/scripts/impeccable context` uma vez (com `--ta
 - Página inicial (recebe `.cm-page--home`) e página mais usada.
 - Fontes/ícones hospedados em CDN ou em pacote de fonte do tema (Roboto, Inter) que precisarão sair.
 - Se já existem `PRODUCT.md`, `DESIGN.md` (no caminho que o `context` resolveu), `.impeccable/` ou `docs/design/DECISOES.md`. Se existirem, este é um fluxo de **atualização**: leia-os, rode `impeccable doctor --json` e mostre ao usuário o que será refeito; nada é sobrescrito sem confirmação.
+  - Kit adotado antes de 09/10/2026 não tem `colibri-base.css` ao lado do `colibri-ui.css`. O `colibri-ui.css` novo importa a base (`@import url('colibri-base.css')`): copiar só ele deixa a aplicação sem tokens e sem fontes. Na atualização, os dois vão juntos.
   - Artefatos do impeccable 3.x (`## Register` no `PRODUCT.md`, H2 numerados como `## 1. Overview` e `## 4. Elevation` no `DESIGN.md`) entram na atualização como migração, conforme [`./references/mapeamento-impeccable.md`](./references/mapeamento-impeccable.md) ("Migração de um PRODUCT.md…" e "Migração de um DESIGN.md…").
 
 ### 2. Confirmar com o usuário
@@ -78,7 +79,7 @@ As respostas confirmadas aqui valem como a entrevista exigida pelo `impeccable i
 
 Para `<estáticos>/colibri-ui/` (ou a pasta confirmada), mantendo `fonts/` e `logos/` ao lado do CSS, pois os caminhos são relativos:
 
-- `colibri-ui.css`, `fonts/`, `logos/`.
+- `colibri-base.css`, `colibri-ui.css`, `fonts/`, `logos/`. O `colibri-ui.css` importa `colibri-base.css` (tokens dos dois temas, fontes e camadas) pelo caminho relativo: os dois ficam na mesma pasta.
 - `logos/colibri.ico` também numa pasta pública servida pela entrada HTML (quando `colibri-ui/` não for servida diretamente), trocando o ícone da aba do projeto.
 - Com tela de entrada (login) ou páginas de erro: `logos/colibri-marca.svg` na mesma pasta pública, pois é `<img>` do HTML, não `url()` do CSS.
 - `icons/` (Bootstrap Icons 1.13.1 local), ou `npm install bootstrap-icons` quando o projeto usa npm para estáticos.
@@ -132,7 +133,7 @@ O kit em `./assets/kit/` é mantido diretamente nesta skill e é a fonte da verd
 
 Ao alterar o kit:
 
-- Mude a regra e a implementação juntas: `DESIGN.md` e `colibri-ui.css`, mais os adaptadores afetados (`colibri-ui.bootstrap3.css`, `colibri-ui.devexpress.css`) e a marcação de `exemplo.html` quando o componente aparece nela.
+- Mude a regra e a implementação juntas: `DESIGN.md` e `colibri-ui.css` (tokens, temas e fontes ficam em `colibri-base.css`), mais os adaptadores afetados (`colibri-ui.bootstrap3.css`, `colibri-ui.devexpress.css`) e a marcação de `exemplo.html` quando o componente aparece nela.
 - Regra nova ou alterada entra no checklist de `./references/mapeamento-impeccable.md` (e na tabela, se o `DESIGN.md` mudou de estrutura); comportamento por framework vai para `./references/adocao-por-framework.md`.
 - Acrescente no topo de "Versões" do `LEIA-ME.md` uma entrada com a data e o que mudou.
 - Ajuste descoberto numa aplicação que vale para todas volta para cá; não fica só no projeto.
