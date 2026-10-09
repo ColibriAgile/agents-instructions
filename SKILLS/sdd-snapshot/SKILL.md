@@ -76,5 +76,5 @@ Sozinho num bloco de código, pronto para colar depois de `/clear` ou numa sess�
 
 ## Falhas
 
-- Na zona `CRITICAL` o ContextBrake bloqueia a gravação do snapshot: registre o progresso no plano e checkpoint dele, que continuam permitidos, e informe que o snapshot não foi gravado.
+- Na zona `CRITICAL` o ContextBrake pede o snapshot imediato: grave-o já, sem terminar a unidade em andamento, com o estado parcial registrado antes no handoff dela.
 - Falha de escrita mantém a versão anterior intacta; informe o erro em vez de anunciar snapshot pronto.

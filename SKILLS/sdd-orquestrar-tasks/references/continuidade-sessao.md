@@ -4,11 +4,13 @@ As skills SDD gravam artefatos e código na sessão que as executa; subagentes s
 
 ## Pausa de sessão
 
+Sob `sdd-orquestrar-fluxo` com checkpoint em `mode: auto`, a seção Contexto e sessão de `references/modo-autonomo.md` daquela skill substitui a medição e os destinos abaixo: a sessão não estima contexto nem pergunta, e reage à telemetria do ContextBrake.
+
 Roda em cada **fronteira** que a skill chamadora indicar (entre tasks, recortes ou frentes, nos gates HIL, antes da revisão e ao fim de uso avulso), somente com gravações persistidas e nenhum explorador ou processo em execução.
 
 ### Medir o contexto
 
-O **limiar** é 65% da janela de contexto, onde começa a zona `RED` do ContextBrake. Parar ali deixa folga para gravar o snapshot e perguntar antes de `CRITICAL` (75%), onde o ContextBrake bloqueia toda tool exceto seus comandos de plano, checkpoint, validação e git, e o snapshot não pode mais ser gravado.
+O **limiar** é 65% da janela de contexto, onde começa a zona `RED` do ContextBrake. Parar ali deixa folga para gravar o snapshot e perguntar antes de `CRITICAL` (75%), onde o ContextBrake pede o snapshot imediato e a folga para terminar trabalho já acabou. O ContextBrake nunca bloqueia uma tool: as zonas só acrescentam telemetria e orientação.
 
 - **Telemetria.** Quando o retorno de uma tool trouxer o bloco do ContextBrake (`[ContextBrake vN] … usage=<p>% … zone=<ZONA> …`), ou o harness reportar o uso, use a leitura mais recente: é medida e vence a estimativa. `zone=RED` ou `zone=CRITICAL` atinge o limiar com qualquer `usage`.
 - **Estimativa.** Sem telemetria, some o que entrou no contexto desde o início da sessão ou da última compactação: carga fixa de sistema e ferramentas (cerca de 20 mil tokens), skills e fontes lidas, saídas de tools, diffs e o texto que você escreveu, a cerca de 4 caracteres por token, contra a janela do modelo (200 mil tokens quando desconhecida). Parta da estimativa anunciada na fronteira anterior e some só o que veio depois; na dúvida, arredonde para cima. Compactação nesta sessão ou aviso de contexto baixo do harness atinge o limiar.

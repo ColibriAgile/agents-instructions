@@ -7,6 +7,8 @@
   "status": "ativo",
   "safe_to_stop": false,
   "owner_session": null,
+  "mode": "monitorado",
+  "decision_log": null,
   "objective": "",
   "constraints": [],
   "sources": {

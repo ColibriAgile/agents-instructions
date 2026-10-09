@@ -1,7 +1,7 @@
 ---
 name: sdd-triar
 description: Triagem SDD que recomenda ao humano o nível de processo de um pedido de feature, correção ou refatoração — SDD completo, SDD enxuto ou ajuste pontual — por sinais de risco com evidência, antes de qualquer artefato. Use ao iniciar sdd-orquestrar-fluxo numa feature sem checkpoint ou quando perguntarem se um pedido vale o fluxo SDD. Não use para retomar feature com checkpoint nem para recortar pedido amplo em vários PRDs (use sdd-orquestrar-prds).
-argument-hint: --prompt "descrição do pedido"
+argument-hint: --prompt "descrição do pedido" [--modo auto|monitorado] [--log-decisoes caminho|false]
 ---
 
 # Triar pedido para SDD
@@ -36,9 +36,9 @@ A triagem gasta pouco para evitar gastar muito: levanta sinais com evidência, a
    - `sdd-enxuto` nos demais casos.
    Sinal `não medido` que decidiria o nível conta como presente.
    **Saída:** nível da rubrica com os sinais decisivos.
-4. **HIL 0.** Apresente o nível que a rubrica recomenda, os sinais decisivos com evidência e o que cada nível custa em artefatos, HILs e revisão. Pergunte com a ferramenta de pergunta disponível, recomendado primeiro. Silêncio mantém a decisão pendente. Acrescente uma linha a `tasks/triagem-log.jsonl` com data, pedido resumido, sinais, nível da rubrica e decisão humana.
+4. **HIL 0.** Apresente o nível que a rubrica recomenda, os sinais decisivos com evidência e o que cada nível custa em artefatos, HILs e revisão. Pergunte com a ferramenta de pergunta disponível, recomendado primeiro. Silêncio mantém a decisão pendente. Com `--modo auto`, não pergunte: o nível da rubrica é a decisão, registrada como autônoma, e o protocolo de `references/modo-autonomo.md` da skill `sdd-orquestrar-fluxo` vale daqui em diante. Acrescente uma linha a `tasks/triagem-log.jsonl` com data, pedido resumido, sinais, nível da rubrica e decisão humana, ou `autonoma` no modo auto.
    **Saída:** nível decidido pelo humano e registrado.
-5. **Seguir.** `sdd-completo` e `sdd-enxuto` voltam a `sdd-orquestrar-fluxo`, que registra a triagem como decisão em `workflow.md`; em `sdd-enxuto`, registre também a fusão de HIL 1 e HIL 2 como modificação de paradas. `pontual` segue o ramo abaixo.
+5. **Seguir.** `sdd-completo` e `sdd-enxuto` voltam a `sdd-orquestrar-fluxo`, repassando `--modo` e `--log-decisoes` quando informados, e o fluxo registra a triagem como decisão em `workflow.md`; em `sdd-enxuto`, registre também a fusão de HIL 1 e HIL 2 como modificação de paradas. `pontual` segue o ramo abaixo.
    **Saída:** próximo passo iniciado no caminho decidido.
 
 ## Ramo pontual

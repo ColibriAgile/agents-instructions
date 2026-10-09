@@ -50,7 +50,9 @@ Feature em andamento nunca é oferecida. Para cada concluída ou indeterminada, 
 
 - candidatas a ADR nos handoffs (`### Candidatas a ADR` com conteúdo diferente de `Nenhuma`), com ID e título;
 - ressalvas aceitas e pendências registradas na última revisão ou em `workflow.md`;
-- arquivos não versionados na pasta (`git status --porcelain -- tasks/prd-[slug]/`), que a remoção apaga sem volta.
+- arquivos não versionados na pasta (`git status --porcelain -- tasks/prd-[slug]/`), que a remoção apaga sem volta;
+- arquivos versionados fora da pasta que a citam (`git grep -lF "prd-[slug]" -- ":!tasks/prd-[slug]/"`; o slug sem barra também pega citações soltas), como README ou docs, que ficariam com links quebrados; recomende manter a feature ou levar antes o conteúdo citado para a documentação;
+- `checkpoint.json` com `mode: auto`: o aceite foi automático e nenhum humano viu a entrega; aponte o log de decisões (`decision_log`) para revisar antes de remover.
 
 Faça uma única pergunta para todos os repositórios, pela tool de perguntas disponível (`AskUserQuestion` em `multiSelect`) ou, sem ela, em texto com as mesmas opções. Uma opção por feature: repositório quando não for o principal, slug, classe com a evidência que a decidiu e, na descrição, os itens levantados acima. Indeterminada nunca vem marcada como recomendada. Quando houver candidata a ADR, recomende promovê-la antes e não remova a feature nesta execução se o usuário quiser promover. Com mais features do que cabem na ferramenta, pergunte em texto listando todas. Nenhuma seleção, "nenhuma" ou silêncio mantém tudo. Guarde a escolha para o passo 7; a pergunta acontece agora para que o resto da skill siga sem nova interrupção.
 
