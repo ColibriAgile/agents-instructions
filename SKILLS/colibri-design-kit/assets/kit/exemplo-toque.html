@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Colibri UI — perfil Toque</title>
+    <link rel="icon" href="logos/colibri.ico">
+    <link rel="stylesheet" href="icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="colibri-touch.css">
+    <script>
+        /* Tema antes de pintar (só vale sem esquema: KDS). #claro força o tema claro. */
+        document.documentElement.setAttribute('data-theme', location.hash.indexOf('claro') >= 0 ? 'light' : 'dark');
+    </script>
+    <style>
+        /* Apenas para esta página de exemplo */
+        html, body { height: 100%; margin: 0; }
+        .demo-bar { position: fixed; right: 8px; bottom: 8px; z-index: 3000; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: calc(100vw - 16px); padding: 6px 8px; font: 12px/1.3 var(--cm-font); color: var(--cm-ink); background: var(--cm-surface); border: 1px solid var(--cm-line); border-radius: 6px; box-shadow: var(--cm-shadow-menu); }
+        .demo-bar[hidden] { display: none; }
+        .demo-bar a { color: var(--cm-accent-ink); }
+        .demo-bar label { display: inline-flex; align-items: center; gap: 4px; }
+        .demo-bar input[type=color] { width: 28px; height: 22px; padding: 0; border: 1px solid var(--cm-line); }
+        .demo-bar button { font: inherit; }
+        .demo-surface { display: none; height: 100vh; }
+        .demo-surface.is-on { display: flex; flex-direction: column; }
+        .demo-main { display: flex; flex: 1; min-height: 0; }
+        .demo-main .ct-rail { flex: 0 0 220px; }
+        .demo-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+        .demo-kds-bar { display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: var(--ct-surface); border-bottom: 1px solid var(--ct-line); }
+        .demo-kds-bar strong { margin-right: auto; font-size: var(--ct-text-lg); }
+    </style>
+</head>
+<body>
+
+<!-- Tablet: paisagem 1024×600, esquema do canal "tablet" -->
+<div class="ct-app ct-app--tablet ct-app--kiosk demo-surface" id="tablet">
+    <header class="ct-header">
+        <div class="ct-header__brand">
+            <span class="ct-header__name">Cantina do Porto</span>
+        </div>
+        <div class="ct-header__actions">
+            <button class="ct-btn ct-btn--ghost" type="button"><i class="bi bi-bell" aria-hidden="true"></i>Chamar garçom</button>
+            <button class="ct-btn" type="button"><i class="bi bi-receipt" aria-hidden="true"></i>Minha conta</button>
+        </div>
+    </header>
+    <div class="demo-main">
+        <nav aria-label="Categorias">
+            <ul class="ct-rail" style="height: 100%">
+                <li><button class="ct-rail__item" type="button"><i class="bi bi-star" aria-hidden="true"></i>Destaques</button></li>
+                <li><button class="ct-rail__item is-active" type="button" aria-current="true"><i class="bi bi-egg-fried" aria-hidden="true"></i>Pratos</button></li>
+                <li><button class="ct-rail__item" type="button"><i class="bi bi-cup-straw" aria-hidden="true"></i>Bebidas</button></li>
+                <li><button class="ct-rail__item" type="button"><i class="bi bi-cake2" aria-hidden="true"></i>Sobremesas</button></li>
+            </ul>
+        </nav>
+        <div class="demo-scroll">
+            <div class="ct-products" style="--ct-cols: 3">
+                <article class="ct-product">
+                    <div class="ct-product__media"><i class="bi bi-egg-fried" aria-hidden="true"></i><div class="ct-product__tags"><span class="ct-tag ct-tag--brand">Destaque</span></div></div>
+                    <div class="ct-product__body">
+                        <h3 class="ct-product__name">Risoto de cogumelos</h3>
+                        <p class="ct-product__desc">Arroz arbóreo, shitake, shimeji, parmesão e manteiga de sálvia.</p>
+                        <div class="ct-product__foot"><span class="ct-price">R$ 58,90</span><button class="ct-btn ct-btn--primary" type="button">Adicionar</button></div>
+                    </div>
+                </article>
+                <article class="ct-product">
+                    <div class="ct-product__media"><i class="bi bi-basket" aria-hidden="true"></i><div class="ct-product__tags"><span class="ct-tag ct-tag--combo">Combo</span></div></div>
+                    <div class="ct-product__body">
+                        <h3 class="ct-product__name">Combo executivo</h3>
+                        <p class="ct-product__desc">Prato do dia, bebida e sobremesa.</p>
+                        <div class="ct-product__foot"><span class="ct-price"><span class="ct-price__from">a partir de</span>R$ 42,00</span><button class="ct-btn ct-btn--primary" type="button">Montar</button></div>
+                    </div>
+                </article>
+                <article class="ct-product is-unavailable">
+                    <div class="ct-product__media"><i class="bi bi-fire" aria-hidden="true"></i><div class="ct-product__tags"><span class="ct-tag">Indisponível hoje</span></div></div>
+                    <div class="ct-product__body">
+                        <h3 class="ct-product__name">Picanha na chapa</h3>
+                        <p class="ct-product__desc">300 g, farofa, vinagrete e mandioca.</p>
+                        <div class="ct-product__foot"><span class="ct-price">R$ 89,00</span><button class="ct-btn ct-btn--primary" type="button" disabled>Adicionar</button></div>
+                    </div>
+                </article>
+                <article class="ct-product">
+                    <div class="ct-product__media"><i class="bi bi-cup-hot" aria-hidden="true"></i><div class="ct-product__tags"><span class="ct-tag ct-tag--rodizio">Rodízio</span></div></div>
+                    <div class="ct-product__body">
+                        <h3 class="ct-product__name">Rodízio de massas</h3>
+                        <p class="ct-product__desc">Molhos à escolha, reposição à vontade.</p>
+                        <div class="ct-product__foot"><span class="ct-price">R$ 69,90</span><button class="ct-btn ct-btn--primary" type="button">Escolher</button></div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+    <footer class="ct-footer">
+        <div class="ct-footer__summary">3 itens<span class="ct-footer__total">R$ 159,80</span></div>
+        <button class="ct-btn" type="button" onclick="abrir('folha-tablet')">Ver produto</button>
+        <button class="ct-btn ct-btn--primary ct-btn--lg" type="button"><i class="bi bi-bag-check" aria-hidden="true"></i>Enviar pedido</button>
+    </footer>
+    <div id="folha-tablet" hidden>
+        <div class="ct-backdrop" onclick="fechar('folha-tablet')"></div>
+        <section class="ct-sheet ct-sheet--center" role="dialog" aria-modal="true" aria-labelledby="folha-tablet-titulo">
+            <div class="ct-sheet__head">
+                <h2 class="ct-sheet__title" id="folha-tablet-titulo">Risoto de cogumelos</h2>
+                <button class="ct-icon-btn" type="button" aria-label="Fechar" onclick="fechar('folha-tablet')"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+            </div>
+            <div class="ct-sheet__body">
+                <div class="ct-notice ct-notice--warning" style="margin-bottom: 12px"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i><span><strong>Contém:</strong> lactose.</span></div>
+                <ul class="ct-options" role="radiogroup" aria-label="Ponto do arroz">
+                    <li class="ct-option ct-option--radio is-selected" role="radio" aria-checked="true"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Al dente</span></li>
+                    <li class="ct-option ct-option--radio" role="radio" aria-checked="false"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Mais cozido</span></li>
+                    <li class="ct-option" role="checkbox" aria-checked="true"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Trufas</span><span class="ct-option__extra">+ R$ 12,00</span></li>
+                </ul>
+            </div>
+            <div class="ct-sheet__foot">
+                <div class="ct-qty"><button class="ct-qty__btn" type="button" aria-label="Diminuir"><i class="bi bi-dash-lg" aria-hidden="true"></i></button><span class="ct-qty__value" aria-live="polite">1</span><button class="ct-qty__btn" type="button" aria-label="Aumentar"><i class="bi bi-plus-lg" aria-hidden="true"></i></button></div>
+                <button class="ct-btn ct-btn--primary" type="button">Adicionar · R$ 70,90</button>
+            </div>
+        </section>
+        <div class="ct-toast" role="status"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Risoto adicionado</div>
+    </div>
+</div>
+
+<!-- Totem: retrato, esquema do canal "totem" -->
+<div class="ct-app ct-app--totem ct-app--kiosk demo-surface" id="totem">
+    <header class="ct-header"><div class="ct-header__brand"><span class="ct-header__name">Cantina do Porto</span></div><span class="ct-tag">Comer aqui</span></header>
+    <ul class="ct-chips" role="tablist" aria-label="Categorias">
+        <li><button class="ct-chip" type="button" role="tab" aria-selected="false">Destaques</button></li>
+        <li><button class="ct-chip is-active" type="button" role="tab" aria-selected="true">Lanches</button></li>
+        <li><button class="ct-chip" type="button" role="tab" aria-selected="false">Bebidas</button></li>
+        <li><button class="ct-chip" type="button" role="tab" aria-selected="false">Sobremesas</button></li>
+    </ul>
+    <div class="demo-scroll">
+        <div class="ct-products" style="--ct-cols: 2">
+            <article class="ct-product"><div class="ct-product__media"><i class="bi bi-egg-fried" aria-hidden="true"></i></div><div class="ct-product__body"><h3 class="ct-product__name">X-salada da casa</h3><p class="ct-product__desc">Pão brioche, 180 g, queijo, alface e tomate.</p><div class="ct-product__foot"><span class="ct-price">R$ 32,00</span><button class="ct-btn ct-btn--primary" type="button">Adicionar</button></div></div></article>
+            <article class="ct-product"><div class="ct-product__media"><i class="bi bi-basket" aria-hidden="true"></i><div class="ct-product__tags"><span class="ct-tag ct-tag--combo">Combo</span></div></div><div class="ct-product__body"><h3 class="ct-product__name">Combo família</h3><p class="ct-product__desc">Quatro lanches, batata grande e refrigerante 2 L.</p><div class="ct-product__foot"><span class="ct-price">R$ 119,00</span><button class="ct-btn ct-btn--primary" type="button">Montar</button></div></div></article>
+            <article class="ct-product"><div class="ct-product__media"><i class="bi bi-cup-straw" aria-hidden="true"></i></div><div class="ct-product__body"><h3 class="ct-product__name">Suco natural</h3><p class="ct-product__desc">Laranja, limão ou abacaxi com hortelã.</p><div class="ct-product__foot"><span class="ct-price">R$ 12,00</span><button class="ct-btn ct-btn--primary" type="button">Adicionar</button></div></div></article>
+            <article class="ct-product"><div class="ct-product__media"><i class="bi bi-cake2" aria-hidden="true"></i></div><div class="ct-product__body"><h3 class="ct-product__name">Brownie</h3><p class="ct-product__desc">Com sorvete de creme.</p><div class="ct-product__foot"><span class="ct-price">R$ 18,00</span><button class="ct-btn ct-btn--primary" type="button">Adicionar</button></div></div></article>
+        </div>
+    </div>
+    <footer class="ct-footer">
+        <button class="ct-btn" type="button">Cancelar</button>
+        <div class="ct-footer__summary">2 itens<span class="ct-footer__total">R$ 44,00</span></div>
+        <button class="ct-btn ct-btn--primary ct-btn--lg" type="button">Finalizar pedido</button>
+    </footer>
+</div>
+
+<!-- KDS: telas de produção, tema Colibri (sem esquema) -->
+<div class="ct-app ct-app--kds demo-surface" id="kds">
+    <div class="demo-kds-bar"><strong><i class="bi bi-fire" aria-hidden="true"></i> Estação Chapa</strong><span class="ct-tag ct-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>2 em atenção</span><span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>1 atrasado</span></div>
+    <div class="demo-scroll">
+        <div class="ct-orders" style="--ct-cols: 4">
+            <article class="ct-order ct-order--mesa">
+                <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa 12</span><span class="ct-order__ticket">#482</span><span class="ct-order__timer">03:12</span></div>
+                <ul class="ct-order__items">
+                    <li class="ct-order__item"><span class="ct-order__qty">2×</span><span class="ct-order__name">X-salada da casa<span class="ct-order__note"><i class="bi bi-chat-left-text" aria-hidden="true"></i>Sem cebola</span></span></li>
+                    <li class="ct-order__item"><span class="ct-order__qty">1×</span><span class="ct-order__name">Batata média</span></li>
+                </ul>
+                <div class="ct-order__foot"><button class="ct-btn" type="button">Iniciar</button><button class="ct-btn ct-btn--primary" type="button">Concluir</button></div>
+            </article>
+            <article class="ct-order ct-order--entrega ct-order--attention">
+                <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="ct-order__ticket">#479</span><span class="ct-order__timer">07:40</span></div>
+                <div class="ct-order__urgency"><i class="bi bi-hourglass-split" aria-hidden="true"></i>Atenção · passou de 5 min</div>
+                <div class="ct-order__meta">Mariana · iFood</div>
+                <ul class="ct-order__items">
+                    <li class="ct-order__item"><span class="ct-order__qty">1×</span><span class="ct-order__name">Combo família<span class="ct-order__sub">4 X-salada · batata grande · refrigerante 2 L</span><span class="ct-order__allergen"><i class="bi bi-exclamation-octagon" aria-hidden="true"></i>Alérgeno: glúten</span></span></li>
+                </ul>
+                <div class="ct-order__foot"><button class="ct-btn" type="button">Pausar</button><button class="ct-btn ct-btn--primary" type="button">Concluir</button></div>
+            </article>
+            <article class="ct-order ct-order--balcao ct-order--late is-selected">
+                <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="ct-order__ticket">#471</span><span class="ct-order__timer">12:05</span></div>
+                <div class="ct-order__urgency"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Atrasado · passou de 10 min</div>
+                <ul class="ct-order__items">
+                    <li class="ct-order__item"><span class="ct-order__qty">3×</span><span class="ct-order__name">Pastel de carne</span></li>
+                </ul>
+                <div class="ct-order__foot"><button class="ct-btn ct-btn--primary" type="button">Concluir</button></div>
+            </article>
+            <article class="ct-order ct-order--ficha is-waiting">
+                <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-ticket-perforated" aria-hidden="true"></i>Ficha</span><span class="ct-order__ticket">#485</span><span class="ct-order__timer">00:40</span></div>
+                <div class="ct-order__meta"><span class="ct-tag"><i class="bi bi-pause-circle" aria-hidden="true"></i>Em espera</span></div>
+                <ul class="ct-order__items">
+                    <li class="ct-order__item"><span class="ct-order__qty">1×</span><span class="ct-order__name">Brownie</span></li>
+                </ul>
+                <div class="ct-order__foot"><button class="ct-btn" type="button">Retomar</button></div>
+            </article>
+        </div>
+    </div>
+</div>
+
+<!-- Pedidos prontos: TV voltada ao cliente, esquema do canal "pedido-pronto" -->
+<div class="ct-app ct-app--tv ct-app--kiosk demo-surface" id="pronto">
+    <header class="ct-header"><div class="ct-header__brand"><span class="ct-header__name">Cantina do Porto</span></div><span class="ct-tag ct-tag--success"><i class="bi bi-check-circle" aria-hidden="true"></i>Pedidos prontos</span></header>
+    <div class="ct-ready-grid">
+        <div class="ct-ready"><span class="ct-ready__type"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="ct-ready__number">471</span><span class="ct-ready__name">Carlos</span><span class="ct-ready__expire"><span style="transform: scaleX(.8)"></span></span></div>
+        <div class="ct-ready"><span class="ct-ready__type"><i class="bi bi-ticket-perforated" aria-hidden="true"></i>Ficha</span><span class="ct-ready__number">485</span><span class="ct-ready__name">Ana</span><span class="ct-ready__expire"><span style="transform: scaleX(.45)"></span></span></div>
+        <div class="ct-ready"><span class="ct-ready__type"><i class="bi bi-bag" aria-hidden="true"></i>Retirada</span><span class="ct-ready__number">490</span><span class="ct-ready__name">Pedro Henrique</span><span class="ct-ready__expire"><span style="transform: scaleX(.2)"></span></span></div>
+    </div>
+</div>
+
+<div class="demo-bar" id="demo-bar">
+    <a href="#tablet">Tablet</a> · <a href="#totem">Totem</a> · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>) · <a href="#pronto">Pronto</a>
+    <span id="demo-esquema" hidden>
+        | <label>Ambiente <input type="color" id="s-ambiente" value="#0b1120"></label>
+        <label>Ação <input type="color" id="s-acao" value="#f59e0b"></label>
+        <label><input type="checkbox" id="s-usa-marca"> Marca <input type="color" id="s-marca" value="#c62828"></label>
+        <button type="button" id="s-padrao">Padrão Colibri</button>
+        <span id="s-ajustes"></span>
+    </span>
+    <span id="demo-sem-modulo" hidden>| Seletor de esquema: abra por um servidor local (módulos não carregam em file://).</span>
+</div>
+
+<script>
+    function abrir(id) { document.getElementById(id).hidden = false; }
+    function fechar(id) { document.getElementById(id).hidden = true; }
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') fechar('folha-tablet'); });
+    function mostrar() {
+        var h = location.hash.replace('#', '') || 'tablet';
+        var id = h.split('-')[0];
+        if (!document.getElementById(id)) id = 'tablet';
+        document.querySelectorAll('.demo-surface').forEach(function (el) { el.classList.toggle('is-on', el.id === id); });
+        if (h.indexOf('folha') >= 0) abrir('folha-tablet');
+        document.getElementById('demo-bar').hidden = h.indexOf('limpo') >= 0;
+        document.dispatchEvent(new CustomEvent('demo:superficie', { detail: id }));
+    }
+    window.addEventListener('hashchange', mostrar);
+    mostrar();
+    setTimeout(function () { if (!window.__esquemaCarregado) document.getElementById('demo-sem-modulo').hidden = false; }, 800);
+</script>
+<script type="module">
+    import { derivarEsquema, aplicarEsquema } from './colibri-esquema.js';
+    window.__esquemaCarregado = true;
+    var campos = ['ambiente', 'acao', 'marca'].map(function (k) { return document.getElementById('s-' + k); });
+    var usaMarca = document.getElementById('s-usa-marca');
+    var superficie = 'tablet';
+    var padrao = false;
+    function atualizar() {
+        var consumidor = superficie !== 'kds';
+        document.getElementById('demo-esquema').hidden = !consumidor;
+        if (!consumidor || padrao) {
+            aplicarEsquema(null);
+            document.documentElement.setAttribute('data-theme', location.hash.indexOf('claro') >= 0 ? 'light' : 'dark');
+            document.getElementById('s-ajustes').textContent = consumidor ? '(tema Colibri)' : '';
+            return;
+        }
+        var e = derivarEsquema({ ambiente: campos[0].value, acao: campos[1].value, marca: usaMarca.checked ? campos[2].value : null });
+        aplicarEsquema(e);
+        document.getElementById('s-ajustes').textContent = 'modo ' + (e.modo === 'dark' ? 'escuro' : 'claro') +
+            (e.ajustes.length ? ' · ajustado: ' + e.ajustes.map(function (a) { return a.token + ' ' + a.obtido; }).join(', ') : '');
+    }
+    campos.concat([usaMarca]).forEach(function (c) { c.addEventListener('input', function () { padrao = false; atualizar(); }); });
+    document.getElementById('s-padrao').addEventListener('click', function () { padrao = true; atualizar(); });
+    document.addEventListener('demo:superficie', function (ev) { superficie = ev.detail; atualizar(); });
+    superficie = (location.hash.replace('#', '') || 'tablet').split('-')[0];
+    atualizar();
+</script>
+</body>
+</html>

@@ -81,6 +81,42 @@ O CSS do kit só entrega o visual; reimplemente no framework do projeto (o `exem
   });
   ```
 
+## Perfil Toque (tablet, totem, KDS, pedidos prontos)
+
+Regras em `DESIGN.md` do kit, seção 9; marcação em `../assets/kit/exemplo-toque.html` (sirva a pasta por um servidor local para o seletor de esquema funcionar: módulos ES não carregam em `file://`).
+
+- **Carga:** `icons/bootstrap-icons.min.css` → `colibri-touch.css` (traz a base por `@import`). Num app com admin e telas de toque no mesmo bundle (ex.: React + Vite com rotas `/admin` e `/tablet`), importe `colibri-ui.css` só no código do admin e `colibri-touch.css` só no das telas de toque, para um não vazar no outro.
+- **Contêiner:** `<div class="ct-app ct-app--tablet ct-app--kiosk">` (ou `--totem`, `--kds`, `--tv`) na raiz da tela. A altura total (`html`, `body`, raiz do app com `height: 100%`) fica com o projeto.
+- **Alvo de build Chrome 101:** com Vite, `css: { transformer: 'lightningcss', lightningcss: { targets: { chrome: 101 << 16 } } }`, `build: { cssMinify: 'lightningcss', cssTarget: 'chrome101', target: 'chrome101' }` (e `lightningcss` nas dependências de desenvolvimento). O `lightningcss` rebaixa `oklch()`, `lab()` e `color-mix()` estáticos para hex, mas **não** converte `:has()` nem as propriedades `scale`/`translate` separadas: as utilidades `scale-*`, `translate-*` e `active:scale-*` do Tailwind 4 geram essas propriedades e são descartadas no Chrome 101. Use as classes do kit (o retorno de toque já vem em `.ct-btn`, `.ct-icon-btn`, `.ct-qty__btn`) ou `transform` escrito no CSS do projeto.
+- **Tailwind 4:** só utilitários de layout (`flex`, `grid`, `gap-*`, `p-*`, `w-*`); nenhuma classe de cor da paleta (`bg-*`, `text-*`, `border-*`, `ring-*` com cor) nem `shadow-*` com cor. A cor vem das classes `ct-` ou de `var(--ct-*)`. O CSS do kit não está em `@layer` e vence o preflight e as utilidades do Tailwind.
+- **Esquema por canal (telas de consumidor):** o backend grava as sementes do canal (`{ "schema": "colibri-esquema/1", "canal": "totem", "ambiente": "#…", "acao": "#…", "marca": null }`) e as entrega ao app com a configuração. No app:
+
+  ```js
+  import { derivarEsquema, aplicarEsquema } from './colibri-ui/colibri-esquema.js';
+
+  const esquema = derivarEsquema(config.esquema);   // tokens --ct-* em hex, modo e ajustes
+  aplicarEsquema(esquema);                          // <html>: tokens + data-theme
+  try { localStorage.setItem('ct-esquema', JSON.stringify({ modo: esquema.modo, tokens: esquema.tokens })); } catch (e) {}
+  ```
+
+  No `<head>` da entrada HTML, antes do bundle, aplique o último esquema gravado sem recalcular (o motor não carrega antes do bundle):
+
+  ```html
+  <script>
+    try {
+      var e = JSON.parse(localStorage.getItem('ct-esquema'));
+      if (e) { var r = document.documentElement; r.setAttribute('data-theme', e.modo);
+        for (var k in e.tokens) r.style.setProperty(k, e.tokens[k]); }
+    } catch (x) {}
+  </script>
+  ```
+
+  Mudança de esquema no admin chega ao app como a do tema do KDS hoje (evento em tempo real ou recarga da configuração) e é reaplicada com `aplicarEsquema`. Splash, barra de status do Android e janela do Electron usam a cor de `--ct-bg` do esquema gravado quando o plugin permitir; senão, a cor padrão do produto, registrada em `DECISOES.md`.
+- **Prévia no admin:** três campos de cor (Ambiente, Ação, Marca opcional) e uma prévia da tela num contêiner, com `aplicarEsquema(derivarEsquema(sementes), contêiner)`. Mostre a lista `esquema.ajustes` ("a cor de ação foi escurecida para manter a leitura") e a cor efetiva ao lado da escolhida. Nada de campo por token nem de aviso de contraste: o motor já garante.
+- **Migração de tema existente** (ex.: o totem com oito cores): a semente Ambiente vem do fundo gravado e a Ação, do destaque; superfícies, linhas e textos passam a ser derivados (valores gravados que divergem se perdem; mostre antes e depois ao lojista); campos sem uso saem. Registre em `DECISOES.md`.
+- **KDS:** tema Colibri (`data-theme` por configuração global ou da estação), sem esquema. Tipo de pedido no modificador do cartão (`.ct-order--mesa`) ou, configurado, `style="--ct-order-color: var(--ct-palette-azul)"`: o admin oferece só as oito cores da paleta, gravadas pelo nome (`azul`), não pelo hex. Urgência: `.ct-order--attention` e `.ct-order--late` com a faixa `.ct-order__urgency` (ícone e rótulo), calculadas pelos limites configurados.
+- **Comportamentos:** folha (`.ct-sheet`) com véu (`.ct-backdrop`) que fecha ao toque, Esc quando houver teclado e foco devolvido a quem abriu; `.ct-toast` some sozinho (1,6 s); quantidade anunciada (`aria-live`); totem e tablet voltam à tela de descanso por inatividade com aviso antes ("Ainda está aí?") e opção de continuar.
+
 ## Página inicial
 
 Somente o contêiner da página inicial recebe `cm-page--home` (`<div class="cm-page cm-page--home">`). Se a marca rolar junto com a página ou sumir, procure `transform`, `filter` ou `contain` em algum ancestral de `.cm-page`.

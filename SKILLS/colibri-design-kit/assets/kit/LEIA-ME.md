@@ -8,7 +8,10 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 |---|---|
 | `DESIGN.md` | Regras visuais da linha Colibri: cores, tipografia, estrutura da aplicação, anatomia de página e componentes. Copie para a raiz do repositório. |
 | `PRODUCT.template.md` | Modelo de `PRODUCT.md` (usuários, propósito, contexto, compromissos da marca, princípios), no schema de produto do impeccable 4.x. Copie para a raiz como `PRODUCT.md` e preencha os trechos entre colchetes. |
-| `colibri-base.css` | Base comum: tokens `--cm-*` dos temas claro e escuro, fontes locais e camadas. Sem regras de elemento nem componentes. Importada por `colibri-ui.css`. |
+| `colibri-base.css` | Base comum: tokens `--cm-*` dos temas claro e escuro, fontes locais e camadas. Sem regras de elemento nem componentes. Importada por `colibri-ui.css` e por `colibri-touch.css`. |
+| `colibri-touch.css` | Implementação de referência do perfil Toque (prefixo `ct-`): escala por superfície (tablet, totem, KDS, TV), cabeçalho, categorias, botões, quantidade, selos, cartão de produto, folha, opções, avisos, cartão de pedido do KDS e pedidos prontos. Importa `colibri-base.css`. Piso Chrome 101. |
+| `colibri-esquema.js` | Motor do esquema de cores por canal (perfil Toque): três sementes (ambiente, ação, marca) → tokens `--ct-*` em hex com contraste garantido por ajuste. ES2019, sem dependências. `colibri-esquema.d.ts` traz os tipos. |
+| `exemplo-toque.html` | Demonstração do perfil Toque: `#tablet`, `#tablet-folha`, `#totem`, `#kds`, `#kds-claro`, `#pronto` (acrescente `-limpo` para esconder a barra do exemplo). O seletor de esquema precisa da página servida por um servidor local (módulos ES não carregam em `file://`). |
 | `colibri-ui.css` | Implementação de referência do perfil Operação em CSS puro (prefixo `cm-`), sem dependência de framework. Importa `colibri-base.css`, que fica na mesma pasta. |
 | `colibri-ui.bootstrap3.css` | Adaptador opcional para projetos com Bootstrap 3, AngularJS, angular-growl, pnotify (`pnotify-colibri` 1.2), chosen ou Dropzone. |
 | `colibri-ui.devexpress.css` | Adaptador opcional para DevExpress Blazor (temas Fluent, clássicos e Bootstrap externo) e DevExtreme (React etc.): leva a fonte do kit aos elementos internos e popups dos componentes e, no DevExtreme, a DataGrid e a caixa de seleção à anatomia e aos tokens de `.cm-table`, nos dois temas. |
@@ -20,7 +23,7 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 ## Como adotar em um repositório
 
-1. Copie `DESIGN.md` para a raiz e `PRODUCT.template.md` para a raiz como `PRODUCT.md`; preencha o `PRODUCT.md` e a seção 9 do `DESIGN.md` ("Implementação neste projeto").
+1. Copie `DESIGN.md` para a raiz e `PRODUCT.template.md` para a raiz como `PRODUCT.md`; preencha o `PRODUCT.md` e a seção 10 do `DESIGN.md` ("Implementação neste projeto").
 2. Copie `colibri-base.css`, `colibri-ui.css`, `fonts/`, `logos/` e os ícones para a pasta de estáticos do projeto, mantendo os dois CSS juntos e `fonts/` e `logos/` ao lado deles (os caminhos são relativos). Ao atualizar um kit anterior a 09/10/2026, copie a base junto: sem ela, o `colibri-ui.css` fica sem tokens e sem fontes.
 3. Carregue na página, nesta ordem: CSS do framework e tema da biblioteca de componentes (se houver) → `bootstrap-icons.min.css` → `colibri-ui.css` → adaptadores: `colibri-ui.bootstrap3.css` (somente com Bootstrap 3/AngularJS) e/ou `colibri-ui.devexpress.css` (com DevExpress Blazor ou DevExtreme).
 4. Monte o shell (lateral + barra superior) usando a marcação de `exemplo.html`, depois refatore página a página seguindo a seção 6 do `DESIGN.md`.
@@ -30,6 +33,15 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 8. Com Bootstrap 4/5, React, Blazor etc., não use o adaptador Bootstrap 3: implemente os componentes do framework com as classes `cm-` ou transponha os tokens `--cm-*` para o tema do framework, usando o adaptador apenas como referência.
 9. Tema escuro: alternância na barra superior que grava `data-theme="dark"` ou `"light"` no `<html>`, seguindo `prefers-color-scheme` até a pessoa escolher (seção 2 do `DESIGN.md`, "Tema escuro"). Leve o modo também ao tema da biblioteca de componentes.
 10. Com DevExpress/DevExtreme, confira que o calendário e o seletor de hora do controle de data/hora, listas suspensas, grades e dicas estão em Google Sans Flex (seção 3 do `DESIGN.md`, "Bibliotecas de componentes") e que as grades seguem a regra da grade como tabela (seção 7): cabeçalho de 36 px, linha de 36 px mais o divisor, sem zebra, bordas em `--cm-line` nos dois temas.
+
+### Perfil Toque (cardápio do tablet, totem, KDS, pedidos prontos)
+
+1. Copie `colibri-base.css`, `colibri-touch.css`, `fonts/` e os ícones (e `colibri-esquema.js`, com `.d.ts` em TypeScript, se houver tela voltada ao cliente) para a mesma pasta de estáticos.
+2. Carregue `bootstrap-icons.min.css` → `colibri-touch.css` só nas telas de toque; num app que também tem admin, o `colibri-ui.css` fica só no admin.
+3. Declare o alvo de build Chrome 101 e use o Tailwind, se houver, só para layout (seção 9 do `DESIGN.md`, "Compatibilidade").
+4. Marque a raiz da tela com `ct-app` e a superfície (`ct-app--tablet`, `--totem`, `--kds`, `--tv`) e monte as telas com a marcação de `exemplo-toque.html`.
+5. Telas voltadas ao cliente: esquema do canal com `colibri-esquema.js`, aplicado antes de pintar, e as três sementes na aparência do admin com prévia (seção 9, "Fronteira e cores"). Telas de operação (KDS): tema Colibri por `data-theme`.
+6. Confira os alvos de toque na resolução real e as telas com um esquema claro e um escuro (ou nos dois temas, no KDS).
 
 ## Observações
 
@@ -41,6 +53,8 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 ## Versões
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
+
+- **09/10/2026 (perfil Toque):** segundo perfil da linha, para telas cheias de toque: cardápio do tablet, totem, produção do KDS e painel de pedidos prontos (`DESIGN.md` seção 9; "Implementação neste projeto" passa a ser a seção 10). `colibri-touch.css` (prefixo `ct-`, importa a base): escala por superfície com alvo mínimo de 48 px no tablet, `max(56px, 4.4vh)` no totem e 56 px no KDS; cabeçalho com a marca da loja, categorias em coluna ou faixa, botões, quantidade, selos, cartão de produto (com indisponível visível), folha que sobe ou centralizada, opções, avisos, cartão de pedido do KDS e pedidos prontos. Esquema de cores por canal de venda para as telas voltadas ao cliente: o lojista escolhe três sementes (ambiente, ação, marca) e `colibri-esquema.js` deriva os tokens `--ct-*` em hex, com contraste garantido por ajuste e estados fixos da base (regra do esquema por sementes); `scripts/verificar-esquema.mjs` confere estados iguais à base, 1100 combinações de sementes e o piso Chrome 101. Paleta curada de oito cores (5,2:1 ou mais sobre texto branco) para tipos de pedido, estações e selos categóricos. Urgência do KDS com borda sobreposta, faixa, ícone e rótulo, nunca só cor (regra da urgência legível). Piso Chrome 101: sem cor da paleta do Tailwind, sem `scale`/`translate` separados, sem `:has()`. Mapeamento para o impeccable, checklist, `SKILL.md` e `adocao-por-framework.md` cobrem o perfil. Vinda do levantamento do ColibriTablet, do ColibriTotem e do Colibri KDS (`docs/design/perfil-toque.md` no ColibriTablet), com as decisões do usuário: tema por canal, cor do cartão do KDS por tipo de pedido dentro da paleta, piso Chrome 101. Conferido no navegador em `exemplo-toque.html`: tablet 1024×600 (com a folha), totem 960×1707, KDS 1920×1080 nos dois temas, pedidos prontos com esquema claro; alvos medidos (48, 75 e 56 px). **Pendente de confirmação:** o norte criativo "Ponto de atendimento" e um modelo de `PRODUCT.md` para projeto só de toque (o atual é do perfil Operação). Não conferido em aparelho real (WebView 101). Observação: o tema escuro do perfil Operação tem o botão principal (`#1b6ec2`) a 2,86:1 sobre `surface-2`; no esquema padrão do Toque, o motor clareia a ação para `#2374c9` para chegar a 3:1.
 
 - **09/10/2026 (base comum):** tokens `--cm-*` dos temas claro e escuro, fontes locais e camadas saem de `colibri-ui.css` para `colibri-base.css`, que o `colibri-ui.css` importa (`@import url('colibri-base.css')`). Preparação para o perfil Toque (tablet, totem e KDS), que usa a mesma base. Sem mudança visual: concatenadas, as regras da base e do `colibri-ui.css` são idênticas às do arquivo anterior (conferido por comparação de texto). Projetos que atualizarem o kit precisam copiar `colibri-base.css` junto (`SKILL.md`, passos 1 e 3).
 
