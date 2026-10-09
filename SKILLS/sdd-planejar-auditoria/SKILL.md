@@ -21,7 +21,7 @@ Um relatório de `architectural-analysis` vira **frentes**: cada frente é uma f
    | --- | --- |
    | Preserva comportamento observável: remoção, consolidação, decomposição, acoplamento, camadas, tipos, smells | `sdd-planejar-refatoracao` grava `prd.md` e `techspec.md` |
    | Corrige defeito e muda comportamento observável: falha passa a ser registrada ou propagada, bloqueio síncrono vira async | `sdd-criar-prd`, depois `sdd-criar-techspec` |
-   | `tasks/prd-[slug]/` já tem PRD e TechSpec válidos para o escopo | Reutilizada: nenhum contrato novo |
+   | `tasks/prd-[slug]/` de feature ainda não concluída já tem PRD e TechSpec válidos para o escopo | Reutilizada: nenhum contrato novo |
 
    Ao gravar o mapa, leia integralmente [assets/destinos.template.md](assets/destinos.template.md); frentes entram como `proposta`.
    **Saída:** todo acionável pertence a exatamente uma frente; cada frente tem rota e dependências sem ciclo; mapa gravado.
@@ -36,4 +36,4 @@ Um relatório de `architectural-analysis` vira **frentes**: cada frente é uma f
 7. **Fechar o mapa.** Registre em cada `AA-NN` a frente e as tasks que o cobrem, lidas da matriz de rastreabilidade de `tasks.md`, ou seu destino final. Confira que todo acionável de frente planejada aparece em pelo menos uma task e que links do mapa resolvem. Apresente frentes, ordem de execução, riscos e pendências; a autorização de implementação fica com o usuário. Aponte o próximo passo do snapshot para `sdd-orquestrar-tasks` na primeira frente, ou marque-o `encerrado`.
    **Saída:** nenhum achado sem destino no mapa; execução indicada como `sdd-orquestrar-tasks --prd [slug]` na ordem do mapa.
 
-Relatório novo sobre código com mapa anterior: reconcilie achados por arquivo e regra, preserve frentes em andamento e numere frentes novas após a maior existente. Frente cuja fonte muda durante o planejamento invalida só os próprios derivados.
+Relatório novo sobre código com mapa anterior: reconcilie achados por arquivo e regra, preserve frentes em andamento e numere frentes novas após a maior existente. Frente cuja fonte muda durante o planejamento invalida só os próprios derivados. Frente concluída cuja pasta a skill `commit` já removeu conta como concluída; o link quebrado no mapa não é erro.
