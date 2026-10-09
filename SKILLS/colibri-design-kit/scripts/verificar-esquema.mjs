@@ -76,6 +76,15 @@ for (const ambiente of ambientes) for (const acao of acoes) for (const marca of 
     }
 }
 
+// Paleta curada (colibri-touch.css): cada cor com 4,5:1 ou mais sobre texto branco.
+const touch = readFileSync(join(raiz, 'colibri-touch.css'), 'utf8');
+const paleta = [...touch.matchAll(/--ct-palette-([\w-]+):\s*(#[0-9a-fA-F]{6})\s*;/g)];
+if (paleta.length !== 8) falhar(`Paleta curada com ${paleta.length} cores em colibri-touch.css (esperado 8)`);
+for (const [, nome, cor] of paleta) {
+    const c = contraste(cor, '#ffffff');
+    if (c < CONTRASTE.texto) falhar(`--ct-palette-${nome} ${cor} sobre branco = ${c.toFixed(2)}:1 (mínimo ${CONTRASTE.texto})`);
+}
+
 // Esquema padrão = tema escuro Colibri: o fundo não pode ser ajustado.
 const padrao = derivarEsquema({});
 if (padrao.tokens['--ct-bg'] !== '#0b1822') falhar(`Esquema padrão: --ct-bg ${padrao.tokens['--ct-bg']} (esperado #0b1822, o plano do tema escuro)`);
@@ -94,7 +103,7 @@ if (falhas.length) {
     if (falhas.length > 40) console.error(` … e mais ${falhas.length - 40}`);
     process.exit(1);
 }
-console.log(`OK: estados iguais à base; ${combinacoes} combinações de sementes com contraste garantido (${comAjuste} com ajuste); sem APIs acima do Chrome 101.`);
+console.log(`OK: estados iguais à base; paleta curada com ${paleta.length} cores legíveis com texto branco; ${combinacoes} combinações de sementes com contraste garantido (${comAjuste} com ajuste); sem APIs acima do Chrome 101.`);
 for (const [nome, s] of [['padrão Colibri', {}], ['totem atual', { ambiente: '#0b1120', acao: '#f59e0b' }], ['tablet atual', { ambiente: '#020617', acao: '#f99c00' }], ['claro creme', { ambiente: '#fdf6e3', acao: '#c62828', marca: '#1b5e20' }]]) {
     const e = derivarEsquema(s);
     console.log(`  ${nome}: modo ${e.modo}; bg ${e.tokens['--ct-bg']}, surface ${e.tokens['--ct-surface']}, ink-3 ${e.tokens['--ct-ink-3']}, action ${e.tokens['--ct-action']}/${e.tokens['--ct-on-action']}, brand-ink ${e.tokens['--ct-brand-ink']}; ajustes: ${e.ajustes.map((a) => a.token).join(', ') || 'nenhum'}`);

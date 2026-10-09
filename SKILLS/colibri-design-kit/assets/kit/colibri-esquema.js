@@ -282,7 +282,8 @@ export function derivarEsquema(sementes) {
  * Aplica o esquema: grava os tokens --ct-* no elemento e data-ct-mode nele.
  * Sem `alvo` (o app em execução), grava no <html> e também data-theme, para as sombras, o véu e o
  * color-scheme da base acompanharem o modo. Com `alvo` (prévia do admin), não mexe no tema da página.
- * Com `esquema` nulo, remove o que aplicou e o elemento volta ao tema Colibri (--ct-* = --cm-*).
+ * Com `esquema` nulo, remove os tokens e data-ct-mode: o elemento volta aos --ct-* padrão (= --cm-*).
+ * O data-theme do <html> fica como está; o tema Colibri (claro ou escuro) é decisão do app.
  */
 export function aplicarEsquema(esquema, alvo) {
     var raiz = typeof document !== 'undefined' ? document.documentElement : null;
