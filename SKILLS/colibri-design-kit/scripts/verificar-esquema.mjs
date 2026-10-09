@@ -65,6 +65,11 @@ for (const ambiente of ambientes) for (const acao of acoes) for (const marca of 
         const c = contraste(t[k], f);
         if (c < CONTRASTE.componente - 1e-9) falhar(`${id}: ${k} ${t[k]} sobre ${f} = ${c.toFixed(2)}:1 (mínimo ${CONTRASTE.componente})`);
     }
+    // Seleção (opção escolhida, categoria ativa): texto e texto de ação sobre o fundo suave da ação.
+    for (const k of ['--ct-ink', '--ct-ink-2', '--ct-action-ink']) {
+        const c = contraste(t[k], t['--ct-action-soft']);
+        if (c < CONTRASTE.texto - 1e-9) falhar(`${id}: ${k} sobre --ct-action-soft = ${c.toFixed(2)}:1 (mínimo ${CONTRASTE.texto})`);
+    }
     for (const [a, b] of pares) {
         const c = contraste(t[a], t[b]);
         if (c < CONTRASTE.texto - 1e-9) falhar(`${id}: ${a} sobre ${b} = ${c.toFixed(2)}:1 (mínimo ${CONTRASTE.texto})`);

@@ -206,18 +206,20 @@ function derivarPreenchimento(semente, n, modo) {
     return { cor: cor, on: on, pressionado: pressionado };
 }
 
-/* Texto na cor da semente (link, preço, ícone ativo) com 4,5:1 sobre fundo e superfícies. */
-function derivarTinta(semente, n, modo) {
-    var fundos = [n.bg, n.surface, n['surface-2']];
+/* Texto na cor da semente (link, preço, ícone ativo) com 4,5:1 sobre fundo e superfícies
+ * (e sobre os fundos extras, como o suave da seleção). */
+function derivarTinta(semente, n, modo, extras) {
+    var fundos = [n.bg, n.surface, n['surface-2']].concat(extras || []);
     return ajustarLuminosidade(oklch(semente), modo === 'dark' ? 1 : -1, function (cor) {
         return contrasteMinimo(cor, fundos) >= CONTRASTE.texto;
     });
 }
 
-/* Mistura em OKLab aproximada (por canal sRGB linear), para fundos suaves e bordas. */
+/* Mistura por canal em sRGB (gama), para fundos suaves e bordas: `peso` de `a` sobre `b`.
+ * Em sRGB a cor clara não domina a mistura, como aconteceria em RGB linear. */
 function misturar(a, b, peso) {
-    var ra = hexParaRgb(a).map(paraLinear), rb = hexParaRgb(b).map(paraLinear);
-    return rgbParaHex(ra.map(function (v, i) { return deLinear(v * peso + rb[i] * (1 - peso)); }));
+    var ra = hexParaRgb(a), rb = hexParaRgb(b);
+    return rgbParaHex(ra.map(function (v, i) { return v * peso + rb[i] * (1 - peso); }));
 }
 
 function registrarAjuste(ajustes, token, pedido, obtido, motivo) {
@@ -238,12 +240,18 @@ export function derivarEsquema(sementes) {
 
     var acao = derivarPreenchimento(s.acao, n, modo);
     registrarAjuste(ajustes, '--ct-action', s.acao, acao.cor, 'ação ajustada para 3:1 sobre o fundo e 4,5:1 no texto do botão');
-    var acaoTinta = derivarTinta(s.acao, n, modo);
+    /* Fundo suave da seleção: a mistura diminui até o texto e o texto de apoio terem 4,5:1 sobre ele. */
+    var acaoSuave = n.surface;
+    for (var peso = modo === 'dark' ? 0.16 : 0.12; peso >= 0.04; peso -= 0.02) {
+        var suave = misturar(acao.cor, n.surface, peso);
+        if (contrasteMinimo(n.ink, [suave]) >= CONTRASTE.texto && contrasteMinimo(n['ink-2'], [suave]) >= CONTRASTE.texto) { acaoSuave = suave; break; }
+    }
+    var acaoTinta = derivarTinta(s.acao, n, modo, [acaoSuave]);
 
     var marcaSemente = s.marca || s.acao;
     var marca = s.marca ? derivarPreenchimento(s.marca, n, modo) : acao;
     if (s.marca) registrarAjuste(ajustes, '--ct-brand', s.marca, marca.cor, 'marca ajustada para 3:1 sobre o fundo e 4,5:1 no texto do selo');
-    var marcaTinta = s.marca ? derivarTinta(s.marca, n, modo) : acaoTinta;
+    var marcaTinta = derivarTinta(marcaSemente, n, modo);
     registrarAjuste(ajustes, '--ct-brand-ink', marcaSemente, marcaTinta, 'texto da marca (nome, preço) ajustado para 4,5:1 sobre as superfícies');
 
     var tokens = {
@@ -259,7 +267,7 @@ export function derivarEsquema(sementes) {
         '--ct-on-action': acao.on,
         '--ct-action-pressed': acao.pressionado,
         '--ct-action-ink': acaoTinta,
-        '--ct-action-soft': misturar(acao.cor, n.surface, modo === 'dark' ? 0.22 : 0.12),
+        '--ct-action-soft': acaoSuave,
         '--ct-action-line': misturar(acao.cor, n.surface, modo === 'dark' ? 0.55 : 0.4),
         '--ct-brand': marca.cor,
         '--ct-on-brand': marca.on,
