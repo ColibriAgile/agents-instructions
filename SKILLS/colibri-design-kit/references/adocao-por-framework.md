@@ -81,7 +81,7 @@ O CSS do kit só entrega o visual; reimplemente no framework do projeto (o `exem
   });
   ```
 
-## Perfil Toque (tablet, totem, KDS, pedidos prontos)
+## Perfil Operação (tablet, totem, KDS, pedidos prontos)
 
 Regras em `DESIGN.md` do kit, seção 9; marcação em `../assets/kit/exemplo-toque.html` (sirva a pasta por um servidor local para o seletor de esquema funcionar: módulos ES não carregam em `file://`).
 

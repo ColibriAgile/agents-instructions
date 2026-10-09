@@ -1,7 +1,7 @@
 /*
  * Colibri UI — base comum da linha visual Colibri.
  * Tokens dos temas claro e escuro, fontes locais e camadas. Sem regras de elemento nem componentes.
- * Carregada por colibri-ui.css (perfil Operação) e por colibri-touch.css (perfil Toque) via @import:
+ * Carregada por colibri-ui.css (perfil Admin) e por colibri-touch.css (perfil Operação) via @import:
  * fica na mesma pasta que eles, com fonts/ ao lado. Regras de uso: ver DESIGN.md do kit.
  */
 :root {

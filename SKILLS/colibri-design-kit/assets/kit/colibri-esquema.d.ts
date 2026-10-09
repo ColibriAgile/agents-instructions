@@ -1,4 +1,4 @@
-/* Tipos de colibri-esquema.js (perfil Toque). */
+/* Tipos de colibri-esquema.js (perfil Operação). */
 
 export type ModoEsquema = 'light' | 'dark';
 

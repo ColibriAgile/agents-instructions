@@ -1,4 +1,4 @@
-// Conferência do motor de esquema do perfil Toque (assets/kit/colibri-esquema.js).
+// Conferência do motor de esquema do perfil Operação (assets/kit/colibri-esquema.js).
 // Uso, na pasta da skill: node scripts/verificar-esquema.mjs
 // Sem dependências. Sai com código 1 se alguma verificação falhar.
 //

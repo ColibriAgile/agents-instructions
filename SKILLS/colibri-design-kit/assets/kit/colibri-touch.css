@@ -1,11 +1,11 @@
 /*
- * Colibri UI — perfil Toque da linha visual Colibri: telas cheias de toque (cardápio do tablet,
+ * Colibri UI — perfil Operação da linha visual Colibri: telas cheias de toque (cardápio do tablet,
  * totem, telas de produção do KDS e painel de pedidos prontos).
  * CSS puro, prefixo `ct-`. Piso Chrome 101: sem :has(), @container, color-mix() nem oklch();
  * retorno de toque por transform (nunca pelas propriedades scale/translate separadas).
  * Requisitos: colibri-base.css e a pasta fonts/ ao lado deste arquivo; Bootstrap Icons (classe .bi);
  * colibri-esquema.js nos canais de consumidor (esquema de cores do lojista).
- * Regras de uso: ver DESIGN.md do kit, seção "Perfil Toque".
+ * Regras de uso: ver DESIGN.md do kit, seção "Perfil Operação".
  */
 @import url('colibri-base.css');
 

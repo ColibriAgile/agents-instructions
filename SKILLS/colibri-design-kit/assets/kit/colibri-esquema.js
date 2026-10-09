@@ -1,5 +1,5 @@
 /*
- * Colibri UI — esquema de cores por canal (perfil Toque).
+ * Colibri UI — esquema de cores por canal (perfil Operação).
  *
  * O lojista escolhe três sementes (ambiente, ação e, opcional, marca); este módulo deriva os tokens
  * --ct-* em hex, garante o contraste ajustando a luminosidade (nunca só avisa) e decide o modo
@@ -8,7 +8,7 @@
  *
  * Uma implementação só: a prévia do admin e o app em execução usam este arquivo.
  * Sintaxe ES2019, sem dependências (piso Chrome 101). Saída sempre em hex (#rrggbb).
- * Regras de uso: ver DESIGN.md do kit, seção "Perfil Toque".
+ * Regras de uso: ver DESIGN.md do kit, seção "Perfil Operação".
  */
 
 export const ESQUEMA_VERSAO = 'colibri-esquema/1';

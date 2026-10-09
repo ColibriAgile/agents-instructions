@@ -1,6 +1,6 @@
 ---
 name: Colibri UI
-description: Linha visual das aplicações Colibri — mesa de operação compacta, sóbria e precisa
+description: Linha visual das aplicações Colibri — perfis Admin e Operação, sóbria, precisa e direta
 colors:
   action: "#1b6ec2"
   action-hover: "#175fa9"
@@ -90,13 +90,13 @@ motion:
 
 # Colibri UI — linha visual das aplicações Colibri
 
-Este documento descreve a linha visual comum das aplicações Colibri e orienta a refatoração visual de cada uma delas. A linha tem dois perfis sobre a mesma base (`colibri-base.css`: tokens dos dois temas, fontes e camadas): **Operação** (seções 1 a 8), a mesa de operação dos painéis e ferramentas internas, e **Toque** (seção 9), as telas cheias de toque do cardápio do tablet, do totem, da produção do KDS e do painel de pedidos prontos. As seções 1 a 8 valem para o perfil Toque no que a seção 9 não muda (cores de estado, fontes, ícones, foco, tema por token). A implementação de referência do perfil Operação está em `colibri-ui.css` (CSS puro, prefixo `cm-`); a do perfil Toque, em `colibri-touch.css` (prefixo `ct-`), com o motor de esquema de cores `colibri-esquema.js` e a demonstração `exemplo-toque.html`; `colibri-ui.bootstrap3.css` e `colibri-ui.devexpress.css` são adaptadores opcionais; `logos/colibri-colorido.svg` é a marca da página inicial; `logos/colibri.ico` é o ícone da aba; `logos/colibri-marca.svg` é a marca da tela de entrada; `exemplo.html` mostra a marcação de cada componente e `exemplo-entrada.html`, a tela de entrada e a página de erro.
+Este documento descreve a linha visual comum das aplicações Colibri e orienta a refatoração visual de cada uma delas. A linha tem dois perfis sobre a mesma base (`colibri-base.css`: tokens dos dois temas, fontes e camadas): **Admin** (seções 1 a 8), para painéis, admins e ferramentas internas, e **Operação** (seção 9), as telas cheias de toque do cardápio do tablet, do totem, da produção do KDS e do painel de pedidos prontos. As seções 1 a 8 valem para o perfil Operação no que a seção 9 não muda (cores de estado, fontes, ícones, foco, tema por token). A implementação de referência do perfil Admin está em `colibri-ui.css` (CSS puro, prefixo `cm-`); a do perfil Operação, em `colibri-touch.css` (prefixo `ct-`), com o motor de esquema de cores `colibri-esquema.js` e a demonstração `exemplo-toque.html`; `colibri-ui.bootstrap3.css` e `colibri-ui.devexpress.css` são adaptadores opcionais; `logos/colibri-colorido.svg` é a marca da página inicial; `logos/colibri.ico` é o ícone da aba; `logos/colibri-marca.svg` é a marca da tela de entrada; `exemplo.html` mostra a marcação de cada componente e `exemplo-entrada.html`, a tela de entrada e a página de erro.
 
 Ao adotar em um repositório, copie este arquivo para a raiz como `DESIGN.md`, escreva o `PRODUCT.md` do produto (modelo em `PRODUCT.template.md`) e registre na seção "Implementação neste projeto" onde o CSS e os componentes ficam.
 
 ## 1. Visão geral
 
-**Norte criativo: "Mesa de operação".** As aplicações Colibri são ferramentas de trabalho usadas por suporte, implantação e administradores, em estações Windows, à luz de escritório, muitas vezes com a janela reduzida até a largura de um tablet. A interface existe para consultar estado, identificar pendências e agir, sem atravessar espaços decorativos. O registro é de produto: sóbrio, preciso e discreto.
+**Norte criativo: "Admin".** As aplicações Colibri são ferramentas de trabalho usadas por suporte, implantação e administradores, em estações Windows, à luz de escritório, muitas vezes com a janela reduzida até a largura de um tablet. A interface existe para consultar estado, identificar pendências e agir, sem atravessar espaços decorativos. O registro é de produto: sóbrio, preciso e discreto.
 
 **Características:**
 
@@ -288,24 +288,24 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Botão vermelho preenchido para excluir um item dentro do diálogo de edição dele.
 - Halo de foco só no campo de um conjunto unido, cortado pelo botão ou invadindo a borda dele.
 
-## 9. Perfil Toque
+## 9. Perfil Operação
 
 Telas cheias de toque: cardápio do tablet (Mesa, Comanda e Autoficha), totem de autoatendimento, telas de produção do KDS (cozinha, estação, expedição, consolidado, delivery) e painel de pedidos prontos. É o mesmo sistema da base (fontes, ícones, estados, foco, movimento, tema por token); mudam a escala, a composição e, nas telas voltadas ao cliente da loja, as cores. Implementação em `colibri-touch.css` (prefixo `ct-`, importa `colibri-base.css`), motor de esquema em `colibri-esquema.js` e marcação de cada componente em `exemplo-toque.html` (`#tablet`, `#tablet-folha`, `#totem`, `#kds`, `#kds-claro`, `#pronto`).
 
-**Norte criativo: "Ponto de atendimento"** (proposto em 09/10/2026, a confirmar antes da adoção num projeto só de toque). A tela atende alguém em pé, de passagem ou com as mãos ocupadas: uma tarefa por vez, a ação principal sempre à vista e o que importa (preço, senha, tempo, quantidade) grande o bastante para ler de onde a pessoa está.
+**Norte criativo: "Operação".** A tela atende alguém em pé, de passagem ou com as mãos ocupadas: uma tarefa por vez, a ação principal sempre à vista e o que importa (preço, senha, tempo, quantidade) grande o bastante para ler de onde a pessoa está.
 
 **Características:**
 
 - Uma tarefa por tela ou folha; a ação principal fica sempre visível e ao alcance.
 - Alvo de toque grande em toda ação; nada depende de hover, teclado ou gesto escondido (o único gesto oculto permitido é o acesso do atendente ao menu de serviço).
-- Telas voltadas ao cliente da loja usam o esquema de cores do canal; telas de operação usam o tema Colibri.
+- Telas voltadas ao cliente da loja usam o esquema de cores do canal; telas de produção do KDS usam o tema Colibri.
 - A informação principal é grande: preço, senha, timer, quantidade.
 - Funciona sem internet e no piso Chrome 101.
 
 ### Fronteira e cores
 
 - **Consumidor** (cardápio do tablet, totem, painel de pedidos prontos): cada canal de venda tem o seu esquema de cores, definido pelo lojista com três sementes: **Ambiente** (fundo; dele saem superfícies, linhas e textos), **Ação** (Adicionar, Finalizar, Pagar, opção escolhida, categoria ativa, foco) e **Marca**, opcional (nome da loja, preço, selo "Destaque"; vazia, é igual à Ação). `colibri-esquema.js` deriva os tokens `--ct-*` em hex e decide o modo (claro ou escuro) pela luminância do Ambiente. A loja aparece pelo logo e pelo nome no cabeçalho; a marca Colibri fica no ícone do aplicativo, na abertura e no admin (confirmado em 09/10/2026; está previsto um logo pequeno da Colibri na tela de destaques, a definir).
-- **Operação** (telas de produção do KDS): tema Colibri, claro ou escuro (`data-theme`), sem esquema do lojista. Sem esquema aplicado, os `--ct-*` são os `--cm-*` da base.
+- **Produção** (telas de produção do KDS): tema Colibri, claro ou escuro (`data-theme`), sem esquema do lojista. Sem esquema aplicado, os `--ct-*` são os `--cm-*` da base.
 - **Contraste garantido por ajuste, não por aviso:** textos (`ink`, `ink-2`, `ink-3`, texto da ação e da marca) e estados com 4,5:1 sobre o fundo e as superfícies; preenchimentos de ação e marca com 3:1 sobre o fundo e as superfícies; o texto sobre o preenchimento com 4,5:1; texto sobre a seleção (`action-soft`) com 4,5:1. Quando a semente não atinge, o motor muda só a luminosidade (matiz e croma ficam) e devolve a lista de ajustes, que a prévia do admin mostra.
 - **Estados não são configuráveis:** sucesso, aviso e erro são os da base no modo decidido (o motor os emite também como `--ct-*`, para a prévia funcionar dentro de um contêiner).
 - **Aplicação:** no app, `aplicarEsquema(esquema)` grava os tokens e `data-theme` no `<html>`; grave o último esquema derivado (tokens e modo) e aplique-o no script de pré-pintura, sem recalcular, para não piscar o tema padrão. Na prévia do admin, `aplicarEsquema(esquema, contêiner)`.
@@ -325,12 +325,12 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 | Pedidos prontos (TV, 2 a 5 m, só leitura) | `.ct-app--tv` | 56 px | 24 px | 96 px |
 
 - Nenhum alvo de toque fica abaixo do mínimo da superfície, inclusive +/− de quantidade, fechar e ações de linha; entre alvos vizinhos, no mínimo 8 px.
-- Preço, senha, timer, quantidade e número do pedido são a informação principal e podem ser grandes (a regra da informação primeiro, seção 3, é do perfil Operação). Timer, senha e números de pedido em Google Sans Mono com algarismos tabulares; preço em Google Sans Flex com algarismos tabulares.
+- Preço, senha, timer, quantidade e número do pedido são a informação principal e podem ser grandes (a regra da informação primeiro, seção 3, é do perfil Admin). Timer, senha e números de pedido em Google Sans Mono com algarismos tabulares; preço em Google Sans Flex com algarismos tabulares.
 - Quiosque (tablet de mesa, totem, TV): `.ct-app--kiosk` tira a seleção de texto, o zoom por toque duplo e a rolagem elástica.
 
 ### Composição
 
-- Tela cheia, sem o shell do perfil Operação: cabeçalho (`.ct-header`, logo e nome da loja à esquerda, ações à direita), navegação de categorias, conteúdo rolável e rodapé de pedido (`.ct-footer`, resumo à esquerda e a ação principal à direita, sempre visível).
+- Tela cheia, sem o shell do perfil Admin: cabeçalho (`.ct-header`, logo e nome da loja à esquerda, ações à direita), navegação de categorias, conteúdo rolável e rodapé de pedido (`.ct-footer`, resumo à esquerda e a ação principal à direita, sempre visível).
 - Categorias: coluna (`.ct-rail`) em paisagem, faixa rolável (`.ct-chips`) em retrato e nas subcategorias. A ativa no rail fica no fundo suave da ação com texto na cor de ação; na faixa, preenchida com a cor de ação. Sem faixa lateral colorida.
 - Uma ação principal por tela ou folha, na extremidade direita ou na largura toda, embaixo.
 - **Folha** (`.ct-sheet`): sobe da base em retrato; centralizada (`.ct-sheet--center`) em paisagem. Título, fechar com alvo inteiro, corpo rolável e rodapé em `surface-2` com a ação principal maior. Tocar no véu fecha; Esc também, quando houver teclado.
@@ -363,7 +363,7 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 
 Folha sobe em 260 ms com `--cm-ease`; véus e diálogos centralizados esmaecem em 200 ms; retorno de toque em 120 ms. O halo de atraso pulsa a cada 1,2 s. Animações de foto do produto (aproximação, Ken Burns, brilho) são conteúdo escolhido pelo lojista e param com movimento reduzido. Com `prefers-reduced-motion`, nada desliza, pisca ou gira: folhas e confirmações aparecem, o atraso fica com a borda fixa e o carregamento mostra o ícone parado com o texto.
 
-### Faça / Não faça no perfil Toque
+### Faça / Não faça no perfil Operação
 
 **Faça**
 
@@ -371,7 +371,7 @@ Folha sobe em 260 ms com `--cm-ease`; véus e diálogos centralizados esmaecem e
 - Usar a classe de superfície certa e conferir os alvos medindo no navegador, na resolução real (1024×600 no tablet, 960×1707 no totem, 1920×1080 no KDS).
 - Deixar visível o produto indisponível e a ação desabilitada, com o motivo escrito.
 - Mostrar observação e alérgeno no próprio item do pedido.
-- Conferir cada tela de operação nos temas claro e escuro, e cada tela de consumidor com um esquema claro e um escuro.
+- Conferir cada tela de produção nos temas claro e escuro, e cada tela de consumidor com um esquema claro e um escuro.
 
 **Não faça**
 
@@ -385,4 +385,4 @@ Folha sobe em 260 ms com `--cm-ease`; véus e diálogos centralizados esmaecem e
 
 ## 10. Implementação neste projeto
 
-_Preencher ao adotar:_ os perfis usados (Operação e/ou Toque, com as superfícies), onde está o CSS (`colibri-ui.css` ou `colibri-touch.css` e, se usados, os adaptadores), onde ficam fontes, ícones e `logos/`, de onde a entrada HTML serve o ícone da aba, qual página recebe `.cm-page--home`, a biblioteca de componentes e o tema usados (com versão) e como cada componente é implementado no framework do projeto (componentes, diretivas, templates). No perfil Toque: a classe de superfície, o alvo de build (Chrome 101), onde o esquema de cada canal é gravado, como chega ao app e como é aplicado antes de pintar, e as cores da paleta escolhidas para tipos de pedido e estações.
+_Preencher ao adotar:_ os perfis usados (Admin e/ou Operação, com as superfícies), onde está o CSS (`colibri-ui.css` ou `colibri-touch.css` e, se usados, os adaptadores), onde ficam fontes, ícones e `logos/`, de onde a entrada HTML serve o ícone da aba, qual página recebe `.cm-page--home`, a biblioteca de componentes e o tema usados (com versão) e como cada componente é implementado no framework do projeto (componentes, diretivas, templates). No perfil Operação: a classe de superfície, o alvo de build (Chrome 101), onde o esquema de cada canal é gravado, como chega ao app e como é aplicado antes de pintar, e as cores da paleta escolhidas para tipos de pedido e estações.

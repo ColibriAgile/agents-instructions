@@ -2,7 +2,7 @@
 
 <!-- impeccable:product-schema 1 -->
 
-<!-- Modelo de PRODUCT.md para produtos Colibri só com o perfil Toque (cardápio em tablet, totem, KDS,
+<!-- Modelo de PRODUCT.md para produtos Colibri só com o perfil Operação (cardápio em tablet, totem, KDS,
      painel de pedidos prontos), no formato do impeccable 4.x. Produto com admin e telas de toque usa
      PRODUCT.template.md e acrescenta as superfícies de toque em Users e Operating Context. Copie para a
      raiz do repositório como PRODUCT.md e substitua os trechos entre colchetes. As seções já preenchidas
@@ -33,12 +33,12 @@ Telas de toque em uso contínuo no salão, no balcão e na cozinha: tablet na me
 
 - O produto precisa funcionar sem acesso à internet: fontes, ícones e estilos são servidos por ele mesmo.
 - Piso de navegador Chrome 101 (WebView dos tablets e totens).
-- Cada canal de venda tem o seu esquema de cores, escolhido pelo lojista com três sementes (ambiente, ação, marca); as telas de operação usam o tema Colibri.
+- Cada canal de venda tem o seu esquema de cores, escolhido pelo lojista com três sementes (ambiente, ação, marca); as telas de produção (KDS) usam o tema Colibri.
 - [Funcionalidades confirmadas, restrições técnicas e termos do produto.]
 
 ## Brand Commitments
 
-Linha visual Colibri, perfil Toque ("Ponto de atendimento"), definida pelo Colibri Design Kit e registrada em `DESIGN.md`. Nas telas voltadas ao cliente, a loja aparece pelo logo, pelo nome e pelo esquema de cores do canal; a marca Colibri fica no ícone do aplicativo, na abertura e no admin.
+Linha visual Colibri, perfil Operação, definida pelo Colibri Design Kit e registrada em `DESIGN.md`. Nas telas voltadas ao cliente, a loja aparece pelo logo, pelo nome e pelo esquema de cores do canal; a marca Colibri fica no ícone do aplicativo, na abertura e no admin.
 
 Personalidade: claro, objetivo e confiável. A linguagem é curta e direta; a ação principal e a informação que importa (preço, senha, tempo, quantidade) têm prioridade sobre ornamentação.
 
