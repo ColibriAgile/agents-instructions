@@ -67,10 +67,10 @@ rounded:
   small: "4px"
   surface: "6px"
   tag: "10px"
-  touch-control: "8px"
-  touch-card: "12px"
-  touch-sheet: "16px"
-  pill: "999px"
+  touch-control: "6px"
+  touch-card: "8px"
+  touch-sheet: "12px"
+  touch-tag: "4px"
 sizes:
   control-height: "32px"
   topbar-height: "56px"
@@ -304,7 +304,7 @@ Telas cheias de toque: cardápio do tablet (Mesa, Comanda e Autoficha), totem de
 
 ### Fronteira e cores
 
-- **Consumidor** (cardápio do tablet, totem, painel de pedidos prontos): cada canal de venda tem o seu esquema de cores, definido pelo lojista com três sementes: **Ambiente** (fundo; dele saem superfícies, linhas e textos), **Ação** (Adicionar, Finalizar, Pagar, opção escolhida, categoria ativa, foco) e **Marca**, opcional (nome da loja, preço, selo "Destaque"; vazia, é igual à Ação). `colibri-esquema.js` deriva os tokens `--ct-*` em hex e decide o modo (claro ou escuro) pela luminância do Ambiente. A loja aparece pelo logo e pelo nome no cabeçalho; a marca Colibri fica no ícone do aplicativo, na abertura e no admin (proposto em 09/10/2026, a confirmar).
+- **Consumidor** (cardápio do tablet, totem, painel de pedidos prontos): cada canal de venda tem o seu esquema de cores, definido pelo lojista com três sementes: **Ambiente** (fundo; dele saem superfícies, linhas e textos), **Ação** (Adicionar, Finalizar, Pagar, opção escolhida, categoria ativa, foco) e **Marca**, opcional (nome da loja, preço, selo "Destaque"; vazia, é igual à Ação). `colibri-esquema.js` deriva os tokens `--ct-*` em hex e decide o modo (claro ou escuro) pela luminância do Ambiente. A loja aparece pelo logo e pelo nome no cabeçalho; a marca Colibri fica no ícone do aplicativo, na abertura e no admin (confirmado em 09/10/2026; está previsto um logo pequeno da Colibri na tela de destaques, a definir).
 - **Operação** (telas de produção do KDS): tema Colibri, claro ou escuro (`data-theme`), sem esquema do lojista. Sem esquema aplicado, os `--ct-*` são os `--cm-*` da base.
 - **Contraste garantido por ajuste, não por aviso:** textos (`ink`, `ink-2`, `ink-3`, texto da ação e da marca) e estados com 4,5:1 sobre o fundo e as superfícies; preenchimentos de ação e marca com 3:1 sobre o fundo e as superfícies; o texto sobre o preenchimento com 4,5:1; texto sobre a seleção (`action-soft`) com 4,5:1. Quando a semente não atinge, o motor muda só a luminosidade (matiz e croma ficam) e devolve a lista de ajustes, que a prévia do admin mostra.
 - **Estados não são configuráveis:** sucesso, aviso e erro são os da base no modo decidido (o motor os emite também como `--ct-*`, para a prévia funcionar dentro de um contêiner).
@@ -339,9 +339,10 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 
 ### Componentes
 
-- **Botões** (`.ct-btn`): altura do alvo da superfície, texto de `--ct-text-lg` peso 600, cantos de 8 px. Principal `.ct-btn--primary` (ação com o texto derivado), secundário (`surface-2` com linha), `.ct-btn--ghost` (texto na cor de ação), `.ct-btn--danger` (texto de erro sobre o fundo suave de erro, nunca vermelho preenchido), `.ct-btn--block` e `.ct-btn--lg`. Ícone dentro do botão é permitido. Retorno de toque por `transform: scale(.97)` e a cor pressionada; desabilitado continua visível, apagado. Botão só com ícone: `.ct-icon-btn`, com o alvo inteiro e `aria-label` obrigatório.
+- **Cantos discretos, para um perfil profissional:** 6 px em controles (botões, abas de categoria, quantidade, confirmação), 8 px em cartões, 12 px em folhas e diálogos e 4 px em selos, marcas de opção e observações. Nenhuma forma de pílula; só o rádio é redondo.
+- **Botões** (`.ct-btn`): altura do alvo da superfície, texto de `--ct-text-lg` peso 600, cantos de 6 px. Principal `.ct-btn--primary` (ação com o texto derivado), secundário (`surface-2` com linha), `.ct-btn--ghost` (texto na cor de ação), `.ct-btn--danger` (texto de erro sobre o fundo suave de erro, nunca vermelho preenchido), `.ct-btn--block` e `.ct-btn--lg`. Ícone dentro do botão é permitido. Retorno de toque por `transform: scale(.97)` e a cor pressionada; desabilitado continua visível, apagado. Botão só com ícone: `.ct-icon-btn`, com o alvo inteiro e `aria-label` obrigatório.
 - **Quantidade** (`.ct-qty`): − valor +, cada botão com o alvo inteiro, valor com algarismos tabulares e anunciado a leitores de tela.
-- **Selos** (`.ct-tag`, pílula): neutro, `--brand` (Destaque), `--success`, `--warning`, `--danger` e os categóricos `--combo` e `--rodizio`, sempre com texto.
+- **Selos** (`.ct-tag`, cantos de 4 px): neutro, `--brand` (Destaque), `--success`, `--warning`, `--danger` e os categóricos `--combo` e `--rodizio`, sempre com texto.
 - **Cartão de produto** (`.ct-product`): foto 4:3 (ícone em `ink-3` sem foto), selos sobre a foto, nome, descrição de até duas linhas, preço (`.ct-price`, na cor de texto da marca; "a partir de" em `ink-3`) e a ação. Formato linha (`.ct-product--row`) com a foto à esquerda. Indisponível (`.is-unavailable`): continua na lista, apagado, com o motivo num selo e a ação desabilitada.
 - **Opções** (`.ct-option`, jornada, combo e observações): linha com no mínimo o alvo mais 8 px, marca de 28 px (quadrada; redonda em `.ct-option--radio`), adicional de preço à direita; escolhida no fundo suave da ação, com a marca preenchida.
 - **Avisos** (`.ct-notice`, variantes de estado) com ícone e texto; confirmação curta (`.ct-toast`, "adicionado") centralizada embaixo, some sozinha; vazio (`.ct-empty`) com ícone e uma frase; carregamento com `bi-arrow-repeat ct-spin` e texto.
@@ -380,6 +381,7 @@ Folha sobe em 260 ms com `--cm-ease`; véus e diálogos centralizados esmaecem e
 - Classes de cor da paleta do Tailwind, propriedades `scale`/`translate` separadas, `:has()` ou `color-mix()` com variável.
 - Emojis como ícone; `confirm()` e `alert()` do navegador no lugar de uma folha.
 - Faixa lateral colorida para marcar item ativo; cartões de métrica nas telas de toque.
+- Cantos acima da escala do perfil ou botões, abas e selos em forma de pílula.
 
 ## 10. Implementação neste projeto
 

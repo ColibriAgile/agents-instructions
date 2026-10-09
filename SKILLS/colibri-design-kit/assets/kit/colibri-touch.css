@@ -62,9 +62,10 @@
     --ct-order-ficha: var(--ct-palette-roxo);
     --ct-order-outro: var(--ct-palette-grafite);
 
-    --ct-radius-control: 8px;
-    --ct-radius-card: 12px;
-    --ct-radius-sheet: 16px;
+    --ct-radius-control: 6px;
+    --ct-radius-card: 8px;
+    --ct-radius-sheet: 12px;
+    --ct-radius-tag: 4px;
     --ct-shadow-sheet: var(--cm-shadow-dialog);
     --ct-backdrop: var(--cm-backdrop);
     --ct-ease: var(--cm-ease);
@@ -245,7 +246,7 @@
     color: var(--ct-ink-2);
     background: var(--ct-surface-2);
     border: 1px solid var(--ct-line);
-    border-radius: 999px;
+    border-radius: var(--ct-radius-control);
     font-size: var(--ct-text-lg);
     white-space: nowrap;
     cursor: pointer;
@@ -363,7 +364,7 @@
     color: var(--ct-ink-2);
     background: var(--ct-surface-2);
     border: 1px solid var(--ct-line);
-    border-radius: 999px;
+    border-radius: var(--ct-radius-tag);
     font-size: var(--ct-text-sm);
     font-weight: 600;
     line-height: 1.2;
@@ -522,7 +523,7 @@
     height: 28px;
     color: transparent;
     border: 2px solid var(--ct-ink-3);
-    border-radius: 6px;
+    border-radius: var(--ct-radius-tag);
 }
 .ct-option--radio .ct-option__mark { border-radius: 50%; }
 .ct-option__text { flex: 1; font-size: var(--ct-text-lg); }
@@ -562,7 +563,7 @@
     color: var(--ct-success);
     background: var(--ct-success-soft);
     border: 1px solid var(--ct-success-line);
-    border-radius: 999px;
+    border-radius: var(--ct-radius-control);
     box-shadow: var(--ct-shadow-sheet);
     font-size: var(--ct-text-lg);
     font-weight: 600;
@@ -635,7 +636,7 @@
     gap: 6px;
     margin-top: 6px;
     padding: 6px 8px;
-    border-radius: 6px;
+    border-radius: var(--ct-radius-tag);
     font-size: var(--ct-text-sm);
     font-weight: 600;
 }
