@@ -34,6 +34,7 @@ bundles:
       - colibri-ports
       - csharp-string-optimization
       - csharp-tests
+      - csharp-tests-refactor
       - dotnet-efficient-validation
       - extrair-requisitos-csharp
       - http-client-resilience
