@@ -1,0 +1,752 @@
+/*
+ * Colibri UI — perfil Operação da linha visual Colibri: telas cheias de toque (cardápio do tablet,
+ * totem, telas de produção do KDS e painel de pedidos prontos).
+ * CSS puro, prefixo `ct-`. Piso Chrome 101: sem :has(), @container, color-mix() nem oklch();
+ * retorno de toque por transform (nunca pelas propriedades scale/translate separadas).
+ * Requisitos: colibri-base.css e a pasta fonts/ ao lado deste arquivo; Bootstrap Icons (classe .bi);
+ * colibri-esquema.js nos canais de consumidor (esquema de cores do lojista).
+ * Regras de uso: ver DESIGN.md do kit, seção "Perfil Operação".
+ */
+@import url('colibri-base.css');
+
+/* ---------- Tokens do perfil ----------
+ * Sem esquema aplicado, os --ct-* são o tema Colibri (claro ou escuro por data-theme), como nas telas
+ * de produção do KDS. Nos canais de consumidor, colibri-esquema.js grava os --ct-* derivados das
+ * sementes do lojista no <html>, por cima destes. Nenhuma tela escreve cor própria. */
+:root {
+    --ct-bg: var(--cm-bg);
+    --ct-surface: var(--cm-surface);
+    --ct-surface-2: var(--cm-surface-2);
+    --ct-line: var(--cm-line);
+    --ct-ink: var(--cm-ink);
+    --ct-ink-2: var(--cm-ink-2);
+    --ct-ink-3: var(--cm-ink-3);
+    --ct-disabled-ink: var(--cm-disabled-ink);
+    --ct-action: var(--cm-accent);
+    --ct-on-action: #fff;
+    --ct-action-pressed: var(--cm-accent-hover);
+    --ct-action-ink: var(--cm-accent-ink);
+    --ct-action-soft: var(--cm-accent-soft);
+    --ct-action-line: var(--cm-accent-line);
+    --ct-brand: var(--cm-accent);
+    --ct-on-brand: #fff;
+    --ct-brand-ink: var(--cm-accent-ink);
+    --ct-focus: var(--cm-focus);
+    --ct-success: var(--cm-success);
+    --ct-success-soft: var(--cm-success-soft);
+    --ct-success-line: var(--cm-success-line);
+    --ct-warning: var(--cm-warning);
+    --ct-warning-soft: var(--cm-warning-soft);
+    --ct-warning-line: var(--cm-warning-line);
+    --ct-danger: var(--cm-danger);
+    --ct-danger-soft: var(--cm-danger-soft);
+    --ct-danger-line: var(--cm-danger-line);
+
+    /* Paleta curada: cores fixas com no mínimo 5,2:1 sobre texto branco, nos dois temas. Usada nos
+     * tipos de pedido e nas estações do KDS e nos selos categóricos (Combo, Rodízio). O lojista
+     * escolhe dentro dela; nunca hex livre. */
+    --ct-palette-verde: #1e7a46;
+    --ct-palette-laranja: #b0500c;
+    --ct-palette-azul: #1d62ad;
+    --ct-palette-roxo: #6d3fa3;
+    --ct-palette-vinho: #a32c52;
+    --ct-palette-petroleo: #0e6d77;
+    --ct-palette-marrom: #7d5130;
+    --ct-palette-grafite: #4d5a68;
+
+    /* Tipos de pedido (padrão; o KDS troca por configuração, dentro da paleta). */
+    --ct-order-balcao: var(--ct-palette-verde);
+    --ct-order-retirada: var(--ct-palette-laranja);
+    --ct-order-entrega: var(--ct-palette-petroleo);
+    --ct-order-mesa: var(--ct-palette-azul);
+    --ct-order-ficha: var(--ct-palette-roxo);
+    --ct-order-outro: var(--ct-palette-grafite);
+
+    --ct-radius-control: 6px;
+    --ct-radius-card: 8px;
+    --ct-radius-sheet: 12px;
+    --ct-radius-tag: 4px;
+    --ct-shadow-sheet: var(--cm-shadow-dialog);
+    --ct-backdrop: var(--cm-backdrop);
+    --ct-ease: var(--cm-ease);
+
+    /* Escala da superfície tablet (padrão). As outras superfícies trocam estes valores. */
+    --ct-target: 48px;
+    --ct-gap: 12px;
+    --ct-pad: 16px;
+    --ct-text-sm: 13px;
+    --ct-text: 16px;
+    --ct-text-lg: 18px;
+    --ct-text-xl: 22px;
+    --ct-text-2xl: 28px;
+    --ct-text-display: 40px;
+}
+
+/* ---------- Escala por superfície ----------
+ * Uma classe no contêiner da aplicação. O alvo de toque nunca fica abaixo de --ct-target. */
+.ct-app--tablet {
+    --ct-target: 48px;
+    --ct-text-sm: 13px;
+    --ct-text: 16px;
+    --ct-text-lg: 18px;
+    --ct-text-xl: 22px;
+    --ct-text-2xl: 28px;
+    --ct-text-display: 40px;
+}
+/* Totem em retrato: escala em vh (a tela vai de 800×1280 a 2160×3840), alvo nunca abaixo de 56 px. */
+.ct-app--totem {
+    --ct-target: max(56px, 4.4vh);
+    --ct-gap: max(12px, 1.1vh);
+    --ct-pad: max(16px, 1.5vh);
+    --ct-text-sm: max(13px, 1.15vh);
+    --ct-text: max(16px, 1.45vh);
+    --ct-text-lg: max(18px, 1.7vh);
+    --ct-text-xl: max(22px, 2.1vh);
+    --ct-text-2xl: max(28px, 2.8vh);
+    --ct-text-display: max(40px, 6vh);
+}
+/* KDS: leitura a 1–3 m, mãos ocupadas; o zoom por estação multiplica tudo. */
+.ct-app--kds {
+    --ct-target: 56px;
+    --ct-gap: 12px;
+    --ct-pad: 14px;
+    --ct-text-sm: 14px;
+    --ct-text: 18px;
+    --ct-text-lg: 20px;
+    --ct-text-xl: 24px;
+    --ct-text-2xl: 32px;
+    --ct-text-display: 48px;
+}
+/* Painel de pedidos prontos (TV): só leitura, de 2 a 5 m. */
+.ct-app--tv {
+    --ct-target: 56px;
+    --ct-gap: 20px;
+    --ct-pad: 24px;
+    --ct-text-sm: 18px;
+    --ct-text: 24px;
+    --ct-text-lg: 32px;
+    --ct-text-xl: 44px;
+    --ct-text-2xl: 64px;
+    --ct-text-display: 96px;
+}
+
+/* ---------- Aplicação ---------- */
+.ct-app {
+    box-sizing: border-box;
+    min-height: 100%;
+    color: var(--ct-ink);
+    background: var(--ct-bg);
+    font-family: var(--cm-font);
+    font-size: var(--ct-text);
+    line-height: 1.35;
+    -webkit-tap-highlight-color: transparent;
+}
+.ct-app *,
+.ct-app *::before,
+.ct-app *::after { box-sizing: inherit; }
+/* Especificidade zero: as classes dos componentes (.ct-btn--primary etc.) definem a cor do texto. */
+:where(.ct-app) :where(button, input, textarea, select) { font: inherit; color: inherit; }
+/* Quiosque (totem, tablet de mesa, TV): sem seleção de texto, sem zoom por toque duplo, sem rolagem elástica. */
+.ct-app--kiosk {
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+    overscroll-behavior: none;
+}
+.ct-app--kiosk input,
+.ct-app--kiosk textarea { -webkit-user-select: text; user-select: text; }
+.ct-app :focus { outline: none; }
+.ct-app :focus-visible { outline: 3px solid var(--ct-focus); outline-offset: 2px; }
+.ct-num { font-variant-numeric: tabular-nums; }
+.ct-mono { font-family: var(--cm-mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- Cabeçalho e navegação por categoria ---------- */
+.ct-header {
+    display: flex;
+    align-items: center;
+    gap: var(--ct-gap);
+    min-height: calc(var(--ct-target) + 16px);
+    padding: 8px var(--ct-pad);
+    background: var(--ct-surface);
+    border-bottom: 1px solid var(--ct-line);
+}
+.ct-header__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    margin-right: auto;
+}
+.ct-header__logo { display: block; max-height: calc(var(--ct-target) - 4px); max-width: 160px; object-fit: contain; }
+.ct-header__name {
+    overflow: hidden;
+    color: var(--ct-brand-ink);
+    font-size: var(--ct-text-xl);
+    font-weight: 700;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.ct-header__actions { display: flex; align-items: center; gap: 8px; }
+
+/* Coluna de categorias (paisagem). Ativa no fundo suave da ação, com texto na cor de ação e peso maior. */
+.ct-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 8px;
+    overflow-y: auto;
+    list-style: none;
+    background: var(--ct-surface);
+    border-right: 1px solid var(--ct-line);
+}
+.ct-rail__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: var(--ct-target);
+    padding: 8px 14px;
+    color: var(--ct-ink-2);
+    background: transparent;
+    border: 0;
+    border-radius: var(--ct-radius-control);
+    font-size: var(--ct-text-lg);
+    text-align: left;
+    cursor: pointer;
+}
+.ct-rail__item .bi { font-size: 1.2em; }
+.ct-rail__item.is-active,
+.ct-rail__item[aria-current="true"] {
+    color: var(--ct-action-ink);
+    background: var(--ct-action-soft);
+    font-weight: 650;
+}
+
+/* Faixa de categorias (retrato) e subcategorias. Ativa preenchida com a cor de ação. */
+.ct-chips {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 8px var(--ct-pad);
+    overflow-x: auto;
+    list-style: none;
+    scrollbar-width: none;
+}
+.ct-chips::-webkit-scrollbar { display: none; }
+.ct-chip {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+    min-height: var(--ct-target);
+    padding: 0 18px;
+    color: var(--ct-ink-2);
+    background: var(--ct-surface-2);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-control);
+    font-size: var(--ct-text-lg);
+    white-space: nowrap;
+    cursor: pointer;
+}
+.ct-chip.is-active,
+.ct-chip[aria-selected="true"] {
+    color: var(--ct-on-action);
+    background: var(--ct-action);
+    border-color: var(--ct-action);
+    font-weight: 650;
+}
+
+/* ---------- Botões ---------- */
+.ct-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: var(--ct-target);
+    padding: 0 22px;
+    color: var(--ct-ink);
+    background: var(--ct-surface-2);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-control);
+    font-size: var(--ct-text-lg);
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 120ms var(--ct-ease), background-color 120ms var(--ct-ease);
+}
+.ct-btn .bi { font-size: 1.15em; }
+.ct-btn:active:not(:disabled) { transform: scale(.97); }
+.ct-btn--primary {
+    color: var(--ct-on-action);
+    background: var(--ct-action);
+    border-color: var(--ct-action);
+    font-weight: 700;
+}
+.ct-btn--primary:active:not(:disabled) { background: var(--ct-action-pressed); border-color: var(--ct-action-pressed); }
+.ct-btn--ghost { color: var(--ct-action-ink); background: transparent; border-color: transparent; }
+.ct-btn--ghost:active:not(:disabled) { background: var(--ct-action-soft); }
+/* Destrutivo: texto de erro sobre o fundo suave de erro, nunca vermelho preenchido sobre a superfície. */
+.ct-btn--danger { color: var(--ct-danger); background: var(--ct-danger-soft); border-color: var(--ct-danger-line); }
+.ct-btn--block { display: flex; width: 100%; }
+.ct-btn--lg { min-height: calc(var(--ct-target) * 1.25); font-size: var(--ct-text-xl); }
+.ct-btn:disabled,
+.ct-btn[aria-disabled="true"] {
+    color: var(--ct-disabled-ink);
+    background: var(--ct-surface-2);
+    border-color: var(--ct-line);
+    cursor: not-allowed;
+}
+
+/* Botão só com ícone: área de toque inteira, ícone no centro; aria-label obrigatório. */
+.ct-icon-btn {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: var(--ct-target);
+    height: var(--ct-target);
+    padding: 0;
+    color: var(--ct-ink-2);
+    background: transparent;
+    border: 0;
+    border-radius: var(--ct-radius-control);
+    font-size: calc(var(--ct-text) * 1.35);
+    cursor: pointer;
+    transition: transform 120ms var(--ct-ease);
+}
+.ct-icon-btn:active:not(:disabled) { background: var(--ct-surface-2); transform: scale(.94); }
+.ct-icon-btn:disabled { color: var(--ct-disabled-ink); cursor: not-allowed; }
+
+/* ---------- Quantidade ---------- */
+.ct-qty {
+    display: inline-flex;
+    align-items: center;
+    background: var(--ct-surface-2);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-control);
+}
+.ct-qty__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--ct-target);
+    height: var(--ct-target);
+    padding: 0;
+    color: var(--ct-action-ink);
+    background: transparent;
+    border: 0;
+    border-radius: var(--ct-radius-control);
+    font-size: calc(var(--ct-text) * 1.3);
+    cursor: pointer;
+}
+.ct-qty__btn:active:not(:disabled) { background: var(--ct-action-soft); transform: scale(.94); }
+.ct-qty__btn:disabled { color: var(--ct-disabled-ink); cursor: not-allowed; }
+.ct-qty__value {
+    min-width: 2.2em;
+    font-size: var(--ct-text-lg);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+/* ---------- Selos ---------- */
+.ct-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 1.9em;
+    padding: 0 .7em;
+    color: var(--ct-ink-2);
+    background: var(--ct-surface-2);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-tag);
+    font-size: var(--ct-text-sm);
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+.ct-tag--brand { color: var(--ct-on-brand); background: var(--ct-brand); border-color: var(--ct-brand); }
+.ct-tag--success { color: var(--ct-success); background: var(--ct-success-soft); border-color: var(--ct-success-line); }
+.ct-tag--warning { color: var(--ct-warning); background: var(--ct-warning-soft); border-color: var(--ct-warning-line); }
+.ct-tag--danger { color: var(--ct-danger); background: var(--ct-danger-soft); border-color: var(--ct-danger-line); }
+/* Categóricos: cor fixa da paleta, texto branco. */
+.ct-tag--combo { color: #fff; background: var(--ct-palette-roxo); border-color: var(--ct-palette-roxo); }
+.ct-tag--rodizio { color: #fff; background: var(--ct-palette-verde); border-color: var(--ct-palette-verde); }
+
+/* ---------- Cartão de produto ---------- */
+.ct-products {
+    display: grid;
+    grid-template-columns: repeat(var(--ct-cols, 3), minmax(0, 1fr));
+    gap: var(--ct-gap);
+    padding: var(--ct-pad);
+}
+.ct-product {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    color: inherit;
+    background: var(--ct-surface);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-card);
+    text-align: left;
+}
+.ct-product__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--ct-surface-2);
+}
+.ct-product__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ct-product__media .bi {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: var(--ct-ink-3);
+    font-size: calc(var(--ct-text-display) * .9);
+    transform: translate(-50%, -50%);
+}
+.ct-product__tags { position: absolute; top: 10px; left: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.ct-product__body { display: flex; flex: 1; flex-direction: column; gap: 6px; padding: 12px 14px 14px; }
+.ct-product__name { margin: 0; font-size: var(--ct-text-lg); font-weight: 650; line-height: 1.25; }
+.ct-product__desc {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    color: var(--ct-ink-2);
+    font-size: var(--ct-text-sm);
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+.ct-product__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 6px; }
+/* No cartão, a ação usa o corpo de texto: cabe ao lado do preço em três colunas de tablet. */
+.ct-product__foot .ct-btn { padding: 0 16px; font-size: var(--ct-text); }
+.ct-price { color: var(--ct-brand-ink); font-size: var(--ct-text-xl); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ct-price__from { display: block; color: var(--ct-ink-3); font-size: var(--ct-text-sm); font-weight: 500; }
+/* Linha (formato detalhado): foto à esquerda. */
+.ct-product--row { flex-direction: row; }
+.ct-product--row .ct-product__media { flex: 0 0 34%; aspect-ratio: auto; min-height: 150px; }
+/* Indisponível: continua visível, apagado, com o motivo escrito e a ação desabilitada. */
+.ct-product.is-unavailable .ct-product__media img,
+.ct-product.is-unavailable .ct-product__name,
+.ct-product.is-unavailable .ct-price { opacity: .5; }
+
+/* ---------- Rodapé de pedido ---------- */
+.ct-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--ct-gap);
+    padding: 10px var(--ct-pad);
+    background: var(--ct-surface);
+    border-top: 1px solid var(--ct-line);
+}
+.ct-footer__summary { margin-right: auto; color: var(--ct-ink-2); font-size: var(--ct-text); }
+.ct-footer__total { display: block; color: var(--ct-ink); font-size: var(--ct-text-xl); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ---------- Folha (painel que sobe da base) e diálogo ---------- */
+.ct-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--cm-layer-modal-backdrop);
+    background: var(--ct-backdrop);
+}
+.ct-sheet {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--cm-layer-modal);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    color: var(--ct-ink);
+    background: var(--ct-surface);
+    border-radius: var(--ct-radius-sheet) var(--ct-radius-sheet) 0 0;
+    box-shadow: var(--ct-shadow-sheet);
+    animation: ct-sheet-in 260ms var(--ct-ease);
+}
+/* Centralizado (paisagem): mesmo conteúdo, no meio da tela. */
+.ct-sheet--center {
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    width: min(720px, calc(100vw - 48px));
+    max-height: calc(100vh - 48px);
+    border-radius: var(--ct-radius-sheet);
+    transform: translate(-50%, -50%);
+    animation: ct-fade-in 200ms var(--ct-ease);
+}
+.ct-sheet__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 8px 8px var(--ct-pad);
+    border-bottom: 1px solid var(--ct-line);
+}
+.ct-sheet__title { flex: 1; margin: 0; font-size: var(--ct-text-xl); font-weight: 700; }
+.ct-sheet__body { flex: 1; padding: var(--ct-pad); overflow-y: auto; }
+.ct-sheet__foot {
+    display: flex;
+    gap: var(--ct-gap);
+    padding: 12px var(--ct-pad);
+    background: var(--ct-surface-2);
+    border-top: 1px solid var(--ct-line);
+}
+.ct-sheet__foot .ct-btn { flex: 1; }
+.ct-sheet__foot .ct-btn--primary { flex: 2; }
+
+/* ---------- Opções (jornada, combo, observações) ---------- */
+.ct-options { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.ct-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: calc(var(--ct-target) + 8px);
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--ct-line);
+    cursor: pointer;
+}
+.ct-option__mark {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: transparent;
+    border: 2px solid var(--ct-ink-3);
+    border-radius: var(--ct-radius-tag);
+}
+.ct-option--radio .ct-option__mark { border-radius: 50%; }
+.ct-option__text { flex: 1; font-size: var(--ct-text-lg); }
+.ct-option__extra { color: var(--ct-ink-2); font-size: var(--ct-text); font-variant-numeric: tabular-nums; }
+.ct-option.is-selected,
+.ct-option[aria-checked="true"] { background: var(--ct-action-soft); }
+.ct-option.is-selected .ct-option__mark,
+.ct-option[aria-checked="true"] .ct-option__mark { color: var(--ct-on-action); background: var(--ct-action); border-color: var(--ct-action); }
+
+/* ---------- Campos (nome para chamada, observação livre, senha, número da comanda) ----------
+ * Rótulo sempre visível acima do campo; campo da altura do alvo de toque. O contorno de foco
+ * é o de .ct-app :focus-visible; a borda acompanha. */
+.ct-field { display: flex; flex-direction: column; gap: 6px; }
+.ct-field__label { color: var(--ct-ink-2); font-size: var(--ct-text-sm); font-weight: 600; }
+.ct-field__required { color: var(--ct-action-ink); }
+.ct-field__hint { color: var(--ct-ink-3); font-size: var(--ct-text-sm); }
+.ct-field__error { display: flex; align-items: center; gap: 6px; color: var(--ct-danger); font-size: var(--ct-text-sm); font-weight: 600; }
+.ct-input {
+    display: block;
+    width: 100%;
+    min-height: var(--ct-target);
+    padding: 10px 14px;
+    color: var(--ct-ink);
+    background: var(--ct-surface-2);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-control);
+    font-size: var(--ct-text-lg);
+    line-height: 1.3;
+}
+textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
+.ct-input::placeholder { color: var(--ct-ink-3); opacity: 1; }
+.ct-input:focus { border-color: var(--ct-focus); }
+.ct-input:disabled { color: var(--ct-disabled-ink); cursor: not-allowed; }
+.ct-field.is-invalid .ct-input,
+.ct-input[aria-invalid="true"] { border-color: var(--ct-danger); }
+
+/* Caixa de seleção de toque: a linha inteira é o alvo; a caixa nativa, ampliada, na cor de ação. */
+.ct-check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: var(--ct-target);
+    color: var(--ct-ink);
+    font-size: var(--ct-text);
+    cursor: pointer;
+}
+.ct-check input { flex: 0 0 auto; width: 24px; height: 24px; margin: 0; accent-color: var(--ct-action); }
+
+/* ---------- Avisos ---------- */
+.ct-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px var(--ct-pad);
+    color: var(--ct-ink);
+    background: var(--ct-surface-2);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-control);
+    font-size: var(--ct-text);
+}
+.ct-notice .bi { flex: 0 0 auto; font-size: 1.25em; line-height: 1.1; }
+.ct-notice--success { color: var(--ct-success); background: var(--ct-success-soft); border-color: var(--ct-success-line); }
+.ct-notice--warning { color: var(--ct-warning); background: var(--ct-warning-soft); border-color: var(--ct-warning-line); }
+.ct-notice--danger { color: var(--ct-danger); background: var(--ct-danger-soft); border-color: var(--ct-danger-line); }
+
+/* Confirmação curta ("adicionado"), centralizada embaixo, some sozinha. */
+.ct-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    z-index: var(--cm-layer-toast);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    color: var(--ct-success);
+    background: var(--ct-success-soft);
+    border: 1px solid var(--ct-success-line);
+    border-radius: var(--ct-radius-control);
+    box-shadow: var(--ct-shadow-sheet);
+    font-size: var(--ct-text-lg);
+    font-weight: 600;
+    transform: translateX(-50%);
+    animation: ct-fade-in 200ms var(--ct-ease);
+}
+
+.ct-empty { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 48px 24px; color: var(--ct-ink-2); text-align: center; }
+.ct-empty .bi { color: var(--ct-ink-3); font-size: calc(var(--ct-text-display) * .9); }
+.ct-spin { display: inline-block; animation: ct-spin 1s linear infinite; }
+
+/* ---------- Cartão de pedido (KDS) ----------
+ * O cabeçalho leva a cor do tipo de pedido (paleta curada) com texto branco; a urgência nunca é só cor:
+ * borda + faixa com ícone e rótulo. --ct-order-color pode vir da configuração (sempre da paleta). */
+.ct-orders {
+    display: grid;
+    grid-template-columns: repeat(var(--ct-cols, 4), minmax(0, 1fr));
+    align-items: start;
+    gap: var(--ct-gap);
+    padding: var(--ct-pad);
+}
+.ct-order {
+    --ct-order-color: var(--ct-order-outro);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    background: var(--ct-surface);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-card);
+}
+.ct-order--balcao { --ct-order-color: var(--ct-order-balcao); }
+.ct-order--retirada { --ct-order-color: var(--ct-order-retirada); }
+.ct-order--entrega { --ct-order-color: var(--ct-order-entrega); }
+.ct-order--mesa { --ct-order-color: var(--ct-order-mesa); }
+.ct-order--ficha { --ct-order-color: var(--ct-order-ficha); }
+.ct-order__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: var(--ct-target);
+    padding: 8px 12px;
+    color: #fff;
+    background: var(--ct-order-color);
+}
+.ct-order__type { display: inline-flex; align-items: center; gap: 6px; font-size: var(--ct-text-sm); font-weight: 600; }
+.ct-order__ticket { margin-right: auto; font-family: var(--cm-mono); font-size: var(--ct-text-xl); font-weight: 700; font-variant-numeric: tabular-nums; }
+.ct-order__timer { font-family: var(--cm-mono); font-size: var(--ct-text-lg); font-weight: 700; font-variant-numeric: tabular-nums; }
+.ct-order__meta { padding: 6px 12px; color: var(--ct-ink-2); background: var(--ct-surface-2); border-bottom: 1px solid var(--ct-line); font-size: var(--ct-text-sm); }
+.ct-order__urgency {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    font-size: var(--ct-text-sm);
+    font-weight: 700;
+}
+.ct-order__items { margin: 0; padding: 4px 0; list-style: none; }
+.ct-order__item { display: flex; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--ct-line); }
+.ct-order__item:last-child { border-bottom: 0; }
+.ct-order__qty { flex: 0 0 auto; min-width: 2.2em; font-family: var(--cm-mono); font-size: var(--ct-text-lg); font-weight: 700; font-variant-numeric: tabular-nums; }
+.ct-order__name { flex: 1; min-width: 0; font-size: var(--ct-text); font-weight: 600; }
+.ct-order__sub { display: block; margin-top: 2px; color: var(--ct-ink-2); font-size: var(--ct-text-sm); font-weight: 400; }
+/* Observação, alteração e alérgeno: fundo do estado + ícone + texto, no próprio item. */
+.ct-order__note,
+.ct-order__allergen {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 6px 8px;
+    border-radius: var(--ct-radius-tag);
+    font-size: var(--ct-text-sm);
+    font-weight: 600;
+}
+.ct-order__note { color: var(--ct-warning); background: var(--ct-warning-soft); }
+.ct-order__allergen { color: var(--ct-danger); background: var(--ct-danger-soft); }
+.ct-order__foot { display: flex; gap: 8px; margin-top: auto; padding: 10px 12px; border-top: 1px solid var(--ct-line); }
+.ct-order__foot .ct-btn { flex: 1; padding: 0 12px; }
+.ct-order__foot .ct-btn--primary { flex: 2; }
+/* Urgência: borda de 3 px numa camada por cima (o cartão não muda de tamanho ao atrasar) e faixa com
+ * ícone e rótulo. No atraso, um halo interno pulsa; com movimento reduzido, fica só a borda. */
+.ct-order--attention::after,
+.ct-order--late::after,
+.ct-order--late::before {
+    position: absolute;
+    inset: 0;
+    content: '';
+    border-radius: inherit;
+    pointer-events: none;
+}
+.ct-order--attention::after { border: 3px solid var(--ct-warning); }
+.ct-order--attention .ct-order__urgency { color: var(--ct-warning); background: var(--ct-warning-soft); }
+.ct-order--late::after { border: 3px solid var(--ct-danger); }
+.ct-order--late::before { border: 8px solid var(--ct-danger); opacity: 0; animation: ct-alert 1.2s ease-in-out infinite; }
+.ct-order--late .ct-order__urgency { color: var(--ct-danger); background: var(--ct-danger-soft); }
+/* Estados do pedido. */
+.ct-order.is-waiting { border-style: dashed; }
+.ct-order.is-canceled .ct-order__items,
+.ct-order.is-done { opacity: .55; }
+.ct-order.is-selected { outline: 3px solid var(--ct-focus); outline-offset: 2px; }
+
+/* ---------- Pedidos prontos (TV voltada ao cliente; usa o esquema do canal) ---------- */
+.ct-ready-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(calc(var(--ct-text-display) * 2.6), 1fr));
+    gap: var(--ct-gap);
+    padding: var(--ct-pad);
+}
+.ct-ready {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 18px 14px 0;
+    overflow: hidden;
+    background: var(--ct-surface);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-card);
+    text-align: center;
+}
+.ct-ready__type { display: inline-flex; align-items: center; gap: 8px; color: var(--ct-ink-2); font-size: var(--ct-text-sm); font-weight: 600; }
+.ct-ready__number { color: var(--ct-brand-ink); font-family: var(--cm-mono); font-size: var(--ct-text-display); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.ct-ready__name { max-width: 100%; overflow: hidden; color: var(--ct-ink); font-size: var(--ct-text); white-space: nowrap; text-overflow: ellipsis; }
+.ct-ready__expire { align-self: stretch; height: 6px; margin: 12px -14px 0; background: var(--ct-surface-2); }
+.ct-ready__expire > span { display: block; height: 100%; background: var(--ct-action); transform-origin: left; }
+
+/* ---------- Movimento ---------- */
+@keyframes ct-sheet-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes ct-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ct-spin { to { transform: rotate(360deg); } }
+@keyframes ct-alert { 0%, 100% { opacity: 0; } 50% { opacity: .45; } }
+
+/* Movimento reduzido: sem deslocamento nem piscar; o alerta de atraso fica fixo (borda e faixa continuam). */
+@media (prefers-reduced-motion: reduce) {
+    .ct-sheet,
+    .ct-sheet--center,
+    .ct-toast { animation: ct-fade-in 1ms linear; }
+    .ct-btn,
+    .ct-icon-btn { transition: none; }
+    .ct-btn:active:not(:disabled),
+    .ct-icon-btn:active:not(:disabled),
+    .ct-qty__btn:active:not(:disabled) { transform: none; }
+    .ct-order--late::before { animation: none; }
+    .ct-spin { animation: none; }
+}

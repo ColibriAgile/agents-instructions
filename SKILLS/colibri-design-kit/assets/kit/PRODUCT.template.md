@@ -34,7 +34,7 @@ Estações Windows, à luz de escritório, muitas vezes com a janela reduzida at
 
 ## Brand Commitments
 
-Linha visual Colibri ("Mesa de operação"), definida pelo Colibri Design Kit e registrada em `DESIGN.md`, com a marca-d'água do colibri colorido na página inicial.
+Linha visual Colibri, perfil Admin, definida pelo Colibri Design Kit e registrada em `DESIGN.md`, com a marca-d'água do colibri colorido na página inicial.
 
 Personalidade: sóbrio, preciso e discreto. A linguagem é direta e operacional; informação e ação têm prioridade sobre ornamentação.
 
