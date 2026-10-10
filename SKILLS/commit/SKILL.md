@@ -1,6 +1,6 @@
 ---
 name: commit
-description: 'Cria commits no padrão conventional commits (título + descrição em bullets), tratando primeiro os submódulos com alterações pendentes e depois o repositório principal, e oferece remover do git os artefatos SDD (`tasks/prd-*/`) de features já concluídas. Use quando o usuário pedir para commitar, fazer commit, salvar alterações no git, gerar mensagem de commit, ou usar /commit. Só envia ao remoto quando o argumento `push`/`--push` for informado.'
+description: 'Cria commits no padrão conventional commits (título + descrição em bullets), tratando primeiro os submódulos com alterações pendentes e depois o repositório principal, e oferece remover do git os artefatos SDD (`tasks/prd-*/`) de features já concluídas, movendo antes os ADRs delas para `docs/adr/`. Use quando o usuário pedir para commitar, fazer commit, salvar alterações no git, gerar mensagem de commit, ou usar /commit. Só envia ao remoto quando o argumento `push`/`--push` for informado.'
 argument-hint: '[--push|--enviar] [contexto opcional sobre o que foi feito]'
 disable-model-invocation: true
 ---
@@ -48,13 +48,13 @@ Classifique cada `tasks/prd-[slug]/` pela primeira linha que decidir:
 
 Feature em andamento nunca é oferecida. Para cada concluída ou indeterminada, levante antes de perguntar o que a remoção levaria embora sem registro em outro lugar:
 
-- candidatas a ADR nos handoffs (`### Candidatas a ADR` com conteúdo diferente de `Nenhuma`), com ID e título;
+- ADRs da pasta: candidatas nos handoffs de tasks e correções (`### Candidatas a ADR` com conteúdo diferente de `Nenhuma`) e arquivos de ADR soltos na pasta, com ID e título; elas não se perdem, porque o passo 7 as move para `docs/adr/` antes da remoção, e a pergunta informa o número que cada uma vai receber;
 - ressalvas aceitas e pendências registradas na última revisão ou em `workflow.md`;
 - arquivos não versionados na pasta (`git status --porcelain -- tasks/prd-[slug]/`), que a remoção apaga sem volta;
 - arquivos versionados fora da pasta que a citam (`git grep -lF "prd-[slug]" -- ":!tasks/prd-[slug]/"`; o slug sem barra também pega citações soltas), como README ou docs, que ficariam com links quebrados; recomende manter a feature ou levar antes o conteúdo citado para a documentação;
 - `checkpoint.json` com `mode: auto`: o aceite foi automático e nenhum humano viu a entrega; aponte o log de decisões (`decision_log`) para revisar antes de remover.
 
-Faça uma única pergunta para todos os repositórios, pela tool de perguntas disponível (`AskUserQuestion` em `multiSelect`) ou, sem ela, em texto com as mesmas opções. Uma opção por feature: repositório quando não for o principal, slug, classe com a evidência que a decidiu e, na descrição, os itens levantados acima. Indeterminada nunca vem marcada como recomendada. Quando houver candidata a ADR, recomende promovê-la antes e não remova a feature nesta execução se o usuário quiser promover. Com mais features do que cabem na ferramenta, pergunte em texto listando todas. Nenhuma seleção, "nenhuma" ou silêncio mantém tudo. Guarde a escolha para o passo 7; a pergunta acontece agora para que o resto da skill siga sem nova interrupção.
+Faça uma única pergunta para todos os repositórios, pela tool de perguntas disponível (`AskUserQuestion` em `multiSelect`) ou, sem ela, em texto com as mesmas opções. Uma opção por feature: repositório quando não for o principal, slug, classe com a evidência que a decidiu e, na descrição, os itens levantados acima. Indeterminada nunca vem marcada como recomendada. Com mais features do que cabem na ferramenta, pergunte em texto listando todas. Nenhuma seleção, "nenhuma" ou silêncio mantém tudo. Guarde a escolha para o passo 7; a pergunta acontece agora para que o resto da skill siga sem nova interrupção.
 
 ### 3. Para cada submódulo com alterações pendentes
 
@@ -127,11 +127,19 @@ Depois dos submódulos, volte à raiz e repita os passos 4 e 5. O commit do subm
 
 Só quando o passo 2 teve feature escolhida, depois do commit normal do repositório que a contém. Num submódulo, faça a remoção logo depois do commit dele, antes de voltar ao principal, para que o gitlink já inclua a remoção. A remoção vai num commit próprio para manter o commit da feature limpo e deixar os artefatos recuperáveis pelo histórico a partir do commit anterior.
 
-Para cada feature escolhida:
+Para cada feature escolhida, primeiro mova os ADRs e depois remova a pasta. Uma decisão arquitetural continua valendo depois que a feature conclui, e o handoff que a guarda sai junto com a pasta; levá-la para `docs/adr/` é o que a mantém como documentação durável.
 
-```bash
-git -C <repo> rm -r -q tasks/prd-<slug>/
-```
+1. **Mover ADRs.** Para cada ADR levantado no passo 2, exceto candidata que `workflow.md` ou a revisão registram como recusada:
+   - Siga a convenção de `docs/adr/` do repositório (numeração, título, seções), lendo um ADR existente; sem pasta ou sem ADR, crie-a com numeração sequencial `NNNN-slug.md` a partir do maior número existente, título curto e um parágrafo com contexto, decisão e motivo.
+   - Leve o conteúdo da candidata: alternativas e consequências só quando acrescentam algo; evidência como referência ao código, não ao artefato que será removido.
+   - Feche com uma linha de origem: `Origem: prd-<slug>, <TXX-ADR-NN>, artefatos até <hash curto>`.
+   - Decisão que já tem ADR em `docs/adr/` (mesma decisão ou a mesma origem) não é duplicada: cite o existente no relatório.
+   - `git -C <repo> add docs/adr/`.
+2. **Remover a pasta.**
+
+   ```bash
+   git -C <repo> rm -r -q tasks/prd-<slug>/
+   ```
 
 - Se o `git rm` recusar por alteração local (o usuário commitou só parte do stage no passo 4), pule essa feature e reporte; nada de `-f`.
 - Arquivos não versionados que sobrarem na pasta foram avisados na pergunta: apague a pasta restante.
@@ -143,7 +151,10 @@ Commite com título e idioma conforme o `git log`, e um bullet por feature citan
 chore(sdd): remove artefatos de features concluídas
 
 - prd-<slug>: artefatos até <hash curto>
+- docs/adr/NNNN-slug.md: ADR <TXX-ADR-NN> de prd-<slug>
 ```
+
+Os ADRs entram no mesmo commit da remoção para que a mudança seja um movimento: a decisão nunca fica fora do repositório entre dois commits.
 
 Nunca ofereça nem remova `tasks/triagem-log.jsonl`: é log de calibração da triagem, não artefato de feature.
 

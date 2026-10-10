@@ -69,7 +69,7 @@ Ao escalonar: conclua antes as unidades independentes, grave o checkpoint com `s
 | Conferência visual | Registra o roteiro como aceite manual pendente e segue para a revisão |
 | HIL 3 | Aceite automático, abaixo |
 
-**Aceite automático.** Com a última revisão `APROVADO`, ou `APROVADO COM RESSALVAS` com as ressalvas destinadas, nenhuma obrigação bloqueante aberta e nenhuma validação manual essencial pendente, marque o checkpoint `concluido`, o snapshot `encerrado` e registre no log `aceite automático` com o caminho da revisão. Conferência visual ou outra validação manual essencial pendente impede a conclusão: escalone, com o roteiro de aceite manual e o resumo do log no HIL 3. Candidatas a ADR e pendências aceitas entram no resumo final, porque a remoção futura dos artefatos as levaria junto.
+**Aceite automático.** Com a última revisão `APROVADO`, ou `APROVADO COM RESSALVAS` com as ressalvas destinadas, nenhuma obrigação bloqueante aberta e nenhuma validação manual essencial pendente, marque o checkpoint `concluido`, o snapshot `encerrado` e registre no log `aceite automático` com o caminho da revisão. Conferência visual ou outra validação manual essencial pendente impede a conclusão: escalone, com o roteiro de aceite manual e o resumo do log no HIL 3. Candidatas a ADR e pendências aceitas entram no resumo final: as candidatas serão movidas para `docs/adr/` quando a skill `commit` remover os artefatos, e as pendências aceitas sairiam junto com eles.
 
 ## Contexto e sessão
 
