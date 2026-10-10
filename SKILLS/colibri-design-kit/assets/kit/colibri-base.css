@@ -59,6 +59,15 @@
     --cm-shadow-drawer: -8px 0 24px rgba(18, 38, 63, .14);
     --cm-shadow-dialog: 0 12px 32px rgba(18, 38, 63, .18);
     --cm-backdrop: rgba(12, 30, 50, .4);
+    /* Paleta categórica dos gráficos (ordem fixa; DESIGN.md, seção 2, "Gráficos"). */
+    --cm-chart-1: #1b6ec2;
+    --cm-chart-2: #eb6834;
+    --cm-chart-3: #1baf7a;
+    --cm-chart-4: #eda100;
+    --cm-chart-5: #e87ba4;
+    --cm-chart-6: #008300;
+    --cm-chart-7: #4a3aa7;
+    --cm-chart-8: #e34948;
     --cm-ease: cubic-bezier(.22, 1, .36, 1);
 }
 
@@ -107,6 +116,12 @@
     --cm-shadow-drawer: -8px 0 24px rgba(0, 0, 0, .45);
     --cm-shadow-dialog: 0 12px 32px rgba(0, 0, 0, .5);
     --cm-backdrop: rgba(2, 10, 18, .6);
+    --cm-chart-2: #d95926;
+    --cm-chart-3: #199e70;
+    --cm-chart-4: #c98500;
+    --cm-chart-5: #d55181;
+    --cm-chart-7: #9085e9;
+    --cm-chart-8: #e66767;
 }
 
 /* ---------- Fontes locais (sem dependência de internet) ---------- */

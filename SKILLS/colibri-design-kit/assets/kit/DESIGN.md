@@ -51,6 +51,20 @@ colors:
   palette-petroleo: "#0e6d77"
   palette-marrom: "#7d5130"
   palette-grafite: "#4d5a68"
+  chart-1: "#1b6ec2"
+  chart-2: "#eb6834"
+  chart-3: "#1baf7a"
+  chart-4: "#eda100"
+  chart-5: "#e87ba4"
+  chart-6: "#008300"
+  chart-7: "#4a3aa7"
+  chart-8: "#e34948"
+  dark-chart-2: "#d95926"
+  dark-chart-3: "#199e70"
+  dark-chart-4: "#c98500"
+  dark-chart-5: "#d55181"
+  dark-chart-7: "#9085e9"
+  dark-chart-8: "#e66767"
 typography:
   page-title: { fontFamily: "Google Sans Flex", fontSize: "18px", fontWeight: 700, lineHeight: 1.2, letterSpacing: "-0.01em" }
   dialog-title: { fontFamily: "Google Sans Flex", fontSize: "16px", fontWeight: 650, lineHeight: 1.3 }
@@ -114,6 +128,7 @@ Os valores exatos estão no frontmatter e nos tokens `--cm-*` de `colibri-ui.css
 - **Azul de ação** (`action`): botão principal, link, seleção, item ativo de grupo de alternância (fundo `action-soft`).
 - **Neutros:** plano de trabalho (`page`), superfícies (`surface`, `surface-2`), divisores (`line`) e textos (`ink`, `ink-2`, `ink-3`). Texto de apoio nunca fica mais claro que `ink-3`.
 - **Estados** (`success`, `warning`, `danger`, cada um com fundo `-soft` e borda `-line`): sempre acompanhados de rótulo ou ícone, nunca só a cor.
+- **Gráficos:** medida única (uma série, barras de um ranking) no azul de ação. Séries que precisam de identidade própria (categorias, lojas comparadas) usam a paleta categórica `chart-1` a `chart-8` (`--cm-chart-*`), sempre nessa ordem, validada sobre `surface` nos dois temas (no escuro, `dark-chart-*` onde o valor muda); nunca cores locais. A cor não é a única pista: legenda ou rótulo direto em cada série. Eixos em `line-strong`, grade em `line`, textos em `ink-3` (11 px, algarismos tabulares) e a dica como camada do kit (superfície, divisor, sombra de menu).
 - **Lateral:** degradê `#043355 → #2aa3e7`; cabeçalho com o nome do produto em retângulo mais escuro (`#043354 → #0b2a41`); itens em `#d7d7d7`, peso regular; item ativo em branco sobre `rgba(255,255,255,.36)`; separadores em branco a 16%; versão no rodapé em 11 px, branco a 60%.
 - **Foco:** contorno azul-claro (`focus`) de 2 px em botões e links; em campos, borda `focus` com halo `0 0 0 3px rgba(96,165,232,.22)`. Em botões o contorno é **interno** (`outline-offset: -3px`), sozinho ou em grupo: o botão focado sobe acima dos vizinhos, inclusive do principal, e nada encobre o contorno. No botão principal e no destrutivo o contorno é claro (`rgba(255,255,255,.7)`). Links mantêm o contorno externo. Em campo unido a botão ou a prefixo/sufixo (`.cm-input-group`), o halo contorna o **conjunto**, nunca só o campo: o campo focado fica com a borda `focus`, acima do vizinho na emenda, e o halo envolve campo e botão juntos, sem ser cortado pelo botão nem invadi-lo. O campo com erro também fica acima do vizinho, para a borda `danger` aparecer inteira.
 
@@ -152,6 +167,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 - **Popups ficam fora da página.** Calendários, listas suspensas e diálogos das bibliotecas costumam ser anexados ao `<body>`, fora do contêiner da aplicação. Por isso a fonte é definida em `:root`/`body` e nas classes raiz dos componentes — nunca apenas num contêiner como `.cm-page` ou `.app`.
 - **Tamanho e peso também seguem a escala** (13 px corpo, 12 px rótulos e legendas, 600 em títulos de linha, 32 px de altura de controle; grades pela regra da grade como tabela, seção 7). No DevExpress Blazor, escolha o `SizeMode` mais próximo da escala e ajuste o restante por variáveis `--dxds-font-size-*`; no DevExtreme, prefira os temas *compact*.
 - **Fontes locais:** não carregue a fonte do tema da biblioteca (Roboto, Inter, Segoe via CDN ou pacote); as WOFF2 do kit bastam.
+- **Gráficos de biblioteca** (DevExtreme, c3 e similares) escrevem a fonte e as cores no SVG, fora do alcance do CSS: registre um tema de visualização com `--cm-font` (no DevExtreme, um claro e um escuro, trocados com o tema da aplicação) e passe a paleta da seção 2, "Gráficos".
 - **Verificação obrigatória:** abra o calendário e o seletor de hora de um campo de data/hora, uma lista suspensa, uma dica e uma mensagem de validação, e confira nas ferramentas do navegador (aba *Computed*, `font-family` e a fonte efetivamente renderizada) que todos usam Google Sans Flex. Repita ao atualizar a versão da biblioteca ou trocar o tema.
 
 ## 4. Elevação e movimento
@@ -175,13 +191,13 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 - **Tela de entrada (login) e páginas de erro** (`.cm-login`): ficam fora do shell, sobre o plano de trabalho (`page`), com a marca acima de um cartão.
   - **Marca:** `logos/colibri-marca.svg` (o colibri branco sobre o quadrado no degradê azul da lateral, o mesmo desenho do ícone da aba) com 36 px, seguida do nome do produto em 20 px peso 700 (`.cm-login__brand`). Use o SVG do kit sem alterar cores, recorte ou proporção. É a única marca da tela: o nome do produto na lateral continua sem ícone.
   - **Cartão** (`.cm-panel.cm-form.cm-login__card`, 360 px, 24 px de respiro): título de 18 px (`.cm-login__title`), uma linha de apoio (`.cm-login__text`), campos `.cm-field` e o botão principal na largura do cartão (`.cm-login__submit`). Credencial recusada: `.cm-notice--danger` acima dos campos e o campo marcado como inválido.
-  - **Páginas de erro** (404, 500, ambiente não encontrado, navegador não suportado): o mesmo cartão com `.cm-error`: ícone em `ink-3`, título com o código do erro, uma frase e um link de volta (`.cm-btn.cm-error__back`).
+  - **Páginas de erro** (404, 500, ambiente não encontrado, navegador não suportado): o mesmo cartão com `.cm-error` (`.cm-login__card.cm-error`, na cor do texto): ícone em `ink-3`, título com o código do erro, uma frase e um link de volta (`.cm-btn.cm-error__back`).
   - Sem degradê (é da lateral) e sem marca-d'água (é da página inicial). A página carrega só os ícones e `colibri-ui.css` (sem o CSS do framework nem o legado da aplicação) e aplica o tema gravado antes do primeiro desenho, como a aplicação.
 
 ## 6. Anatomia de página
 
 - A página **não repete** título nem subtítulo — a barra superior já nomeia a tarefa.
-- Primeira linha: `.cm-toolbar`. À esquerda, busca (`.cm-search`) ou texto curto de contexto (`.cm-section__hint--toolbar`). À direita (`.cm-toolbar__end`), faixa de estado (`.cm-notice`) e grupo de ações (`.cm-btn-group`).
+- Primeira linha: `.cm-toolbar`. À esquerda, busca (`.cm-search`) ou texto curto de contexto (`.cm-section__hint--toolbar`). À direita (`.cm-toolbar__end`), faixa de estado (`.cm-notice`) e grupo de ações (`.cm-btn-group`). Abaixo de 760 px a busca e o grupo ocupam cada um a linha inteira, e os botões do grupo dividem a largura.
 - Seções: `.cm-section__head` com título (`.cm-section__title`), contagem (`.cm-section__count`) e ferramentas à direita (`.cm-section__tools`).
 - **Estado:** conexões e situações usam `.cm-notice` (neutro, `--success`, `--warning`, `--danger`); erros bloqueantes usam `.cm-alert`. Contagens de resumo viram `.cm-tag` no cabeçalho da seção — e, quando fizer sentido, `.cm-tag-filter` para filtrar a lista. Nunca cartões de métrica.
 - **Cartões** (`.cm-cards` / `.cm-card`): apenas na página inicial e em resumos de poucos fatos. Pequenos e informativos: ícone + título + etiqueta de estado, um valor e no máximo uma linha de apoio. Cartão que leva a outra página é um link inteiro, com chevron.
@@ -251,7 +267,8 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 - **Diálogo** (`.cm-dialog`): cabeçalho branco com título de 16 px e fechar à direita, corpo com 16 px de respiro, rodapé em `surface-2` com botões agrupados. Campos no corpo usam `.cm-field`, com o rótulo junto do controle (letras a cerca de 4 px), como fora do diálogo. Tab circula dentro do diálogo, Enter aciona o botão padrão, Esc cancela. Prefira resolver no próprio conteúdo antes de abrir um diálogo.
 - **Botão padrão do diálogo:** é sempre o principal (à direita do grupo), inclusive em confirmações destrutivas (excluir, zerar): o diálogo já é o segundo passo, nomeia o alvo em negrito e Esc cancela. Com campos, o foco inicial vai para o primeiro campo e Enter em qualquer campo aciona o principal (envio do formulário). Sem campos, o principal recebe o foco ao abrir. Diálogo só de leitura, sem ação, não tem botão padrão: Esc fecha.
 - **Painel lateral** (`.cm-drawer`, aberto com `.is-open`): desliza da direita, 420 px, cabeçalho de 56 px, itens separados por divisores.
-- **Notificações:** canto superior direito, abaixo da barra superior; superfície branca, ícone colorido pelo estado, título de 13 px. Vale para qualquer biblioteca de notificação (angular-growl e pnotify estão no adaptador Bootstrap 3).
+- **Notificações:** canto superior direito, abaixo da barra superior; superfície branca, ícone colorido pelo estado, título de 13 px. Vale para qualquer biblioteca de notificação (angular-growl, pnotify 1.2 e PNotify 5 estão no adaptador Bootstrap 3).
+- **Ordem das camadas** (`--cm-layer-*`): menus, lateral e gaveta abaixo do diálogo (`--cm-layer-modal`, 1900); notificações acima de tudo (`--cm-layer-toast`, 2000). Popups de biblioteca abertos dentro de um diálogo (lista suspensa, calendário, dica) ficam entre os dois: no DevExtreme, `DevExpress.ui.dxOverlay.baseZIndex(1950)` (o padrão, 1500, fica atrás do diálogo).
 - **Menu suspenso** (`.cm-menu`): superfície branca, itens de 32 px, item atual em azul com marca.
 
 ### Ícones

@@ -1,6 +1,8 @@
 /*
- * Colibri UI — adaptador para Bootstrap 3, AngularJS, angular-growl, pnotify (pnotify-colibri 1.2), chosen e Dropzone.
- * Opcional: carregue depois do CSS do Bootstrap e de colibri-ui.css somente se o projeto usar essas bibliotecas.
+ * Colibri UI — adaptador para Bootstrap 3, AngularJS, angular-growl, pnotify (pnotify-colibri 1.2 e PNotify 5 com o
+ * módulo bootstrap3), chosen (com ou sem o chosen-bootstrap.css), bootstrap-daterangepicker 2.1, c3 e Dropzone.
+ * Opcional: carregue depois do CSS do Bootstrap e das bibliotecas, e depois de colibri-ui.css, somente se o projeto
+ * usar essas bibliotecas; os blocos de cada biblioteca empatam em especificidade com o CSS dela e vencem pela ordem.
  * Para Bootstrap 4/5 ou outro framework, use este arquivo como referência dos ajustes necessários.
  */
 .btn,
@@ -25,6 +27,16 @@
 textarea.form-control { height: auto; padding: 8px 10px; }
 .form-control:focus { border-color: var(--cm-focus); box-shadow: var(--cm-focus-ring); }
 .form-control::placeholder { color: var(--cm-ink-3); opacity: 1; }
+/* Somente leitura e desabilitado: o bootstrap.css pinta #eee fixo (claro no tema escuro, com o texto quase
+   invisível); mesmo visual do .cm-input[readonly] e :disabled. */
+.form-control[readonly] { color: var(--cm-ink-2); background: var(--cm-surface-2); }
+.form-control[disabled],
+fieldset[disabled] .form-control {
+    color: var(--cm-disabled-ink);
+    background: var(--cm-surface-2);
+    border-color: var(--cm-line);
+    cursor: not-allowed;
+}
 .input-group-addon {
     color: var(--cm-ink-3);
     background: var(--cm-surface-2);
@@ -267,8 +279,9 @@ textarea.form-control { height: auto; padding: 8px 10px; }
     line-height: 1.5;
 }
 /* Rótulo solto e .control-label do Bootstrap; o .cm-field__label fica fora (a margem somava 6 px ao gap do
-   .cm-field e afastava o rótulo do controle). */
-.modal-body label:not(.cm-field__label),
+   .cm-field e afastava o rótulo do controle), e a caixa de seleção e a alternância também (o rótulo as deixava em
+   12 px negrito, com mais especificidade que as regras delas logo abaixo). */
+.modal-body label:not(.cm-field__label):not(.cm-check):not(.cm-toggle),
 .modal-body .control-label {
     margin-bottom: 6px;
     color: var(--cm-ink-2);
@@ -283,6 +296,7 @@ textarea.form-control { height: auto; padding: 8px 10px; }
     font-size: 13px;
     font-weight: 400;
 }
+.modal-body .cm-check--nested { margin-left: 24px; }
 .modal-body .cm-check:has(input:disabled) { color: var(--cm-ink-3); }
 .modal-body .cm-toggle {
     margin: 0;
@@ -437,6 +451,65 @@ textarea.form-control { height: auto; padding: 8px 10px; }
 }
 .ui-pnotify .ui-pnotify-sticker { display: none; }
 
+/* ---------- PNotify 5 (@pnotify/core com o módulo bootstrap3 e os ícones bootstrap3) ----------
+ * Mesma anatomia do bloco anterior; no PNotify 5 título e texto ficam dentro de .pnotify-content. */
+.pnotify .pnotify-container.alert {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    align-items: start;
+    gap: 2px 10px;
+    padding: 11px 40px 11px 12px;
+    color: var(--cm-ink);
+    background: var(--cm-surface);
+    border: 1px solid var(--cm-line);
+    border-radius: var(--cm-radius);
+    box-shadow: var(--cm-shadow-menu);
+    font-family: var(--cm-font);
+    text-shadow: none;
+}
+.pnotify .pnotify-container::after { display: none; }
+.pnotify .pnotify-icon { grid-column: 1; float: none; margin: 1px 0 0; }
+.pnotify .pnotify-icon > span { display: block; float: none; top: 0; font-size: 16px; line-height: 1; }
+.pnotify .pnotify-icon > .glyphicon::before { font-family: 'bootstrap-icons'; }
+.pnotify .pnotify-icon > .glyphicon-warning-sign::before { content: '\f622'; color: var(--cm-danger); }
+.pnotify .pnotify-icon > .glyphicon-exclamation-sign::before { content: '\f33a'; color: var(--cm-warning); }
+.pnotify .pnotify-icon > .glyphicon-info-sign::before { content: '\f430'; color: var(--cm-accent-ink); }
+.pnotify .pnotify-icon > .glyphicon-ok-sign::before { content: '\f26a'; color: var(--cm-success); }
+.pnotify.pnotify-with-icon .pnotify-container .pnotify-content { grid-column: 2; margin: 0; }
+.pnotify .pnotify-title {
+    margin: 0;
+    color: var(--cm-ink);
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.35;
+}
+.pnotify .pnotify-text {
+    color: var(--cm-ink-2);
+    font-size: 13px;
+    line-height: 1.45;
+}
+.pnotify .pnotify-closer {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    margin: 0;
+    color: var(--cm-ink-3);
+    border-radius: var(--cm-radius-sm);
+}
+.pnotify .pnotify-closer:hover { color: var(--cm-ink); background: var(--cm-muted-soft); }
+.pnotify .pnotify-closer > .glyphicon { display: none; }
+.pnotify .pnotify-closer::before {
+    content: '\f659';
+    font-family: 'bootstrap-icons';
+    font-size: 14px;
+    line-height: 1;
+}
+.pnotify .pnotify-sticker { display: none; }
+
 /* ---------- chosen (seleção simples e múltipla) ----------
  * O chosen.css pinta campo, etiquetas e lista em branco e cinza fixos, que ficam claros no tema escuro. Mesmo
  * campo do .cm-input (borda, raio, foco com o halo azul-claro), opções escolhidas como etiqueta azul e lista
@@ -480,3 +553,147 @@ textarea.form-control { height: auto; padding: 8px 10px; }
 .chosen-container .chosen-results li.highlighted { color: var(--cm-ink); background: var(--cm-hover); }
 .chosen-container .chosen-results li.no-results { color: var(--cm-ink-3); background: transparent; }
 .chosen-container-multi .chosen-drop .result-selected { color: var(--cm-ink-3); }
+
+/* ---------- chosen com o chosen-bootstrap.css ----------
+ * O chosen-bootstrap.css pinta "select.form-control + .chosen-container…" em branco e cinza fixos, com mais
+ * especificidade que o bloco anterior (no tema escuro os campos ficam brancos). Os mesmos tokens, no seletor dele. */
+select.form-control + .chosen-container-multi .chosen-choices,
+select.form-control + .chosen-container.chosen-container-single .chosen-single,
+select.form-control + .chosen-container .chosen-search input[type=text] {
+    color: var(--cm-ink);
+    background: var(--cm-surface);
+    border: 1px solid var(--cm-btn-line);
+    border-radius: var(--cm-btn-radius);
+    box-shadow: none;
+}
+select.form-control + .chosen-container.chosen-container-single .chosen-single { height: var(--cm-control-h); font-size: 13px; }
+select.form-control + .chosen-container.chosen-container-single .chosen-single div { color: var(--cm-ink-2); }
+select.form-control + .chosen-container .chosen-results { background: transparent; }
+select.form-control + .chosen-container-multi .chosen-choices li.search-field input[type="text"] { color: var(--cm-ink); }
+select.form-control + .chosen-container-multi .chosen-choices li.search-field input[type="text"].default,
+select.form-control + .chosen-container.chosen-container-single .chosen-default { color: var(--cm-ink-3); }
+select.form-control + .chosen-container-multi .chosen-choices li.search-choice {
+    color: var(--cm-accent-ink);
+    background: var(--cm-accent-soft);
+    border: 1px solid var(--cm-accent-line);
+    border-radius: 10px;
+    box-shadow: none;
+}
+select.form-control + .chosen-container-multi.chosen-container-active .chosen-choices,
+select.form-control + .chosen-container.chosen-container-single.chosen-container-active .chosen-single,
+select.form-control + .chosen-container .chosen-search input[type=text]:focus {
+    border-color: var(--cm-focus);
+    box-shadow: var(--cm-focus-ring);
+}
+select.form-control + .chosen-container .chosen-drop {
+    color: var(--cm-ink);
+    background: var(--cm-surface);
+    border: 1px solid var(--cm-line);
+    box-shadow: var(--cm-shadow-menu);
+}
+select.form-control + .chosen-container .chosen-results li,
+select.form-control + .chosen-container .chosen-results li.active-result { color: var(--cm-ink); background: transparent; }
+select.form-control + .chosen-container .chosen-results li:hover,
+select.form-control + .chosen-container .chosen-results li.active-result:hover,
+select.form-control + .chosen-container .chosen-results li.highlighted { color: var(--cm-ink); background: var(--cm-hover); }
+select.form-control + .chosen-container-multi .chosen-results li.result-selected { color: var(--cm-ink-3); }
+
+/* ---------- Seletor de período (bootstrap-daterangepicker 2.1) ----------
+ * Camada do kit nos dois temas: superfície, dias do intervalo em azul-claro, escolhidos no azul de ação, atalhos
+ * como itens de menu e Cancelar | Aplicar como grupo (regra dos botões adjacentes, principal à direita; o
+ * daterangepicker põe o Aplicar primeiro no HTML). */
+.daterangepicker {
+    z-index: var(--cm-layer-dropdown, 1050);
+    color: var(--cm-ink);
+    background: var(--cm-surface);
+    border: 1px solid var(--cm-line);
+    border-radius: var(--cm-radius);
+    box-shadow: var(--cm-shadow-menu);
+    font-family: var(--cm-font);
+    font-size: 13px;
+}
+.daterangepicker:before { border-bottom-color: var(--cm-line); }
+.daterangepicker:after { border-bottom-color: var(--cm-surface); }
+.daterangepicker.dropup:before { border-top-color: var(--cm-line); }
+.daterangepicker.dropup:after { border-top-color: var(--cm-surface); }
+.daterangepicker .calendar-table { background: var(--cm-surface); border-color: var(--cm-surface); }
+.daterangepicker td,
+.daterangepicker th { font-variant-numeric: tabular-nums; }
+.daterangepicker td.available:hover,
+.daterangepicker th.available:hover { color: var(--cm-ink); background: var(--cm-hover); }
+.daterangepicker td.off,
+.daterangepicker td.off.in-range,
+.daterangepicker td.off.start-date,
+.daterangepicker td.off.end-date { color: var(--cm-ink-3); background: var(--cm-surface); }
+.daterangepicker td.in-range { color: var(--cm-ink); background: var(--cm-accent-soft); }
+.daterangepicker td.active,
+.daterangepicker td.active:hover { color: #fff; background: var(--cm-accent); }
+.daterangepicker td.disabled { color: var(--cm-ink-3); }
+.daterangepicker select {
+    color: var(--cm-ink);
+    background: var(--cm-surface);
+    border: 1px solid var(--cm-line-strong);
+    border-radius: var(--cm-btn-radius);
+}
+.daterangepicker .input-mini {
+    color: var(--cm-ink);
+    background: var(--cm-surface);
+    border-color: var(--cm-line-strong);
+    border-radius: var(--cm-btn-radius);
+    font-family: var(--cm-mono);
+}
+.daterangepicker .input-mini.active { border-color: var(--cm-focus); }
+.daterangepicker .ranges li {
+    color: var(--cm-ink);
+    background: transparent;
+    border: 0;
+    border-radius: var(--cm-radius-sm);
+}
+.daterangepicker .ranges li:hover { color: var(--cm-ink); background: var(--cm-accent-soft); }
+.daterangepicker .ranges li.active { color: var(--cm-accent-ink); background: var(--cm-accent-soft); font-weight: 600; }
+.daterangepicker .range_inputs { display: flex; flex-direction: row-reverse; justify-content: flex-end; }
+.daterangepicker .range_inputs .btn {
+    flex: 1 1 0;
+    height: 28px;
+    margin: 0;
+    color: var(--cm-btn-ink);
+    background: var(--cm-surface);
+    border: 1px solid var(--cm-btn-line);
+    border-radius: var(--cm-btn-radius) 0 0 var(--cm-btn-radius);
+    font-size: 13px;
+}
+.daterangepicker .range_inputs .cancelBtn { margin-right: -1px; }
+.daterangepicker .range_inputs .applyBtn {
+    position: relative;
+    z-index: 1;
+    color: #fff;
+    background: var(--cm-accent);
+    border-color: var(--cm-accent-border);
+    border-radius: 0 var(--cm-btn-radius) var(--cm-btn-radius) 0;
+}
+
+/* ---------- Gráficos c3 ----------
+ * Texto, eixos, grade e dica com os tokens, nos dois temas. O c3 escreve o fill dos rótulos de dados como estilo
+ * inline (por isso o !important). Cor das séries: --cm-chart-* (DESIGN.md, seção 2, "Gráficos"). */
+.c3 svg { font: 11px var(--cm-font); }
+.c3 text { fill: var(--cm-ink-3); }
+.c3 path.domain,
+.c3 .tick line { stroke: var(--cm-line-strong); }
+.c3-grid line { stroke: var(--cm-line); }
+.c3-chart-texts text,
+.c3-text { fill: var(--cm-ink) !important; font-size: 11px; }
+.c3-legend-item text { fill: var(--cm-ink-2); font-size: 11px; }
+.c3-chart-arc path { stroke: var(--cm-surface); stroke-width: 2px; }
+.c3-chart-arc text { fill: #fff; font-size: 11px; }
+.c3-tooltip {
+    color: var(--cm-ink);
+    background: var(--cm-surface);
+    border: 1px solid var(--cm-line);
+    border-radius: var(--cm-radius);
+    box-shadow: var(--cm-shadow-menu);
+    opacity: 1;
+    font-family: var(--cm-font);
+}
+.c3-tooltip th { color: var(--cm-ink-2); background: var(--cm-surface-2); font-size: 12px; font-weight: 600; }
+.c3-tooltip td { color: var(--cm-ink); background: var(--cm-surface); border-left-color: var(--cm-line); font-size: 12px; }
+.c3-tooltip tr { border-color: var(--cm-line); }
