@@ -1777,7 +1777,10 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
         font-size: 11px;
     }
     .cm-search { width: 100%; }
-    .cm-toolbar__end { margin-left: 0; }
+    .cm-toolbar__end { width: 100%; margin-left: 0; }
+    /* O grupo de ações da barra ocupa a linha e os botões dividem a largura (não quebram um embaixo do outro). */
+    .cm-toolbar__end > .cm-btn-group { display: flex; flex: 1 1 100%; }
+    .cm-toolbar__end > .cm-btn-group > .cm-btn { flex: 1 1 0; min-width: 0; padding: 0 8px; }
     .cm-topbar__action > span { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1965,11 +1968,14 @@ label { font-weight: inherit; }
 .cm-login__text { margin: 0; color: var(--cm-ink-2); font-size: 13px; }
 .cm-login__submit { width: 100%; }
 .cm-login__card[hidden] { display: none; }
-.cm-error {
+/* Página de erro: o cartão leva .cm-error junto com .cm-login__card. O .cm-error sozinho é o texto de erro em
+   danger (ao lado de .cm-ok); no cartão, título e texto voltam à cor do texto. */
+.cm-login__card.cm-error {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+    color: var(--cm-ink);
 }
 .cm-error__icon { color: var(--cm-ink-3); font-size: 24px; line-height: 1; }
 .cm-error__back { margin-top: 8px; text-decoration: none; }

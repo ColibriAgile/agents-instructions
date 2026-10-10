@@ -7,6 +7,9 @@
  * por isso as regras ficam em :root e nas classes raiz dos componentes, nunca num contêiner da página.
  * Grade e caixa de seleção do DevExtreme: mesma anatomia e mesmos tokens de .cm-table e da caixa de
  * seleção do kit, nos dois temas (DESIGN.md, seção 7, "Regra da grade como tabela").
+ * Fora do alcance deste CSS (configure no JavaScript do projeto; references/adocao-por-framework.md da skill):
+ * camada dos popups do DevExtreme (dxOverlay.baseZIndex(1950), entre o diálogo e as notificações do kit) e a
+ * fonte dos gráficos, escrita no SVG pelo tema de visualização.
  * Remova os blocos da biblioteca que o projeto não usa.
  */
 
