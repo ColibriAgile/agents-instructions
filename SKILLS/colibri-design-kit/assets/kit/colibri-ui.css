@@ -660,6 +660,31 @@ pre.log,
     flex-direction: column;
     gap: 20px;
 }
+/* ---------- Listas lado a lado ----------
+ * Seleção numa coluna e resultado na outra (.cm-lists > .cm-lists__col, cada coluna com o cabeçalho
+ * da seção e um .cm-panel ou .cm-table). Acima de 920 px a página ocupa a altura da área, cada coluna
+ * rola por dentro com o cabeçalho da tabela fixo e as duas terminam na mesma linha; abaixo, as colunas
+ * empilham e a página volta a rolar inteira. Colunas por --cm-lists-cols. */
+.cm-lists {
+    display: grid;
+    grid-template-columns: var(--cm-lists-cols, minmax(240px, 300px) minmax(0, 1fr));
+    align-items: start;
+    gap: 20px;
+}
+.cm-lists__col { min-width: 0; }
+@media (min-width: 921px) {
+    .cm-scroll:has(.cm-lists) { display: flex; flex-direction: column; }
+    .cm-scroll:has(.cm-lists) > .cm-content { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+    .cm-content > .cm-page:has(.cm-lists) { flex: 1 1 auto; min-height: 0; }
+    .cm-lists { flex: 1 1 auto; align-items: stretch; min-height: 320px; }
+    .cm-lists__col { display: flex; flex-direction: column; min-height: 0; }
+    .cm-lists__col > .cm-panel,
+    .cm-lists__col > .cm-table { flex: 1 1 auto; min-height: 0; overflow: auto; }
+    .cm-lists .cm-table__head { position: sticky; top: 0; z-index: 1; }
+}
+@media (max-width: 920px) {
+    .cm-lists { grid-template-columns: minmax(0, 1fr); }
+}
 .cm-toolbar {
     display: flex;
     align-items: center;
@@ -1097,6 +1122,9 @@ a.cm-card:hover .cm-card__go { color: var(--cm-accent-ink); transform: translate
 .cm-prose ol { margin: 0 0 8px; }
 .cm-prose ul,
 .cm-prose ol { padding-left: 20px; }
+/* Explícito: resets como o preflight do Tailwind zeram os marcadores de ul/ol. */
+.cm-prose ul { list-style: disc; }
+.cm-prose ol { list-style: decimal; }
 .cm-prose img { max-width: 100%; height: auto; }
 .cm-prose a { color: var(--cm-accent-ink); }
 
@@ -1889,6 +1917,8 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
 /* Em .cm-field o espaço entre rótulo e controle vem do gap (com o rótulo junto do controle, como fora do
    diálogo); a margem acima é para rótulo solto. */
 .cm-dialog__body .cm-field__label { margin: 0; }
+/* A busca é um label (.cm-search): sem a margem, a cor e o peso do rótulo solto. */
+.cm-dialog__body .cm-search { margin: 0; color: var(--cm-ink); font-size: 13px; font-weight: 400; }
 .cm-dialog__body .cm-field > .cm-field__label { margin-bottom: -4px; }
 .cm-dialog__body .cm-check {
     margin: 0;
@@ -1930,8 +1960,11 @@ label { font-weight: inherit; }
  * Fora do shell: plano de trabalho com a marca (logos/colibri-marca.svg, o quadrado azul com o colibri branco,
  * + nome do produto) acima de um cartão .cm-panel de 360 px. Sem degradê (é da lateral) e sem marca-d'água
  * (é da página inicial). As páginas de erro usam o mesmo cartão, com ícone, título, texto e link de volta. */
+/* Altura fixa e rolagem própria: html e body não rolam (o shell rola por dentro), e um cartão alto
+ * (passo a passo de erro) seria cortado em tela baixa. Vale no body e num contêiner da aplicação. */
 .cm-login {
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: auto;
     margin: 0;
     color: var(--cm-ink);
     background: var(--cm-bg);

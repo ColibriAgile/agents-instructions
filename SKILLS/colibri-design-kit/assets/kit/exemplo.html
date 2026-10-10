@@ -12,6 +12,8 @@
         .demo-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; align-items: start; }
         .demo-table { --cm-cols: minmax(200px, 2fr) minmax(110px, .8fr) minmax(100px, .8fr) 90px minmax(120px, 1fr) 104px; }
         .demo-dialog { max-width: 520px; }
+        .demo-lists-grupos { --cm-cols: minmax(120px, 1fr) 64px; }
+        .demo-lists-produtos { --cm-cols: 80px minmax(180px, 2fr) 110px; }
     </style>
 </head>
 <body>
@@ -344,6 +346,29 @@
     </div>
 </div>
 
+<template id="tpl-listas">
+    <div class="cm-toolbar">
+        <label class="cm-search"><i class="bi bi-search" aria-hidden="true"></i><input type="search" placeholder="Buscar produto" aria-label="Buscar produto"></label>
+    </div>
+    <div class="cm-lists">
+        <section class="cm-lists__col">
+            <div class="cm-section__head"><h2 class="cm-section__title">Grupos</h2><span class="cm-section__count">4</span></div>
+            <div class="cm-table demo-lists-grupos">
+                <div class="cm-table__head"><span>Grupo</span><span class="cm-cell--end">Itens</span></div>
+                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell cm-cell--main">Pratos</div><div class="cm-cell cm-cell--end cm-mono">30</div></div></div>
+                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell cm-cell--main">Bebidas</div><div class="cm-cell cm-cell--end cm-mono">12</div></div></div>
+                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell cm-cell--main">Sobremesas</div><div class="cm-cell cm-cell--end cm-mono">8</div></div></div>
+                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell cm-cell--main">Molhos e adicionais</div><div class="cm-cell cm-cell--end cm-mono">5</div></div></div>
+            </div>
+        </section>
+        <section class="cm-lists__col">
+            <div class="cm-section__head"><h2 class="cm-section__title">Pratos</h2><span class="cm-section__count">30</span></div>
+            <div class="cm-table demo-lists-produtos">
+                <div class="cm-table__head"><span class="cm-cell--end">Código</span><span>Produto</span><span class="cm-cell--end">Preço</span></div>
+            </div>
+        </section>
+    </div>
+</template>
 <script>
     function toggleSidebar() {
         var shell = document.getElementById('shell');
@@ -393,6 +418,17 @@
     if (location.hash === '#historico') { toggleDrawer(); }
     // Na aplicação, cm-page--home fica só na página inicial; aqui é ligada por #inicio.
     if (location.hash === '#inicio') { document.getElementById('page').classList.add('cm-page--home'); }
+    // Listas lado a lado: #listas troca a página pela do modelo abaixo.
+    if (location.hash === '#listas') {
+        var pagina = document.getElementById('page');
+        pagina.replaceChildren(document.getElementById('tpl-listas').content.cloneNode(true));
+        var linhas = '';
+        for (var i = 1; i <= 30; i++) {
+            linhas += '<div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell cm-cell--end cm-mono">' + (1000 + i) +
+                '</div><div class="cm-cell cm-cell--main">Produto de exemplo ' + i + '</div><div class="cm-cell cm-cell--end cm-mono">R$ ' + (10 + i) + ',90</div></div></div>';
+        }
+        pagina.querySelector('.demo-lists-produtos').insertAdjacentHTML('beforeend', linhas);
+    }
 </script>
 </body>
 </html>
