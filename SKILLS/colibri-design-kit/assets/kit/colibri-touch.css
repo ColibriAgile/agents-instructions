@@ -590,6 +590,8 @@
     background: var(--ct-brand);
     border-radius: var(--ct-radius-tag);
 }
+/* "a partir de" no preenchimento: a cor do texto dele (ink-3 sumiria sobre a marca). */
+.ct-price--fill .ct-price__from { color: inherit; }
 /* Foto apagada sob texto (tela de descanso): o fundo preto faz da opacidade um escurecimento. */
 .ct-media-dim { background: #000; }
 .ct-media-dim > img { opacity: .4; }
