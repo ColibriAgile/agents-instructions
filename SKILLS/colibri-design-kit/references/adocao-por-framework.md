@@ -69,7 +69,12 @@ $.pnotify({
 });
 ```
 
-`firstpos1: 64` põe a primeira notificação logo abaixo da barra superior de 56 px. Com o PNotify 5 (`@pnotify/core` com os módulos `bootstrap3` e ícones `bootstrap3`), o adaptador veste `.pnotify` da mesma forma; posição e largura vêm da pilha e das opções do PNotify 5, também no serviço. Se o serviço passar um ícone próprio (`icon: 'bi bi-…'`), dê também uma classe por tipo (`addclass`) e pinte o ícone pelo token do estado no CSS do projeto.
+`firstpos1: 64` põe a primeira notificação logo abaixo da barra superior de 56 px. Com o PNotify 5 (`@pnotify/core` com os módulos `bootstrap3` e ícones `bootstrap3`), o adaptador veste `.pnotify` da mesma forma. A pilha padrão do PNotify 5 abre no topo da janela, por cima da barra superior, com 360 px: ajuste-a uma vez, ao registrar os módulos (mantém o `maxOpen` da pilha padrão, uma notificação por vez):
+
+```js
+Object.assign(PNotify.defaultStack, {firstpos1: 64, firstpos2: 16, spacing1: 8, spacing2: 8});
+PNotify.defaults.width = 'min(calc(100vw - 32px), 380px)';
+``` Se o serviço passar um ícone próprio (`icon: 'bi bi-…'`), dê também uma classe por tipo (`addclass`) e pinte o ícone pelo token do estado no CSS do projeto.
 
 ## Comportamentos que o projeto precisa implementar
 
