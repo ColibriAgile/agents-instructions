@@ -279,9 +279,9 @@ fieldset[disabled] .form-control {
     line-height: 1.5;
 }
 /* Rótulo solto e .control-label do Bootstrap; o .cm-field__label fica fora (a margem somava 6 px ao gap do
-   .cm-field e afastava o rótulo do controle), e a caixa de seleção e a alternância também (o rótulo as deixava em
-   12 px negrito, com mais especificidade que as regras delas logo abaixo). */
-.modal-body label:not(.cm-field__label):not(.cm-check):not(.cm-toggle),
+   .cm-field e afastava o rótulo do controle), e a caixa de seleção, a alternância e a busca (.cm-search, também um
+   label) também (o rótulo as deixava em 12 px negrito, com mais especificidade que as regras delas). */
+.modal-body label:not(.cm-field__label):not(.cm-check):not(.cm-toggle):not(.cm-search),
 .modal-body .control-label {
     margin-bottom: 6px;
     color: var(--cm-ink-2);
