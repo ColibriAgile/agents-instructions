@@ -502,6 +502,122 @@
 }
 .ct-sheet__foot .ct-btn { flex: 1; }
 .ct-sheet__foot .ct-btn--primary { flex: 2; }
+/* Painel lateral (paisagem): a mesma folha, presa à direita na altura toda, para o que
+ * acompanha o cardápio sem escondê-lo (carrinho, sacola). Em retrato, use a folha que sobe. */
+.ct-sheet--side {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: min(448px, 100vw);
+    max-height: none;
+    border-left: 1px solid var(--ct-line);
+    border-radius: 0;
+    animation: ct-side-in 260ms var(--ct-ease);
+}
+
+/* ---------- Tela cheia dividida (escolhas passo a passo, combo) ----------
+ * O produto fica à vista à esquerda (foto, nome e descrição) e a tarefa à direita: título
+ * do passo, conteúdo rolável e o rodapé com a ação principal. Em retrato, a foto vai para
+ * cima, mais baixa. */
+.ct-split {
+    position: fixed;
+    inset: 0;
+    z-index: var(--cm-layer-modal);
+    display: flex;
+    color: var(--ct-ink);
+    background: var(--ct-bg);
+    animation: ct-fade-in 200ms var(--ct-ease);
+}
+.ct-split__aside {
+    display: flex;
+    flex: 0 0 35%;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--ct-surface);
+    border-right: 1px solid var(--ct-line);
+}
+.ct-split__media {
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    overflow: hidden;
+    color: var(--ct-ink-3);
+    background: var(--ct-surface-2);
+}
+.ct-split__media > img { width: 100%; height: 100%; object-fit: cover; }
+.ct-split__media > .bi { font-size: 56px; }
+.ct-split__tags { position: absolute; top: 12px; left: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.ct-split__info { padding: 12px var(--ct-pad); border-top: 1px solid var(--ct-line); }
+.ct-split__name { margin: 0; font-size: var(--ct-text-xl); font-weight: 700; line-height: 1.2; }
+.ct-split__desc { margin: 4px 0 0; color: var(--ct-ink-2); font-size: var(--ct-text-sm); line-height: 1.4; }
+.ct-split__main { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.ct-split__head { display: flex; align-items: flex-start; gap: 12px; padding: 8px 8px 8px var(--ct-pad); }
+.ct-split__heading { flex: 1; min-width: 0; padding-top: 8px; }
+.ct-split__title { margin: 0; font-size: var(--ct-text-xl); font-weight: 650; line-height: 1.2; }
+.ct-split__hint { margin: 2px 0 0; color: var(--ct-ink-2); font-size: var(--ct-text); }
+.ct-split__body { flex: 1; min-height: 0; padding: 0 var(--ct-pad) var(--ct-pad); overflow-y: auto; }
+.ct-split > .ct-split__main > .ct-footer { flex-shrink: 0; }
+@media (orientation: portrait) {
+    .ct-split { flex-direction: column; }
+    .ct-split__aside { flex: 0 0 auto; border-right: 0; border-bottom: 1px solid var(--ct-line); }
+    .ct-split__media { flex: 0 0 auto; height: 28vh; }
+}
+
+/* ---------- Texto sobre imagem (vitrine, tela de descanso, leitor de QR) ----------
+ * Exceção à cor por token: sobre foto ou câmera o fundo é a imagem, não o Ambiente do
+ * esquema. Texto branco com degradê ou véu escuro FIXOS, iguais em qualquer esquema; preço
+ * e ação continuam preenchidos nas cores do esquema (.ct-price--fill, .ct-btn--primary). */
+.ct-scrim {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 48px var(--ct-pad) var(--ct-pad);
+    color: #fff;
+    background: linear-gradient(to top, rgba(0, 0, 0, .85), rgba(0, 0, 0, .5) 55%, rgba(0, 0, 0, 0));
+}
+.ct-scrim__title { margin: 0; color: #fff; font-size: var(--ct-text-2xl); font-weight: 700; line-height: 1.15; text-shadow: 0 1px 2px rgba(0, 0, 0, .6); }
+.ct-scrim__text { margin: 4px 0 0; color: rgba(255, 255, 255, .85); font-size: var(--ct-text-sm); }
+.ct-price--fill {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 4px 10px;
+    color: var(--ct-on-brand);
+    background: var(--ct-brand);
+    border-radius: var(--ct-radius-tag);
+}
+/* Foto apagada sob texto (tela de descanso): o fundo preto faz da opacidade um escurecimento. */
+.ct-media-dim { background: #000; }
+.ct-media-dim > img { opacity: .4; }
+/* Leitor de QR: a câmera fica atrás da tela (.is-camera deixa o fundo transparente). Barras
+ * sólidas de superfície em cima e embaixo, legíveis sobre qualquer cena; mira branca com véu
+ * escuro em volta. */
+.ct-scan {
+    position: fixed;
+    inset: 0;
+    z-index: var(--cm-layer-modal);
+    display: flex;
+    flex-direction: column;
+    color: var(--ct-ink);
+    background: var(--ct-bg);
+}
+.ct-scan.is-camera { background: transparent; }
+.ct-scan__bar { display: flex; align-items: center; gap: 12px; padding: 8px var(--ct-pad); background: var(--ct-surface); }
+.ct-scan__bar--top { justify-content: space-between; border-bottom: 1px solid var(--ct-line); }
+.ct-scan__bar--bottom { flex-wrap: wrap; justify-content: center; border-top: 1px solid var(--ct-line); }
+.ct-scan__title { margin: 0; font-size: var(--ct-text-xl); font-weight: 700; }
+.ct-scan__view { position: relative; display: flex; flex: 1; align-items: center; justify-content: center; min-height: 0; overflow: hidden; }
+.ct-scan__aim {
+    width: max(224px, 35vmin);
+    height: max(224px, 35vmin);
+    border: 4px solid rgba(255, 255, 255, .9);
+    border-radius: var(--ct-radius-sheet);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, .45);
+}
 
 /* ---------- Opções (jornada, combo, observações) ---------- */
 .ct-options { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
@@ -733,6 +849,7 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
 
 /* ---------- Movimento ---------- */
 @keyframes ct-sheet-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes ct-side-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes ct-fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ct-spin { to { transform: rotate(360deg); } }
 @keyframes ct-alert { 0%, 100% { opacity: 0; } 50% { opacity: .45; } }
@@ -741,6 +858,8 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
 @media (prefers-reduced-motion: reduce) {
     .ct-sheet,
     .ct-sheet--center,
+    .ct-sheet--side,
+    .ct-split,
     .ct-toast { animation: ct-fade-in 1ms linear; }
     .ct-btn,
     .ct-icon-btn { transition: none; }

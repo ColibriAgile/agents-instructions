@@ -27,6 +27,14 @@
         .demo-scroll { flex: 1; min-height: 0; overflow-y: auto; }
         .demo-kds-bar { display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: var(--ct-surface); border-bottom: 1px solid var(--ct-line); }
         .demo-kds-bar strong { margin-right: auto; font-size: var(--ct-text-lg); }
+        /* Foto e câmera de mentira (o kit não traz imagens): só para mostrar o texto sobre imagem. */
+        .demo-feature { position: relative; height: 220px; margin: var(--ct-pad) var(--ct-pad) 0; overflow: hidden; border-radius: var(--ct-radius-card); }
+        .demo-foto { position: absolute; inset: 0; background: linear-gradient(135deg, #6b3d1c, #c98a3c 55%, #f0d08a); }
+        .demo-camera { background: linear-gradient(160deg, #5b6b73, #2e3a40 45%, #a59a86); }
+        .demo-lines { margin: 0; padding: 0; list-style: none; }
+        .demo-lines li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--ct-line); }
+        .demo-lines .demo-line__name { flex: 1; min-width: 0; font-size: var(--ct-text-lg); }
+        .demo-lines .ct-price { font-size: var(--ct-text-lg); }
     </style>
 </head>
 <body>
@@ -39,6 +47,7 @@
         </div>
         <div class="ct-header__actions">
             <button class="ct-btn ct-btn--ghost" type="button"><i class="bi bi-bell" aria-hidden="true"></i>Chamar garçom</button>
+            <button class="ct-btn" type="button" onclick="abrir('leitor-tablet')"><i class="bi bi-qr-code-scan" aria-hidden="true"></i>Ler comanda</button>
             <button class="ct-btn" type="button"><i class="bi bi-receipt" aria-hidden="true"></i>Minha conta</button>
         </div>
     </header>
@@ -52,6 +61,14 @@
             </ul>
         </nav>
         <div class="demo-scroll">
+            <article class="demo-feature" aria-label="Destaque da casa">
+                <div class="demo-foto" role="img" aria-label="Foto da moqueca"></div>
+                <div class="ct-scrim">
+                    <h3 class="ct-scrim__title">Moqueca da casa</h3>
+                    <p class="ct-scrim__text">Peixe do dia, leite de coco e dendê. Serve duas pessoas.</p>
+                    <span class="ct-price ct-price--fill">R$ 129,00</span>
+                </div>
+            </article>
             <div class="ct-products" style="--ct-cols: 3">
                 <article class="ct-product">
                     <div class="ct-product__media"><i class="bi bi-egg-fried" aria-hidden="true"></i><div class="ct-product__tags"><span class="ct-tag ct-tag--brand">Destaque</span></div></div>
@@ -66,7 +83,7 @@
                     <div class="ct-product__body">
                         <h3 class="ct-product__name">Combo executivo</h3>
                         <p class="ct-product__desc">Prato do dia, bebida e sobremesa.</p>
-                        <div class="ct-product__foot"><span class="ct-price"><span class="ct-price__from">a partir de</span>R$ 42,00</span><button class="ct-btn ct-btn--primary" type="button">Montar</button></div>
+                        <div class="ct-product__foot"><span class="ct-price"><span class="ct-price__from">a partir de</span>R$ 42,00</span><button class="ct-btn ct-btn--primary" type="button" onclick="abrir('passos-tablet')">Montar</button></div>
                     </div>
                 </article>
                 <article class="ct-product is-unavailable">
@@ -90,6 +107,7 @@
     </div>
     <footer class="ct-footer">
         <div class="ct-footer__summary">3 itens<span class="ct-footer__total">R$ 159,80</span></div>
+        <button class="ct-btn" type="button" onclick="abrir('carrinho-tablet')"><i class="bi bi-bag" aria-hidden="true"></i>Carrinho</button>
         <button class="ct-btn" type="button" onclick="abrir('folha-tablet')">Ver produto</button>
         <button class="ct-btn ct-btn--primary ct-btn--lg" type="button"><i class="bi bi-bag-check" aria-hidden="true"></i>Enviar pedido</button>
     </footer>
@@ -120,6 +138,70 @@
             </div>
         </section>
         <div class="ct-toast" role="status"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Risoto adicionado</div>
+    </div>
+    <div id="carrinho-tablet" hidden>
+        <div class="ct-backdrop" onclick="fechar('carrinho-tablet')"></div>
+        <aside class="ct-sheet ct-sheet--side" role="dialog" aria-modal="true" aria-labelledby="carrinho-tablet-titulo">
+            <div class="ct-sheet__head">
+                <h2 class="ct-sheet__title" id="carrinho-tablet-titulo">Seu pedido</h2>
+                <button class="ct-icon-btn" type="button" aria-label="Fechar" onclick="fechar('carrinho-tablet')"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+            </div>
+            <div class="ct-sheet__body">
+                <ul class="demo-lines">
+                    <li><span class="demo-line__name">Risoto de cogumelos</span><div class="ct-qty"><button class="ct-qty__btn" type="button" aria-label="Diminuir"><i class="bi bi-dash-lg" aria-hidden="true"></i></button><span class="ct-qty__value" aria-live="polite">2</span><button class="ct-qty__btn" type="button" aria-label="Aumentar"><i class="bi bi-plus-lg" aria-hidden="true"></i></button></div><span class="ct-price">R$ 117,80</span></li>
+                    <li><span class="demo-line__name">Combo executivo</span><div class="ct-qty"><button class="ct-qty__btn" type="button" aria-label="Diminuir"><i class="bi bi-dash-lg" aria-hidden="true"></i></button><span class="ct-qty__value" aria-live="polite">1</span><button class="ct-qty__btn" type="button" aria-label="Aumentar"><i class="bi bi-plus-lg" aria-hidden="true"></i></button></div><span class="ct-price">R$ 42,00</span></li>
+                </ul>
+            </div>
+            <div class="ct-sheet__foot">
+                <button class="ct-btn" type="button" onclick="fechar('carrinho-tablet')">Continuar</button>
+                <button class="ct-btn ct-btn--primary" type="button">Enviar · R$ 159,80</button>
+            </div>
+        </aside>
+    </div>
+    <div id="passos-tablet" hidden>
+        <section class="ct-split" role="dialog" aria-modal="true" aria-labelledby="passos-tablet-titulo">
+            <aside class="ct-split__aside">
+                <div class="ct-split__media"><i class="bi bi-basket" aria-hidden="true"></i><div class="ct-split__tags"><span class="ct-tag ct-tag--combo">Combo</span></div></div>
+                <div class="ct-split__info">
+                    <p class="ct-split__name">Combo executivo</p>
+                    <p class="ct-split__desc">Prato do dia, bebida e sobremesa.</p>
+                </div>
+            </aside>
+            <div class="ct-split__main">
+                <div class="ct-split__head">
+                    <div class="ct-split__heading">
+                        <h2 class="ct-split__title" id="passos-tablet-titulo">Escolha a bebida</h2>
+                        <p class="ct-split__hint">Passo 2 de 3 · escolha uma</p>
+                    </div>
+                    <button class="ct-icon-btn" type="button" aria-label="Fechar" onclick="fechar('passos-tablet')"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+                </div>
+                <div class="ct-split__body">
+                    <ul class="ct-options" role="radiogroup" aria-label="Bebida">
+                        <li class="ct-option ct-option--radio is-selected" role="radio" aria-checked="true"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Suco natural</span></li>
+                        <li class="ct-option ct-option--radio" role="radio" aria-checked="false"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Refrigerante lata</span></li>
+                        <li class="ct-option ct-option--radio" role="radio" aria-checked="false"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Água com gás</span></li>
+                        <li class="ct-option ct-option--radio" role="radio" aria-checked="false"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Cerveja long neck</span><span class="ct-option__extra">+ R$ 6,00</span></li>
+                    </ul>
+                </div>
+                <footer class="ct-footer">
+                    <button class="ct-btn" type="button">Voltar</button>
+                    <div class="ct-footer__summary">Combo executivo<span class="ct-footer__total">R$ 42,00</span></div>
+                    <button class="ct-btn ct-btn--primary ct-btn--lg" type="button">Próximo</button>
+                </footer>
+            </div>
+        </section>
+    </div>
+    <div id="leitor-tablet" hidden>
+        <section class="ct-scan is-camera" role="dialog" aria-modal="true" aria-labelledby="leitor-tablet-titulo">
+            <div class="ct-scan__bar ct-scan__bar--top">
+                <h2 class="ct-scan__title" id="leitor-tablet-titulo">Aponte para o QR da comanda</h2>
+                <button class="ct-icon-btn" type="button" aria-label="Fechar" onclick="fechar('leitor-tablet')"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+            </div>
+            <div class="ct-scan__view demo-camera"><div class="ct-scan__aim" aria-hidden="true"></div></div>
+            <div class="ct-scan__bar ct-scan__bar--bottom">
+                <button class="ct-btn" type="button"><i class="bi bi-keyboard" aria-hidden="true"></i>Digitar o número</button>
+            </div>
+        </section>
     </div>
 </div>
 
@@ -200,7 +282,7 @@
 </div>
 
 <div class="demo-bar" id="demo-bar">
-    <a href="#tablet">Tablet</a> · <a href="#totem">Totem</a> · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>) · <a href="#pronto">Pronto</a>
+    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>) · <a href="#totem">Totem</a> · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>) · <a href="#pronto">Pronto</a>
     <span id="demo-esquema" hidden>
         | <label>Ambiente <input type="color" id="s-ambiente" value="#0b1120"></label>
         <label>Ação <input type="color" id="s-acao" value="#f59e0b"></label>
@@ -214,13 +296,14 @@
 <script>
     function abrir(id) { document.getElementById(id).hidden = false; }
     function fechar(id) { document.getElementById(id).hidden = true; }
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') fechar('folha-tablet'); });
+    var camadas = ['folha', 'carrinho', 'passos', 'leitor'];
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') camadas.forEach(function (c) { fechar(c + '-tablet'); }); });
     function mostrar() {
         var h = location.hash.replace('#', '') || 'tablet';
         var id = h.split('-')[0];
         if (!document.getElementById(id)) id = 'tablet';
         document.querySelectorAll('.demo-surface').forEach(function (el) { el.classList.toggle('is-on', el.id === id); });
-        if (h.indexOf('folha') >= 0) abrir('folha-tablet');
+        camadas.forEach(function (c) { if (h.indexOf(c) >= 0) abrir(c + '-tablet'); });
         document.getElementById('demo-bar').hidden = h.indexOf('limpo') >= 0;
         document.dispatchEvent(new CustomEvent('demo:superficie', { detail: id }));
     }
