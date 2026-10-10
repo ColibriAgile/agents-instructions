@@ -533,6 +533,45 @@
 .ct-option.is-selected .ct-option__mark,
 .ct-option[aria-checked="true"] .ct-option__mark { color: var(--ct-on-action); background: var(--ct-action); border-color: var(--ct-action); }
 
+/* ---------- Campos (nome para chamada, observação livre, senha, número da comanda) ----------
+ * Rótulo sempre visível acima do campo; campo da altura do alvo de toque. O contorno de foco
+ * é o de .ct-app :focus-visible; a borda acompanha. */
+.ct-field { display: flex; flex-direction: column; gap: 6px; }
+.ct-field__label { color: var(--ct-ink-2); font-size: var(--ct-text-sm); font-weight: 600; }
+.ct-field__required { color: var(--ct-action-ink); }
+.ct-field__hint { color: var(--ct-ink-3); font-size: var(--ct-text-sm); }
+.ct-field__error { display: flex; align-items: center; gap: 6px; color: var(--ct-danger); font-size: var(--ct-text-sm); font-weight: 600; }
+.ct-input {
+    display: block;
+    width: 100%;
+    min-height: var(--ct-target);
+    padding: 10px 14px;
+    color: var(--ct-ink);
+    background: var(--ct-surface-2);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-control);
+    font-size: var(--ct-text-lg);
+    line-height: 1.3;
+}
+textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
+.ct-input::placeholder { color: var(--ct-ink-3); opacity: 1; }
+.ct-input:focus { border-color: var(--ct-focus); }
+.ct-input:disabled { color: var(--ct-disabled-ink); cursor: not-allowed; }
+.ct-field.is-invalid .ct-input,
+.ct-input[aria-invalid="true"] { border-color: var(--ct-danger); }
+
+/* Caixa de seleção de toque: a linha inteira é o alvo; a caixa nativa, ampliada, na cor de ação. */
+.ct-check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: var(--ct-target);
+    color: var(--ct-ink);
+    font-size: var(--ct-text);
+    cursor: pointer;
+}
+.ct-check input { flex: 0 0 auto; width: 24px; height: 24px; margin: 0; accent-color: var(--ct-action); }
+
 /* ---------- Avisos ---------- */
 .ct-notice {
     display: flex;
