@@ -85,6 +85,15 @@ for (const [, nome, cor] of paleta) {
     if (c < CONTRASTE.texto) falhar(`--ct-palette-${nome} ${cor} sobre branco = ${c.toFixed(2)}:1 (mínimo ${CONTRASTE.texto})`);
 }
 
+// Com o plano de cada tema como ambiente, o motor reproduz os neutros da base (a escada vem dela).
+for (const [nome, mapa] of [['claro', claro], ['escuro', escuro]]) {
+    const e = derivarEsquema({ ambiente: mapa.bg, acao: '#1b6ec2' });
+    for (const [ct, cm] of [['bg', 'bg'], ['surface', 'surface'], ['surface-2', 'surface-2'], ['line', 'line'], ['ink', 'ink'], ['ink-2', 'ink-2'], ['ink-3', 'ink-3']]) {
+        const longo = (h) => (h.length === 4 ? '#' + h[1] + h[1] + h[2] + h[2] + h[3] + h[3] : h);
+        if (e.tokens['--ct-' + ct] !== longo(mapa[cm])) falhar(`Tema ${nome}: --ct-${ct} = ${e.tokens['--ct-' + ct]}, mas a base tem --cm-${cm}: ${mapa[cm]}`);
+    }
+}
+
 // Esquema padrão = tema escuro Colibri: o fundo não pode ser ajustado.
 const padrao = derivarEsquema({});
 if (padrao.tokens['--ct-bg'] !== '#0b1822') falhar(`Esquema padrão: --ct-bg ${padrao.tokens['--ct-bg']} (esperado #0b1822, o plano do tema escuro)`);
@@ -103,7 +112,7 @@ if (falhas.length) {
     if (falhas.length > 40) console.error(` … e mais ${falhas.length - 40}`);
     process.exit(1);
 }
-console.log(`OK: estados iguais à base; paleta curada com ${paleta.length} cores legíveis com texto branco; ${combinacoes} combinações de sementes com contraste garantido (${comAjuste} com ajuste); sem APIs acima do Chrome 101.`);
+console.log(`OK: estados iguais à base; neutros dos temas claro e escuro reproduzidos; paleta curada com ${paleta.length} cores legíveis com texto branco; ${combinacoes} combinações de sementes com contraste garantido (${comAjuste} com ajuste); sem APIs acima do Chrome 101.`);
 for (const [nome, s] of [['padrão Colibri', {}], ['totem atual', { ambiente: '#0b1120', acao: '#f59e0b' }], ['tablet atual', { ambiente: '#020617', acao: '#f99c00' }], ['claro creme', { ambiente: '#fdf6e3', acao: '#c62828', marca: '#1b5e20' }]]) {
     const e = derivarEsquema(s);
     console.log(`  ${nome}: modo ${e.modo}; bg ${e.tokens['--ct-bg']}, surface ${e.tokens['--ct-surface']}, ink-3 ${e.tokens['--ct-ink-3']}, action ${e.tokens['--ct-action']}/${e.tokens['--ct-on-action']}, brand-ink ${e.tokens['--ct-brand-ink']}; ajustes: ${e.ajustes.map((a) => a.token).join(', ') || 'nenhum'}`);

@@ -144,28 +144,41 @@ function decidirModo(ambiente) {
     return contraste(ambiente, '#ffffff') >= contraste(ambiente, '#111111') ? 'dark' : 'light';
 }
 
-function neutros(bg, modo) {
-    var o = oklch(bg), c = Math.min(o.c, 0.08), tint = Math.min(o.c, 0.02);
-    if (modo === 'dark') {
-        return {
-            bg: bg,
-            surface: oklchParaHex({ l: o.l + 0.04, c: c, h: o.h }),
-            'surface-2': oklchParaHex({ l: o.l + 0.075, c: c, h: o.h }),
-            line: oklchParaHex({ l: o.l + 0.14, c: c, h: o.h }),
-            ink: oklchParaHex({ l: 0.95, c: tint, h: o.h }),
-            'ink-2': oklchParaHex({ l: 0.84, c: tint, h: o.h }),
-            'ink-3': oklchParaHex({ l: 0.74, c: tint, h: o.h })
-        };
+/* Escada dos neutros a partir do fundo, tirada dos temas do kit (colibri-base.css): com o
+ * plano do tema escuro (#0b1822) ou do claro (#f2f5f9) como ambiente, o motor devolve os
+ * tokens --cm-* desses temas; com outro ambiente, a mesma escada no matiz dele.
+ * Superfícies e linhas: degrau de luminosidade (l), croma proporcional ao do fundo (c) e
+ * desvio de matiz (h). Textos: luminosidade fixa (abs). Croma limitado para cores fortes. */
+var RAMPA = {
+    dark: {
+        surface: { l: 0.0414, c: 1.24, h: -0.1 },
+        'surface-2': { l: 0.0663, c: 1.43, h: 2.5 },
+        line: { l: 0.1354, c: 1.65, h: 0.7 },
+        ink: { abs: 0.9335, c: 0.41, h: 0.8 },
+        'ink-2': { abs: 0.7829, c: 0.86, h: 5.2 },
+        'ink-3': { abs: 0.6847, c: 1.12, h: 3.7 }
+    },
+    light: {
+        surface: { l: 0.031, c: 0, h: 0 },
+        'surface-2': { l: 0.0095, c: 0.73, h: 2.8 },
+        line: { l: -0.0588, c: 1.85, h: -3.4 },
+        ink: { abs: 0.2689, c: 4.29, h: -2.2 },
+        'ink-2': { abs: 0.4522, c: 4.66, h: -1.4 },
+        'ink-3': { abs: 0.544, c: 3.92, h: -2.9 }
     }
-    return {
-        bg: bg,
-        surface: oklchParaHex({ l: Math.min(1, o.l + 0.04), c: c * 0.4, h: o.h }),
-        'surface-2': oklchParaHex({ l: o.l - 0.035, c: c, h: o.h }),
-        line: oklchParaHex({ l: o.l - 0.12, c: c, h: o.h }),
-        ink: oklchParaHex({ l: 0.24, c: tint, h: o.h }),
-        'ink-2': oklchParaHex({ l: 0.4, c: tint, h: o.h }),
-        'ink-3': oklchParaHex({ l: 0.5, c: tint, h: o.h })
-    };
+};
+
+function neutros(bg, modo) {
+    var o = oklch(bg), rampa = RAMPA[modo], n = { bg: bg };
+    Object.keys(rampa).forEach(function (k) {
+        var p = rampa[k], texto = p.abs !== undefined;
+        n[k] = oklchParaHex({
+            l: texto ? p.abs : o.l + p.l,
+            c: Math.min(o.c * p.c, texto ? 0.035 : 0.08),
+            h: o.h + p.h
+        });
+    });
+    return n;
 }
 
 function textosDoModo(n, modo) {
