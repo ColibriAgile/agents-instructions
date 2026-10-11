@@ -15,7 +15,7 @@ Ligue o **modo push** sempre que a mensagem que invocou a skill contiver as pala
 
 - Rede só no **modo push**, e só com `git push`, `git fetch` e `git pull --rebase` (nunca `git merge` nem pull com merge). Fora do modo push, nada de rede.
 - **NUNCA** usar `--no-verify` ou `--no-gpg-sign`. Se um hook falhar, investigar e reportar, não contornar.
-- Preferir commit novo a `--amend`.
+- Preferir commit novo a `--amend`. Única exceção: corrigir a mensagem do commit recém-criado no passo 5, antes de qualquer push.
 - Não criar branch, não fazer checkout, não alterar o estado do working tree além do `git add` acordado e da remoção de artefatos SDD que o usuário escolher no passo 2.
 
 ## Procedimento
@@ -101,6 +101,7 @@ tipo(escopo): resumo no imperativo, minúsculo, sem ponto final
 - Alteração relevante 3
 ```
 
+- **Uma linha em branco entre o título e os bullets.** Sem ela, o Git lê a mensagem inteira como título (`%s`), e depois do push só reescrevendo o histórico se corrige.
 - Título ≤ 72 caracteres. Tipos: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `chore`, `build`, `ci`, `style`.
 - **Idioma e escopo seguem o `git log` do repositório em questão** — cada repo pode ter convenção própria; o submódulo pode diferir do principal.
 - Bullets descrevem *o que mudou e por quê*, não arquivo por arquivo. Um commit trivial (ex.: bump de referência de submódulo) pode ter só o título.
@@ -117,7 +118,24 @@ tipo(escopo): resumo
 '@
 ```
 
-No Bash, use heredoc equivalente (`git commit -F - <<'EOF'`).
+No Bash, use heredoc equivalente, com a mesma linha em branco:
+
+```bash
+git commit -F - <<'EOF'
+tipo(escopo): resumo
+
+- Bullet 1
+- Bullet 2
+EOF
+```
+
+Logo após cada commit, confira o título:
+
+```bash
+git log -1 --format=%s
+```
+
+A saída deve ser só a linha do título. Se trouxer texto dos bullets, faltou a linha em branco: refaça a mensagem com `git commit --amend -F -` (mesmo texto, agora com a linha em branco) e confira de novo antes de seguir. Esse é o único `--amend` permitido, e só antes do push.
 
 ### 6. Repositório principal
 
