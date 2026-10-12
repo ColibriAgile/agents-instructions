@@ -87,7 +87,7 @@
                     </div>
                 </article>
                 <article class="ct-product is-unavailable">
-                    <div class="ct-product__media"><i class="bi bi-fire" aria-hidden="true"></i><div class="ct-product__tags"><span class="ct-tag">Indisponível hoje</span></div></div>
+                    <div class="ct-product__media"><i class="bi bi-fire" aria-hidden="true"></i><div class="ct-product__tags"><span class="ct-tag ct-tag--warning"><i class="bi bi-slash-circle" aria-hidden="true"></i>Indisponível hoje</span></div></div>
                     <div class="ct-product__body">
                         <h3 class="ct-product__name">Picanha na chapa</h3>
                         <p class="ct-product__desc">300 g, farofa, vinagrete e mandioca.</p>
@@ -209,10 +209,10 @@
 <div class="ct-app ct-app--totem ct-app--kiosk demo-surface" id="totem">
     <header class="ct-header"><div class="ct-header__brand"><span class="ct-header__name">Cantina do Porto</span></div><span class="ct-tag">Comer aqui</span></header>
     <ul class="ct-chips" role="tablist" aria-label="Categorias">
-        <li><button class="ct-chip" type="button" role="tab" aria-selected="false">Destaques</button></li>
-        <li><button class="ct-chip is-active" type="button" role="tab" aria-selected="true">Lanches</button></li>
-        <li><button class="ct-chip" type="button" role="tab" aria-selected="false">Bebidas</button></li>
-        <li><button class="ct-chip" type="button" role="tab" aria-selected="false">Sobremesas</button></li>
+        <li role="presentation"><button class="ct-chip ct-chip--stacked" type="button" role="tab" aria-selected="false"><i class="bi bi-star ct-chip__art" aria-hidden="true"></i><span>Destaques</span></button></li>
+        <li role="presentation"><button class="ct-chip ct-chip--stacked is-active" type="button" role="tab" aria-selected="true"><i class="bi bi-egg-fried ct-chip__art" aria-hidden="true"></i><span>Lanches</span></button></li>
+        <li role="presentation"><button class="ct-chip ct-chip--stacked" type="button" role="tab" aria-selected="false"><i class="bi bi-cup-straw ct-chip__art" aria-hidden="true"></i><span>Bebidas geladas</span></button></li>
+        <li role="presentation"><button class="ct-chip ct-chip--stacked" type="button" role="tab" aria-selected="false"><i class="bi bi-cake2 ct-chip__art" aria-hidden="true"></i><span>Sobremesas e cafés</span></button></li>
     </ul>
     <div class="demo-scroll">
         <div class="ct-products" style="--ct-cols: 2">

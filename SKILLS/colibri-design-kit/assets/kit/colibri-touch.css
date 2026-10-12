@@ -236,6 +236,10 @@
     scrollbar-width: none;
 }
 .ct-chips::-webkit-scrollbar { display: none; }
+/* O item da lista não encolhe: no flex da faixa, o <li> encolhia abaixo do conteúdo e, com
+   o rótulo quebrando (variante empilhada), o nome saía palavra a palavra. Todos os chips
+   ficam com a mesma altura. */
+.ct-chips > li { display: flex; flex: 0 0 auto; }
 .ct-chip {
     display: inline-flex;
     flex: 0 0 auto;
@@ -258,6 +262,40 @@
     border-color: var(--ct-action);
     font-weight: 650;
 }
+/* Categoria com foto ou ícone, na faixa e no rail: desenho em cima, nome embaixo, centrados.
+   Lado a lado, o desenho comia a largura e o nome saía cortado; empilhado, o nome quebra em
+   até duas linhas e nunca leva reticências. Sem foto nem ícone, a categoria segue pelo nome. */
+.ct-chip--stacked,
+.ct-rail__item--stacked {
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: var(--ct-text);
+    line-height: 1.2;
+    white-space: normal;
+    text-align: center;
+}
+.ct-chip--stacked > span { max-width: calc(var(--ct-target) * 5); }
+.ct-rail__item--stacked > span { width: 100%; overflow-wrap: anywhere; }
+.ct-chip__art,
+.ct-rail__art {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: var(--ct-target);
+    height: var(--ct-target);
+    border-radius: var(--ct-radius-tag);
+    font-size: calc(var(--ct-target) * .75);
+    object-fit: cover;
+}
+.ct-rail__art {
+    width: calc(var(--ct-target) * 1.35);
+    height: calc(var(--ct-target) * 1.35);
+    font-size: calc(var(--ct-target) * 1.05);
+}
+.ct-rail__item--stacked .bi.ct-rail__art { font-size: calc(var(--ct-target) * 1.05); }
 
 /* ---------- Botões ---------- */
 .ct-btn {
@@ -404,7 +442,9 @@
     background: var(--ct-surface-2);
 }
 .ct-product__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.ct-product__media .bi {
+/* Só o ícone de produto sem foto (filho direto): um ícone dentro de um selo sobre a
+   foto não pode herdar a posição central e o tamanho de display. */
+.ct-product__media > .bi {
     position: absolute;
     top: 50%;
     left: 50%;
