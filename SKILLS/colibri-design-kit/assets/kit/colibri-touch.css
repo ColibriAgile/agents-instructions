@@ -690,6 +690,26 @@
 .ct-option[aria-checked="true"] { background: var(--ct-action-soft); }
 .ct-option.is-selected .ct-option__mark,
 .ct-option[aria-checked="true"] .ct-option__mark { color: var(--ct-on-action); background: var(--ct-action); border-color: var(--ct-action); }
+/* Opção como botão (precisa receber o toque): perde a aparência de botão e fica a linha. */
+button.ct-option {
+    width: 100%;
+    margin: 0;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    background: transparent;
+    border-width: 0 0 1px;
+    border-style: solid;
+    border-color: var(--ct-line);
+    border-radius: 0;
+}
+button.ct-option.is-selected,
+button.ct-option[aria-checked="true"] { background: var(--ct-action-soft); }
+.ct-option:active:not(:disabled) { background: var(--ct-surface-2); }
+.ct-option[aria-checked="true"]:active:not(:disabled) { background: var(--ct-action-soft); }
+/* Bloqueada (o passo já está cheio): continua visível, apagada, e não recebe o toque. */
+.ct-option:disabled,
+.ct-option[aria-disabled="true"] { cursor: not-allowed; opacity: .45; }
 
 /* ---------- Campos (nome para chamada, observação livre, senha, número da comanda) ----------
  * Rótulo sempre visível acima do campo; campo da altura do alvo de toque. O contorno de foco
