@@ -229,6 +229,18 @@
     </footer>
 </div>
 
+<!-- Totem: duas portas (comer aqui ou levar) -->
+<div class="ct-app ct-app--totem ct-app--kiosk demo-surface" id="portas">
+    <div style="display: flex; flex: 1; flex-direction: column; min-height: 0; padding: 10vh 6vw 0; background: var(--ct-bg)">
+        <h1 style="margin: 0 0 6vh; color: var(--ct-ink); font-size: 4.4vh; font-weight: 800; text-align: center">Onde você vai comer?</h1>
+        <div class="ct-doors">
+            <button class="ct-door" type="button"><i class="bi bi-cup-hot ct-door__icon" aria-hidden="true"></i><span class="ct-door__label">Comer aqui</span><span class="ct-door__hint">Vou comer no salão</span></button>
+            <button class="ct-door" type="button"><i class="bi bi-bag ct-door__icon" aria-hidden="true"></i><span class="ct-door__label">Levar</span><span class="ct-door__hint">Vou levar comigo</span></button>
+        </div>
+        <button class="ct-btn ct-btn--ghost" type="button" style="align-self: center; margin: 3vh 0 6vh">Voltar</button>
+    </div>
+</div>
+
 <!-- KDS: telas de produção, tema Colibri (sem esquema) -->
 <div class="ct-app ct-app--kds demo-surface" id="kds">
     <div class="demo-kds-bar"><strong><i class="bi bi-fire" aria-hidden="true"></i> Estação Chapa</strong><span class="ct-tag ct-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>2 em atenção</span><span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>1 atrasado</span></div>
@@ -282,7 +294,7 @@
 </div>
 
 <div class="demo-bar" id="demo-bar">
-    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>) · <a href="#totem">Totem</a> · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>) · <a href="#pronto">Pronto</a>
+    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>) · <a href="#totem">Totem</a> (<a href="#portas">portas</a>) · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>) · <a href="#pronto">Pronto</a>
     <span id="demo-esquema" hidden>
         | <label>Ambiente <input type="color" id="s-ambiente" value="#0b1120"></label>
         <label>Ação <input type="color" id="s-acao" value="#f59e0b"></label>

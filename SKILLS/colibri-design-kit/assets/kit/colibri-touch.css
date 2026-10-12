@@ -711,6 +711,44 @@ button.ct-option[aria-checked="true"] { background: var(--ct-action-soft); }
 .ct-option:disabled,
 .ct-option[aria-disabled="true"] { cursor: not-allowed; opacity: .45; }
 
+/* ---------- Duas portas (escolha de tela cheia) ----------
+ * Uma decisão que abre um caminho (comer aqui ou levar; pedir ou pagar a conta): duas portas, no máximo
+ * três, do mesmo tamanho e NENHUMA acesa — quem decide tem de tocar, e uma porta já preenchida convida a
+ * passar batido. Superfície do kit com o ícone na cor de ação; em retrato empilham, em paisagem ficam lado
+ * a lado. O voltar fica fora delas, como .ct-btn--ghost. */
+.ct-doors {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: calc(var(--ct-gap) * 2);
+    min-height: 0;
+}
+@media (orientation: landscape) {
+    .ct-doors { flex-direction: row; }
+}
+.ct-door {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ct-gap);
+    min-height: calc(var(--ct-target) * 3);
+    padding: var(--ct-pad);
+    color: var(--ct-ink);
+    background: var(--ct-surface);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-card);
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 120ms var(--ct-ease), background-color 120ms var(--ct-ease);
+}
+.ct-door:active:not(:disabled) { background: var(--ct-surface-2); transform: scale(.99); }
+.ct-door__icon { color: var(--ct-action-ink); font-size: calc(var(--ct-text-display) * 1.6); line-height: 1; }
+.ct-door__label { font-size: calc(var(--ct-text-2xl) * 1.4); font-weight: 800; line-height: 1.1; }
+.ct-door__hint { color: var(--ct-ink-2); font-size: var(--ct-text-xl); }
+
 /* ---------- Campos (nome para chamada, observação livre, senha, número da comanda) ----------
  * Rótulo sempre visível acima do campo; campo da altura do alvo de toque. O contorno de foco
  * é o de .ct-app :focus-visible; a borda acompanha. */
@@ -924,10 +962,12 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
     .ct-split,
     .ct-toast { animation: ct-fade-in 1ms linear; }
     .ct-btn,
-    .ct-icon-btn { transition: none; }
+    .ct-icon-btn,
+    .ct-door { transition: none; }
     .ct-btn:active:not(:disabled),
     .ct-icon-btn:active:not(:disabled),
-    .ct-qty__btn:active:not(:disabled) { transform: none; }
+    .ct-qty__btn:active:not(:disabled),
+    .ct-door:active:not(:disabled) { transform: none; }
     .ct-order--late::before { animation: none; }
     .ct-spin { animation: none; }
 }
