@@ -238,6 +238,7 @@ pre.log,
     font-size: 11px;
     font-weight: 600;
     line-height: 14px;
+    text-align: center;
 }
 .cm-sidebar :focus-visible { outline-color: rgba(255, 255, 255, .75) !important; }
 
