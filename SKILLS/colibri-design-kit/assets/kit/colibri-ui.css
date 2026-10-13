@@ -759,8 +759,15 @@ pre.log,
     background: var(--cm-surface);
     border: 1px solid var(--cm-line);
     border-radius: var(--cm-radius);
-    overflow: hidden;
+    overflow-x: auto;
 }
+/* Quando a soma das larguras mínimas de --cm-cols passa da largura da tabela, ela rola na horizontal em vez
+   de cortar as colunas da direita. Cabeçalho e linhas crescem até a largura mínima das colunas, para fundo,
+   divisor e destaque acompanharem a rolagem. min-content, e não max-content: cada linha é uma grade própria
+   e, com max-content, as colunas fr seguiriam o texto de cada linha e desalinhariam; com .cm-cell
+   { min-width: 0 }, o mínimo vem só de --cm-cols, igual em todas as linhas. */
+.cm-table > .cm-table__head,
+.cm-table > .cm-table__item { min-width: min-content; }
 .cm-table__head,
 .cm-table__row {
     display: grid;

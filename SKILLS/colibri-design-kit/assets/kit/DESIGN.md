@@ -238,7 +238,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 - **Etiquetas** (`.cm-tag`, variantes de estado e `--muted`): estado curto, módulos, chaves; listas de etiquetas em `.cm-tags`.
 - **Opções sim/não** de um registro, como etiquetas: ligada na etiqueta padrão com `bi-check-circle-fill`; desligada em `.cm-tag--off` (apagada, **sem risco**) com `bi-x-circle`. As ligadas vêm primeiro. O texto da etiqueta diz a opção, e o estado vai também para leitores de tela.
 - **Descrições que chegam em maiúsculas** de outro sistema (ex.: cadastro do PDV): nas listas, exiba em caixa de frase ("Molhos e adicionais"), com a primeira letra maiúscula mesmo depois de números. Só a exibição muda: busca, ordenação, edição, campos da ficha e arquivos exportados usam o valor gravado. Nas grades que exportam, aplique no modelo da célula, não na formatação que vai ao arquivo. Textos que reproduzem outro sistema (ex.: botões do PDV) ficam como gravados.
-- **Responsivo:** perto da largura de tablet, esconder colunas secundárias; abaixo de 760 px, linhas viram blocos com rótulos (`.cm-cell__label`), preservando ações.
+- **Responsivo:** perto da largura de tablet, esconder colunas secundárias; abaixo de 760 px, linhas viram blocos com rótulos (`.cm-cell__label`), preservando ações. Entre um corte e outro, quando as larguras mínimas das colunas não cabem, a tabela rola na horizontal, com o cabeçalho e as linhas acompanhando a rolagem; nunca corta colunas nem esconde a barra.
 
 **Regra da grade como tabela.** Grades de bibliotecas de componentes (DataGrid do DevExtreme, DxGrid do DevExpress Blazor e similares) têm a mesma anatomia e os mesmos tokens da `.cm-table`; lado a lado, não se distingue uma da outra:
 
