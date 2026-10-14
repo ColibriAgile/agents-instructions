@@ -242,11 +242,13 @@ function registrarAjuste(ajustes, token, pedido, obtido, motivo) {
 /**
  * Deriva o esquema a partir das sementes.
  * @param {{ambiente?: string, acao?: string, marca?: string|null}} sementes
+ * @param {'light'|'dark'} [modoForcado] claro ou escuro escolhido (ex.: pelo cliente no cardápio); sem ele, o modo
+ *   sai da luminância do ambiente. Os neutros vêm do ambiente e o contraste é garantido nos dois modos.
  * @returns {{versao: string, modo: 'light'|'dark', sementes: object, tokens: Object<string,string>, ajustes: Array}}
  */
-export function derivarEsquema(sementes) {
+export function derivarEsquema(sementes, modoForcado) {
     var s = normalizar(sementes);
-    var modo = decidirModo(s.ambiente);
+    var modo = (modoForcado === 'light' || modoForcado === 'dark') ? modoForcado : decidirModo(s.ambiente);
     var ajustes = [];
     var n = derivarAmbiente(s.ambiente, modo);
     registrarAjuste(ajustes, '--ct-bg', s.ambiente, n.bg, 'fundo ajustado para os textos e estados terem 4,5:1');

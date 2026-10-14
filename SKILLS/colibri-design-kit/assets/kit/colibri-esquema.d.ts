@@ -34,6 +34,6 @@ export declare const ESTADOS_BASE: Record<ModoEsquema, Record<string, string>>;
 export declare const CONTRASTE: { texto: number; componente: number };
 
 export declare function contraste(a: string, b: string): number;
-export declare function derivarEsquema(sementes?: SementesEsquema): Esquema;
+export declare function derivarEsquema(sementes?: SementesEsquema, modoForcado?: ModoEsquema): Esquema;
 /** Sem `alvo`: grava no <html> (com data-theme). Com `alvo`: só no elemento (prévia). Com `esquema` nulo: remove. */
 export declare function aplicarEsquema(esquema: Esquema | null, alvo?: HTMLElement): void;

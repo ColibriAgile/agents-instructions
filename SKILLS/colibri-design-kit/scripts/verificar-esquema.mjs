@@ -3,8 +3,9 @@
 // Sem dependências. Sai com código 1 se alguma verificação falhar.
 //
 // 1. As constantes de estado do motor são iguais aos tokens --cm-* de colibri-base.css.
-// 2. Para uma grade de sementes (claras, escuras, cinzas médios, saturadas, extremas), todo token
-//    sai em hex e todo par texto/fundo e preenchimento/fundo atinge o contraste exigido.
+// 2. Para uma grade de sementes (claras, escuras, cinzas médios, saturadas, extremas), no modo
+//    automático e nos dois modos forçados, todo token sai em hex e todo par texto/fundo e
+//    preenchimento/fundo atinge o contraste exigido.
 // 3. O código não usa APIs acima do piso Chrome 101.
 
 import { readFileSync } from 'node:fs';
@@ -48,13 +49,17 @@ const textos = ['--ct-ink', '--ct-ink-2', '--ct-ink-3', '--ct-action-ink', '--ct
 const preenchimentos = ['--ct-action', '--ct-brand'];
 const pares = [['--ct-on-action', '--ct-action'], ['--ct-on-action', '--ct-action-pressed'], ['--ct-on-brand', '--ct-brand'],
     ['--ct-success', '--ct-success-soft'], ['--ct-warning', '--ct-warning-soft'], ['--ct-danger', '--ct-danger-soft']];
+// Modo automático (pela luminância do ambiente) e os dois forçados (claro ou escuro escolhido pelo cliente,
+// inclusive contra o ambiente: modo claro sobre ambiente escuro e vice-versa).
+const modos = [undefined, 'light', 'dark'];
 let combinacoes = 0;
 let comAjuste = 0;
-for (const ambiente of ambientes) for (const acao of acoes) for (const marca of marcas) {
+for (const modoForcado of modos) for (const ambiente of ambientes) for (const acao of acoes) for (const marca of marcas) {
     combinacoes++;
-    const e = derivarEsquema({ ambiente, acao, marca });
+    const e = derivarEsquema({ ambiente, acao, marca }, modoForcado);
     const t = e.tokens;
-    const id = `ambiente ${ambiente}, ação ${acao}, marca ${marca}`;
+    const id = `${modoForcado ? 'modo ' + modoForcado + ', ' : ''}ambiente ${ambiente}, ação ${acao}, marca ${marca}`;
+    if (modoForcado && e.modo !== modoForcado) falhar(`${id}: modo ${e.modo}, mas foi forçado ${modoForcado}`);
     if (e.ajustes.length) comAjuste++;
     for (const [k, v] of Object.entries(t)) if (!/^#[0-9a-f]{6}$/.test(v)) falhar(`${id}: ${k} = ${v} não é hex #rrggbb`);
     for (const k of textos) for (const f of fundosDe(t)) {
@@ -94,6 +99,9 @@ for (const [nome, mapa] of [['claro', claro], ['escuro', escuro]]) {
     }
 }
 
+// Modo forçado inválido é ignorado: vale o automático.
+if (derivarEsquema({ ambiente: '#ffffff' }, 'sepia').modo !== 'light') falhar('Modo forçado inválido não caiu no automático');
+
 // Esquema padrão = tema escuro Colibri: o fundo não pode ser ajustado.
 const padrao = derivarEsquema({});
 if (padrao.tokens['--ct-bg'] !== '#0b1822') falhar(`Esquema padrão: --ct-bg ${padrao.tokens['--ct-bg']} (esperado #0b1822, o plano do tema escuro)`);
@@ -112,7 +120,7 @@ if (falhas.length) {
     if (falhas.length > 40) console.error(` … e mais ${falhas.length - 40}`);
     process.exit(1);
 }
-console.log(`OK: estados iguais à base; neutros dos temas claro e escuro reproduzidos; paleta curada com ${paleta.length} cores legíveis com texto branco; ${combinacoes} combinações de sementes com contraste garantido (${comAjuste} com ajuste); sem APIs acima do Chrome 101.`);
+console.log(`OK: estados iguais à base; neutros dos temas claro e escuro reproduzidos; paleta curada com ${paleta.length} cores legíveis com texto branco; ${combinacoes} combinações de sementes e modo (automático, claro e escuro forçados) com contraste garantido (${comAjuste} com ajuste); sem APIs acima do Chrome 101.`);
 for (const [nome, s] of [['padrão Colibri', {}], ['totem atual', { ambiente: '#0b1120', acao: '#f59e0b' }], ['tablet atual', { ambiente: '#020617', acao: '#f99c00' }], ['claro creme', { ambiente: '#fdf6e3', acao: '#c62828', marca: '#1b5e20' }]]) {
     const e = derivarEsquema(s);
     console.log(`  ${nome}: modo ${e.modo}; bg ${e.tokens['--ct-bg']}, surface ${e.tokens['--ct-surface']}, ink-3 ${e.tokens['--ct-ink-3']}, action ${e.tokens['--ct-action']}/${e.tokens['--ct-on-action']}, brand-ink ${e.tokens['--ct-brand-ink']}; ajustes: ${e.ajustes.map((a) => a.token).join(', ') || 'nenhum'}`);
