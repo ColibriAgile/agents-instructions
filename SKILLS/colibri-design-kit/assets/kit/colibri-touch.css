@@ -62,10 +62,12 @@
     --ct-order-ficha: var(--ct-palette-roxo);
     --ct-order-outro: var(--ct-palette-grafite);
 
-    --ct-radius-control: 6px;
-    --ct-radius-card: 8px;
-    --ct-radius-sheet: 12px;
-    --ct-radius-tag: 4px;
+    /* Os mesmos cantos do perfil Admin (colibri-base.css): controles e selos com o do botão,
+     * cartões, folhas e diálogos com o das superfícies. */
+    --ct-radius-control: var(--cm-btn-radius);
+    --ct-radius-card: var(--cm-radius);
+    --ct-radius-sheet: var(--cm-radius);
+    --ct-radius-tag: var(--cm-btn-radius);
     --ct-shadow-sheet: var(--cm-shadow-dialog);
     --ct-backdrop: var(--cm-backdrop);
     --ct-ease: var(--cm-ease);
@@ -524,6 +526,8 @@
     transform: translate(-50%, -50%);
     animation: ct-fade-in 200ms var(--ct-ease);
 }
+/* O rodapé tem fundo próprio (surface-2): sem o raio de baixo, ele cobria os cantos da folha. */
+.ct-sheet--center > .ct-sheet__foot:last-child { border-radius: 0 0 var(--ct-radius-sheet) var(--ct-radius-sheet); }
 .ct-sheet__head {
     display: flex;
     align-items: center;
