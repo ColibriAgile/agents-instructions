@@ -81,10 +81,10 @@ rounded:
   small: "4px"
   surface: "6px"
   tag: "10px"
-  touch-control: "6px"
-  touch-card: "8px"
-  touch-sheet: "12px"
-  touch-tag: "4px"
+  touch-control: "3px"
+  touch-card: "6px"
+  touch-sheet: "6px"
+  touch-tag: "3px"
 sizes:
   control-height: "32px"
   topbar-height: "56px"
@@ -360,14 +360,14 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 
 ### Componentes
 
-- **Cantos discretos, para um perfil profissional:** 6 px em controles (botões, abas de categoria, quantidade, confirmação), 8 px em cartões, 12 px em folhas e diálogos e 4 px em selos, marcas de opção e observações. Nenhuma forma de pílula; só o rádio é redondo.
-- **Botões** (`.ct-btn`): altura do alvo da superfície, texto de `--ct-text-lg` peso 600, cantos de 6 px. Principal `.ct-btn--primary` (ação com o texto derivado), secundário (`surface-2` com linha), `.ct-btn--ghost` (texto na cor de ação), `.ct-btn--danger` (texto de erro sobre o fundo suave de erro, nunca vermelho preenchido), `.ct-btn--block` e `.ct-btn--lg`. Ícone dentro do botão é permitido. Retorno de toque por `transform: scale(.97)` e a cor pressionada; desabilitado continua visível, apagado. Botão só com ícone: `.ct-icon-btn`, com o alvo inteiro e `aria-label` obrigatório.
+- **Cantos discretos, com os valores do perfil Admin (3 e 6 px):** 3 px em controles (botões, abas de categoria, quantidade, campos, confirmação) e em selos, marcas de opção e observações, o raio do botão do Admin (`--cm-btn-radius`; os selos não seguem os 10 px das etiquetas do Admin); 6 px em cartões, folhas e diálogos, o raio das superfícies do Admin (`--cm-radius`). Os tokens `--ct-radius-*` apontam para os da base. Nenhuma forma de pílula; só o rádio é redondo. Na folha centralizada, o rodapé, quando é o último filho direto da folha, leva o raio de baixo dela, para o fundo dele não deixar os cantos retos.
+- **Botões** (`.ct-btn`): altura do alvo da superfície, texto de `--ct-text-lg` peso 600, cantos de 3 px. Principal `.ct-btn--primary` (ação com o texto derivado), secundário (`surface-2` com linha), `.ct-btn--ghost` (texto na cor de ação), `.ct-btn--danger` (texto de erro sobre o fundo suave de erro, nunca vermelho preenchido), `.ct-btn--block` e `.ct-btn--lg`. Ícone dentro do botão é permitido. Retorno de toque por `transform: scale(.97)` e a cor pressionada; desabilitado continua visível, apagado. Botão só com ícone: `.ct-icon-btn`, com o alvo inteiro e `aria-label` obrigatório.
 - **Quantidade** (`.ct-qty`): − valor +, cada botão com o alvo inteiro, valor com algarismos tabulares e anunciado a leitores de tela.
-- **Selos** (`.ct-tag`, cantos de 4 px): neutro, `--brand` (Destaque), `--success`, `--warning`, `--danger` e os categóricos `--combo` e `--rodizio`, sempre com texto.
+- **Selos** (`.ct-tag`, cantos de 3 px): neutro, `--brand` (Destaque), `--success`, `--warning`, `--danger` e os categóricos `--combo` e `--rodizio`, sempre com texto.
 - **Cartão de produto** (`.ct-product`): foto 4:3 (ícone em `ink-3` sem foto), selos sobre a foto, nome, descrição de até duas linhas, preço (`.ct-price`, na cor de texto da marca; "a partir de" em `ink-3`) e a ação ("Adicionar", "Montar", "Escolher") como **botão comum** (`.ct-btn`, com ícone e o nome do produto no `aria-label`), nunca o principal: numa grade de produtos, cada cartão preenchido somaria uma ação principal por cartão, e a única ação principal da tela é a do pedido, no rodapé ("Finalizar pedido"). Formato linha (`.ct-product--row`) com a foto à esquerda. Indisponível (`.is-unavailable`): continua na lista, apagado, com o motivo num selo e a ação desabilitada.
 - **Opções** (`.ct-option`, jornada, combo e observações): linha com no mínimo o alvo mais 8 px, marca de 28 px (quadrada; redonda em `.ct-option--radio`), adicional de preço à direita; escolhida no fundo suave da ação, com a marca preenchida. Tocável, é um `<button class="ct-option">` com `role="radio"` ou `"checkbox"` e `aria-checked`; bloqueada (o passo já está cheio), continua visível, apagada e desabilitada.
 - **Duas portas** (`.ct-doors` > `button.ct-door` com `.ct-door__icon`, `.ct-door__label` e `.ct-door__hint`): a escolha de tela cheia que abre um caminho (comer aqui ou levar; pedir ou pagar a conta). Duas, no máximo três, do mesmo tamanho, nenhuma acesa: superfície com linha e cantos de cartão, ícone na cor de ação, rótulo grande e uma linha de apoio em `ink-2`. Empilhadas em retrato, lado a lado em paisagem; retorno de toque no fundo de `surface-2`. O voltar fica fora das portas, discreto (`.ct-btn--ghost`): um voltar do tamanho delas competiria com a escolha.
-- **Campos** (`.ct-field` com `.ct-field__label`, `.ct-input`, `.ct-field__hint` e `.ct-field__error`): rótulo sempre visível acima do campo, campo da altura do alvo de toque com texto de `--ct-text-lg`, fundo `surface-2`, linha e cantos de 6 px; a borda vai para o foco no foco e para o erro com `.is-invalid`; `textarea` com duas alturas de alvo; obrigatório marcado com `.ct-field__required`, sempre junto do texto do rótulo. Caixa de seleção de toque (`.ct-check`): a linha inteira é o alvo, caixa de 24 px na cor de ação.
+- **Campos** (`.ct-field` com `.ct-field__label`, `.ct-input`, `.ct-field__hint` e `.ct-field__error`): rótulo sempre visível acima do campo, campo da altura do alvo de toque com texto de `--ct-text-lg`, fundo `surface-2`, linha e cantos de 3 px; a borda vai para o foco no foco e para o erro com `.is-invalid`; `textarea` com duas alturas de alvo; obrigatório marcado com `.ct-field__required`, sempre junto do texto do rótulo. Caixa de seleção de toque (`.ct-check`): a linha inteira é o alvo, caixa de 24 px na cor de ação.
 - **Texto sobre imagem** (`.ct-scrim`, dentro de um contêiner posicionado com a foto): degradê escuro de baixo para cima com título (`.ct-scrim__title`, `--ct-text-2xl`) e texto (`.ct-scrim__text`) brancos, e o preço preenchido na cor da marca (`.ct-price--fill`, com o "a partir de" na cor do texto do preenchimento). Foto apagada sob texto, como na tela de descanso: `.ct-media-dim` (fundo preto e a foto a 40%), que escurece em qualquer esquema.
 - **Leitor de QR** (`.ct-scan`, com `.is-camera` quando a câmera nativa fica atrás da tela): barras sólidas de superfície em cima (título e fechar) e embaixo (alternativa manual, ex.: "Digitar o número"), e a mira (`.ct-scan__aim`, a partir de 224 px) com borda branca e véu escuro em volta. Sem câmera, a mesma tela no fundo do esquema com o campo manual.
 - **Avisos** (`.ct-notice`, variantes de estado) com ícone e texto; confirmação curta (`.ct-toast`, "adicionado") centralizada embaixo, some sozinha; vazio (`.ct-empty`) com ícone e uma frase; carregamento com `bi-arrow-repeat ct-spin` e texto.
