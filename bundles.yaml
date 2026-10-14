@@ -103,6 +103,11 @@ bundles:
       - writing-agents-md
       - writing-skills
 
+  release:
+    description: Liberação de pacotes Colibri para produção a partir de tarefas do Jira.
+    skills:
+      - colibri-deploy-producao
+
   api-docs:
     description: Documentação de APIs a partir de collections e specs — geração de Markdown para wiki/RAG.
     skills:
