@@ -97,6 +97,14 @@ Um deploy com conclusão `success` não prova nada sozinho. Confira sempre o nom
 - Os comentários também listam itens "fora dos pacotes" (por exemplo, scripts do cloud e deploy do Catálogo cloud). Esses itens não fazem parte desta skill. Liste-os no relatório como pendências.
 - No comentário em markdown, não ponha código dentro de negrito (`**texto `código`**`): o Jira quebra a formatação.
 
+### Versões (fixVersions)
+
+- Projeto `WIN`. Cada produto tem a sua sequência de versões: `POS 11.2`, `POS Scripts 2.9.2`, `CBO 2.10.4`, `CBO Connect 1.9.4`, `CBO Scripts 1.8`, `PIS 1.6`, `DConnect 5.4.1`, `Catalog 4.4.1`. O nome usa 2 ou 3 números da versão do pacote.
+- Uma versão reúne tarefas de várias pessoas. Na WIN-3159, a `CBO 2.10.4` tinha 10 tarefas abertas e a `POS 11.2` tinha 2, que não foram para produção. O lançamento moveu essas tarefas para versões novas (`CBO 2.10.5`, `POS 11.2.1`) com `moveUnfixedIssuesTo`.
+- Uma versão pode ser renomeada depois que a tarefa a recebe. A versão 14298 era "CBO Connect 1.9.4" na WIN-3159 e passou a "CBO Connect 2.0" (outro escopo, com tarefas em andamento). A correção foi criar "CBO Connect 1.9.4" já lançada e trocar a fixVersion das tarefas liberadas (WIN-3159 e WIN-3178).
+- Uma versão com o código liberado dentro de outra versão maior (Catalog 4.4.1 dentro do Catálogo 4.4.2.4) foi lançada com a data daquele deploy, com a aprovação do usuário.
+- Operações: `getJiraProjectVersions` (leitura, filtros `query` e `status`) e `manageJiraProjectVersion` (`create`, `update`, `release`, `archive`), as duas pelo `discover`.
+
 ## Problemas conhecidos
 
 | Sintoma | Causa | Ação |

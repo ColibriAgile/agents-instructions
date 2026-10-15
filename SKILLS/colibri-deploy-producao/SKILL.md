@@ -1,6 +1,6 @@
 ---
 name: colibri-deploy-producao
-description: 'Liberação para produção dos pacotes Colibri a partir de tarefas do Jira: lê uma ou mais chaves (por exemplo WIN-3159), levanta as versões dos pacotes, confere o que já foi liberado, as dependências do manifesto.server, o estado do master e os branches pendentes, abre e mescla os PR master -> production, aguarda os builds no GitHub Actions, confere as versões geradas, dispara os workflows de deploy e comenta o resultado em cada tarefa. Use sempre que o usuário pedir para liberar, publicar, subir ou fazer deploy em produção de pacotes ou versões de uma tarefa do Jira, ou pedir os PR para o branch production, mesmo sem dizer "deploy". Não use para gerar pacotes de QA, criar releases de branches de teste, fazer deploy do Catálogo cloud (imagem e Argo) nem para alterar workflows sem uma liberação.'
+description: 'Liberação para produção dos pacotes Colibri a partir de tarefas do Jira: lê uma ou mais chaves (por exemplo WIN-3159), levanta as versões dos pacotes, confere o que já foi liberado, as dependências do manifesto.server, o estado do master e os branches pendentes, abre e mescla os PR master -> production, aguarda os builds no GitHub Actions, confere as versões geradas, dispara os workflows de deploy, lança as versões do Jira (fixVersions) e comenta o resultado em cada tarefa. Use sempre que o usuário pedir para liberar, publicar, subir ou fazer deploy em produção de pacotes ou versões de uma tarefa do Jira, ou pedir os PR para o branch production, mesmo sem dizer "deploy". Não use para gerar pacotes de QA, criar releases de branches de teste, fazer deploy do Catálogo cloud (imagem e Argo) nem para alterar workflows sem uma liberação.'
 argument-hint: 'Informe uma ou mais chaves de tarefa do Jira (por exemplo: WIN-3159 WIN-3160).'
 ---
 
@@ -13,7 +13,7 @@ Antes de começar, leia [references/pipeline-colibri.md](./references/pipeline-c
 ## Ferramentas
 
 - `gh` autenticado na organização `ColibriAgile`.
-- MCP do Atlassian (`getAccessibleAtlassianResources`, `getJiraIssue`, `addOrEditJiraIssueComment`).
+- MCP do Atlassian: `getAccessibleAtlassianResources`, `getJiraIssue`, `searchJiraIssuesUsingJql`, `editJiraIssue` e `addOrEditJiraIssueComment`. As operações de versão vêm do `discover`: `getJiraProjectVersions` (com `executeRead`) e `manageJiraProjectVersion` (com `executeDestructive`). Chame o `discover` uma vez antes de usar essas operações.
 - Scripts desta skill. Nesta skill, `scripts/` quer dizer `<pasta base da skill>/scripts/`: o harness mostra a pasta base quando carrega a skill. Use caminho absoluto nos comandos. Use uma pasta temporária só como pasta de trabalho, para clones e arquivos de saída.
 
 | Script | Uso |
@@ -34,11 +34,13 @@ Antes do passo 1, crie a lista de tarefas da sessão com estes itens. Atualize c
 4. Conferir as dependências do `manifesto.server`
 5. Conferir o estado do master (builds e testes)
 6. Conferir os branches relacionados e os hotfixes não portados
-7. Criar os PR para os branches de produção
-8. Fazer o merge dos PR
-9. Aguardar os builds e conferir as versões geradas
-10. Disparar os deploys na ordem das dependências e aguardar
-11. Gerar o relatório e comentar em cada tarefa
+7. Conferir as versões do Jira e as tarefas pendentes nelas
+8. Criar os PR para os branches de produção
+9. Fazer o merge dos PR
+10. Aguardar os builds e conferir as versões geradas
+11. Disparar os deploys na ordem das dependências e aguardar
+12. Lançar as versões do Jira
+13. Gerar o relatório e comentar em cada tarefa
 
 ## Passo 1: Ler as tarefas
 
@@ -115,7 +117,25 @@ O objetivo é garantir que o master tem tudo o que o QA testou e que o merge nã
 
 **Saída:** branches relacionados sem commits pendentes, commits extras por repositório e hotfixes resolvidos.
 
-## Passo 7: Criar os PR
+## Passo 7: Conferir as versões do Jira
+
+O passo 12 lança as versões do Jira (fixVersions) das tarefas. Uma versão lançada tem de conter só tarefas concluídas. Confira as versões antes dos PR, porque a decisão do usuário pode parar a liberação.
+
+1. Liste as fixVersions de todas as tarefas: id, nome e `released`. Ligue cada versão a um pacote da liberação. O nome da versão usa a versão curta do pacote (por exemplo, `PIS 1.6` para o PIS 1.6.1).
+2. Leia o nome atual de cada versão com `getJiraProjectVersions` (`versionId`). Outra pessoa pode renomear uma versão depois que a tarefa a recebe. Exemplo: a versão da tarefa era "CBO Connect 1.9.4" e passou a "CBO Connect 2.0", com outro escopo. Se o nome não corresponde mais ao pacote, **Pergunte**: criar uma versão com o nome certo e trocar a fixVersion das tarefas liberadas, ou não mexer.
+3. Procure as tarefas pendentes com `searchJiraIssuesUsingJql`: `fixVersion in (<ids>) AND statusCategory != Done`, com `fields: ["fixVersions", "status", "summary"]` e `view: "full"` (sem `view: "full"`, as fixVersions não aparecem).
+4. Para cada versão com tarefa pendente, liste as versões abertas do mesmo produto com `getJiraProjectVersions`: `projectIdOrKey`, `query` com o nome do produto (por exemplo `CBO`) e `status: ["unreleased"]`. Tire da lista a própria versão e as versões de outro produto com nome parecido (`CBO Connect`, `CBO Scripts` e `CBO Reports` não são `CBO`).
+5. **Pergunte** (HIL) para cada versão com pendência. Mostre as tarefas pendentes (chave, resumo e status) e dê estas opções:
+   - **Abortar:** parar a liberação antes dos PR.
+   - **Mover para uma versão aberta:** 1 opção para cada versão aberta do item 4, da menor para a maior.
+   - **Criar uma versão nova:** peça o nome da versão. Sugira a próxima versão de patch (por exemplo, `CBO 2.10.5` para a `CBO 2.10.4`).
+
+   A `AskUserQuestion` aceita até 4 opções por pergunta. Use "Abortar", as 2 menores versões abertas e "Criar `<nome sugerido>`". O usuário escreve outro nome de versão nova ou outra versão aberta em "Other". Cite na pergunta as versões abertas que ficaram fora das opções.
+6. Registre a decisão de cada versão. Não mova nem crie nada agora: o passo 12 faz as mudanças depois do deploy. Assim, uma liberação que para no meio não deixa o Jira com versões lançadas sem pacote em produção.
+
+**Saída:** para cada versão, a ação do passo 12: lançar, lançar e mover as pendentes para uma versão (existente ou nova), ou criar a versão certa no lugar de uma versão renomeada.
+
+## Passo 8: Criar os PR
 
 Crie 1 PR por repositório e branch de produção que tem pacote a liberar. Um repositório pode precisar de 2 PR (por exemplo, `production` para a aplicação e `production-scripts` para os scripts).
 
@@ -133,15 +153,15 @@ Depois de criar, confira cada PR com `gh pr view <n> -R ColibriAgile/<repo> --js
 - `MERGEABLE UNSTABLE`: veja `gh pr checks`. Teste com falha do runner: execute de novo e aguarde. Quality gate do SonarCloud: siga e registre no relatório. Falha real de teste: **Pergunte**.
 - `CONFLICTING`: simule o merge num clone temporário (`git merge --no-commit --no-ff origin/master` a partir do branch de produção) e veja o trecho. Em geral, a causa é um hotfix não portado (passo 6). **Pergunte** como resolver. Não resolva o conflito por conta própria.
 
-## Passo 8: Fazer o merge
+## Passo 9: Fazer o merge
 
-1. Anote o horário UTC antes do merge (`date -u +%Y-%m-%dT%H:%M:%SZ`). Ele é o `T0` do passo 9.
+1. Anote o horário UTC antes do merge (`date -u +%Y-%m-%dT%H:%M:%SZ`). Ele é o `T0` do passo 10.
 2. Faça o merge com commit de merge: `gh pr merge <n> -R ColibriAgile/<repo> --merge`. Não use squash nem rebase: o master e a produção passam a ter históricos diferentes e o próximo PR tem conflito.
 3. Confira `state=MERGED` com `gh pr view <n> --json state,mergeCommit`.
 
 Faça o merge de todos os PR prontos. Um PR com problema não bloqueia os outros, mas os pacotes que dependem dele esperam.
 
-## Passo 9: Aguardar os builds e conferir as versões
+## Passo 10: Aguardar os builds e conferir as versões
 
 1. Inicie a ferramenta Monitor com `bash scripts/aguardar-builds.sh <T0> <repo>:<workflow>:<branch> ...` (timeout de 30 minutos; arme de novo se expirar). Inclua todos os builds que o merge dispara, também os de pacotes fora da liberação, para saber o que foi gerado.
 2. Quando um build termina com `success`, confira o release: `gh release list -R ColibriAgile/<repo> --limit 3`. Compare os 3 primeiros números da tag com a versão esperada.
@@ -151,14 +171,14 @@ Faça o merge de todos os PR prontos. Um PR com problema não bloqueia os outros
    - Falha do runner: `gh run rerun <id> --failed` e acompanhe com `aguardar-execucoes.sh`.
    - Erro de código ou de configuração do build: corrija no master com um commit pequeno (Conventional Commits), abra outro PR para o mesmo branch de produção, faça o merge e aguarde o novo build. Se a correção muda comportamento do produto, **Pergunte** antes.
 
-## Passo 10: Fazer os deploys
+## Passo 11: Fazer os deploys
 
 Comece os deploys quando os builds dos pacotes a liberar terminarem e as versões estiverem conferidas. Siga a ordem do passo 4. Um pacote só vai depois que o deploy de cada pacote que ele exige terminar com o pacote certo enviado.
 
 Para cada pacote:
 
 1. Confira qual release o deploy vai pegar:
-   - `deploy.yml` com `tag_prefix` e que repassa o `tag-prefix`: o release mais recente com o prefixo. Ele tem de ser o release conferido no passo 9.
+   - `deploy.yml` com `tag_prefix` e que repassa o `tag-prefix`: o release mais recente com o prefixo. Ele tem de ser o release conferido no passo 10.
    - `deploy.yml` sem entrada: o release **Latest** (`gh release view -R ColibriAgile/<repo> --json tagName`). Ele tem de ser o release conferido.
    - `deploy.yml` com a entrada `tag_prefix` que não é repassada: o deploy pega o Latest e ignora a entrada. **Pergunte** se corrige o `deploy.yml` (adicionar `tag-prefix: ${{ inputs.tag_prefix }}` no `with:` da action) ou se marca o release certo como Latest.
 2. Dispare: `gh workflow run deploy.yml -R ColibriAgile/<repo> --ref master [-f tag_prefix=<prefixo>]`. O comando mostra a URL da execução, com o id no fim.
@@ -168,7 +188,20 @@ Para cada pacote:
 
 Os deploys de pacotes sem dependência entre si podem rodar ao mesmo tempo.
 
-## Passo 11: Relatório e comentários
+## Passo 12: Lançar as versões do Jira
+
+Lance uma versão só quando todos os pacotes dela estão em produção: deploy com o pacote certo (`Enviados: 1`) ou pacote já liberado antes. Se um pacote da versão teve versão diferente ou deploy com falha, não lance a versão e registre o motivo.
+
+Use como data de lançamento o dia do deploy (`yyyy-mm-dd`). Faça as ações que o passo 7 decidiu:
+
+1. **Versão nova para as pendentes:** crie com `manageJiraProjectVersion` (`action: "create"`, `projectIdOrKey`, `name`). Guarde o id.
+2. **Lançar:** `manageJiraProjectVersion` com `action: "release"`, `versionId` e `releaseDate`. Se a versão tem tarefa pendente, passe também `moveUnfixedIssuesTo` com o id da versão de destino. Este movimento não volta se a versão for reaberta depois.
+3. **Versão renomeada:** crie a versão com o nome certo, já lançada (`action: "create"`, `released: true`, `releaseDate`). Troque a fixVersion das tarefas liberadas com `editJiraIssue`. O campo `fixVersions` substitui a lista inteira: envie todos os ids da tarefa, com o id novo no lugar do antigo.
+4. **Pacote liberado antes por outra pessoa, numa versão maior:** o código da versão da tarefa foi para produção dentro da outra versão. **Pergunte** se lança a versão da tarefa com a data daquele deploy.
+
+Depois, confira com `searchJiraIssuesUsingJql`: as fixVersions das tarefas aparecem com `released: true`, e as tarefas pendentes estão na versão de destino.
+
+## Passo 13: Relatório e comentários
 
 Escreva o relatório na conversa com este modelo:
 
@@ -190,6 +223,11 @@ Escreva o relatório na conversa com este modelo:
 2. <Commits do master que foram para produção sem o teste do QA, por repositório.>
 3. <Checks com falha no merge (SonarCloud, reexecução por falha do runner).>
 4. <Pacotes gerados e sem deploy; itens fora dos pacotes que ficaram pendentes.>
+
+## Versões do Jira
+| Versão | Situação | Tarefas pendentes |
+|---|---|---|
+| <nome> | Lançada em <data> / não lançada (<motivo>) | <nenhuma / movidas para <versão>: <chaves>> |
 ```
 
 Depois, adicione 1 comentário em cada tarefa com `addOrEditJiraIssueComment` (`contentFormat: "markdown"`):
