@@ -346,6 +346,8 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 - Nenhum alvo de toque fica abaixo do mínimo da superfície, inclusive +/− de quantidade, fechar e ações de linha; entre alvos vizinhos, no mínimo 8 px.
 - Preço, senha, timer, quantidade e número do pedido são a informação principal e podem ser grandes (a regra da informação primeiro, seção 3, é do perfil Admin). Timer, senha e números de pedido em Google Sans Mono com algarismos tabulares; preço em Google Sans Flex com algarismos tabulares.
 - Quiosque (tablet de mesa, totem, TV): `.ct-app--kiosk` tira a seleção de texto, o zoom por toque duplo e a rolagem elástica.
+- **Nomes que chegam em maiúsculas** do PDV (categorias, materiais, opções e títulos de passo do combo, linhas do carrinho e da conta): na tela, em caixa de frase ("Filé à parmegiana"), com a primeira letra maiúscula mesmo depois de números; nome que já tem minúsculas fica como gravado, porque a grafia foi escolhida por alguém. Só a exibição muda: pedido, cupom, busca, `alt` e o `aria-label` das ações usam o valor gravado. As observações do PDV ("SEM CEBOLA") ficam como gravadas. É a regra das listas do perfil Admin (seção 7) levada às telas de toque.
+- **Sem caixa alta:** títulos, rótulos, avisos e chamadas em caixa de frase, nunca escritos em maiúsculas nem com `text-transform: uppercase`. A ênfase de um aviso vem do peso, do tamanho e da cor do estado, não das maiúsculas. Códigos (pedido, pareamento), siglas e marcas ficam como são.
 
 ### Composição
 
@@ -409,6 +411,7 @@ Folha sobe em 260 ms com `--cm-ease` e o painel lateral desliza da direita no me
 - Faixa lateral colorida para marcar item ativo; cartões de métrica nas telas de toque.
 - A ação do cartão de produto preenchida (`.ct-btn--primary`) numa grade: a ação principal da tela é a do pedido.
 - Cantos acima da escala do perfil ou botões, abas e selos em forma de pílula.
+- Texto todo em maiúsculas para dar ênfase (`text-transform: uppercase` ou frase escrita em caixa alta), ou nome do PDV em maiúsculas na tela.
 
 ## 10. Implementação neste projeto
 
