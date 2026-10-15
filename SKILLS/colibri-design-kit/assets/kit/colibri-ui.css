@@ -90,6 +90,7 @@ pre.log,
     overflow: hidden;
     color: var(--cm-nav-ink);
     background: var(--cm-sidebar-bg);
+    text-shadow: var(--cm-nav-halo);
     z-index: var(--cm-layer-sidebar, 1090);
 }
 .cm-shell--collapsed .cm-sidebar { visibility: hidden; }
