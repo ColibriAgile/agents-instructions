@@ -45,8 +45,9 @@
     --cm-control-h: 32px;
     --cm-sidebar-bg: linear-gradient(180deg, #043355 0%, #2aa3e7 100%);
     --cm-sidebar-head-bg: linear-gradient(180deg, #043354 0%, #0b2a41 100%);
-    --cm-nav-ink: #d7d7d7;
-    --cm-nav-ink-muted: rgba(215, 215, 215, .72);
+    /* Texto da lateral em branco gelo, sem contorno: legível em toda a altura do degradê. */
+    --cm-nav-ink: #f1f5f9;
+    --cm-nav-ink-muted: rgba(241, 245, 249, .72);
     --cm-topbar-bg: #fafbfc;
     --cm-scroll-bg: linear-gradient(165deg, #e8f0fb 0%, #f2f5f9 32%, #f2f5f9 100%);
     --cm-disabled-ink: #b4bdc7;

@@ -24,7 +24,7 @@ colors:
   danger: "#b02637"
   sidebar: "linear-gradient(180deg, #043355 0%, #2aa3e7 100%)"
   sidebar-head: "linear-gradient(180deg, #043354 0%, #0b2a41 100%)"
-  sidebar-ink: "#d7d7d7"
+  sidebar-ink: "#f1f5f9"
   dark-page: "#0b1822"
   dark-topbar: "#0e1d29"
   dark-surface: "#11222f"
@@ -129,7 +129,7 @@ Os valores exatos estão no frontmatter e nos tokens `--cm-*` de `colibri-ui.css
 - **Neutros:** plano de trabalho (`page`), superfícies (`surface`, `surface-2`), divisores (`line`) e textos (`ink`, `ink-2`, `ink-3`). Texto de apoio nunca fica mais claro que `ink-3`.
 - **Estados** (`success`, `warning`, `danger`, cada um com fundo `-soft` e borda `-line`): sempre acompanhados de rótulo ou ícone, nunca só a cor.
 - **Gráficos:** medida única (uma série, barras de um ranking) no azul de ação. Séries que precisam de identidade própria (categorias, lojas comparadas) usam a paleta categórica `chart-1` a `chart-8` (`--cm-chart-*`), sempre nessa ordem, validada sobre `surface` nos dois temas (no escuro, `dark-chart-*` onde o valor muda); nunca cores locais. A cor não é a única pista: legenda ou rótulo direto em cada série. Eixos em `line-strong`, grade em `line`, textos em `ink-3` (11 px, algarismos tabulares) e a dica como camada do kit (superfície, divisor, sombra de menu).
-- **Lateral:** degradê `#043355 → #2aa3e7`; cabeçalho com o nome do produto em retângulo mais escuro (`#043354 → #0b2a41`); itens em `#d7d7d7`, peso regular; item ativo em branco sobre `rgba(255,255,255,.36)`; separadores em branco a 16%; versão no rodapé em 11 px, branco a 60%.
+- **Lateral:** degradê `#043355 → #2aa3e7`; cabeçalho com o nome do produto em retângulo mais escuro (`#043354 → #0b2a41`); itens em branco gelo (`#f1f5f9`), peso regular, sem contorno nem sombra no texto, e rótulos de grupo no mesmo branco gelo a 72%; item ativo em branco sobre `rgba(255,255,255,.36)`; separadores em branco a 16%; versão no rodapé em 11 px, branco a 60%.
 - **Foco:** contorno azul-claro (`focus`) de 2 px em botões e links; em campos, borda `focus` com halo `0 0 0 3px rgba(96,165,232,.22)`. Em botões o contorno é **interno** (`outline-offset: -3px`), sozinho ou em grupo: o botão focado sobe acima dos vizinhos, inclusive do principal, e nada encobre o contorno. No botão principal e no destrutivo o contorno é claro (`rgba(255,255,255,.7)`). Links mantêm o contorno externo. Em campo unido a botão ou a prefixo/sufixo (`.cm-input-group`), o halo contorna o **conjunto**, nunca só o campo: o campo focado fica com a borda `focus`, acima do vizinho na emenda, e o halo envolve campo e botão juntos, sem ser cortado pelo botão nem invadi-lo. O campo com erro também fica acima do vizinho, para a borda `danger` aparecer inteira.
 
 **Regra da ação rara.** O acento indica ação ou seleção; não colore painéis grandes nem seções inativas.
@@ -301,6 +301,7 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Deixar calendário, seletor de hora, listas suspensas, grades ou dicas de uma biblioteca na fonte padrão do tema dela.
 - Grade de biblioteca com as linhas altas, a zebra, as bordas ou a cor de destaque do tema dela.
 - Tema escuro em preto ou cinza neutro, com degradê fora da lateral ou com cor escrita na tela em vez de token.
+- Escurecer, encurtar ou trocar o degradê da lateral para o texto caber, mesmo em listas longas, ou pôr contorno ou sombra no texto dela: o texto da lateral é branco gelo (`--cm-nav-ink`).
 - Ícone da aba padrão do framework, da identidade anterior ou de outro produto.
 - Riscar a opção desligada ou mostrá-la só pela cor.
 - Botão vermelho preenchido para excluir um item dentro do diálogo de edição dele.
