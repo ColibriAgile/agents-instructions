@@ -8,6 +8,7 @@ Registro das decisões de design do projeto na adoção da linha visual Colibri.
 - **Versão do impeccable:** [metadata.version do SKILL.md do impeccable instalado, ex.: 4.4.0]
 - **Stack:** [framework e versão; biblioteca de componentes, tema e versão]
 - **Arquivos do kit:** [pasta com colibri-ui.css, fonts/, logos/, icons/ ou pacote bootstrap-icons]
+- **Perfis:** [Admin: entrada e páginas | Operação: cada superfície (tablet, totem, KDS, pedidos prontos) com entrada, páginas, consumidor ou produção e canais]
 - **Adaptadores:** [nenhum | colibri-ui.bootstrap3.css | colibri-ui.devexpress.css, com os blocos mantidos]
 - **Ordem de carga:** [arquivo de entrada e ordem dos CSS]
 - **Página inicial (`.cm-page--home`):** [rota/arquivo]
@@ -18,7 +19,7 @@ Registro das decisões de design do projeto na adoção da linha visual Colibri.
 
 | Regra do kit | O que foi feito | Motivo | Confirmado por |
 |---|---|---|---|
-| [ex.: seção 3, fonte em popups] | [ex.: classe interna .dxbl-xyz] | [ex.: tema X não expõe variável pública] | [nome] |
+| [ex.: seção 3, fonte em popups (T1)] | [ex.: classe interna .dxbl-xyz] | [ex.: tema X não expõe variável pública] | [nome] |
 
 Sem desvios: escreva "Nenhum".
 
