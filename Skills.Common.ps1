@@ -175,6 +175,30 @@ function Resolve-SkillsRef {
     return $Ref
 }
 
+# Devolve nome da skill -> computedHash do skills-lock.json do projeto (vazio se não houver).
+# O `npx skills add` recalcula o hash a cada instalação sobre a pasta inteira da skill
+# (todos os arquivos, não só o SKILL.md), então hash diferente = conteúdo diferente.
+function Read-SkillsLockHashes {
+    param([string]$ProjectPath)
+
+    $hashes = @{}
+    $lockPath = Join-Path $ProjectPath 'skills-lock.json'
+    if (-not (Test-Path -LiteralPath $lockPath)) { return $hashes }
+
+    try {
+        $lock = Get-Content -LiteralPath $lockPath -Raw | ConvertFrom-Json
+    }
+    catch {
+        return $hashes
+    }
+    if ($lock.skills) {
+        foreach ($entry in $lock.skills.PSObject.Properties) {
+            $hashes[$entry.Name] = $entry.Value.computedHash
+        }
+    }
+    return $hashes
+}
+
 function Add-SkillSet {
     param([hashtable]$Table, [string]$Repo, [string[]]$Skills)
     if (-not $Table.ContainsKey($Repo)) {

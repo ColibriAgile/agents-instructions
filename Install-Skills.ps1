@@ -3,6 +3,8 @@
     Instala/atualiza skills de agentes de IA a partir de skills.yaml (bundles + sources)
     usando `npx skills`, e reconcilia skills instaladas que não pertencem ao manifesto.
     Se skills.yaml não existir e a execução for interativa, dispara Init-Skills.ps1 antes.
+    Ao final, lista as skills atualizadas e novas, comparando o skills-lock.json do projeto
+    antes e depois (o hash cobre a pasta inteira de cada skill).
 
 .PARAMETER Path
     Caminho do arquivo skills.yaml. Padrão: skills.yaml na pasta atual.
@@ -111,6 +113,13 @@ if (-not $sources -or $sources.Count -eq 0) {
 }
 
 $failed = @()
+# `npx skills add` grava o skills-lock.json na pasta atual; o antes/depois diz o que mudou.
+$projectPath = (Get-Location).Path
+$lockBefore = Read-SkillsLockHashes -ProjectPath $projectPath
+$updatedSkills = @()
+$addedSkills = @()
+$untrackedSkills = @()
+$unchangedCount = 0
 $i = 0
 $totalSkills = ($sources | ForEach-Object { $_.Skills.Count } | Measure-Object -Sum).Sum
 $sw = [System.Diagnostics.Stopwatch]::StartNew()
@@ -151,10 +160,28 @@ foreach ($source in $sources) {
     if ($exitCode -ne 0) {
         $failed += $source.Repo
         Write-Warning "Falha ao instalar/atualizar skills de $($source.Repo)"
+        continue
     }
-    elseif (-not $Silent) {
+
+    $lockNow = Read-SkillsLockHashes -ProjectPath $projectPath
+    $srcUpdated = 0
+    $srcAdded = 0
+    foreach ($skill in $source.Skills) {
+        if (-not $lockNow.ContainsKey($skill)) { $untrackedSkills += $skill }
+        elseif (-not $lockBefore.ContainsKey($skill)) { $addedSkills += $skill; $srcAdded++ }
+        elseif ($lockNow[$skill] -ne $lockBefore[$skill]) { $updatedSkills += $skill; $srcUpdated++ }
+        else { $unchangedCount++ }
+    }
+
+    if (-not $Silent) {
         Write-Host "         OK" -ForegroundColor Green -NoNewline
-        Write-Host (" ({0:n1}s)" -f $itemSw.Elapsed.TotalSeconds) -ForegroundColor DarkGray
+        Write-Host (" ({0:n1}s)" -f $itemSw.Elapsed.TotalSeconds) -ForegroundColor DarkGray -NoNewline
+        if ($srcUpdated -or $srcAdded) {
+            Write-Host " · $srcUpdated atualizada(s), $srcAdded nova(s)" -ForegroundColor Cyan
+        }
+        else {
+            Write-Host " · sem mudança" -ForegroundColor DarkGray
+        }
     }
 }
 
@@ -166,6 +193,17 @@ if (-not $Silent) {
     Write-Host "Concluído: " -NoNewline
     Write-Host "$ok/$($sources.Count) fonte(s)" -ForegroundColor $(if ($failed.Count -gt 0) { 'Yellow' } else { 'Green' }) -NoNewline
     Write-Host (" · $totalSkills skill(s) · {0:n1}s" -f $sw.Elapsed.TotalSeconds) -ForegroundColor DarkGray
+
+    Write-Host "Skills: " -NoNewline
+    Write-Host "$($updatedSkills.Count) atualizada(s)" -ForegroundColor $(if ($updatedSkills.Count) { 'Cyan' } else { 'DarkGray' }) -NoNewline
+    Write-Host ", " -NoNewline
+    Write-Host "$($addedSkills.Count) nova(s)" -ForegroundColor $(if ($addedSkills.Count) { 'Green' } else { 'DarkGray' }) -NoNewline
+    Write-Host ", $unchangedCount sem mudança" -ForegroundColor DarkGray
+    $updatedSkills | Sort-Object | ForEach-Object { Write-Host "  ~ $_" -ForegroundColor Cyan }
+    $addedSkills | Sort-Object | ForEach-Object { Write-Host "  + $_" -ForegroundColor Green }
+    if ($untrackedSkills.Count -gt 0) {
+        Write-Warning "Sem registro em $(Join-Path $projectPath 'skills-lock.json'), não dá para saber se mudaram: $(($untrackedSkills | Sort-Object) -join ', ')"
+    }
 }
 
 if (-not $NoReconcile) {
