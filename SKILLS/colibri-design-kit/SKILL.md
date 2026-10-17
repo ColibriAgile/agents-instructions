@@ -1,30 +1,53 @@
 ---
 name: colibri-design-kit
-description: 'Colibri Design Kit adota a linha visual das aplicações Colibri em um repositório, nos perfis Admin (painéis e admins) e Operação (cardápio do tablet, totem, KDS, com esquema de cores por canal): copia CSS, fontes, ícones e logo do kit, aciona a skill impeccable 4.x (init e document) para gerar PRODUCT.md, DESIGN.md e os arquivos de controle em .impeccable/, e registra as decisões de design do projeto. Use para iniciar ou retomar a refatoração visual de um frontend Colibri, alinhar um projeto ao kit, atualizar a versão do kit adotada ou migrar artefatos gerados pelo impeccable 3.x. Não use para refatorar páginas depois da adoção (peça ao impeccable, com shape, polish ou critique, usando o DESIGN.md gerado), para projetos fora da linha Colibri nem para backend.'
-argument-hint: 'Caminho do frontend no repositório (opcional) e framework, ex.: "src/web, Blazor DevExpress"'
+description: 'Colibri Design Kit leva a linha visual das aplicações Colibri (perfis Admin e Operação) a um repositório e mede a aderência a ela, sobre a skill impeccable 4.x. Use para adotar o kit num frontend Colibri ou atualizar a versão adotada (inclusive migrar artefatos do impeccable 3.x), medir a aderência de uma página ou do frontend ao kit com nota e ranking de páginas, refatorar uma página para o kit ou registrar um desvio do kit. Não use para projetos fora da linha Colibri, para backend nem para crítica de UX sem relação com o kit (use impeccable critique).'
+argument-hint: '[adotar | aderencia | refatorar | desvio] [alvo] — ex.: "aderencia src/pages/Clientes.razor", "adotar src/web, Blazor DevExpress"; vazio abre o menu'
 ---
 
 # Colibri Design Kit
 
-Leva a linha visual Colibri a um repositório e deixa o projeto pronto para o impeccable trabalhar sobre ela. A linha tem dois perfis sobre a mesma base: **Admin** (painéis, admins e ferramentas internas) e **Operação** (telas cheias de toque: cardápio do tablet, totem, produção do KDS, pedidos prontos). Um projeto adota um perfil ou os dois. Ao final o repositório tem:
+Leva a linha visual Colibri a um repositório, deixa o projeto pronto para o impeccable trabalhar sobre ela e mede quanto o projeto segue o kit. A linha tem dois perfis sobre a mesma base: **Admin** (painéis, admins e ferramentas internas) e **Operação** (telas cheias de toque: cardápio do tablet, totem, produção do KDS, pedidos prontos). Um projeto adota um perfil ou os dois. Depois da adoção, o repositório tem:
 
 | Arquivo | Conteúdo | Quem grava |
 |---|---|---|
-| `<estáticos>/colibri-ui/` | `colibri-base.css`, `fonts/`, `logos/`, `icons/`; no perfil Admin, `colibri-ui.css` e os adaptadores usados; no perfil Operação, `colibri-touch.css` e, com canal de consumidor, `colibri-esquema.js` (+ `.d.ts` em TypeScript) | esta skill |
+| `<estáticos>/colibri-ui/` | `colibri-base.css`, `fonts/`, `logos/`, `icons/`; no perfil Admin, `colibri-ui.css` e os adaptadores usados; no perfil Operação, `colibri-touch.css` e, com canal de consumidor, `colibri-esquema.js` (+ `.d.ts` em TypeScript) | `adotar` |
 | `PRODUCT.md` | usuários, propósito, contexto, compromissos da marca, princípios (modelo do kit preenchido) | impeccable `init` |
 | `DESIGN.md` | regras visuais do kit no formato do impeccable + implementação no projeto | impeccable `document` |
 | `.impeccable/design.json` | sidecar: metadados de cor, sombras, movimento, breakpoints, componentes | impeccable `document` |
 | `.impeccable/live/config.json` | configuração do modo `live` | impeccable `init` |
 | `.impeccable/config.json` | `buildPath` (`code` ou `comp`), só quando o usuário escolheu | impeccable `init` |
-| `docs/design/DECISOES.md` | registro das decisões de design e desvios do kit | esta skill |
+| `docs/design/DECISOES.md` | registro das decisões de design, desvios do kit e páginas a refatorar | `adotar`, `refatorar`, `desvio` |
+| `docs/design/ADERENCIA.md` | histórico de notas e relatório mais recente de aderência | `aderencia` |
 
-Compatibilidade: impeccable 4.x (conferido na 4.4.0): `PRODUCT.md` no schema de produto 1, `DESIGN.md` com oito seções canônicas, contexto carregado pelo launcher `scripts/impeccable`. Artefatos gerados com o impeccable 3.x são migrados no fluxo de atualização (passo 1).
+Compatibilidade: impeccable 4.x (conferido na 4.4.0): `PRODUCT.md` no schema de produto 1, `DESIGN.md` com oito seções canônicas, contexto carregado pelo launcher `scripts/impeccable`. Artefatos gerados com o impeccable 3.x são migrados pelo `adotar`.
+
+## Comandos
+
+| Comando | O que faz | Procedimento |
+|---|---|---|
+| `adotar [caminho, framework]` | Adota o kit ou atualiza a versão adotada: copia os arquivos, aciona `impeccable init` e `document`, registra as decisões | [`references/adotar.md`](references/adotar.md) |
+| `aderencia [alvo]` | Nota de 0 a 100 de aderência ao kit, por grupo de regras, com evidência `arquivo:linha`; sem alvo, avalia o frontend e ranqueia as páginas da menos aderente para a mais. Somente leitura, salvo o relatório | [`references/aderencia.md`](references/aderencia.md) |
+| `refatorar <página>` | Mede a página, pede ao impeccable a refatoração já enquadrada no kit, mede de novo e marca a página no `DECISOES.md` | [`references/refatorar.md`](references/refatorar.md) |
+| `desvio <descrição>` | Registra um desvio do kit no `DECISOES.md`, com confirmação | seção "Desvio" abaixo |
+
+Roteamento pelo primeiro termo do argumento (com ou sem acento: `aderência`, `aderencia`; `atualizar` é sinônimo de `adotar`):
+
+- **Verbo da tabela:** leia o procedimento dele por inteiro antes de agir e siga-o.
+- **Outro texto** (ex.: `src/web, Blazor DevExpress`): é a entrada do `adotar`; quem usava a skill antes dos verbos continua com o mesmo comando.
+- **Sem argumento:** apresente o menu abaixo; nunca execute um verbo sem a escolha do usuário.
+
+**Menu.** Leia o estado do projeto e abra com uma ou duas recomendações, cada uma com o motivo em uma linha e o comando pronto para digitar; depois mostre a tabela de comandos.
+
+- Sem `docs/design/DECISOES.md` nem `DESIGN.md` → `adotar`.
+- Versão do kit registrada no `DECISOES.md` mais antiga que a primeira entrada de "Versões" do `LEIA-ME.md` do kit, ou `colibri-ui.css` sem `colibri-base.css` ao lado → `adotar` (atualização), citando as entradas de "Versões" que o projeto ainda não tem.
+- Sem `docs/design/ADERENCIA.md` → `aderencia`, para a nota de partida e a ordem das páginas.
+- Com relatório de aderência → `refatorar <página pior colocada no ranking>`, ou `aderencia` de novo se o relatório é anterior aos últimos commits de UI.
 
 ## Fonte da verdade
 
-O kit em [`./assets/kit/`](./assets/kit/) é normativo. [`./assets/kit/DESIGN.md`](./assets/kit/DESIGN.md) define cores, tipografia, estrutura, anatomia de página e componentes; [`./assets/kit/LEIA-ME.md`](./assets/kit/LEIA-ME.md) define a ordem de carga e a versão do kit (seção "Versões"). Leia os dois antes do passo 1.
+O kit em [`./assets/kit/`](./assets/kit/) é normativo. [`./assets/kit/DESIGN.md`](./assets/kit/DESIGN.md) define cores, tipografia, estrutura, anatomia de página e componentes; [`./assets/kit/LEIA-ME.md`](./assets/kit/LEIA-ME.md) define a ordem de carga e a versão do kit (seção "Versões"). Leia os dois antes de qualquer verbo.
 
-Para o impeccable, o kit é um **mundo visual estabelecido**: ele herda, não inventa. Quando o impeccable propuser algo que contraria o kit, **o kit vence**. Em especial, dentro deste fluxo e nas refatorações seguintes:
+Para o impeccable, o kit é um **mundo visual estabelecido**: ele herda, não inventa. Quando o impeccable propuser algo que contraria o kit, **o kit vence**. Em especial, em todos os verbos e nas refatorações seguintes:
 
 - Não rode o workshop de mundo visual do impeccable (`new-work` → "Create or replace the visual world", `concept-seed --scope world`, `document --seed`) nem proponha estratégia de cor ou paleta: as cores do kit são marca comprometida.
 - Cores em hex no frontmatter (valores exatos do kit); não converta para OKLCH.
@@ -32,115 +55,36 @@ Para o impeccable, o kit é um **mundo visual estabelecido**: ele herda, não in
 - Não pergunte o que o kit já decidiu (norte criativo, personalidade, antirreferências, acessibilidade, nomes das cores, elevação, filosofia dos componentes). Mostre o que foi herdado e pergunte só o que é do produto.
 - Nenhuma regra do kit pode ser resumida a ponto de sumir, nem enfraquecida ("prefira" no lugar de "nunca").
 
-Desvios do kit são permitidos apenas com confirmação do usuário e sempre registrados em `docs/design/DECISOES.md` com o motivo.
+Desvios do kit são permitidos apenas com confirmação do usuário e sempre registrados em `docs/design/DECISOES.md` com o motivo (verbo `desvio`).
 
 ## Pré-requisitos
 
-- A skill `impeccable` 4.x precisa estar instalada no projeto (`.agents/skills/impeccable/` ou `.claude/skills/impeccable/`; a versão está em `metadata.version` do `SKILL.md` dela). Se não estiver, ou se for 3.x (tem `scripts/context.mjs` em vez de `scripts/impeccable`), pare e peça para instalar o bundle `frontend` (`Install-Skills.ps1`) ou, pontualmente, `npx skills add ColibriAgile/agents-instructions -s impeccable -y`.
+- A skill `impeccable` 4.x precisa estar instalada no projeto (`.agents/skills/impeccable/` ou `.claude/skills/impeccable/`; a versão está em `metadata.version` do `SKILL.md` dela). Se não estiver, ou se for 3.x (tem `scripts/context.mjs` em vez de `scripts/impeccable`), pare e peça para instalar o bundle `frontend` (`Install-Skills.ps1`) ou, pontualmente, `npx skills add ColibriAgile/agents-instructions -s impeccable -y`. `aderencia` e `desvio` rodam sem o impeccable; sem ele, a parte do detector fica não verificada.
 - O launcher `<pasta-da-skill-impeccable>/scripts/impeccable` (em Windows sem `sh`, `impeccable.cmd`) roda um binário próprio, sem Node. Na primeira execução ele baixa o binário das releases de `pbakaus/impeccable` no GitHub, confere o SHA-256 e guarda em `~/.impeccable/bin/<versão>/`; isso exige rede. Se o launcher falhar, siga o "Launcher unavailable" do `SKILL.md` do impeccable (ler `PRODUCT.md` e `DESIGN.md` direto) e registre a verificação como não realizada.
 - Se `impeccable context` imprimir `UPDATE_AVAILABLE`, não rode `npx impeccable update` no projeto: a skill vem do bundle, e a atualização entra no repositório `agents-instructions`. Avise o usuário e siga.
 - Trabalhe a partir da raiz do repositório de destino; nunca a partir da pasta da skill.
 
-## Procedimento
+## Desvio
 
-### 1. Levantar o projeto
+Procedimento do verbo `desvio <descrição>`. Exige `docs/design/DECISOES.md`; sem ele, recomende `adotar`.
 
-Rode `<pasta-da-skill-impeccable>/scripts/impeccable context` uma vez (com `--target <pasta do frontend>` em monorepo) e, sem alterar nada, descubra e anote:
+1. Identifique a regra do kit afetada: seção do `DESIGN.md` do kit e, se houver, o nome da regra (ex.: "seção 7, regra dos botões adjacentes") e o item da rubrica de aderência que ela cobre (ex.: K1). Sem regra do kit afetada, não é desvio: diga isso e pare.
+2. Monte a linha da tabela "Desvios do kit" (`Regra do kit | O que foi feito | Motivo | Confirmado por`), com o ID da rubrica entre parênteses em "Regra do kit" (`seção 7, regra dos botões adjacentes (K1)`) e o escopo (página ou projeto) em "O que foi feito". Pergunte o que faltar; o motivo é obrigatório.
+3. Mostre a linha e peça confirmação. Se o motivo vale para todas as aplicações Colibri (limitação de biblioteca, regra que não cabe no caso), diga que o caminho é evoluir o kit (seção abaixo) e registre o desvio só se o usuário mantiver.
+4. Acrescente a linha confirmada à tabela "Desvios do kit" da entrada mais recente do `DECISOES.md`, trocando o "Nenhum" se for o primeiro.
 
-- Framework e biblioteca de componentes, com versão: Bootstrap 3/AngularJS, Bootstrap 4/5, React, Blazor (DevExpress, com tema), DevExtreme etc.
-- Pasta de estáticos servida e a entrada HTML que o navegador carrega (layout/_Host/index.html).
-- Página inicial (recebe `.cm-page--home`) e página mais usada.
-- Superfícies de toque (perfil Operação): cardápio de tablet, totem, telas de produção de KDS, painel de pedidos prontos. Para cada uma: orientação e resolução, navegador e versão mínima do aparelho (WebView), alvo de build declarado (`lightningcss`, `build.target`), se é tela de consumidor ou de produção (KDS), e se já existe tema ou cor configurável pelo lojista (campos, onde grava, como chega ao app). Tema existente entra como migração para o esquema por canal (seção 9 do `DESIGN.md` do kit).
-- Fontes/ícones hospedados em CDN ou em pacote de fonte do tema (Roboto, Inter) que precisarão sair.
-- Se já existem `PRODUCT.md`, `DESIGN.md` (no caminho que o `context` resolveu), `.impeccable/` ou `docs/design/DECISOES.md`. Se existirem, este é um fluxo de **atualização**: leia-os, rode `impeccable doctor --json` e mostre ao usuário o que será refeito; nada é sobrescrito sem confirmação.
-  - Kit adotado antes de 09/10/2026 não tem `colibri-base.css` ao lado do `colibri-ui.css`. O `colibri-ui.css` novo importa a base (`@import url('colibri-base.css')`): copiar só ele deixa a aplicação sem tokens e sem fontes. Na atualização, os dois vão juntos.
-  - Artefatos do impeccable 3.x (`## Register` no `PRODUCT.md`, H2 numerados como `## 1. Overview` e `## 4. Elevation` no `DESIGN.md`) entram na atualização como migração, conforme [`./references/mapeamento-impeccable.md`](./references/mapeamento-impeccable.md) ("Migração de um PRODUCT.md…" e "Migração de um DESIGN.md…").
-
-### 2. Confirmar com o usuário
-
-Use a ferramenta de perguntas estruturadas do harness (ou pergunte no chat e aguarde), em rodadas de no máximo três perguntas, como o `impeccable init` exige. Pergunte apenas:
-
-**Rodada 1 (produto):**
-
-1. Usuários: quem usa, em que contexto e com que frequência (ofereça o texto padrão do modelo como opção).
-2. Propósito e página mais usada: o que a aplicação precisa permitir e o que essa página deve favorecer.
-3. Posicionamento em uma frase ("o lugar onde [quem] faz [o quê]").
-
-**Rodada 2 (projeto):**
-
-4. Nome do produto (título do `PRODUCT.md` e da lateral).
-5. Pasta de destino dos estáticos e página inicial, apresentando o que o passo 1 encontrou como opção recomendada.
-6. Perfis e adaptadores: Admin e/ou Operação (com as superfícies de toque e os canais de consumidor) e, no perfil Admin, Bootstrap 3 e/ou DevExpress/DevExtreme, apresentando o que o passo 1 detectou.
-
-**Rodada 3, só se houver geração de imagem** (ferramenta de imagem do harness ou `IMAGE_GEN_AVAILABLE` no `impeccable context`) e `buildPath` ainda não estiver gravado: como novas superfícies começam, em pergunta própria. Explique a troca: **code-first** (constrói direto no código; recomendado aqui, porque o mundo visual já está fixado pelo kit) ou **comp-first** (uma imagem define a meta antes do código). Grave só a resposta recebida; sem resposta, não grave nada.
-
-As respostas confirmadas aqui valem como a entrevista exigida pelo `impeccable init`.
-
-### 3. Copiar os arquivos do kit
-
-Para `<estáticos>/colibri-ui/` (ou a pasta confirmada), mantendo `fonts/` e `logos/` ao lado do CSS, pois os caminhos são relativos:
-
-- `colibri-base.css`, `colibri-ui.css`, `fonts/`, `logos/`. O `colibri-ui.css` importa `colibri-base.css` (tokens dos dois temas, fontes e camadas) pelo caminho relativo: os dois ficam na mesma pasta.
-- `logos/colibri.ico` também numa pasta pública servida pela entrada HTML (quando `colibri-ui/` não for servida diretamente), trocando o ícone da aba do projeto.
-- Com tela de entrada (login) ou páginas de erro: `logos/colibri-marca.svg` na mesma pasta pública, pois é `<img>` do HTML, não `url()` do CSS.
-- `icons/` (Bootstrap Icons 1.13.1 local), ou `npm install bootstrap-icons` quando o projeto usa npm para estáticos.
-- `colibri-ui.bootstrap3.css` somente com Bootstrap 3/AngularJS; `colibri-ui.devexpress.css` somente com DevExpress Blazor ou DevExtreme (remova dele os blocos da biblioteca não usada).
-- Perfil Operação: `colibri-touch.css` (importa `colibri-base.css`, na mesma pasta) e, com canal de consumidor, `colibri-esquema.js` (e `colibri-esquema.d.ts` em TypeScript), importados pelo código do app e pela prévia do admin. Num projeto com os dois perfis, cada entrada carrega só o seu CSS (`colibri-ui.css` no admin, `colibri-touch.css` nas telas de toque).
-- Não copie `DESIGN.md`, `PRODUCT.template.md`, `PRODUCT.toque.template.md`, `LEIA-ME.md`, `exemplo.html`, `exemplo-entrada.html` nem `exemplo-toque.html` para o projeto: o `DESIGN.md` e os modelos de `PRODUCT.md` viram arquivos do impeccable nos passos 4–5; os demais são referência da skill.
-
-Depois ajuste a carga na entrada HTML, nesta ordem: CSS do framework e tema da biblioteca → `bootstrap-icons.min.css` → `colibri-ui.css` → adaptadores (perfil Operação: `bootstrap-icons.min.css` → `colibri-touch.css`). Remova fontes e ícones de CDN. Detalhes por framework e comportamentos de JavaScript do shell: [`./references/adocao-por-framework.md`](./references/adocao-por-framework.md).
-
-Se o usuário pediu só a documentação (sem tocar no código), pule este passo e registre isso em `DECISOES.md`.
-
-### 4. Acionar `impeccable init` (PRODUCT.md e configuração do live)
-
-Invoque a skill `impeccable` com o argumento `init` (`/impeccable init` no Claude Code, `$impeccable init` no Codex) e siga `reference/init.md` dela, com estas entradas:
-
-- **Entrevista (passo 3 do init):** as respostas do passo 2. Não repita perguntas já respondidas nem pergunte direção estética (o init também proíbe).
-- **PRODUCT.md (passo 4 do init):** parta de [`./assets/kit/PRODUCT.template.md`](./assets/kit/PRODUCT.template.md) (projeto com admin, mesmo que tenha também telas de toque) ou de [`./assets/kit/PRODUCT.toque.template.md`](./assets/kit/PRODUCT.toque.template.md) (projeto só de toque, ex.: totem); os dois já estão no schema 1. Preencha os colchetes com as respostas; mantenha com o mesmo texto as partes já preenchidas do modelo (cenário de `## Operating Context`, a restrição de `## Capabilities and Constraints`, `## Brand Commitments` com personalidade e antirreferências, os quatro princípios fixos, `## Accessibility & Inclusion`); troque o título pelo nome do produto; mantenha o comentário `impeccable:product-schema 1` e remova o comentário do modelo. Regras de cada seção em [`./references/mapeamento-impeccable.md`](./references/mapeamento-impeccable.md).
-- **Passo 5 do init:** grave em `.impeccable/config.json` o `buildPath` somente se a rodada 3 teve resposta. Configure o live seguindo `reference/live-setup.md`: `.impeccable/live/config.json` com a entrada HTML do passo 1 e `impeccable detect-csp`; o patch de CSP continua exigindo consentimento.
-- **Passo 6 do init:** o init não oferece `DESIGN.md`; siga para o passo 5 desta skill. Se o usuário quiser, acrescente ao `AGENTS.md` um ponteiro "Design Context" para `PRODUCT.md`, `DESIGN.md` e `docs/design/DECISOES.md`.
-
-### 5. Acionar `impeccable document` (DESIGN.md e `.impeccable/design.json`)
-
-Invoque a skill `impeccable` com o argumento `document` em **modo scan** (nunca seed) e siga `reference/document.md` dela, usando o kit como fonte principal e o código do projeto como complemento. As regras de conversão (10 seções do kit → 8 seções da spec, grupos de frontmatter permitidos, conteúdo do sidecar, onde entra "Implementação neste projeto") e o checklist de fidelidade estão em [`./references/mapeamento-impeccable.md`](./references/mapeamento-impeccable.md). Leia-o antes de escrever o `DESIGN.md`.
-
-No passo 3 do document (linguagem qualitativa, duas rodadas de perguntas), não abra perguntas: apresente as respostas herdadas do kit (tabela no mapeamento) e só pergunte se o usuário quiser mudar algo — mudança é desvio e vai para `DECISOES.md`.
-
-### 6. Registrar as decisões (`docs/design/DECISOES.md`)
-
-Crie o arquivo a partir de [`./assets/DECISOES.template.md`](./assets/DECISOES.template.md) (ou acrescente uma entrada, se já existir). Registre: versão do kit (data da entrada mais recente de "Versões" do `LEIA-ME.md`), versão do impeccable, framework e biblioteca com versão, adaptadores, onde ficam os arquivos, página inicial, cada desvio do kit com o motivo, e a lista de páginas a refatorar com a mais usada primeiro.
-
-### 7. Validar e relatar
-
-Confira antes de concluir:
-
-- `impeccable context` imprime `PRODUCT.md` e `DESIGN.md` sem `NO_PRODUCT_MD`.
-- `impeccable doctor --json` volta sem findings de `PRODUCT.md`, `DESIGN.md` ou sidecar (em especial, sem `product-deprecated-register`). Finding de outra natureza é relatado como o `reference/doctor.md` manda; não corrija por conta própria.
-- `DESIGN.md` passa no checklist de [`./references/mapeamento-impeccable.md`](./references/mapeamento-impeccable.md) (oito seções na ordem, frontmatter só com grupos permitidos, todas as regras nomeadas do kit presentes).
-- `.impeccable/design.json` é JSON válido com `schemaVersion: 2` (valide com o runtime disponível: `node`, `python -m json.tool` ou `ConvertFrom-Json`).
-- Se o passo 3 rodou: `impeccable detect --json` uma vez sobre os arquivos de UI alterados no projeto. Achados em arquivos do projeto são corrigidos ou relatados; achados nos arquivos copiados do kit (`colibri-ui/`) não se corrigem no projeto: relate e leve ao kit (seção "Evoluir o kit").
-- Se o passo 3 rodou: a aplicação carrega sem 404 para `fonts/`, `logos/` e ícones; nenhuma fonte/ícone vem de CDN; a página inicial mostra a marca-d'água e as demais não; a aba mostra o ícone do kit (`colibri.ico`), sem 404 e sem o ícone antigo ou o padrão do framework. Com DevExpress/DevExtreme, faça a verificação obrigatória da seção 3 do `DESIGN.md` do kit (calendário, seletor de hora, lista suspensa, dica e validação em Google Sans Flex); gráficos do DevExtreme escrevem a fonte no SVG e precisam de tema de visualização próprio (ver `adocao-por-framework.md`). Com grade de biblioteca, meça no navegador cabeçalho (36 px) e linha (36 px mais o divisor) e confira as bordas em `--cm-line` nos dois temas, inclusive na linha selecionada e na em edição, e abra o filtro de cabeçalho no tema escuro (itens legíveis, divisores em `--cm-line`) (regra da grade como tabela, seção 7); no projeto, a grade não leva zebra, borda própria nem CSS de grade que o adaptador já cobre. Com o tema escuro, a alternância na barra superior troca `data-theme` no `<html>` sem piscar o tema claro ao carregar, e as páginas, popups e componentes de biblioteca ficam no tema escuro. No perfil Operação: o build declara o alvo Chrome 101 e o CSS gerado não tem cor da paleta do Tailwind em `oklch()` sem alternativa hex, nem `scale:`/`translate:` separados; meça no navegador, na resolução real de cada superfície, os alvos de toque (nenhum abaixo do mínimo da tabela da seção 9); nas telas de consumidor, aplique um esquema claro e um escuro e confira que a tela segue os `--ct-*` sem cor própria e que o esquema gravado é aplicado antes de pintar; nas de produção, os dois temas; urgência com borda, faixa, ícone e rótulo. O que não puder ser verificado aqui (app não sobe, falta banco, sem o aparelho real), relate como não verificado.
-
-Relate ao usuário: arquivos criados/alterados, desvios registrados, o que ficou sem verificação e os próximos passos, página a página, começando pelo shell e depois pela mais usada. `craft` é alias descontinuado no impeccable 4.x; indique:
-
-- pedido direto ao impeccable para refatorar a página seguindo o `DESIGN.md` (ex.: `/impeccable refatore a página Clientes seguindo a anatomia de página do DESIGN.md`). Deixe claro no pedido que o mundo visual e a anatomia de página são do kit, para que o impeccable estenda o mundo estabelecido em vez de abrir um torneio de conceitos;
-- `impeccable shape <página>` para planejar e gravar o brief da superfície (modo Operate) antes de implementar;
-- `impeccable critique <página>` para medir antes/depois, e `impeccable polish <página>` ou `impeccable audit <página>` no fechamento;
-- `impeccable live` (ou `impeccable generate`) para iterar no navegador, se o live foi configurado e o servidor de desenvolvimento estiver rodando.
+Conclua com a linha gravada e confirmada; a próxima `aderencia` conta o item como desvio, fora da nota.
 
 ## Evoluir o kit desta skill
 
-O kit em `./assets/kit/` é mantido diretamente nesta skill e é a fonte da verdade da linha visual Colibri: nenhuma aplicação serve de matriz nem gera o kit. Mudança de design nasce aqui e chega às aplicações pelo fluxo de atualização.
+O kit em `./assets/kit/` é mantido diretamente nesta skill e é a fonte da verdade da linha visual Colibri: nenhuma aplicação serve de matriz nem gera o kit. Mudança de design nasce aqui e chega às aplicações pelo `adotar` (atualização).
 
 Ao alterar o kit:
 
 - Mude a regra e a implementação juntas: `DESIGN.md` e `colibri-ui.css` (tokens, temas e fontes ficam em `colibri-base.css`), mais os adaptadores afetados (`colibri-ui.bootstrap3.css`, `colibri-ui.devexpress.css`) e a marcação de `exemplo.html` quando o componente aparece nela. No perfil Operação, `colibri-touch.css`, `colibri-esquema.js` e `exemplo-toque.html`.
 - Mudou `colibri-esquema.js` ou os estados de `colibri-base.css`: rode `node scripts/verificar-esquema.mjs` (estados iguais à base, contraste garantido numa grade de sementes, nada acima do Chrome 101). Falhou, não publique.
-- Regra nova ou alterada entra no checklist de `./references/mapeamento-impeccable.md` (e na tabela, se o `DESIGN.md` mudou de estrutura); comportamento por framework vai para `./references/adocao-por-framework.md`.
+- Regra nova ou alterada entra no checklist de `./references/mapeamento-impeccable.md` (e na tabela, se o `DESIGN.md` mudou de estrutura) e na rubrica de `./references/aderencia.md` (item novo ou alterado, com a busca dele, e a versão da rubrica incrementada); comportamento por framework vai para `./references/adocao-por-framework.md`.
 - Acrescente no topo de "Versões" do `LEIA-ME.md` uma entrada com a data e o que mudou.
 - Ajuste descoberto numa aplicação que vale para todas volta para cá; não fica só no projeto.
 
 Ao atualizar o impeccable no bundle, confira esta skill contra a versão nova: formato do `PRODUCT.md` (`reference/init.md`), seções do `DESIGN.md` e sidecar (`reference/document.md`), verbos do launcher e findings do `doctor`. Rode `impeccable detect --json` sobre `assets/kit/` para ver o que o detector novo acusa no próprio kit.
-
-Nas aplicações que já adotaram o kit, rode esta skill de novo: é o fluxo de atualização do passo 1.

@@ -18,7 +18,7 @@ Registro das decisões de design do projeto na adoção da linha visual Colibri.
 
 | Regra do kit | O que foi feito | Motivo | Confirmado por |
 |---|---|---|---|
-| [ex.: seção 3, fonte em popups] | [ex.: classe interna .dxbl-xyz] | [ex.: tema X não expõe variável pública] | [nome] |
+| [ex.: seção 3, fonte em popups (T1)] | [ex.: classe interna .dxbl-xyz] | [ex.: tema X não expõe variável pública] | [nome] |
 
 Sem desvios: escreva "Nenhum".
 

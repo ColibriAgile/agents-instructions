@@ -1,6 +1,6 @@
 # Adoção por framework
 
-Complementa o passo 3 do `SKILL.md`. A marcação de cada componente está em `../assets/kit/exemplo.html` (`#historico` abre o painel lateral; `#inicio` mostra a marca-d'água) e a da tela de entrada em `../assets/kit/exemplo-entrada.html` (`#erro` mostra a página de erro).
+Complementa o passo 3 de [`./adotar.md`](./adotar.md). A marcação de cada componente está em `../assets/kit/exemplo.html` (`#historico` abre o painel lateral; `#inicio` mostra a marca-d'água) e a da tela de entrada em `../assets/kit/exemplo-entrada.html` (`#erro` mostra a página de erro).
 
 ## Ordem de carga (todos os frameworks)
 
@@ -149,4 +149,4 @@ Somente o contêiner da página inicial recebe `cm-page--home` (`<div class="cm-
 
 ## Refatoração página a página
 
-Depois do shell, refatore uma página por vez seguindo a anatomia de página do `DESIGN.md` (seção `## Layout`, `### Anatomia de página`), começando pela mais usada. No impeccable 4.x, peça a refatoração direto (ou use `impeccable shape <página>` para planejar antes), deixando claro que mundo visual e anatomia vêm do kit; `craft` é alias descontinuado. Confira o alinhamento em 1440, 1920 e ~900 px antes de dar a página por concluída e atualize a lista de páginas em `docs/design/DECISOES.md`.
+Depois do shell, refatore uma página por vez com o verbo `refatorar <página>` ([`./refatorar.md`](./refatorar.md)), começando pela mais usada ou pela pior colocada no ranking da `aderencia`. Ele mede a página, pede ao impeccable a refatoração já enquadrada no kit, confere o alinhamento em 1440, 1920 e ~900 px e marca a página em `docs/design/DECISOES.md`.
