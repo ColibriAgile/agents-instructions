@@ -6,7 +6,7 @@ Pré-condição: o projeto adotou o kit (`DESIGN.md` e `docs/design/DECISOES.md`
 
 ## 1. Resolver a página
 
-Resolva o argumento para o arquivo da página (e a rota, se houver) e o perfil (Admin ou Operação). Leia o `DESIGN.md` do projeto, os desvios do `DECISOES.md` e, no `DESIGN.md` do kit, a seção 6 (Admin) ou 9 (Operação). Sem argumento, sugira a primeira página não marcada de "Páginas a refatorar" e espere a confirmação.
+Resolva o argumento para o arquivo da página (e a rota, se houver) e o perfil, pela regra de "Perfil da página" de [`./aderencia.md`](./aderencia.md). Leia o `DESIGN.md` do projeto, os desvios do `DECISOES.md` e, no `DESIGN.md` do kit, a seção 6 (Admin) ou 9 (Operação). Sem argumento, sugira a primeira página não marcada de "Páginas a refatorar" e espere a confirmação.
 
 Conclua com arquivo, rota e perfil da página.
 

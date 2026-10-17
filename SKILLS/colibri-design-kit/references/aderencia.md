@@ -12,6 +12,16 @@ Verificação: **E** estática (busca no código, padrões na tabela "Buscas"), 
 
 Escopo: itens de **projeto** são avaliados uma vez por execução; itens de **página**, em cada página do alvo. Página do perfil Admin usa todos os grupos, menos O. Página do perfil Operação usa B, C1, C3, T1, T2, T4, A e O.
 
+### Perfil da página
+
+O perfil decide quais itens valem, então é decidido por evidência, na primeira regra que se aplica:
+
+1. **`DECISOES.md`:** a página está listada como superfície de toque (cardápio do tablet, totem, KDS, pedidos prontos) → Operação; listada no perfil Admin → Admin.
+2. **Código:** a página usa o contêiner `.ct-app` ou é servida por uma entrada HTML que carrega `colibri-touch.css` → Operação; usa o shell `.cm-shell` ou é servida por uma entrada que carrega `colibri-ui.css` → Admin.
+3. **Pergunta:** sem registro nem sinal no código (projeto ainda não adotado, página nova), ou com sinais que se contradizem (listada como Admin mas com `.ct-app`), pergunte o perfil ao usuário, mostrando o que foi encontrado. Não decida pelo nome ou pela aparência da página.
+
+Contradição entre o `DECISOES.md` e o código também entra no relatório, como pendência a corrigir num dos dois. Cada página do relatório mostra o perfil e a origem dele (`DECISOES.md`, `.ct-app`, entrada com `colibri-touch.css`, resposta do usuário).
+
 ### B. Base (projeto; kit seções 3, 5 e 7 "Ícones", `LEIA-ME.md`)
 
 | ID | Item | Verif. |
@@ -123,10 +133,10 @@ Busque no código de UI do projeto, excluindo a pasta copiada do kit (`colibri-u
 
 - Com alvo (página, componente, rota ou pasta): resolva para arquivos; o alvo é essa página.
 - Sem alvo: o frontend inteiro. Liste as páginas (rotas ou arquivos de página) e use a lista de "Páginas a refatorar" do `DECISOES.md` para saber qual é a mais usada. Com mais de 12 páginas, pergunte se avalia todas ou as 12 mais usadas.
-- Leia `docs/design/DECISOES.md` (perfis, superfícies, desvios, versão do kit); desvio registrado antes dos IDs da rubrica é associado ao item pelo texto da regra, e o relatório sugere acrescentar o ID à linha e a seção "Implementação neste projeto" do `DESIGN.md` do projeto. Sem `DECISOES.md` nem `DESIGN.md`, o projeto não adotou o kit: avalie mesmo assim (B6 reprovado) e recomende `adotar` no fechamento.
-- Classifique cada página no perfil Admin ou Operação.
+- Leia `docs/design/DECISOES.md` (perfis, superfícies, desvios, versão do kit) e a seção "Implementação neste projeto" do `DESIGN.md` do projeto. Desvio registrado antes dos IDs da rubrica é associado ao item pelo texto da regra, e o relatório sugere acrescentar o ID à linha. Sem `DECISOES.md` nem `DESIGN.md`, o projeto não adotou o kit: avalie mesmo assim (B6 reprovado) e recomende `adotar` no fechamento.
+- Classifique cada página pela regra de "Perfil da página".
 
-Conclua com a lista de páginas do alvo, cada uma com arquivo e perfil, e os desvios registrados.
+Conclua com a lista de páginas do alvo, cada uma com arquivo, perfil e a origem do perfil, e os desvios registrados.
 
 ### 2. Coletar a evidência
 

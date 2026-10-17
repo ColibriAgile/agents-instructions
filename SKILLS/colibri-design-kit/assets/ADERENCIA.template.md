@@ -35,9 +35,12 @@ Grupo sem item aplicável: "n/a".
 
 Da menos aderente para a mais.
 
-| # | Página | Arquivo | Perfil | Nota | Faixa | Reprovados (★ primeiro) |
+| # | Página | Arquivo | Perfil (origem) | Nota | Faixa | Reprovados (★ primeiro) |
 |---|---|---|---|---|---|---|
-| 1 | [Clientes] | [src/pages/Clientes.razor] | [Admin] | [42] | [Distante] | [P4 ★, K1 ★, C1 ★, T3] |
+| 1 | [Clientes] | [src/pages/Clientes.razor] | [Admin (`DECISOES.md`)] | [42] | [Distante] | [P4 ★, K1 ★, C1 ★, T3] |
+| 2 | [Cardápio] | [src/tablet/Cardapio.tsx] | [Operação (`.ct-app`)] | [61] | [Parcial] | [O2 ★, T4] |
+
+Perfil em contradição entre o `DECISOES.md` e o código: [página — o que cada um diz | nenhum].
 
 ### Reprovações
 

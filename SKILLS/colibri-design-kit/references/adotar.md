@@ -68,7 +68,7 @@ No passo 3 do document (linguagem qualitativa, duas rodadas de perguntas), não 
 
 ## 6. Registrar as decisões (`docs/design/DECISOES.md`)
 
-Crie o arquivo a partir de [`../assets/DECISOES.template.md`](../assets/DECISOES.template.md) (ou acrescente uma entrada, se já existir). Registre: versão do kit (data da entrada mais recente de "Versões" do `LEIA-ME.md`), versão do impeccable, framework e biblioteca com versão, adaptadores, onde ficam os arquivos, página inicial, cada desvio do kit com o motivo, e a lista de páginas a refatorar com a mais usada primeiro.
+Crie o arquivo a partir de [`../assets/DECISOES.template.md`](../assets/DECISOES.template.md) (ou acrescente uma entrada, se já existir). Registre: versão do kit (data da entrada mais recente de "Versões" do `LEIA-ME.md`), versão do impeccable, framework e biblioteca com versão, perfis com as entradas e páginas de cada um (no Operação, cada superfície, se é de consumidor ou de produção, e os canais; é por esse campo que `aderencia` e `refatorar` decidem o perfil da página), adaptadores, onde ficam os arquivos, página inicial, cada desvio do kit com o motivo, e a lista de páginas a refatorar com a mais usada primeiro.
 
 ## 7. Validar e relatar
 
