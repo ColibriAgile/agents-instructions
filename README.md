@@ -34,6 +34,11 @@ sobrescreve com confirmação, marcando `[já incluído]` nos bundles já presen
 pwsh <caminho-local-do-clone>\Install-Skills.ps1
 ```
 
+Ao final, o resumo diz quais skills foram atualizadas (`~`) ou instaladas pela primeira vez (`+`)
+e quantas ficaram sem mudança, comparando o `skills-lock.json` do projeto antes e depois. Skill
+que você alterou aqui e aparece "sem mudança" não chegou ao projeto: confira se o push foi feito
+e de qual branch as skills vieram.
+
 Se `skills.yaml` não existir e a execução for interativa, `Install-Skills.ps1` chama o
 `Init-Skills.ps1` automaticamente antes de instalar. Com `-Silent` (ex: hook de git) isso não
 acontece — falha pedindo pra rodar o `Init-Skills.ps1` manualmente primeiro, já que o picker
