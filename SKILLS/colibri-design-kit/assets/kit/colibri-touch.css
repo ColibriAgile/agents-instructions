@@ -925,6 +925,106 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
 .ct-order.is-canceled .ct-order__items,
 .ct-order.is-done { opacity: .55; }
 .ct-order.is-selected { outline: 3px solid var(--ct-focus); outline-offset: 2px; }
+/* Quantidade de 2 ou mais: selo neutro invertido (fundo na cor do texto), legível de longe sem cor de estado. */
+.ct-order__qty--multi {
+    align-self: flex-start;
+    padding: 0 6px;
+    color: var(--ct-surface);
+    background: var(--ct-ink);
+    border-radius: var(--ct-radius-tag);
+    text-align: center;
+}
+/* Estado de preparo do item: ícone e rótulo, nunca só cor e nunca piscando (só o atraso pulsa). Aguardando é o
+ * padrão, sem marca; em preparo, a linha no fundo suave da ação; pronto, quantidade e nome em ink-3 com o check
+ * em sucesso. Pronto não usa opacidade: o rótulo precisa manter 4,5:1 para ser lido de longe. */
+.ct-order__state {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: var(--ct-text-sm);
+    font-weight: 600;
+}
+.ct-order__item.is-preparing { background: var(--ct-action-soft); }
+.ct-order__item.is-preparing .ct-order__state { color: var(--ct-action-ink); }
+.ct-order__item.is-ready .ct-order__qty,
+.ct-order__item.is-ready .ct-order__name { color: var(--ct-ink-3); }
+.ct-order__item.is-ready .ct-order__qty--multi { color: var(--ct-surface); background: var(--ct-ink-3); }
+.ct-order__item.is-ready .ct-order__state { color: var(--ct-success); }
+/* Cartão de agrupamento (visão por produto, consolidado): cabeçalho neutro com o produto e o total; cada linha
+ * é um pedido de origem, com o tipo em selo da paleta, o número e o tempo em mono. A urgência é a do pior pedido. */
+.ct-order--group .ct-order__head { color: var(--ct-ink); background: var(--ct-surface-2); border-bottom: 1px solid var(--ct-line); }
+.ct-order__title { flex: 1; min-width: 0; font-size: var(--ct-text-lg); font-weight: 700; }
+.ct-order__total { font-family: var(--cm-mono); font-size: var(--ct-text-xl); font-weight: 700; font-variant-numeric: tabular-nums; }
+.ct-order__origin { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ct-order__ref { font-family: var(--cm-mono); font-weight: 700; font-variant-numeric: tabular-nums; }
+/* Tipo de pedido em selo (linhas do agrupamento, listas): a mesma cor do cabeçalho do cartão, da paleta curada. */
+.ct-tag--balcao { --ct-order-color: var(--ct-order-balcao); }
+.ct-tag--retirada { --ct-order-color: var(--ct-order-retirada); }
+.ct-tag--entrega { --ct-order-color: var(--ct-order-entrega); }
+.ct-tag--mesa { --ct-order-color: var(--ct-order-mesa); }
+.ct-tag--ficha { --ct-order-color: var(--ct-order-ficha); }
+.ct-tag--balcao,
+.ct-tag--retirada,
+.ct-tag--entrega,
+.ct-tag--mesa,
+.ct-tag--ficha { color: #fff; background: var(--ct-order-color); border-color: var(--ct-order-color); }
+
+/* ---------- Barra da estação (KDS) ----------
+ * Identidade da estação (ícone da lista curada sobre a cor da estação, da paleta, e o nome), contagens de
+ * atenção e atraso em selos de estado e as ações da estação à direita, com o alvo da superfície. */
+.ct-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    min-height: var(--ct-target);
+    padding: 8px var(--ct-pad);
+    background: var(--ct-surface);
+    border-bottom: 1px solid var(--ct-line);
+}
+.ct-bar__station {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    margin-right: auto;
+    font-size: var(--ct-text-lg);
+    font-weight: 700;
+}
+.ct-bar__station > .bi {
+    display: inline-grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 1.8em;
+    height: 1.8em;
+    color: #fff;
+    background: var(--ct-station-color, var(--ct-palette-grafite));
+    border-radius: var(--ct-radius-tag);
+    font-size: .85em;
+}
+.ct-bar__actions { display: flex; gap: 8px; }
+
+/* ---------- Painel da produção (TV de indicadores do KDS, tema Colibri) ----------
+ * Até seis números grandes numa linha, cada um com rótulo; estado em selo com ícone; nada de cartão de métrica:
+ * os números ficam no plano, separados por divisores. Gráficos seguem a seção 2 ("Gráficos"). */
+.ct-board { display: flex; flex-direction: column; gap: 32px; padding: var(--ct-pad); }
+.ct-board__stats { display: flex; flex-wrap: wrap; row-gap: 24px; }
+.ct-stat {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 10em;
+    padding: 4px 24px;
+    border-left: 1px solid var(--ct-line);
+}
+.ct-stat:first-child { padding-left: 0; border-left: 0; }
+.ct-stat__label { color: var(--ct-ink-2); font-size: var(--ct-text); font-weight: 600; }
+.ct-stat__value { color: var(--ct-ink); font-family: var(--cm-mono); font-size: var(--ct-text-display); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.ct-stat__value small { margin-left: 6px; color: var(--ct-ink-2); font-size: var(--ct-text-lg); font-weight: 600; }
+.ct-stat > .ct-tag { align-self: flex-start; }
+.ct-board__title { margin: 0 0 12px; font-size: var(--ct-text-lg); font-weight: 700; }
 
 /* ---------- Pedidos prontos (TV voltada ao cliente; usa o esquema do canal) ---------- */
 .ct-ready-grid {
