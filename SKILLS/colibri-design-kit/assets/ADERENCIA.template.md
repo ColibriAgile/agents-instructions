@@ -6,7 +6,7 @@ Gerado pelo verbo `aderencia` da skill `colibri-design-kit`. O histórico só cr
 
 | Data | Alvo | Rubrica | Kit | Nota | Faixa | Não verificados |
 |---|---|---|---|---|---|---|
-| [AAAA-MM-DD] | [frontend \| página] | v1 | [data da versão do kit adotada] | [0–100] | [Aderente \| Próximo \| Parcial \| Distante] | [n] |
+| [AAAA-MM-DD] | [frontend \| página] | v2 | [data da versão do kit adotada] | [0–100] | [Aderente \| Próximo \| Parcial \| Distante] | [n] |
 
 ## Relatório de [AAAA-MM-DD] — [alvo]
 

@@ -1000,6 +1000,30 @@ a.cm-card:hover .cm-card__go { color: var(--cm-accent-ink); transform: translate
 }
 
 /* ---------- Importação, upload e progresso ---------- */
+/* Código QR: branco fixo nos dois temas (cor da imagem, não da interface; o leitor falha com o código
+   invertido), respiro de 8 px como zona de silêncio e os cantos do kit. O código vai em preto e branco
+   literais dentro dele. Texto do que o código abre em .cm-qr__text, ao lado. */
+.cm-qr {
+    display: inline-flex;
+    flex: none;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid var(--cm-line);
+    border-radius: var(--cm-radius);
+    line-height: 0;
+}
+.cm-qr > svg,
+.cm-qr > img,
+.cm-qr > canvas { display: block; }
+.cm-qr__text {
+    display: flex;
+    flex: 1 1 240px;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    font-size: 13px;
+    color: var(--cm-ink-2);
+}
 .cm-import {
     display: flex;
     align-items: center;

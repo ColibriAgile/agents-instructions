@@ -4,7 +4,9 @@ Procedimento do verbo `aderencia`. Mede quanto o código de UI e a aplicação e
 
 A avaliação é somente leitura. A única gravação é o relatório `docs/design/ADERENCIA.md`.
 
-## Rubrica v1
+## Rubrica v2
+
+Mudanças desde a v1 (21/10/2026): C1 ganha a exceção do código QR em `.cm-qr` (preto sobre branco fixos, perfil Admin). Notas da v1 não se comparam com as da v2 sem recalcular.
 
 Cada item é **aprovado**, **reprovado**, **n/a** (não se aplica ao alvo, com o motivo), **desvio** (há linha em "Desvios do kit" do `DECISOES.md` com o ID do item na coluna "Regra do kit" e o escopo que cobre o caso) ou **não verificado** (a evidência exige o que não está disponível, como navegador ou aparelho). A regra de cada item está no `DESIGN.md` do kit, na seção indicada; leia a seção antes de julgar o item.
 
@@ -37,7 +39,7 @@ Contradição entre o `DECISOES.md` e o código também entra no relatório, com
 
 | ID | Item | Verif. |
 |---|---|---|
-| C1 ★ | Cor só por token: CSS e marcação do projeto sem cor literal (hex, `rgb()`, `hsl()`, nome de cor) fora de definição de token; o detector não acusa cor fora do `DESIGN.md`. Exceções do kit: `transparent`, `currentColor`, `inherit` e o texto branco sobre foto ou câmera do perfil Operação. | E, D |
+| C1 ★ | Cor só por token: CSS e marcação do projeto sem cor literal (hex, `rgb()`, `hsl()`, nome de cor) fora de definição de token; o detector não acusa cor fora do `DESIGN.md`. Exceções do kit: `transparent`, `currentColor`, `inherit`, o texto branco sobre foto ou câmera do perfil Operação e o preto e branco literais de um código QR dentro de `.cm-qr` (seção 2, "Código QR na tela"). | E, D |
 | C2 | Regra da ação rara: o azul de ação só em ação, link, seleção e item ativo; nenhum painel, seção ou cabeçalho com fundo de acento. | E, N |
 | C3 | Estado nunca só por cor: todo uso de sucesso, aviso e erro tem rótulo ou ícone. | E |
 | C4 | Tema escuro: alternância na barra superior grava `data-theme` no `<html>`, aplicado antes de pintar; nenhum código do projeto testa o tema para escolher cor; popups e componentes de biblioteca no escuro. | E, N |
