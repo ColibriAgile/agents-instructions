@@ -4,9 +4,9 @@ Procedimento do verbo `aderencia`. Mede quanto o código de UI e a aplicação e
 
 A avaliação é somente leitura. A única gravação é o relatório `docs/design/ADERENCIA.md`.
 
-## Rubrica v2
+## Rubrica v3
 
-Mudanças desde a v1 (21/10/2026): C1 ganha a exceção do código QR em `.cm-qr` (preto sobre branco fixos, perfil Admin). Notas da v1 não se comparam com as da v2 sem recalcular.
+Mudanças desde a v2 (21/10/2026): O7 e O8 novos, para o KDS: leitura dos itens e estado de preparo, cartão de agrupamento, identidade da estação por ícone curado e painel da produção sem cartões de métrica. Mudanças da v1 para a v2: C1 ganha a exceção do código QR em `.cm-qr` (preto sobre branco fixos, perfil Admin). Notas de uma versão não se comparam com as de outra sem recalcular.
 
 Cada item é **aprovado**, **reprovado**, **n/a** (não se aplica ao alvo, com o motivo), **desvio** (há linha em "Desvios do kit" do `DECISOES.md` com o ID do item na coluna "Regra do kit" e o escopo que cobre o caso) ou **não verificado** (a evidência exige o que não está disponível, como navegador ou aparelho). A regra de cada item está no `DESIGN.md` do kit, na seção indicada; leia a seção antes de julgar o item.
 
@@ -102,6 +102,8 @@ Contradição entre o `DECISOES.md` e o código também entra no relatório, com
 | O4 ★ | Chrome 101: alvo declarado no build; nenhum `oklch()`, `lab()`, `color-mix()` com variável, classe de cor da paleta do Tailwind, `scale:`/`translate:` separados, `:has()` ou `@container` no CSS entregue. | E |
 | O5 | Composição: uma ação principal por tela (a do cartão de produto é botão comum); cartões só de produto e de pedido; sem faixa lateral colorida; cantos de 3 e 6 px, sem pílula. | E |
 | O6 | Regra da urgência legível: borda de 3 px mais faixa com ícone e rótulo; só o atraso pulsa. n/a sem KDS. | E, N |
+| O7 | Cartão de pedido legível: nome do item na cor do texto e quantidade em mono, a de 2 ou mais no selo neutro (`.ct-order__qty--multi`); estado de preparo do item na linha com ícone e rótulo (`.ct-order__state`, `is-preparing`, `is-ready`), sem piscar; visão por produto em `.ct-order--group` com o tipo em selo da paleta; situação do despacho do delivery em selo de estado com ícone. n/a sem KDS. | E, N |
+| O8 | Estação e painel: estação identificada por nome, cor da paleta e ícone da lista curada na barra `.ct-bar`; nenhum emoji ou imagem como ícone de estação; painel da produção em `.ct-board` com até seis `.ct-stat` no plano, sem cartões de métrica, e número fora da meta com selo de estado. n/a sem KDS. | E |
 
 ## Buscas
 
@@ -121,6 +123,8 @@ Busque no código de UI do projeto, excluindo a pasta copiada do kit (`colibri-u
 - A1: `outline:\s*(none|0)`
 - A2: `animation|transition|prefers-reduced-motion`
 - O4: `oklch\(|lab\(|color-mix\(|:has\(|@container|\bscale:|\btranslate:|\b(bg|text|border|ring|fill|stroke)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}\b`
+- O7: `animate-pulse|animation:|ct-order__qty|ct-order__state` (pulso fora do `.ct-order--late`, quantidade e nome com cor própria)
+- O8: emoji no código e nos dados de estação (`rg -P "[\x{1F300}-\x{1FAFF}\x{2300}-\x{27BF}]"`), `ct-bar|ct-board|ct-stat` e cartões de métrica no painel
 
 ## Nota e faixa
 

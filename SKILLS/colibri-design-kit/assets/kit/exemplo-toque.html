@@ -25,8 +25,6 @@
         .demo-main { display: flex; flex: 1; min-height: 0; }
         .demo-main .ct-rail { flex: 0 0 220px; }
         .demo-scroll { flex: 1; min-height: 0; overflow-y: auto; }
-        .demo-kds-bar { display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: var(--ct-surface); border-bottom: 1px solid var(--ct-line); }
-        .demo-kds-bar strong { margin-right: auto; font-size: var(--ct-text-lg); }
         /* Foto e câmera de mentira (o kit não traz imagens): só para mostrar o texto sobre imagem. */
         .demo-feature { position: relative; height: 220px; margin: var(--ct-pad) var(--ct-pad) 0; overflow: hidden; border-radius: var(--ct-radius-card); }
         .demo-foto { position: absolute; inset: 0; background: linear-gradient(135deg, #6b3d1c, #c98a3c 55%, #f0d08a); }
@@ -243,14 +241,20 @@
 
 <!-- KDS: telas de produção, tema Colibri (sem esquema) -->
 <div class="ct-app ct-app--kds demo-surface" id="kds">
-    <div class="demo-kds-bar"><strong><i class="bi bi-fire" aria-hidden="true"></i> Estação Chapa</strong><span class="ct-tag ct-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>2 em atenção</span><span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>1 atrasado</span></div>
+    <!-- Barra da estação: ícone da lista curada sobre a cor da estação (paleta), contagens em selos de estado, ações à direita -->
+    <div class="ct-bar" style="--ct-station-color: var(--ct-palette-laranja)">
+        <span class="ct-bar__station"><i class="bi bi-fire" aria-hidden="true"></i>Chapa</span>
+        <span class="ct-tag ct-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>2 em atenção</span>
+        <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>1 atrasado</span>
+        <div class="ct-bar__actions"><a class="ct-btn" href="#consolidado">Por produto</a></div>
+    </div>
     <div class="demo-scroll">
         <div class="ct-orders" style="--ct-cols: 4">
             <article class="ct-order ct-order--mesa">
                 <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa 12</span><span class="ct-order__ticket">#482</span><span class="ct-order__timer">03:12</span></div>
                 <ul class="ct-order__items">
-                    <li class="ct-order__item"><span class="ct-order__qty">2×</span><span class="ct-order__name">X-salada da casa<span class="ct-order__note"><i class="bi bi-chat-left-text" aria-hidden="true"></i>Sem cebola</span></span></li>
-                    <li class="ct-order__item"><span class="ct-order__qty">1×</span><span class="ct-order__name">Batata média</span></li>
+                    <li class="ct-order__item is-preparing"><span class="ct-order__qty ct-order__qty--multi">2×</span><span class="ct-order__name">X-salada da casa<span class="ct-order__state"><i class="bi bi-fire" aria-hidden="true"></i>Em preparo</span><span class="ct-order__note"><i class="bi bi-chat-left-text" aria-hidden="true"></i>Sem cebola</span></span></li>
+                    <li class="ct-order__item is-ready"><span class="ct-order__qty">1×</span><span class="ct-order__name">Batata média<span class="ct-order__state"><i class="bi bi-check2-circle" aria-hidden="true"></i>Pronto</span></span></li>
                 </ul>
                 <div class="ct-order__foot"><button class="ct-btn" type="button">Iniciar</button><button class="ct-btn ct-btn--primary" type="button">Concluir</button></div>
             </article>
@@ -267,7 +271,7 @@
                 <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="ct-order__ticket">#471</span><span class="ct-order__timer">12:05</span></div>
                 <div class="ct-order__urgency"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Atrasado · passou de 10 min</div>
                 <ul class="ct-order__items">
-                    <li class="ct-order__item"><span class="ct-order__qty">3×</span><span class="ct-order__name">Pastel de carne</span></li>
+                    <li class="ct-order__item"><span class="ct-order__qty ct-order__qty--multi">3×</span><span class="ct-order__name">Pastel de carne</span></li>
                 </ul>
                 <div class="ct-order__foot"><button class="ct-btn ct-btn--primary" type="button">Concluir</button></div>
             </article>
@@ -283,6 +287,63 @@
     </div>
 </div>
 
+<!-- Visão por produto (consolidado): cartão de agrupamento, cabeçalho neutro com o produto e o total; no delivery,
+     entregador na faixa de dados e a situação do despacho em selo de estado -->
+<div class="ct-app ct-app--kds demo-surface" id="consolidado">
+    <div class="ct-bar" style="--ct-station-color: var(--ct-palette-laranja)">
+        <span class="ct-bar__station"><i class="bi bi-fire" aria-hidden="true"></i>Chapa · por produto</span>
+        <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>1 atrasado</span>
+        <div class="ct-bar__actions"><a class="ct-btn" href="#kds">Por pedido</a></div>
+    </div>
+    <div class="demo-scroll">
+        <div class="ct-orders" style="--ct-cols: 3">
+            <article class="ct-order ct-order--group ct-order--late">
+                <div class="ct-order__head"><span class="ct-order__title">Pastel de carne</span><span class="ct-order__total">5×</span></div>
+                <div class="ct-order__urgency"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Atrasado · #471 passou de 10 min</div>
+                <ul class="ct-order__items">
+                    <li class="ct-order__item"><span class="ct-order__qty ct-order__qty--multi">3×</span><span class="ct-order__name"><span class="ct-order__origin"><span class="ct-tag ct-tag--balcao"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="ct-order__ref">#471</span><span class="ct-order__ref">12:05</span></span></span></li>
+                    <li class="ct-order__item is-preparing"><span class="ct-order__qty ct-order__qty--multi">2×</span><span class="ct-order__name"><span class="ct-order__origin"><span class="ct-tag ct-tag--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa 12</span><span class="ct-order__ref">#482</span><span class="ct-order__ref">03:12</span></span><span class="ct-order__state"><i class="bi bi-fire" aria-hidden="true"></i>Em preparo</span></span></li>
+                </ul>
+                <div class="ct-order__foot"><button class="ct-btn" type="button">Iniciar todos</button><button class="ct-btn ct-btn--primary" type="button">Concluir 5</button></div>
+            </article>
+            <article class="ct-order ct-order--group">
+                <div class="ct-order__head"><span class="ct-order__title">Batata média</span><span class="ct-order__total">3×</span></div>
+                <ul class="ct-order__items">
+                    <li class="ct-order__item is-ready"><span class="ct-order__qty">1×</span><span class="ct-order__name"><span class="ct-order__origin"><span class="ct-tag ct-tag--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa 12</span><span class="ct-order__ref">#482</span></span><span class="ct-order__state"><i class="bi bi-check2-circle" aria-hidden="true"></i>Pronto</span></span></li>
+                    <li class="ct-order__item"><span class="ct-order__qty ct-order__qty--multi">2×</span><span class="ct-order__name"><span class="ct-order__origin"><span class="ct-tag ct-tag--entrega"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="ct-order__ref">#479</span><span class="ct-order__ref">07:40</span></span></span></li>
+                </ul>
+                <div class="ct-order__foot"><button class="ct-btn ct-btn--primary" type="button">Concluir 2</button></div>
+            </article>
+            <article class="ct-order ct-order--entrega">
+                <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="ct-order__ticket">#468</span><span class="ct-order__timer">14:20</span></div>
+                <div class="ct-order__meta">Joana · site · entregador Rafael <span class="ct-tag ct-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>Aguardando entregador</span></div>
+                <ul class="ct-order__items">
+                    <li class="ct-order__item is-ready"><span class="ct-order__qty">1×</span><span class="ct-order__name">Combo família<span class="ct-order__state"><i class="bi bi-check2-circle" aria-hidden="true"></i>Pronto</span></span></li>
+                </ul>
+                <div class="ct-order__foot"><button class="ct-btn ct-btn--primary" type="button">Despachar</button></div>
+            </article>
+        </div>
+    </div>
+</div>
+
+<!-- Painel da produção: TV de indicadores no tema Colibri, números no plano com divisores, sem cartões de métrica -->
+<div class="ct-app ct-app--tv demo-surface" id="painel">
+    <div class="ct-bar">
+        <span class="ct-bar__station"><i class="bi bi-speedometer2" aria-hidden="true"></i>Produção de hoje</span>
+        <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>3 atrasados</span>
+    </div>
+    <div class="demo-scroll">
+        <div class="ct-board">
+            <div class="ct-board__stats">
+                <div class="ct-stat"><span class="ct-stat__label">Itens produzidos</span><span class="ct-stat__value">412</span></div>
+                <div class="ct-stat"><span class="ct-stat__label">Tempo médio</span><span class="ct-stat__value">6:40<small>min</small></span></div>
+                <div class="ct-stat"><span class="ct-stat__label">Na fila agora</span><span class="ct-stat__value">18</span></div>
+                <div class="ct-stat"><span class="ct-stat__label">Acima de 10 min</span><span class="ct-stat__value">7%</span><span class="ct-tag ct-tag--warning"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i>Meta: até 5%</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Pedidos prontos: TV voltada ao cliente, esquema do canal "pedido-pronto" -->
 <div class="ct-app ct-app--tv ct-app--kiosk demo-surface" id="pronto">
     <header class="ct-header"><div class="ct-header__brand"><span class="ct-header__name">Cantina do Porto</span></div><span class="ct-tag ct-tag--success"><i class="bi bi-check-circle" aria-hidden="true"></i>Pedidos prontos</span></header>
@@ -294,7 +355,7 @@
 </div>
 
 <div class="demo-bar" id="demo-bar">
-    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>) · <a href="#totem">Totem</a> (<a href="#portas">portas</a>) · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>) · <a href="#pronto">Pronto</a>
+    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>) · <a href="#totem">Totem</a> (<a href="#portas">portas</a>) · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>, <a href="#consolidado">por produto</a>, <a href="#painel">painel</a>) · <a href="#pronto">Pronto</a>
     <span id="demo-esquema" hidden>
         | <label>Ambiente <input type="color" id="s-ambiente" value="#0b1120"></label>
         <label>Ação <input type="color" id="s-acao" value="#f59e0b"></label>
@@ -331,7 +392,7 @@
     var superficie = 'tablet';
     var padrao = false;
     function atualizar() {
-        var consumidor = superficie !== 'kds';
+        var consumidor = ['kds', 'consolidado', 'painel'].indexOf(superficie) < 0;
         document.getElementById('demo-esquema').hidden = !consumidor;
         if (!consumidor || padrao) {
             aplicarEsquema(null);
