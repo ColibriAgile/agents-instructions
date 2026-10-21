@@ -1001,7 +1001,8 @@ a.cm-card:hover .cm-card__go { color: var(--cm-accent-ink); transform: translate
 
 /* ---------- Importação, upload e progresso ---------- */
 /* Código QR: branco fixo nos dois temas (cor da imagem, não da interface; o leitor falha com o código
-   invertido), respiro de 8 px como zona de silêncio e os cantos do kit. O código vai em preto e branco
+   invertido), respiro visual de 8 px e os cantos do kit. A zona de silêncio do leitor é a margem de
+   módulos gerada com o próprio código (no mínimo 2), não este respiro. O código vai em preto e branco
    literais dentro dele. Texto do que o código abre em .cm-qr__text, ao lado. */
 .cm-qr {
     display: inline-flex;
