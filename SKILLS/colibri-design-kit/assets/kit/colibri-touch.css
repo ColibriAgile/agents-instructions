@@ -42,17 +42,17 @@
     --ct-danger-soft: var(--cm-danger-soft);
     --ct-danger-line: var(--cm-danger-line);
 
-    /* Paleta curada: cores fixas com no mínimo 5,2:1 sobre texto branco, nos dois temas. Usada nos
-     * tipos de pedido e nas estações do KDS e nos selos categóricos (Combo, Rodízio). O lojista
-     * escolhe dentro dela; nunca hex livre. */
-    --ct-palette-verde: #1e7a46;
-    --ct-palette-laranja: #b0500c;
-    --ct-palette-azul: #1d62ad;
-    --ct-palette-roxo: #6d3fa3;
-    --ct-palette-vinho: #a32c52;
-    --ct-palette-petroleo: #0e6d77;
-    --ct-palette-marrom: #7d5130;
-    --ct-palette-grafite: #4d5a68;
+    /* Paleta curada, definida em colibri-base.css (--cm-palette-*) para o admin oferecer as mesmas
+     * cores. Usada nos tipos de pedido e nas estações do KDS e nos selos categóricos (Combo, Rodízio).
+     * O lojista escolhe dentro dela; nunca hex livre. */
+    --ct-palette-verde: var(--cm-palette-verde);
+    --ct-palette-laranja: var(--cm-palette-laranja);
+    --ct-palette-azul: var(--cm-palette-azul);
+    --ct-palette-roxo: var(--cm-palette-roxo);
+    --ct-palette-vinho: var(--cm-palette-vinho);
+    --ct-palette-petroleo: var(--cm-palette-petroleo);
+    --ct-palette-marrom: var(--cm-palette-marrom);
+    --ct-palette-grafite: var(--cm-palette-grafite);
 
     /* Tipos de pedido (padrão; o KDS troca por configuração, dentro da paleta). */
     --ct-order-balcao: var(--ct-palette-verde);
