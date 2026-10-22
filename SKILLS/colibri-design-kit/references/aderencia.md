@@ -124,7 +124,7 @@ Busque no código de UI do projeto, excluindo a pasta copiada do kit (`colibri-u
 - A2: `animation|transition|prefers-reduced-motion`
 - O4: `oklch\(|lab\(|color-mix\(|:has\(|@container|\bscale:|\btranslate:|\b(bg|text|border|ring|fill|stroke)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}\b`
 - O7: `animate-pulse|animation:|ct-order__qty|ct-order__state` (pulso fora do `.ct-order--late`, quantidade e nome com cor própria)
-- O8: emoji no código e nos dados de estação (`rg -P "[\x{1F300}-\x{1FAFF}\x{2300}-\x{27BF}]"`), `ct-bar|ct-board|ct-stat` e cartões de métrica no painel
+- O8: emoji no código e nos dados de estação (`rg -P "[\x{1F300}-\x{1FAFF}\x{2300}-\x{23FF}\x{2600}-\x{27BF}]"`; a faixa pula `U+2400`–`U+25FF`, dos traços de desenho de caixa (`──`) dos comentários de seção), `ct-bar|ct-board|ct-stat` e cartões de métrica no painel
 
 ## Nota e faixa
 

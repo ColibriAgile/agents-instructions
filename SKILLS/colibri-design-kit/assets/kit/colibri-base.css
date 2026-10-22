@@ -70,6 +70,18 @@
     --cm-chart-7: #4a3aa7;
     --cm-chart-8: #e34948;
     --cm-ease: cubic-bezier(.22, 1, .36, 1);
+    /* Paleta curada (DESIGN.md, seção 9): cores fixas com no mínimo 5,2:1 sobre texto branco, nos dois
+     * temas, para tipos de pedido, estações e selos categóricos. Fica na base porque o admin (perfil
+     * Admin) mostra e oferece as mesmas cores que as telas de produção desenham; o perfil Operação as
+     * expõe como --ct-palette-*. O lojista escolhe dentro dela, gravando o nome (verde), nunca o hex. */
+    --cm-palette-verde: #1e7a46;
+    --cm-palette-laranja: #b0500c;
+    --cm-palette-azul: #1d62ad;
+    --cm-palette-roxo: #6d3fa3;
+    --cm-palette-vinho: #a32c52;
+    --cm-palette-petroleo: #0e6d77;
+    --cm-palette-marrom: #7d5130;
+    --cm-palette-grafite: #4d5a68;
 }
 
 /* ---------- Tema escuro ----------

@@ -55,6 +55,8 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **21/10/2026 (paleta curada na base):** as oito cores da paleta curada passam do `colibri-touch.css` para o `colibri-base.css`, como `--cm-palette-*`; o perfil Operação continua expondo `--ct-palette-*`, agora apontando para elas, sem mudança de valor. Assim o admin (perfil Admin), que não carrega o `colibri-touch.css`, oferece e mostra a cor da estação e do tipo de pedido com o token, sem copiar o hex (`DESIGN.md`, seção 9). A busca de emoji do item O8 da rubrica deixa de acusar os traços de desenho de caixa dos comentários de seção. Projetos que adotaram o kit: copiar o `colibri-base.css` e o `colibri-touch.css` novos; no admin, trocar amostras de cor em hex por `var(--cm-palette-*)`.
+
 - **21/10/2026 (perfil Operação: cores e peças do KDS):** quatro lacunas que as telas de produção do Colibri KDS tinham resolvido fora do kit, com regras de cor próprias, entram na seção 9 do `DESIGN.md`, para o KDS adotar o perfil Operação sem desvios.
   - **Leitura dos itens:** o nome do item fica na cor do texto, e a quantidade de 2 ou mais vai num selo neutro invertido (`.ct-order__qty--multi`), no lugar de quantidade amarela e nome azul.
   - **Estado de preparo por item:** fica na própria linha (`.ct-order__state`, `.ct-order__item.is-preparing` no fundo suave da ação e `.is-ready` com quantidade e nome em `ink-3` e o check em sucesso, sem opacidade, para o rótulo manter 4,5:1), sem piscar: só o atraso pulsa.
