@@ -38,7 +38,7 @@ Artefatos SDD são o contrato da feature só enquanto ela está em andamento, e 
 
 ## Etapas
 
-Salve checkpoint antes de cada pergunta HIL, após registrar sua resposta, entre tasks, antes de delegar cada revisão e após recebê-la. Nesses pontos faça a pausa de sessão conforme o protocolo de estado, combinada com qualquer gate pendente; pausar não aprova um gate nem conclui a feature. Ao concluir, marque o checkpoint `concluido` e o snapshot `encerrado` para impedir retomada automática de trabalho encerrado.
+Salve checkpoint antes de cada pergunta HIL, após registrar sua resposta, entre tasks, antes de delegar cada revisão e após recebê-la. Nesses pontos faça a pausa de sessão conforme o protocolo de estado, combinada com qualquer gate pendente; pausar não aprova um gate nem conclui a feature. Ao concluir, marque o checkpoint `concluido` e o snapshot `encerrado` para impedir retomada automática de trabalho encerrado. Após cada gravação que muda `phase` ou `status`, informe o estado da feature conforme `references/relatorio-progresso.md` da skill `sdd-orquestrar-tasks`.
 
 Toda etapa roda na sessão coordenadora, exceto a revisão delegada; a última coluna diz qual contexto pode executá-la.
 
