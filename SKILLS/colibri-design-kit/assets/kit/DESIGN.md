@@ -527,10 +527,14 @@ Os tokens ficam em `colibri-producao.css`, não na base, porque só o card os us
 O modo é configurado por estação (todos os monitores de uma estação no mesmo modo) e marcado na raiz da grade: `.cp-modo-toque` ou `.cp-modo-bump`.
 
 - **Toque** (tablet ao alcance do cozinheiro): rodapé com botões só de texto, de 40 px (`.cp-card__acao`): Espera ou Iniciar e Concluir (`--principal`, com o dobro da largura); Remover (`--perigo`) no cancelado. O ícone de estado é o botão do item (`.cp-card__estado-btn`, 30 px visíveis): o toque avança de aguardando para em preparo e para pronto, o toque no pronto volta para em preparo (é o desfazer), e o toque longo põe ou tira o item da espera. O nome continua abrindo a ficha técnica. Num combo, a ação vale para a linha toda.
-- **Bump** (TV operada pela bump bar): sem rodapé. O card selecionado (`.is-selecionado`) tem contorno de 4 px na cor de seleção, afastado 3 px, e o índice aceso. O cursor (`.is-cursor`) fica no cabeçalho, com contorno interno na tinta do cabeçalho, ou num item, com contorno interno de 2 px e `action-soft`. Ao chegar num card, o cursor para no primeiro item não pronto; quando um item fica pronto, ele pula para o próximo.
-- **Faixas do card** (`.cp-card__faixa`): "Enter de novo para concluir", só no card selecionado e enquanto espera o segundo Enter; "Tudo pronto · Enter conclui" (`--pronto`), quando todos os itens estão prontos. O card nunca conclui sozinho.
+- **Bump** (TV operada pela bump bar): sem rodapé. O card selecionado (`.is-selecionado`) tem contorno de 4 px na cor de seleção, afastado 3 px, e o índice aceso. O cursor (`.is-cursor`) fica no cabeçalho, com contorno interno na tinta do cabeçalho, ou num item, com contorno interno de 2 px e `action-soft`. Ao chegar num card, o cursor para no primeiro item pendente (nem pronto nem em espera); quando um item fica pronto, ele pula para o próximo pendente. No card cancelado, o cabeçalho é a única linha do cursor.
+- **Faixas do card** (`.cp-card__faixa`): "Enter de novo para concluir", só no card selecionado e enquanto espera o segundo Enter; "Tudo pronto · Enter conclui" (`--pronto`), quando todos os itens estão prontos. O card nunca conclui sozinho: o item pronto fica no card, esmaecido, até o card ser concluído.
 
 **Regra da bump bar em dois níveis.** O cursor fica no cabeçalho (o card inteiro) ou num item, e a mesma tecla age no nível dele: 8 e 2 andam entre os itens, e acima do primeiro está o cabeçalho; 4 e 6 vão ao card anterior e ao próximo na ordem da fila, que o índice mostra; 0 avança o item ou inicia o card; `.` põe na espera o item ou o card; Enter sempre conclui o card, com a confirmação do segundo Enter; 5 vai ao primeiro card e Esc limpa a seleção. As teclas continuam configuráveis.
+
+- O 0 no cabeçalho inicia só os itens aguardando: não desfaz os prontos nem tira da espera.
+- Num combo, o 0 e o `.` valem para a linha toda, como o toque.
+- A confirmação do segundo Enter dura 3 s; depois disso, a faixa some e o próximo Enter volta a pedir confirmação.
 
 ### Alvos de toque
 
@@ -541,7 +545,11 @@ O modo é configurado por estação (todos os monitores de uma estação no mesm
 ### Grade
 
 - Sem altura mínima: cada card tem a altura do conteúdo.
-- Empilhamento: cada card entra na coluna mais baixa, na ordem da fila, e as posições só mudam quando um pedido entra ou sai (um card que muda de altura não pula de coluna). Um card maior que a altura disponível transborda para colunas vizinhas e entra a partir do ponto mais baixo entre elas. A alvenaria nativa da grade não existe no Chrome 101: a aplicação posiciona os cards em JavaScript.
+- Empilhamento: cada card entra na coluna mais baixa, na ordem da fila (no empate, a mais à esquerda), e as posições só mudam quando um pedido entra ou sai ou um card muda de span (um card que muda de altura não pula de coluna). Um card maior que a altura disponível transborda para colunas vizinhas e entra a partir do ponto mais baixo entre elas. A alvenaria nativa da grade não existe no Chrome 101: a aplicação posiciona os cards em JavaScript.
+- O span vem do card, não da grade: o card calcula em quantas colunas o conteúdo quebra e informa o número à grade. Com o span decidido pela grade, a largura e a quebra se realimentam e o card oscila (1, 2, 3, 2 colunas).
+- Quebra em colunas: a coluna que continua termina em "Continua →" e a seguinte começa em "Continuação"; a altura útil de cada coluna desconta esses indicadores, para que nada fique cortado.
+- Transbordo entre monitores da estação: pelos cards inteiros, na ordem da fila, nunca por um card partido entre dois monitores. Os monitores que não são o último escondem os cards que não cabem, que passam ao seguinte; o último mostra todos, e os excedentes ficam cortados embaixo.
+- Os cards cancelados da visão por pedido ficam numa faixa própria, fora da alvenaria: são poucos, saem pelo Remover e não entram na ordem da fila.
 
 ### Faça / Não faça no perfil Produção
 
