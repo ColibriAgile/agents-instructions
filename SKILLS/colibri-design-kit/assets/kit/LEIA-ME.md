@@ -11,7 +11,7 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 | `PRODUCT.toque.template.md` | Modelo de `PRODUCT.md` para produto só com o perfil Operação (ex.: totem): cenário das telas de toque, piso Chrome 101, esquema por canal, personalidade, antirreferências e princípios do perfil. Produto com admin usa `PRODUCT.template.md`. |
 | `colibri-base.css` | Base comum: tokens `--cm-*` dos temas claro e escuro, fontes locais e camadas. Sem regras de elemento nem componentes. Importada por `colibri-ui.css` e por `colibri-touch.css`. |
 | `colibri-touch.css` | Implementação de referência do perfil Operação (prefixo `ct-`): escala por superfície (tablet, totem, KDS, TV), cabeçalho, categorias, botões, quantidade, selos, cartão de produto, folha, opções, avisos, cartão de pedido do KDS (com estado de preparo do item e cartão de agrupamento), barra da estação, painel da produção e pedidos prontos. Importa `colibri-base.css`. Piso Chrome 101. |
-| `colibri-cards.css` | Implementação de referência do perfil Cards (prefixo `cc-`), sobre o perfil Operação: card de produção do KDS (`.cc-producao`) com o cabeçalho na cor do tempo, a coluna de estado do item, os modos toque e bump e as faixas do card. Carregado depois do `colibri-touch.css`. Piso Chrome 101. |
+| `colibri-producao.css` | Implementação de referência do perfil Produção (prefixo `cp-`), sobre o perfil Operação: card de produção do KDS (`.cp-card`) com o cabeçalho na cor do tempo, a coluna de estado do item, os modos toque e bump e as faixas do card. Carregado depois do `colibri-touch.css`. Piso Chrome 101. |
 | `colibri-esquema.js` | Motor do esquema de cores por canal (perfil Operação): três sementes (ambiente, ação, marca) → tokens `--ct-*` em hex com contraste garantido por ajuste. ES2019, sem dependências. `colibri-esquema.d.ts` traz os tipos. |
 | `exemplo-toque.html` | Demonstração do perfil Operação: `#tablet`, `#tablet-folha`, `#tablet-carrinho`, `#tablet-passos`, `#tablet-leitor`, `#totem`, `#kds`, `#kds-claro`, `#bump`, `#bump-claro`, `#consolidado`, `#painel`, `#pronto` (acrescente `-limpo` para esconder a barra do exemplo). O seletor de esquema precisa da página servida por um servidor local (módulos ES não carregam em `file://`). |
 | `colibri-ui.css` | Implementação de referência do perfil Admin em CSS puro (prefixo `cm-`), sem dependência de framework. Importa `colibri-base.css`, que fica na mesma pasta. |
@@ -45,10 +45,10 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 5. Telas voltadas ao cliente: esquema do canal com `colibri-esquema.js`, aplicado antes de pintar, e as três sementes na aparência do admin com prévia (seção 9, "Fronteira e cores"). Telas de produção (KDS): tema Colibri por `data-theme`.
 6. Confira os alvos de toque na resolução real e as telas com um esquema claro e um escuro (ou nos dois temas, no KDS).
 
-### Perfil Cards (card de produção do KDS)
+### Perfil Produção (card de produção do KDS)
 
-1. Copie também `colibri-cards.css` para a mesma pasta e carregue-o depois do `colibri-touch.css` nas telas de produção.
-2. Marque a raiz da grade com o modo da estação (`cc-modo-toque` ou `cc-modo-bump`) e o fundo dela com `cc-piso`; monte o card com a marcação de `exemplo-toque.html#kds` e `#bump`.
+1. Copie também `colibri-producao.css` para a mesma pasta e carregue-o depois do `colibri-touch.css` nas telas de produção.
+2. Marque a raiz da grade com o modo da estação (`cp-modo-toque` ou `cp-modo-bump`) e o fundo dela com `cp-piso`; monte o card com a marcação de `exemplo-toque.html#kds` e `#bump`.
 3. Empilhe os cards em JavaScript, sem altura mínima, e implemente a ação por item (toque e toque longo no botão de estado) e a bump bar em dois níveis (seção 10 do `DESIGN.md`).
 4. Confira o card nos dois temas e nos dois modos, com um pedido grande.
 
@@ -63,8 +63,8 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
-- **26/10/2026 (perfil Cards: card de produção do KDS):** terceiro perfil da linha, sobre o perfil Operação, para cards de dados lidos de longe. Nasce com o card de produção do KDS (`.cc-producao`), desenhado com o usuário em oito rodadas a partir do painel de chamados de garçom do ColibriTablet; os cards dos painéis de chamado (garçom, entregadores, senhas) ficam para uma próxima entrada, porque carregam desvios do tablet (cor livre por estado, escala fluida da TV) que ainda precisam ser revistos contra a paleta curada.
-  - **Implementação:** `colibri-cards.css` novo (prefixo `cc-`, depois do `colibri-touch.css`, tokens `--cc-*` próprios nos dois temas) e as telas `#kds` (modo toque) e `#bump` (modo bump) de `exemplo-toque.html`, que passam a usar o card novo.
+- **26/10/2026 (perfil Produção: card de produção do KDS):** terceiro perfil da linha, sobre o perfil Operação, específico do KDS. Nasce com o card de produção do KDS (`.cp-card`), desenhado com o usuário em oito rodadas a partir do painel de chamados de garçom do ColibriTablet; os cards dos painéis de chamado (garçom, entregadores, senhas) ficam para o perfil Cards, genérico, numa próxima entrada, porque carregam desvios do tablet (cor livre por estado, escala fluida da TV) que ainda precisam ser revistos contra a paleta curada.
+  - **Implementação:** `colibri-producao.css` novo (prefixo `cp-`, depois do `colibri-touch.css`, tokens `--cp-*` próprios nos dois temas) e as telas `#kds` (modo toque) e `#bump` (modo bump) de `exemplo-toque.html`, que passam a usar o card novo.
   - **Regras** (`DESIGN.md`, seção 10 nova; "Implementação neste projeto" passa a 11):
     - regra do tempo no preenchimento: o cabeçalho é neutro, âmbar ou vermelho conforme o tempo, com o ícone antes do tempo, e o tipo do pedido vai num selo branco;
     - estado, quantidade e nome numa linha, com cinco estados de formas diferentes (aguardando com `bi-clock`) e traço de 1 px entre os itens;
@@ -73,10 +73,10 @@ Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
     - alérgeno em tag de pílula, a única do kit, e ritmo de preparo com `bi-stopwatch`;
     - modo por estação: toque, com botões de 40 px e o ícone de estado como botão do item (toque avança, toque no pronto volta, toque longo põe na espera), ou bump, sem botões e com a regra da bump bar em dois níveis;
     - grade empilhada em JavaScript, sem altura mínima.
-  - **Mudanças no perfil Operação** (seção 9): o cartão `.ct-order` e a regra da urgência legível passam a valer para o cartão de agrupamento e para aplicações sem o perfil Cards. O toque longo no estado do item entra como segundo gesto oculto permitido, e a tag de alérgeno, como a única pílula.
-  - **Rubrica e mapeamento:** a rubrica de aderência passa à v4, com o grupo R (perfil Cards) e O6 e O7 restritos ao `.ct-order`. O mapeamento ganha a seção 10, duas regras nomeadas e o checklist do perfil.
+  - **Mudanças no perfil Operação** (seção 9): o cartão `.ct-order` e a regra da urgência legível passam a valer para o cartão de agrupamento e para aplicações sem o perfil Produção. O toque longo no estado do item entra como segundo gesto oculto permitido, e a tag de alérgeno, como a única pílula.
+  - **Rubrica e mapeamento:** a rubrica de aderência passa à v4, com o grupo R (perfil Produção) e O6 e O7 restritos ao `.ct-order`. O mapeamento ganha a seção 10, duas regras nomeadas e o checklist do perfil.
   - **Correção:** o `scripts/verificar-esquema.mjs` passa a ler a paleta curada do `colibri-base.css`; desde a entrada de 21/10 ele a procurava no `colibri-touch.css` e falhava.
-  - **Projetos com KDS:** copiar o `colibri-cards.css` e adotar o card nas telas de produção da estação, com o modo por estação, a grade empilhada, a ação por item e a bump bar em dois níveis.
+  - **Projetos com KDS:** copiar o `colibri-producao.css` e adotar o card nas telas de produção da estação, com o modo por estação, a grade empilhada, a ação por item e a bump bar em dois níveis.
 
 - **21/10/2026 (paleta curada na base):** as oito cores da paleta curada passam do `colibri-touch.css` para o `colibri-base.css`, como `--cm-palette-*`; o perfil Operação continua expondo `--ct-palette-*`, agora apontando para elas, sem mudança de valor. Assim o admin (perfil Admin), que não carrega o `colibri-touch.css`, oferece e mostra a cor da estação e do tipo de pedido com o token, sem copiar o hex (`DESIGN.md`, seção 9). A busca de emoji do item O8 da rubrica deixa de acusar os traços de desenho de caixa dos comentários de seção. Projetos que adotaram o kit: copiar o `colibri-base.css` e o `colibri-touch.css` novos; no admin, trocar amostras de cor em hex por `var(--cm-palette-*)`.
 

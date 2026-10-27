@@ -7,7 +7,7 @@
     <link rel="icon" href="logos/colibri.ico">
     <link rel="stylesheet" href="icons/bootstrap-icons.min.css">
     <link rel="stylesheet" href="colibri-touch.css">
-    <link rel="stylesheet" href="colibri-cards.css">
+    <link rel="stylesheet" href="colibri-producao.css">
     <script>
         /* Tema antes de pintar (só vale sem esquema: KDS). #claro força o tema claro. */
         document.documentElement.setAttribute('data-theme', location.hash.indexOf('claro') >= 0 ? 'light' : 'dark');
@@ -250,59 +250,59 @@
         <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>1 atrasado</span>
         <div class="ct-bar__actions"><a class="ct-btn" href="#consolidado">Por produto</a></div>
     </div>
-    <!-- Perfil Cards, modo toque (tablet perto do cozinheiro): o ícone de estado é o botão do item, o rodapé age no card.
+    <!-- Perfil Produção, modo toque (tablet perto do cozinheiro): o ícone de estado é o botão do item, o rodapé age no card.
          Na aplicação, a grade empilha os cards na coluna mais baixa, na ordem da fila; aqui, a pilha é manual. -->
-    <div class="demo-scroll cc-piso">
-        <div class="ct-orders cc-modo-toque" style="--ct-cols: 3">
-            <article class="cc-producao">
-                <header class="cc-producao__head">
-                    <div class="cc-producao__linha"><span class="cc-producao__tipo cc-producao__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cc-producao__senha">12</span><span class="cc-producao__tempo">03:12</span></div>
-                    <div class="cc-producao__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Ana</span><span><i class="bi bi-geo-alt" aria-hidden="true"></i>Varanda</span></div>
+    <div class="demo-scroll cp-piso">
+        <div class="ct-orders cp-modo-toque" style="--ct-cols: 3">
+            <article class="cp-card">
+                <header class="cp-card__head">
+                    <div class="cp-card__linha"><span class="cp-card__tipo cp-card__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cp-card__senha">12</span><span class="cp-card__tempo">03:12</span></div>
+                    <div class="cp-card__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Ana</span><span><i class="bi bi-geo-alt" aria-hidden="true"></i>Varanda</span></div>
                 </header>
-                <ul class="cc-producao__itens">
-                    <li class="cc-producao__item is-preparo is-alterado"><button type="button" class="cc-producao__estado-btn" aria-label="X-salada da casa: em preparo. Tocar marca pronto"><i class="bi bi-fire cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">2×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">X-salada da casa</span><span class="cc-producao__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>SEM CEBOLA</span><span class="cc-producao__alt"><i class="bi bi-pencil-square" aria-hidden="true"></i>Ponto da carne: bem passado</span></span></li>
-                    <li class="cc-producao__item is-pronto"><button type="button" class="cc-producao__estado-btn" aria-label="Batata média: pronto. Tocar volta para em preparo"><i class="bi bi-check-circle-fill cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Batata média</span><span class="cc-producao__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>SEM SAL</span></span></li>
-                    <li class="cc-producao__item is-aguardando"><button type="button" class="cc-producao__estado-btn" aria-label="Refrigerante lata: aguardando. Tocar inicia"><i class="bi bi-clock cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Refrigerante lata</span></span></li>
+                <ul class="cp-card__itens">
+                    <li class="cp-card__item is-preparo is-alterado"><button type="button" class="cp-card__estado-btn" aria-label="X-salada da casa: em preparo. Tocar marca pronto"><i class="bi bi-fire cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">2×</span><span class="cp-card__corpo"><span class="cp-card__nome">X-salada da casa</span><span class="cp-card__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>SEM CEBOLA</span><span class="cp-card__alt"><i class="bi bi-pencil-square" aria-hidden="true"></i>Ponto da carne: bem passado</span></span></li>
+                    <li class="cp-card__item is-pronto"><button type="button" class="cp-card__estado-btn" aria-label="Batata média: pronto. Tocar volta para em preparo"><i class="bi bi-check-circle-fill cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Batata média</span><span class="cp-card__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>SEM SAL</span></span></li>
+                    <li class="cp-card__item is-aguardando"><button type="button" class="cp-card__estado-btn" aria-label="Refrigerante lata: aguardando. Tocar inicia"><i class="bi bi-clock cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Refrigerante lata</span></span></li>
                 </ul>
-                <div class="cc-producao__foot"><button type="button" class="cc-producao__acao">Espera</button><button type="button" class="cc-producao__acao cc-producao__acao--principal">Concluir</button></div>
+                <div class="cp-card__foot"><button type="button" class="cp-card__acao">Espera</button><button type="button" class="cp-card__acao cp-card__acao--principal">Concluir</button></div>
             </article>
-            <article class="cc-producao cc-producao--atencao">
-                <header class="cc-producao__head">
-                    <div class="cc-producao__linha"><span class="cc-producao__tipo cc-producao__tipo--entrega"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="cc-producao__senha">#479</span><span class="cc-producao__tempo"><i class="bi bi-hourglass-split" aria-label="Atenção"></i>07:40</span></div>
-                    <div class="cc-producao__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Mariana</span><span>iFood</span></div>
+            <article class="cp-card cp-card--atencao">
+                <header class="cp-card__head">
+                    <div class="cp-card__linha"><span class="cp-card__tipo cp-card__tipo--entrega"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="cp-card__senha">#479</span><span class="cp-card__tempo"><i class="bi bi-hourglass-split" aria-label="Atenção"></i>07:40</span></div>
+                    <div class="cp-card__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Mariana</span><span>iFood</span></div>
                 </header>
-                <ul class="cc-producao__itens">
-                    <li class="cc-producao__item is-aguardando"><button type="button" class="cc-producao__estado-btn" aria-label="Combo família: aguardando. Tocar inicia"><i class="bi bi-clock cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Combo família</span><span class="cc-producao__sub"><b>4×</b><span>X-salada</span><span class="cc-producao__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>2 SEM PICLES</span></span><span class="cc-producao__sub"><b>1×</b><span>Batata grande</span></span><span class="cc-producao__sub"><b>1×</b><span>Refrigerante 2 L</span></span><span class="cc-producao__alergenos"><span class="cc-producao__alergeno"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Glúten</span><span class="cc-producao__alergeno"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Lactose</span></span></span></li>
-                    <li class="cc-producao__item is-aguardando"><button type="button" class="cc-producao__estado-btn" aria-label="Pudim: aguardando. Tocar inicia"><i class="bi bi-clock cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">2×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Pudim</span><span class="cc-producao__ritmo"><i class="bi bi-stopwatch" aria-hidden="true"></i>Iniciar em <span class="ct-mono">6</span> min</span></span></li>
+                <ul class="cp-card__itens">
+                    <li class="cp-card__item is-aguardando"><button type="button" class="cp-card__estado-btn" aria-label="Combo família: aguardando. Tocar inicia"><i class="bi bi-clock cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Combo família</span><span class="cp-card__sub"><b>4×</b><span>X-salada</span><span class="cp-card__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>2 SEM PICLES</span></span><span class="cp-card__sub"><b>1×</b><span>Batata grande</span></span><span class="cp-card__sub"><b>1×</b><span>Refrigerante 2 L</span></span><span class="cp-card__alergenos"><span class="cp-card__alergeno"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Glúten</span><span class="cp-card__alergeno"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Lactose</span></span></span></li>
+                    <li class="cp-card__item is-aguardando"><button type="button" class="cp-card__estado-btn" aria-label="Pudim: aguardando. Tocar inicia"><i class="bi bi-clock cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">2×</span><span class="cp-card__corpo"><span class="cp-card__nome">Pudim</span><span class="cp-card__ritmo"><i class="bi bi-stopwatch" aria-hidden="true"></i>Iniciar em <span class="ct-mono">6</span> min</span></span></li>
                 </ul>
-                <div class="cc-producao__foot"><button type="button" class="cc-producao__acao">Iniciar</button><button type="button" class="cc-producao__acao cc-producao__acao--principal">Concluir</button></div>
+                <div class="cp-card__foot"><button type="button" class="cp-card__acao">Iniciar</button><button type="button" class="cp-card__acao cp-card__acao--principal">Concluir</button></div>
             </article>
             <div class="demo-pilha">
-                <article class="cc-producao cc-producao--atraso">
-                    <header class="cc-producao__head">
-                        <div class="cc-producao__linha"><span class="cc-producao__tipo cc-producao__tipo--balcao"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="cc-producao__senha">A47</span><span class="cc-producao__tempo"><i class="bi bi-exclamation-octagon-fill" aria-label="Atrasado"></i>12:05</span></div>
+                <article class="cp-card cp-card--atraso">
+                    <header class="cp-card__head">
+                        <div class="cp-card__linha"><span class="cp-card__tipo cp-card__tipo--balcao"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="cp-card__senha">A47</span><span class="cp-card__tempo"><i class="bi bi-exclamation-octagon-fill" aria-label="Atrasado"></i>12:05</span></div>
                     </header>
-                    <ul class="cc-producao__itens">
-                        <li class="cc-producao__item is-aguardando"><button type="button" class="cc-producao__estado-btn" aria-label="Pastel de carne: aguardando. Tocar inicia"><i class="bi bi-clock cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">3×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Pastel de carne</span></span></li>
-                        <li class="cc-producao__item is-preparo"><button type="button" class="cc-producao__estado-btn" aria-label="Caldo de cana 500 ml: em preparo. Tocar marca pronto"><i class="bi bi-fire cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Caldo de cana 500 ml</span></span></li>
+                    <ul class="cp-card__itens">
+                        <li class="cp-card__item is-aguardando"><button type="button" class="cp-card__estado-btn" aria-label="Pastel de carne: aguardando. Tocar inicia"><i class="bi bi-clock cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">3×</span><span class="cp-card__corpo"><span class="cp-card__nome">Pastel de carne</span></span></li>
+                        <li class="cp-card__item is-preparo"><button type="button" class="cp-card__estado-btn" aria-label="Caldo de cana 500 ml: em preparo. Tocar marca pronto"><i class="bi bi-fire cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Caldo de cana 500 ml</span></span></li>
                     </ul>
-                    <div class="cc-producao__foot"><button type="button" class="cc-producao__acao">Iniciar</button><button type="button" class="cc-producao__acao cc-producao__acao--principal">Concluir</button></div>
+                    <div class="cp-card__foot"><button type="button" class="cp-card__acao">Iniciar</button><button type="button" class="cp-card__acao cp-card__acao--principal">Concluir</button></div>
                 </article>
-                <article class="cc-producao">
-                    <header class="cc-producao__head">
-                        <div class="cc-producao__linha"><span class="cc-producao__tipo cc-producao__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cc-producao__senha">7</span><span class="cc-producao__marca cc-producao__marca--cancelado"><i class="bi bi-x-circle" aria-hidden="true"></i>Cancelado</span></div>
+                <article class="cp-card">
+                    <header class="cp-card__head">
+                        <div class="cp-card__linha"><span class="cp-card__tipo cp-card__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cp-card__senha">7</span><span class="cp-card__marca cp-card__marca--cancelado"><i class="bi bi-x-circle" aria-hidden="true"></i>Cancelado</span></div>
                     </header>
-                    <ul class="cc-producao__itens">
-                        <li class="cc-producao__item is-cancelado"><i class="bi bi-x-circle-fill cc-producao__estado" aria-label="Cancelado"></i><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Risoto de cogumelos</span></span></li>
+                    <ul class="cp-card__itens">
+                        <li class="cp-card__item is-cancelado"><i class="bi bi-x-circle-fill cp-card__estado" aria-label="Cancelado"></i><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Risoto de cogumelos</span></span></li>
                     </ul>
-                    <div class="cc-producao__foot"><button type="button" class="cc-producao__acao cc-producao__acao--perigo">Remover</button></div>
+                    <div class="cp-card__foot"><button type="button" class="cp-card__acao cp-card__acao--perigo">Remover</button></div>
                 </article>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Perfil Cards, modo bump (TV operada pela bump bar): sem botões; o card selecionado tem o contorno de foco e o índice
+<!-- Perfil Produção, modo bump (TV operada pela bump bar): sem botões; o card selecionado tem o contorno de foco e o índice
      aceso, e o cursor fica num item (contorno interno) ou no cabeçalho (o card inteiro) -->
 <div class="ct-app ct-app--kds demo-surface" id="bump">
     <div class="ct-bar" style="--ct-station-color: var(--ct-palette-laranja)">
@@ -310,49 +310,49 @@
         <span class="ct-tag ct-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>1 em atenção</span>
         <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>1 atrasado</span>
     </div>
-    <div class="demo-scroll cc-piso">
-        <div class="ct-orders cc-modo-bump" style="--ct-cols: 3">
-            <article class="cc-producao is-selecionado">
-                <header class="cc-producao__head">
-                    <div class="cc-producao__linha"><span class="cc-producao__indice">1</span><span class="cc-producao__tipo cc-producao__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cc-producao__senha">21</span><span class="cc-producao__tempo">04:30</span></div>
-                    <div class="cc-producao__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Família Souza</span><span><i class="bi bi-geo-alt" aria-hidden="true"></i>Salão 2</span></div>
+    <div class="demo-scroll cp-piso">
+        <div class="ct-orders cp-modo-bump" style="--ct-cols: 3">
+            <article class="cp-card is-selecionado">
+                <header class="cp-card__head">
+                    <div class="cp-card__linha"><span class="cp-card__indice">1</span><span class="cp-card__tipo cp-card__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cp-card__senha">21</span><span class="cp-card__tempo">04:30</span></div>
+                    <div class="cp-card__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Família Souza</span><span><i class="bi bi-geo-alt" aria-hidden="true"></i>Salão 2</span></div>
                 </header>
-                <ul class="cc-producao__itens">
-                    <li class="cc-producao__item is-preparo"><i class="bi bi-fire cc-producao__estado" aria-label="Em preparo"></i><span class="cc-producao__qtd">2×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Picanha na chapa</span><span class="cc-producao__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>MAL PASSADA</span></span></li>
-                    <li class="cc-producao__item is-aguardando is-cursor"><i class="bi bi-clock cc-producao__estado" aria-label="Aguardando"></i><span class="cc-producao__qtd">3×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Arroz branco</span></span></li>
-                    <li class="cc-producao__item is-aguardando"><i class="bi bi-clock cc-producao__estado" aria-label="Aguardando"></i><span class="cc-producao__qtd">2×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Feijão tropeiro</span></span></li>
-                    <li class="cc-producao__item is-pronto"><i class="bi bi-check-circle-fill cc-producao__estado" aria-label="Pronto"></i><span class="cc-producao__qtd">2×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Batata frita</span></span></li>
+                <ul class="cp-card__itens">
+                    <li class="cp-card__item is-preparo"><i class="bi bi-fire cp-card__estado" aria-label="Em preparo"></i><span class="cp-card__qtd">2×</span><span class="cp-card__corpo"><span class="cp-card__nome">Picanha na chapa</span><span class="cp-card__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>MAL PASSADA</span></span></li>
+                    <li class="cp-card__item is-aguardando is-cursor"><i class="bi bi-clock cp-card__estado" aria-label="Aguardando"></i><span class="cp-card__qtd">3×</span><span class="cp-card__corpo"><span class="cp-card__nome">Arroz branco</span></span></li>
+                    <li class="cp-card__item is-aguardando"><i class="bi bi-clock cp-card__estado" aria-label="Aguardando"></i><span class="cp-card__qtd">2×</span><span class="cp-card__corpo"><span class="cp-card__nome">Feijão tropeiro</span></span></li>
+                    <li class="cp-card__item is-pronto"><i class="bi bi-check-circle-fill cp-card__estado" aria-label="Pronto"></i><span class="cp-card__qtd">2×</span><span class="cp-card__corpo"><span class="cp-card__nome">Batata frita</span></span></li>
                 </ul>
                 <!-- Só no card selecionado: confirmação do Concluir, enquanto espera o segundo Enter (3 s) -->
-                <div class="cc-producao__faixa"><span class="cc-producao__tecla">Enter</span>de novo para concluir</div>
+                <div class="cp-card__faixa"><span class="cp-card__tecla">Enter</span>de novo para concluir</div>
             </article>
-            <article class="cc-producao cc-producao--atencao">
-                <header class="cc-producao__head">
-                    <div class="cc-producao__linha"><span class="cc-producao__indice">2</span><span class="cc-producao__tipo cc-producao__tipo--entrega"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="cc-producao__senha">#479</span><span class="cc-producao__tempo"><i class="bi bi-hourglass-split" aria-label="Atenção"></i>07:40</span></div>
-                    <div class="cc-producao__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Mariana</span><span>iFood</span></div>
+            <article class="cp-card cp-card--atencao">
+                <header class="cp-card__head">
+                    <div class="cp-card__linha"><span class="cp-card__indice">2</span><span class="cp-card__tipo cp-card__tipo--entrega"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="cp-card__senha">#479</span><span class="cp-card__tempo"><i class="bi bi-hourglass-split" aria-label="Atenção"></i>07:40</span></div>
+                    <div class="cp-card__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Mariana</span><span>iFood</span></div>
                 </header>
-                <ul class="cc-producao__itens">
-                    <li class="cc-producao__item is-pronto"><i class="bi bi-check-circle-fill cc-producao__estado" aria-label="Pronto"></i><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Combo família</span><span class="cc-producao__sub"><b>4×</b><span>X-salada</span></span><span class="cc-producao__sub"><b>1×</b><span>Batata grande</span></span></span></li>
+                <ul class="cp-card__itens">
+                    <li class="cp-card__item is-pronto"><i class="bi bi-check-circle-fill cp-card__estado" aria-label="Pronto"></i><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Combo família</span><span class="cp-card__sub"><b>4×</b><span>X-salada</span></span><span class="cp-card__sub"><b>1×</b><span>Batata grande</span></span></span></li>
                 </ul>
                 <!-- Todos os itens prontos: o card avisa, mas não conclui sozinho -->
-                <div class="cc-producao__faixa cc-producao__faixa--pronto"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Tudo pronto · <span class="cc-producao__tecla">Enter</span>conclui</div>
+                <div class="cp-card__faixa cp-card__faixa--pronto"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Tudo pronto · <span class="cp-card__tecla">Enter</span>conclui</div>
             </article>
             <div class="demo-pilha">
-                <article class="cc-producao cc-producao--atraso">
-                    <header class="cc-producao__head">
-                        <div class="cc-producao__linha"><span class="cc-producao__indice">3</span><span class="cc-producao__tipo cc-producao__tipo--balcao"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="cc-producao__senha">A47</span><span class="cc-producao__tempo"><i class="bi bi-exclamation-octagon-fill" aria-label="Atrasado"></i>12:05</span></div>
+                <article class="cp-card cp-card--atraso">
+                    <header class="cp-card__head">
+                        <div class="cp-card__linha"><span class="cp-card__indice">3</span><span class="cp-card__tipo cp-card__tipo--balcao"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="cp-card__senha">A47</span><span class="cp-card__tempo"><i class="bi bi-exclamation-octagon-fill" aria-label="Atrasado"></i>12:05</span></div>
                     </header>
-                    <ul class="cc-producao__itens">
-                        <li class="cc-producao__item is-aguardando"><i class="bi bi-clock cc-producao__estado" aria-label="Aguardando"></i><span class="cc-producao__qtd">3×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Pastel de carne</span></span></li>
-                        <li class="cc-producao__item is-preparo"><i class="bi bi-fire cc-producao__estado" aria-label="Em preparo"></i><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Caldo de cana 500 ml</span></span></li>
+                    <ul class="cp-card__itens">
+                        <li class="cp-card__item is-aguardando"><i class="bi bi-clock cp-card__estado" aria-label="Aguardando"></i><span class="cp-card__qtd">3×</span><span class="cp-card__corpo"><span class="cp-card__nome">Pastel de carne</span></span></li>
+                        <li class="cp-card__item is-preparo"><i class="bi bi-fire cp-card__estado" aria-label="Em preparo"></i><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Caldo de cana 500 ml</span></span></li>
                     </ul>
                 </article>
-                <article class="cc-producao cc-producao--pausa">
-                    <header class="cc-producao__head">
-                        <div class="cc-producao__linha"><span class="cc-producao__indice">4</span><span class="cc-producao__tipo cc-producao__tipo--ficha"><i class="bi bi-ticket-perforated" aria-hidden="true"></i>Ficha</span><span class="cc-producao__senha">485</span><span class="cc-producao__marca"><i class="bi bi-pause-circle" aria-hidden="true"></i>Em espera</span></div>
+                <article class="cp-card cp-card--pausa">
+                    <header class="cp-card__head">
+                        <div class="cp-card__linha"><span class="cp-card__indice">4</span><span class="cp-card__tipo cp-card__tipo--ficha"><i class="bi bi-ticket-perforated" aria-hidden="true"></i>Ficha</span><span class="cp-card__senha">485</span><span class="cp-card__marca"><i class="bi bi-pause-circle" aria-hidden="true"></i>Em espera</span></div>
                     </header>
-                    <ul class="cc-producao__itens">
-                        <li class="cc-producao__item is-pausado"><i class="bi bi-pause-circle-fill cc-producao__estado" aria-label="Pausado"></i><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Brownie</span></span></li>
+                    <ul class="cp-card__itens">
+                        <li class="cp-card__item is-pausado"><i class="bi bi-pause-circle-fill cp-card__estado" aria-label="Pausado"></i><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Brownie</span></span></li>
                     </ul>
                 </article>
             </div>

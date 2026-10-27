@@ -45,10 +45,10 @@ Para `<estáticos>/colibri-ui/` (ou a pasta confirmada), mantendo `fonts/` e `lo
 - `icons/` (Bootstrap Icons 1.13.1 local), ou `npm install bootstrap-icons` quando o projeto usa npm para estáticos.
 - `colibri-ui.bootstrap3.css` somente com Bootstrap 3/AngularJS; `colibri-ui.devexpress.css` somente com DevExpress Blazor ou DevExtreme (remova dele os blocos da biblioteca não usada).
 - Perfil Operação: `colibri-touch.css` (importa `colibri-base.css`, na mesma pasta) e, com canal de consumidor, `colibri-esquema.js` (e `colibri-esquema.d.ts` em TypeScript), importados pelo código do app e pela prévia do admin. Num projeto com os dois perfis, cada entrada carrega só o seu CSS (`colibri-ui.css` no admin, `colibri-touch.css` nas telas de toque).
-- Perfil Cards (telas de produção do KDS): `colibri-cards.css`, carregado depois do `colibri-touch.css` nas telas com o card de produção.
+- Perfil Produção (telas de produção do KDS): `colibri-producao.css`, carregado depois do `colibri-touch.css` nas telas com o card de produção.
 - Não copie `DESIGN.md`, `PRODUCT.template.md`, `PRODUCT.toque.template.md`, `LEIA-ME.md`, `exemplo.html`, `exemplo-entrada.html` nem `exemplo-toque.html` para o projeto: o `DESIGN.md` e os modelos de `PRODUCT.md` viram arquivos do impeccable nos passos 4–5; os demais são referência da skill.
 
-Depois ajuste a carga na entrada HTML, nesta ordem: CSS do framework e tema da biblioteca → `bootstrap-icons.min.css` → `colibri-ui.css` → adaptadores (perfil Operação: `bootstrap-icons.min.css` → `colibri-touch.css` → `colibri-cards.css`, este só com o perfil Cards). Remova fontes e ícones de CDN. Detalhes por framework e comportamentos de JavaScript do shell: [`./adocao-por-framework.md`](./adocao-por-framework.md).
+Depois ajuste a carga na entrada HTML, nesta ordem: CSS do framework e tema da biblioteca → `bootstrap-icons.min.css` → `colibri-ui.css` → adaptadores (perfil Operação: `bootstrap-icons.min.css` → `colibri-touch.css` → `colibri-producao.css`, este só com o perfil Produção). Remova fontes e ícones de CDN. Detalhes por framework e comportamentos de JavaScript do shell: [`./adocao-por-framework.md`](./adocao-por-framework.md).
 
 Se o usuário pediu só a documentação (sem tocar no código), pule este passo e registre isso em `DECISOES.md`.
 
