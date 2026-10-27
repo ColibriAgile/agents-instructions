@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="icons/bootstrap-icons.min.css">
     <link rel="stylesheet" href="colibri-touch.css">
     <link rel="stylesheet" href="colibri-producao.css">
+    <link rel="stylesheet" href="colibri-cards.css">
     <script>
         /* Tema antes de pintar (só vale sem esquema: KDS). #claro força o tema claro. */
         document.documentElement.setAttribute('data-theme', location.hash.indexOf('claro') >= 0 ? 'light' : 'dark');
@@ -35,6 +36,11 @@
         .demo-lines .demo-line__name { flex: 1; min-width: 0; font-size: var(--ct-text-lg); }
         .demo-lines .ct-price { font-size: var(--ct-text-lg); }
         .demo-pilha { display: grid; gap: var(--ct-gap); align-content: start; }
+        /* Barra dos painéis de chamado: título, contagem e hora (como na proposta aprovada do perfil Cards). */
+        .demo-cc-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-height: var(--ct-target); padding: 8px var(--cc-pad); background: var(--ct-surface); }
+        .demo-cc-barra__titulo { margin-right: auto; font-size: var(--cc-t-xl); font-weight: 700; letter-spacing: -.01em; }
+        .demo-cc-barra__apoio { color: var(--ct-ink-2); font-size: var(--cc-t); }
+        .demo-cc-barra__hora { font-family: var(--cm-mono); font-size: var(--cc-t-xl); font-weight: 700; font-variant-numeric: tabular-nums; }
     </style>
 </head>
 <body>
@@ -427,8 +433,84 @@
     </div>
 </div>
 
+<!-- Painéis de chamado (perfil Cards): três painéis empilhados só para a demonstração; na aplicação, cada um é uma tela -->
+<div class="ct-app ct-app--kds demo-surface" id="chamados">
+    <div class="demo-scroll">
+        <!-- Garçom: cor de espera padrão (azul da paleta); a faixa vazia reserva a altura da urgência -->
+        <section class="cc-painel" aria-label="Chamados de garçom">
+            <div class="demo-cc-barra"><span class="demo-cc-barra__titulo">Garçom</span><span class="demo-cc-barra__apoio">5 chamados</span><span class="demo-cc-barra__hora">19:42</span></div>
+            <div class="cc-grade">
+                <article class="cc-sinal">
+                    <div class="cc-sinal__topo"><span class="cc-sinal__rotulo">Mesa</span><span class="cc-sinal__timer">01:12</span></div>
+                    <div class="cc-sinal__valor">12</div>
+                    <div class="cc-urgencia"></div>
+                    <div class="cc-sinal__rodape"><span>Conta · Talheres</span></div>
+                </article>
+                <article class="cc-sinal cc-sinal--atraso">
+                    <div class="cc-sinal__topo"><span class="cc-sinal__rotulo">Mesa</span><span class="cc-sinal__timer">05:22</span></div>
+                    <div class="cc-sinal__valor">21</div>
+                    <div class="cc-urgencia"><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>Atrasado · passou de 5 min</div>
+                    <div class="cc-sinal__rodape"><span class="cc-veu"><i class="bi bi-person-walking" aria-hidden="true"></i>A caminho</span><span>Cardápio</span></div>
+                </article>
+                <article class="cc-sinal">
+                    <div class="cc-sinal__topo"><span class="cc-sinal__rotulo">Mesa</span><span class="cc-sinal__timer">00:35</span></div>
+                    <div class="cc-sinal__valor">4</div>
+                    <div class="cc-urgencia"></div>
+                    <div class="cc-sinal__rodape"><span>Conta</span></div>
+                </article>
+                <article class="cc-sinal cc-sinal--atencao">
+                    <div class="cc-sinal__topo"><span class="cc-sinal__rotulo">Mesa</span><span class="cc-sinal__timer">03:40</span></div>
+                    <div class="cc-sinal__valor">7</div>
+                    <div class="cc-urgencia"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Atenção · passou de 3 min</div>
+                    <div class="cc-sinal__rodape"><span class="cc-veu"><i class="bi bi-person-walking" aria-hidden="true"></i>A caminho</span></div>
+                </article>
+                <article class="cc-sinal">
+                    <div class="cc-sinal__topo"><span class="cc-sinal__rotulo">Local</span><span class="cc-sinal__timer">01:58</span></div>
+                    <div class="cc-sinal__valor cc-sinal__valor--texto">Varanda 3</div>
+                    <div class="cc-urgencia"></div>
+                    <div class="cc-sinal__rodape"><span>Talheres</span></div>
+                </article>
+            </div>
+        </section>
+        <!-- Entregadores: o painel troca a cor de espera por outra da paleta (petróleo); o que não cabe vira "+N" -->
+        <section class="cc-painel" style="--cc-espera: var(--cm-palette-petroleo)" aria-label="Chamados de entregadores">
+            <div class="demo-cc-barra"><span class="demo-cc-barra__titulo">Entregadores</span><span class="demo-cc-barra__apoio">3 chamados</span><span class="demo-cc-barra__hora">19:42</span></div>
+            <div class="cc-grade">
+                <article class="cc-sinal">
+                    <div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-bicycle" aria-hidden="true"></i>Entregador</span><span class="cc-sinal__timer">00:48</span></div>
+                    <div class="cc-sinal__valor cc-sinal__valor--texto">Rafael</div>
+                    <div class="cc-urgencia"></div>
+                    <div class="cc-sinal__rodape"><span class="cc-veu"><i class="bi bi-bag-check" aria-hidden="true"></i>2 sacolas</span><span>#468 · #470</span></div>
+                </article>
+                <article class="cc-sinal cc-sinal--atencao">
+                    <div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-bicycle" aria-hidden="true"></i>Entregador</span><span class="cc-sinal__timer">04:15</span></div>
+                    <div class="cc-sinal__valor cc-sinal__valor--texto">Bruno</div>
+                    <div class="cc-urgencia"><i class="bi bi-hourglass-split" aria-hidden="true"></i>Atenção · passou de 4 min</div>
+                    <div class="cc-sinal__rodape"><span class="cc-veu"><i class="bi bi-bag-check" aria-hidden="true"></i>1 sacola</span><span>#472</span></div>
+                </article>
+                <article class="cc-sinal cc-sinal--atraso">
+                    <div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-bicycle" aria-hidden="true"></i>Entregador</span><span class="cc-sinal__timer">08:02</span></div>
+                    <div class="cc-sinal__valor cc-sinal__valor--texto">Lucas</div>
+                    <div class="cc-urgencia"><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>Atrasado · passou de 8 min</div>
+                    <div class="cc-sinal__rodape"><span>#465</span></div>
+                </article>
+                <div class="cc-mais"><b>+2</b>chamados</div>
+            </div>
+        </section>
+        <!-- Senhas prontas: voltado ao cliente, piso e preenchimento do esquema do canal; sem tempo e sem urgência -->
+        <section class="cc-painel cc-painel--cliente" aria-label="Senhas prontas">
+            <div class="demo-cc-barra"><span class="demo-cc-barra__titulo">Senhas prontas</span><span class="demo-cc-barra__hora">19:42</span></div>
+            <div class="cc-grade">
+                <article class="cc-sinal"><div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span></div><div class="cc-sinal__valor">A47</div><div class="cc-sinal__rodape"><span>Retire no balcão 2</span></div></article>
+                <article class="cc-sinal"><div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-bag" aria-hidden="true"></i>Retirada</span></div><div class="cc-sinal__valor">#486</div><div class="cc-sinal__rodape"><span>Carlos</span></div></article>
+                <article class="cc-sinal"><div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span></div><div class="cc-sinal__valor">A51</div><div class="cc-sinal__rodape"><span>Retire no balcão 1</span></div></article>
+            </div>
+        </section>
+    </div>
+</div>
+
 <div class="demo-bar" id="demo-bar">
-    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>) · <a href="#totem">Totem</a> (<a href="#portas">portas</a>) · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>, <a href="#bump">bump</a>, <a href="#bump-claro">bump claro</a>, <a href="#consolidado">por produto</a>, <a href="#painel">painel</a>) · <a href="#pronto">Pronto</a>
+    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>) · <a href="#totem">Totem</a> (<a href="#portas">portas</a>) · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>, <a href="#bump">bump</a>, <a href="#bump-claro">bump claro</a>, <a href="#consolidado">por produto</a>, <a href="#painel">painel</a>) · <a href="#chamados">Chamados</a> (<a href="#chamados-claro">claro</a>) · <a href="#pronto">Pronto</a>
     <span id="demo-esquema" hidden>
         | <label>Ambiente <input type="color" id="s-ambiente" value="#0b1120"></label>
         <label>Ação <input type="color" id="s-acao" value="#f59e0b"></label>
@@ -465,7 +547,7 @@
     var superficie = 'tablet';
     var padrao = false;
     function atualizar() {
-        var consumidor = ['kds', 'consolidado', 'painel'].indexOf(superficie) < 0;
+        var consumidor = ['kds', 'consolidado', 'painel', 'chamados'].indexOf(superficie) < 0;
         document.getElementById('demo-esquema').hidden = !consumidor;
         if (!consumidor || padrao) {
             aplicarEsquema(null);

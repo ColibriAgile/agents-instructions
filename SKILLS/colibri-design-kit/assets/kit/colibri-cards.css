@@ -1,0 +1,208 @@
+/*
+ * Colibri UI — perfil Cards da linha visual Colibri: painéis de chamado lidos de longe (garçom,
+ * entregadores, senhas prontas), com o card de sinal (.cc-sinal): um bloco de cor cheia, sem borda e
+ * sem corpo de itens, em que a cor diz o estado.
+ * CSS puro, prefixo `cc-`. Piso Chrome 101: só seletores, funções e propriedades que ele já suporta.
+ * Requisitos: colibri-touch.css carregado antes (tokens --ct-* e a tela .ct-app); Bootstrap Icons;
+ * colibri-esquema.js no painel voltado ao cliente (.cc-painel--cliente).
+ * Regras de uso: ver DESIGN.md do kit, seção "Perfil Cards".
+ */
+
+/* ---------- Tokens do perfil ----------
+ * Atenção e atraso são os mesmos nos dois temas e têm 4,5:1 ou mais sob texto branco. O véu escurece o
+ * preenchimento corrente para a faixa de urgência e os selos. */
+:root {
+    --cc-piso: var(--cm-line);
+    --cc-atencao: #875800;
+    --cc-atraso: #b02637;
+    --cc-atraso-respiro: #6a1720;
+    --cc-veu: rgba(0, 0, 0, .24);
+    --cc-raio: var(--cm-radius);
+    --cc-raio-selo: var(--cm-btn-radius);
+}
+:root[data-theme="dark"] {
+    --cc-piso: var(--cm-bg);
+}
+
+/* ---------- Painel ----------
+ * Raiz do painel: o piso, a cor de espera (paleta curada; o painel troca por outra --cm-palette-*) e a
+ * escala do card, a do KDS (leitura de 1 a 3 m). */
+.cc-painel {
+    --cc-espera: var(--cm-palette-azul);
+    --cc-tinta: #fff;
+    --cc-t-sm: 14px;
+    --cc-t: 18px;
+    --cc-t-xl: 24px;
+    --cc-t-2xl: 32px;
+    --cc-t-display: 48px;
+    --cc-gap: 12px;
+    --cc-pad: 14px;
+    background: var(--cc-piso);
+}
+/* TV (2 a 5 m): cada tamanho acompanha a largura e bate na escala .ct-app--tv do kit em 1920 px
+ * (N vw = valor em 1920 ÷ 19,2); abaixo disso, nunca menor que a escala base. vw dentro de max() roda
+ * no Chrome 101. */
+.cc-painel--tv {
+    --cc-t-sm: max(14px, .94vw);
+    --cc-t: max(18px, 1.25vw);
+    --cc-t-xl: max(24px, 2.3vw);
+    --cc-t-2xl: max(32px, 3.34vw);
+    --cc-t-display: max(48px, 5vw);
+    --cc-gap: max(12px, 1.05vw);
+    --cc-pad: max(14px, 1.25vw);
+}
+/* Voltado ao cliente (senhas prontas): piso, preenchimento e tinta vêm do esquema do canal
+ * (colibri-esquema.js), os mesmos do preço preenchido do cardápio. Sem tempo e sem urgência. */
+.cc-painel--cliente {
+    --cc-piso: var(--ct-bg);
+    --cc-espera: var(--ct-brand);
+    --cc-tinta: var(--ct-on-brand);
+}
+
+/* Grade: colunas que cabem na largura, cards alinhados ao topo (não esticam até o vizinho). */
+.cc-grade {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(calc(var(--cc-t) * 16), 1fr));
+    align-items: start;
+    gap: var(--cc-gap);
+    padding: var(--cc-pad);
+}
+
+/* ---------- Card de sinal ----------
+ * topo (rótulo e tempo), valor grande, faixa de urgência e rodapé. Preenchimento = espera, atenção ou
+ * atraso; o texto vai sempre na tinta do card. */
+.cc-sinal {
+    --cc-cor: var(--cc-espera);
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--cc-gap) * .6);
+    min-width: 0;
+    padding: calc(var(--cc-pad) * 1.15) calc(var(--cc-pad) * 1.5);
+    color: var(--cc-tinta);
+    background: var(--cc-cor);
+    border-radius: var(--cc-raio);
+    font-family: var(--cm-font);
+    line-height: 1.45;
+}
+.cc-sinal--atencao { --cc-cor: var(--cc-atencao); --cc-tinta: #fff; }
+.cc-sinal--atraso { --cc-cor: var(--cc-atraso); --cc-tinta: #fff; }
+.cc-sinal__topo {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--cc-gap);
+}
+.cc-sinal__rotulo {
+    display: inline-flex;
+    align-items: center;
+    gap: .45em;
+    font-size: var(--cc-t);
+    font-weight: 600;
+}
+.cc-sinal__timer {
+    font-family: var(--cm-mono);
+    font-size: var(--cc-t-xl);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+}
+.cc-sinal__valor {
+    overflow: hidden;
+    font-family: var(--cm-mono);
+    font-size: var(--cc-t-display);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.02em;
+    line-height: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+/* Nome em vez de número (entregador, local). */
+.cc-sinal__valor--texto {
+    font-family: var(--cm-font);
+    font-size: var(--cc-t-2xl);
+    letter-spacing: -.01em;
+    line-height: 1.1;
+}
+/* Faixa de urgência: ícone + rótulo, nunca só cor. Vazia, reserva a altura no card no prazo, para o
+ * card não pular ao entrar em atenção. */
+.cc-urgencia {
+    display: flex;
+    align-items: center;
+    gap: .65em;
+    min-height: calc(var(--cc-t-sm) * 1.3 + 10px);
+    padding: .4em .65em;
+    border-radius: var(--cc-raio-selo);
+    font-size: var(--cc-t-sm);
+    font-weight: 700;
+}
+.cc-sinal--atencao .cc-urgencia,
+.cc-sinal--atraso .cc-urgencia { background: var(--cc-veu); }
+.cc-sinal__rodape {
+    display: flex;
+    align-items: center;
+    gap: .65em;
+    min-width: 0;
+    min-height: calc(var(--cc-t-sm) * 1.3 + 4px);
+    font-size: var(--cc-t-sm);
+    font-weight: 600;
+}
+.cc-sinal__rodape > span:last-child {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+/* Selo sobre o preenchimento ("A caminho", "2 sacolas"). */
+.cc-veu {
+    display: inline-flex;
+    align-items: center;
+    gap: .5em;
+    padding: .15em .65em;
+    background: var(--cc-veu);
+    border-radius: var(--cc-raio-selo);
+    font-weight: 700;
+    white-space: nowrap;
+}
+/* "+N chamados": o que não coube, num bloco neutro (sem borda tracejada). */
+.cc-mais {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 100%;
+    color: var(--ct-ink-2);
+    background: var(--ct-surface-2);
+    border-radius: var(--cc-raio);
+    font-family: var(--cm-font);
+    font-size: var(--cc-t);
+}
+.cc-mais b {
+    color: var(--ct-ink);
+    font-family: var(--cm-mono);
+    font-size: var(--cc-t-2xl);
+    line-height: 1;
+}
+
+/* Só o atraso respira: uma camada por trás escurece o fundo e volta a cada 1,2 s (só opacidade,
+ * anima no compositor); parada com movimento reduzido. */
+.cc-sinal--atraso::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    background: var(--cc-atraso-respiro);
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+    animation: cc-respirar 1.2s ease-in-out infinite;
+}
+@keyframes cc-respirar {
+    0%, 100% { opacity: 0; }
+    45% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .cc-sinal--atraso::before { animation: none; }
+}

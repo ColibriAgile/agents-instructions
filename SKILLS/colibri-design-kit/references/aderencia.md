@@ -4,22 +4,22 @@ Procedimento do verbo `aderencia`. Mede quanto o código de UI e a aplicação e
 
 A avaliação é somente leitura. A única gravação é o relatório `docs/design/ADERENCIA.md`.
 
-## Rubrica v4
+## Rubrica v5
 
-Mudanças desde a v3 (26/10/2026): grupo R novo, para o card do perfil Produção (tempo no preenchimento, itens, observação e alérgeno, modos e grade); O6 e O7 passam a valer só para o cartão `.ct-order`; O2 e O5 ganham as exceções do perfil Produção. Mudanças da v2 para a v3 (21/10/2026): O7 e O8 novos, para o KDS: leitura dos itens e estado de preparo, cartão de agrupamento, identidade da estação por ícone curado e painel da produção sem cartões de métrica. Mudanças da v1 para a v2: C1 ganha a exceção do código QR em `.cm-qr` (preto sobre branco fixos, perfil Admin). Notas de uma versão não se comparam com as de outra sem recalcular.
+Mudanças desde a v4 (27/10/2026): grupo H novo, para o card de sinal do perfil Cards (estado no preenchimento, urgência legível, anatomia, grade e transbordo, tema e escala); O5 e O6 ganham as exceções do perfil Cards. Mudanças da v3 para a v4 (26/10/2026): grupo R novo, para o card do perfil Produção (tempo no preenchimento, itens, observação e alérgeno, modos e grade); O6 e O7 passam a valer só para o cartão `.ct-order`; O2 e O5 ganham as exceções do perfil Produção. Mudanças da v2 para a v3 (21/10/2026): O7 e O8 novos, para o KDS: leitura dos itens e estado de preparo, cartão de agrupamento, identidade da estação por ícone curado e painel da produção sem cartões de métrica. Mudanças da v1 para a v2: C1 ganha a exceção do código QR em `.cm-qr` (preto sobre branco fixos, perfil Admin). Notas de uma versão não se comparam com as de outra sem recalcular.
 
 Cada item é **aprovado**, **reprovado**, **n/a** (não se aplica ao alvo, com o motivo), **desvio** (há linha em "Desvios do kit" do `DECISOES.md` com o ID do item na coluna "Regra do kit" e o escopo que cobre o caso) ou **não verificado** (a evidência exige o que não está disponível, como navegador ou aparelho). A regra de cada item está no `DESIGN.md` do kit, na seção indicada; leia a seção antes de julgar o item.
 
 Verificação: **E** estática (busca no código, padrões na tabela "Buscas"), **D** detector (`impeccable detect --json`), **N** navegador (aplicação rodando). Item com E e N é aprovado pela parte estática e reprovado por qualquer uma das duas; sem navegador, a parte N fica registrada como não verificada no próprio item. ★ marca item crítico.
 
-Escopo: itens de **projeto** são avaliados uma vez por execução; itens de **página**, em cada página do alvo. Página do perfil Admin usa todos os grupos, menos O. Página do perfil Operação usa B, C1, C3, T1, T2, T4, A e O; com o card do perfil Produção, também R.
+Escopo: itens de **projeto** são avaliados uma vez por execução; itens de **página**, em cada página do alvo. Página do perfil Admin usa todos os grupos, menos O. Página do perfil Operação usa B, C1, C3, T1, T2, T4, A e O; com o card do perfil Produção, também R; com o perfil Cards, também H.
 
 ### Perfil da página
 
 O perfil decide quais itens valem, então é decidido por evidência, na primeira regra que se aplica:
 
 1. **`DECISOES.md`:** a página está listada como superfície de toque (cardápio do tablet, totem, KDS, pedidos prontos) → Operação; listada no perfil Admin → Admin.
-2. **Código:** a página usa o contêiner `.ct-app` ou é servida por uma entrada HTML que carrega `colibri-touch.css` → Operação; usa o shell `.cm-shell` ou é servida por uma entrada que carrega `colibri-ui.css` → Admin. Página do perfil Operação com `.cp-card` ou servida com `colibri-producao.css` também usa o grupo R.
+2. **Código:** a página usa o contêiner `.ct-app` ou é servida por uma entrada HTML que carrega `colibri-touch.css` → Operação; usa o shell `.cm-shell` ou é servida por uma entrada que carrega `colibri-ui.css` → Admin. Página do perfil Operação com `.cp-card` ou servida com `colibri-producao.css` também usa o grupo R; com `.cc-sinal` ou `.cc-painel` ou servida com `colibri-cards.css`, também usa o grupo H.
 3. **Pergunta:** sem registro nem sinal no código (projeto ainda não adotado, página nova), ou com sinais que se contradizem (listada como Admin mas com `.ct-app`), pergunte o perfil ao usuário, mostrando o que foi encontrado. Não decida pelo nome ou pela aparência da página.
 
 Contradição entre o `DECISOES.md` e o código também entra no relatório, como pendência a corrigir num dos dois. Cada página do relatório mostra o perfil e a origem dele (`DECISOES.md`, `.ct-app`, entrada com `colibri-touch.css`, resposta do usuário).
@@ -100,8 +100,8 @@ Contradição entre o `DECISOES.md` e o código também entra no relatório, com
 | O2 ★ | Alvos de toque no mínimo da superfície, inclusive +/−, fechar e ações de linha, com 8 px entre vizinhos; nenhuma ação só no hover. No card do perfil Produção, valem as exceções da seção 10 (rodapé de 40 px; botão de estado com 42 px pela altura da linha, sem os 8 px). | E, N |
 | O3 | Regra do esquema por sementes: telas de consumidor só com `--ct-*` de `colibri-esquema.js`, esquema aplicado antes de pintar; tipo de pedido e estação só da paleta curada; KDS no tema Colibri. | E, N |
 | O4 ★ | Chrome 101: alvo declarado no build; nenhum `oklch()`, `lab()`, `color-mix()` com variável, classe de cor da paleta do Tailwind, `scale:`/`translate:` separados, `:has()` ou `@container` no CSS entregue. | E |
-| O5 | Composição: uma ação principal por tela (a do cartão de produto é botão comum); cartões só de produto e de pedido; sem faixa lateral colorida; cantos de 3 e 6 px, sem pílula (a tag de alérgeno do perfil Produção é a exceção). | E |
-| O6 | Regra da urgência legível no cartão `.ct-order`: borda de 3 px mais faixa com ícone e rótulo; só o atraso pulsa. n/a sem KDS ou sem `.ct-order` (o card do perfil Produção é avaliado em R1). | E, N |
+| O5 | Composição: uma ação principal por tela (a do cartão de produto é botão comum); cartões só de produto e de pedido (o `.cc-sinal` e o `.cc-mais` do perfil Cards também são permitidos); sem faixa lateral colorida; cantos de 3 e 6 px, sem pílula (a tag de alérgeno do perfil Produção é a exceção). | E |
+| O6 | Regra da urgência legível no cartão `.ct-order`: borda de 3 px mais faixa com ícone e rótulo; só o atraso pulsa. n/a sem KDS ou sem `.ct-order` (o card do perfil Produção é avaliado em R1) e n/a no `.cc-sinal` do perfil Cards (avaliado em H1 e H2). | E, N |
 | O7 | Cartão `.ct-order` legível (n/a no card do perfil Produção, avaliado em R2): nome do item na cor do texto e quantidade em mono, a de 2 ou mais no selo neutro (`.ct-order__qty--multi`); estado de preparo do item na linha com ícone e rótulo (`.ct-order__state`, `is-preparing`, `is-ready`), sem piscar; visão por produto em `.ct-order--group` com o tipo em selo da paleta; situação do despacho do delivery em selo de estado com ícone. n/a sem KDS. | E, N |
 | O8 | Estação e painel: estação identificada por nome, cor da paleta e ícone da lista curada na barra `.ct-bar`; nenhum emoji ou imagem como ícone de estação; painel da produção em `.ct-board` com até seis `.ct-stat` no plano, sem cartões de métrica, e número fora da meta com selo de estado. n/a sem KDS. | E |
 
@@ -114,6 +114,16 @@ Contradição entre o `DECISOES.md` e o código também entra no relatório, com
 | R3 | Observação com `bi-arrow-right` na cor de aviso; linha alterada em `warning-soft`, sem bloco extra; alérgeno em `.cp-card__alergeno` só com o nome; ritmo de preparo com `bi-stopwatch` ou `bi-alarm`, nunca `bi-clock`. | E |
 | R4 | Modos: modo da estação na raiz da grade (`.cp-modo-toque` ou `.cp-modo-bump`). Toque: rodapé com `.cp-card__acao` de 40 px e botão de estado do item (toque avança, toque no pronto volta, toque longo põe na espera). Bump: sem rodapé, `.is-selecionado` com o índice, cursor em dois níveis, Enter conclui com confirmação. O card nunca conclui sozinho. | E, N |
 | R5 | Grade: cards sem altura mínima, empilhados na ordem da fila, com posições estáveis enquanto nenhum pedido entra ou sai, e card grande transbordando para colunas vizinhas. | E, N |
+
+### H. Perfil Cards (página com painel de chamados; kit seção 11)
+
+| ID | Item | Verif. |
+|---|---|---|
+| H1 ★ | Regra do estado no preenchimento: o `.cc-sinal` inteiro na cor do estado (`--cc-cor`); espera em `--cc-espera`, padrão `var(--cm-palette-azul)` ou outra `var(--cm-palette-*)` pelo nome, nunca hex; atenção `#875800` e atraso `#b02637` fixos nos dois temas (`.cc-sinal--atencao`, `.cc-sinal--atraso`), só os limites de tempo configuráveis; o atraso respira até `#6a1720` em `::before` só com opacidade, a cada 1,2 s, parado com movimento reduzido; tinta branca com 4,5:1. | E, N |
+| H2 ★ | Urgência legível: atenção e atraso com a faixa `.cc-urgencia` (ícone e rótulo "Atenção · passou de N min" / "Atrasado · passou de N min"), nunca só a cor; atraso com `bi-exclamation-octagon-fill`, atenção com o ícone aprovado do painel; a faixa vazia reserva a altura no card no prazo, para o card não pular; sem borda de urgência. | E, N |
+| H3 | Anatomia: topo com `.cc-sinal__rotulo` e `.cc-sinal__timer` em mono; valor em display mono, ou o nome em `.cc-sinal__valor--texto`; rodapé com o motivo e selos `.cc-veu`; nenhum corpo de itens (isso é o `.cp-card`); cantos de 6 px no card e de 3 px no selo e na faixa; sem borda, sem caixa alta. | E |
+| H4 | Grade e transbordo: `.cc-grade` em `auto-fill`, cards alinhados ao topo, sem esticar até o vizinho; o que não cabe vira `.cc-mais` "+N chamados", neutro (`surface-2`, `ink-2`, número em `ink` mono), sem borda tracejada. | E, N |
+| H5 | Tema e escala: painel da equipe pelo tema Colibri (`data-theme`); painel voltado ao cliente em `.cc-painel--cliente`, com piso, preenchimento e tinta do esquema do canal (`--ct-*`), sem tempo nem urgência; na TV, `.cc-painel--tv` (cada tamanho em `max(piso, N vw)`), sem cortar em 1366×768; tamanhos pelos tokens `--cc-t-*`, `--cc-gap` e `--cc-pad`. | E, N |
 
 ## Buscas
 
@@ -139,6 +149,11 @@ Busque no código de UI do projeto, excluindo a pasta copiada do kit (`colibri-u
 - R3: `bi-clock|bi-stopwatch|bi-alarm|cp-card__alergeno|Alérgeno` (relógio fora do aguardando, palavra "Alérgeno" na tag)
 - R4: `cp-modo-(toque|bump)|cp-card__estado-btn|is-cursor|is-selecionado`
 - R5: `min-height|column-count|masonry|grid-row` (altura mínima nos cards, colunas do CSS)
+- H1: `--cc-espera:\s*#|cc-sinal--(atencao|atraso)|cc-respirar|prefers-reduced-motion` (cor de espera em hex, respiro sem a parada do movimento reduzido)
+- H2: `cc-urgencia|bi-exclamation-octagon-fill|bi-hourglass-split|bi-exclamation-triangle-fill|border[^;]*cc-sinal` (faixa ausente, urgência por borda)
+- H3: `cc-sinal__(rotulo|timer|valor|rodape)|cc-veu|text-transform:\s*uppercase` (corpo de itens no card de sinal, caixa alta)
+- H4: `cc-grade|cc-mais|dashed|align-items:\s*stretch` (borda tracejada no transbordo, cards esticados)
+- H5: `cc-painel--(cliente|tv)|data-theme|--cc-t` (painel do cliente com tempo ou hex, TV sem a escala fluida)
 - O8: emoji no código e nos dados de estação (`rg -P "[\x{1F300}-\x{1FAFF}\x{2300}-\x{23FF}\x{2600}-\x{27BF}]"`; a faixa pula `U+2400`–`U+25FF`, dos traços de desenho de caixa (`──`) dos comentários de seção), `ct-bar|ct-board|ct-stat` e cartões de métrica no painel
 
 ## Nota e faixa
