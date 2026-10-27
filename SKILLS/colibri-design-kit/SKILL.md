@@ -6,11 +6,11 @@ argument-hint: '[adotar | aderencia | refatorar | desvio] [alvo] — ex.: "adere
 
 # Colibri Design Kit
 
-Leva a linha visual Colibri a um repositório, deixa o projeto pronto para o impeccable trabalhar sobre ela e mede quanto o projeto segue o kit. A linha tem dois perfis sobre a mesma base: **Admin** (painéis, admins e ferramentas internas) e **Operação** (telas cheias de toque: cardápio do tablet, totem, produção do KDS, pedidos prontos). Sobre o Operação, o perfil **Produção**, específico do KDS, traz o card de produção da estação, e o perfil **Cards**, genérico, o card de sinal dos painéis de chamado (garçom, entregadores, senhas). Um projeto adota um perfil ou mais. Depois da adoção, o repositório tem:
+Leva a linha visual Colibri a um repositório, deixa o projeto pronto para o impeccable trabalhar sobre ela e mede quanto o projeto segue o kit. A linha tem dois perfis sobre a mesma base: **Admin** (painéis, admins e ferramentas internas) e **Operação** (telas cheias de toque: cardápio do tablet, totem, produção do KDS, pedidos prontos). Sobre o Operação, o perfil **Produção**, específico do KDS, traz o card de produção da estação, e o perfil **Cards**, genérico, o card de sinal dos painéis de chamado e de kanban (garçom, entregadores, senhas), em regras fixas e escolhas do painel. Um projeto adota um perfil ou mais. Depois da adoção, o repositório tem:
 
 | Arquivo | Conteúdo | Quem grava |
 |---|---|---|
-| `<estáticos>/colibri-ui/` | `colibri-base.css`, `fonts/`, `logos/`, `icons/`; no perfil Admin, `colibri-ui.css` e os adaptadores usados; no perfil Operação, `colibri-touch.css` e, com canal de consumidor, `colibri-esquema.js` (+ `.d.ts` em TypeScript); no perfil Produção, `colibri-producao.css`; no perfil Cards, `colibri-cards.css` | `adotar` |
+| `<estáticos>/colibri-ui/` | `colibri-base.css`, `fonts/`, `logos/`, `icons/`; no perfil Admin, `colibri-ui.css` e os adaptadores usados; no perfil Operação, `colibri-touch.css` e, com canal de consumidor, `colibri-esquema.js` (+ `.d.ts` em TypeScript); no perfil Produção, `colibri-producao.css`; no perfil Cards, `colibri-cards.css` (e `colibri-esquema.js`, com cor livre do lojista ou cor própria no painel) | `adotar` |
 | `PRODUCT.md` | usuários, propósito, contexto, compromissos da marca, princípios (modelo do kit preenchido) | impeccable `init` |
 | `DESIGN.md` | regras visuais do kit no formato do impeccable + implementação no projeto | impeccable `document` |
 | `.impeccable/design.json` | sidecar: metadados de cor, sombras, movimento, breakpoints, componentes | impeccable `document` |
@@ -82,7 +82,7 @@ O kit em `./assets/kit/` é mantido diretamente nesta skill e é a fonte da verd
 Ao alterar o kit:
 
 - Mude a regra e a implementação juntas: `DESIGN.md` e `colibri-ui.css` (tokens, temas e fontes ficam em `colibri-base.css`), mais os adaptadores afetados (`colibri-ui.bootstrap3.css`, `colibri-ui.devexpress.css`) e a marcação de `exemplo.html` quando o componente aparece nela. No perfil Operação, `colibri-touch.css`, `colibri-esquema.js` e `exemplo-toque.html`; no perfil Produção, `colibri-producao.css` e as telas `#kds` e `#bump` de `exemplo-toque.html`; no perfil Cards, `colibri-cards.css` e as telas `#chamados` e `#chamados-claro` de `exemplo-toque.html`.
-- Mudou `colibri-esquema.js` ou os estados de `colibri-base.css`: rode `node scripts/verificar-esquema.mjs` (estados iguais à base, contraste garantido numa grade de sementes, nada acima do Chrome 101). Falhou, não publique.
+- Mudou `colibri-esquema.js` ou os estados de `colibri-base.css`: rode `node scripts/verificar-esquema.mjs` (estados iguais à base, contraste garantido numa grade de sementes e nas cores livres do perfil Cards, nada acima do Chrome 101). Falhou, não publique.
 - Regra nova ou alterada entra no checklist de `./references/mapeamento-impeccable.md` (e na tabela, se o `DESIGN.md` mudou de estrutura) e na rubrica de `./references/aderencia.md` (item novo ou alterado, com a busca dele, e a versão da rubrica incrementada); comportamento por framework vai para `./references/adocao-por-framework.md`.
 - Acrescente no topo de "Versões" do `LEIA-ME.md` uma entrada com a data e o que mudou.
 - Ajuste descoberto numa aplicação que vale para todas volta para cá; não fica só no projeto.

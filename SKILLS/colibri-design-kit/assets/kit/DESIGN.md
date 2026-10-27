@@ -141,7 +141,7 @@ motion:
 
 # Colibri UI — linha visual das aplicações Colibri
 
-Este documento descreve a linha visual comum das aplicações Colibri e orienta a refatoração visual de cada uma delas. A linha tem dois perfis sobre a mesma base (`colibri-base.css`: tokens dos dois temas, fontes e camadas): **Admin** (seções 1 a 8), para painéis, admins e ferramentas internas, e **Operação** (seção 9), as telas cheias de toque do cardápio do tablet, do totem, da produção do KDS e do painel de pedidos prontos. Sobre o perfil Operação, o perfil **Produção** (seção 10), específico do KDS, define o card de produção da estação. O perfil **Cards** (seção 11), genérico e também sobre o perfil Operação, define o card de sinal dos painéis de chamado (garçom, entregadores, senhas). As seções 1 a 8 valem para o perfil Operação no que a seção 9 não muda (cores de estado, fontes, ícones, foco, tema por token), e a seção 9 vale para o perfil Produção no que a seção 10 não muda e para o perfil Cards no que a seção 11 não muda. A implementação de referência do perfil Admin está em `colibri-ui.css` (CSS puro, prefixo `cm-`); a do perfil Operação, em `colibri-touch.css` (prefixo `ct-`), com o motor de esquema de cores `colibri-esquema.js` e a demonstração `exemplo-toque.html`; a do perfil Produção, em `colibri-producao.css` (prefixo `cp-`), demonstrada em `exemplo-toque.html#kds` e `#bump`; a do perfil Cards, em `colibri-cards.css` (prefixo `cc-`), demonstrada em `exemplo-toque.html#chamados` e `#chamados-claro`; `colibri-ui.bootstrap3.css` e `colibri-ui.devexpress.css` são adaptadores opcionais; `logos/colibri-colorido.svg` é a marca da página inicial; `logos/colibri.ico` é o ícone da aba; `logos/colibri-marca.svg` é a marca da tela de entrada; `exemplo.html` mostra a marcação de cada componente e `exemplo-entrada.html`, a tela de entrada e a página de erro.
+Este documento descreve a linha visual comum das aplicações Colibri e orienta a refatoração visual de cada uma delas. A linha tem dois perfis sobre a mesma base (`colibri-base.css`: tokens dos dois temas, fontes e camadas): **Admin** (seções 1 a 8), para painéis, admins e ferramentas internas, e **Operação** (seção 9), as telas cheias de toque do cardápio do tablet, do totem, da produção do KDS e do painel de pedidos prontos. Sobre o perfil Operação, o perfil **Produção** (seção 10), específico do KDS, define o card de produção da estação. O perfil **Cards** (seção 11), genérico e também sobre o perfil Operação, define o card de sinal dos painéis de chamado e de kanban (garçom, entregadores, senhas, quadros de etapas), em regras fixas e escolhas do painel. As seções 1 a 8 valem para o perfil Operação no que a seção 9 não muda (cores de estado, fontes, ícones, foco, tema por token), e a seção 9 vale para o perfil Produção no que a seção 10 não muda e para o perfil Cards no que a seção 11 não muda. A implementação de referência do perfil Admin está em `colibri-ui.css` (CSS puro, prefixo `cm-`); a do perfil Operação, em `colibri-touch.css` (prefixo `ct-`), com o motor de esquema de cores `colibri-esquema.js` e a demonstração `exemplo-toque.html`; a do perfil Produção, em `colibri-producao.css` (prefixo `cp-`), demonstrada em `exemplo-toque.html#kds` e `#bump`; a do perfil Cards, em `colibri-cards.css` (prefixo `cc-`), demonstrada em `exemplo-toque.html#chamados` e `#chamados-claro`; `colibri-ui.bootstrap3.css` e `colibri-ui.devexpress.css` são adaptadores opcionais; `logos/colibri-colorido.svg` é a marca da página inicial; `logos/colibri.ico` é o ícone da aba; `logos/colibri-marca.svg` é a marca da tela de entrada; `exemplo.html` mostra a marcação de cada componente e `exemplo-entrada.html`, a tela de entrada e a página de erro.
 
 Ao adotar em um repositório, copie este arquivo para a raiz como `DESIGN.md`, escreva o `PRODUCT.md` do produto (modelo em `PRODUCT.template.md`) e registre na seção "Implementação neste projeto" onde o CSS e os componentes ficam.
 
@@ -434,7 +434,7 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 
 ### Movimento
 
-Folha sobe em 260 ms com `--cm-ease` e o painel lateral desliza da direita no mesmo tempo; véus, diálogos centralizados e a tela cheia dividida esmaecem em 200 ms; retorno de toque em 120 ms. O halo de atraso pulsa a cada 1,2 s (no perfil Cards, o card em atraso respira no mesmo ritmo, seção 11). Animações de foto do produto (aproximação, Ken Burns, brilho) são conteúdo escolhido pelo lojista e param com movimento reduzido. Com `prefers-reduced-motion`, nada desliza, pisca ou gira: folhas e confirmações aparecem, o atraso fica com a borda fixa e o carregamento mostra o ícone parado com o texto.
+Folha sobe em 260 ms com `--cm-ease` e o painel lateral desliza da direita no mesmo tempo; véus, diálogos centralizados e a tela cheia dividida esmaecem em 200 ms; retorno de toque em 120 ms. O halo de atraso pulsa a cada 1,2 s (no perfil Cards, o card no estado mais grave respira no mesmo ritmo, seção 11). Animações de foto do produto (aproximação, Ken Burns, brilho) são conteúdo escolhido pelo lojista e param com movimento reduzido. Com `prefers-reduced-motion`, nada desliza, pisca ou gira: folhas e confirmações aparecem, o atraso fica com a borda fixa e o carregamento mostra o ícone parado com o texto.
 
 ### Faça / Não faça no perfil Operação
 
@@ -562,35 +562,44 @@ O modo é configurado por estação (todos os monitores de uma estação no mesm
 
 ## 11. Perfil Cards
 
-Card de sinal (`.cc-sinal`) dos painéis de chamado (garçom, entregadores, senhas), lido de longe, sobre o perfil Operação. É um perfil genérico: o card mostra um chamado ou um sinal (quem chamou, há quanto tempo, o número ou o nome), nunca um corpo de itens. O card de produção do KDS é o `.cp-card` do perfil Produção (seção 10), e o cartão de pedidos prontos `.ct-ready` (seção 9) continua para as aplicações que não adotaram o perfil Cards. Implementação em `colibri-cards.css` (prefixo `cc-`), carregado depois do `colibri-touch.css`; demonstração em `exemplo-toque.html#chamados` (tema escuro) e `#chamados-claro` (tema claro), com os painéis de garçom, entregadores e senhas. O perfil Operação continua valendo no que esta seção não muda: tema Colibri por `data-theme`, paleta curada, piso Chrome 101, caixa de frase e nenhum texto em caixa alta.
+Card de sinal (`.cc-sinal`) dos painéis de chamado e de kanban (garçom, entregadores, senhas, quadros de etapas), lido de longe, sobre o perfil Operação. É um perfil genérico, em **regras fixas e escolhas do painel**: as regras fixas garantem a leitura de longe em qualquer painel; o resto (cores, estados, ícones, ordem das peças, fundo, escala) é escolha de cada painel, porque cada cenário pode pedir um ícone ou uma posição de texto diferente. O card mostra um chamado ou um sinal (quem chamou, há quanto tempo, o número ou o nome), nunca um corpo de itens: a lista de itens a produzir, com ação por item, é o `.cp-card` do perfil Produção (seção 10), e o cartão de pedidos prontos `.ct-ready` (seção 9) continua para as aplicações que não adotaram o perfil Cards. Implementação em `colibri-cards.css` (prefixo `cc-`), carregado depois do `colibri-touch.css`, com a tinta, o véu e o respiro da cor livre calculados por `colibri-esquema.js`; demonstração em `exemplo-toque.html#chamados` (tema escuro) e `#chamados-claro` (tema claro), com os exemplos de garçom, entregadores e senhas e um card de cor livre. O perfil Operação continua valendo no que esta seção não muda: piso Chrome 101, caixa de frase e nenhum texto em caixa alta.
 
-**Norte criativo: "Sinal de longe".** Quem atende vê o painel de relance, do outro lado do salão ou da expedição. Cada card é um bloco de cor que diz uma coisa só: há um chamado, e em que estado ele está. O número ou o nome é o que se lê primeiro; rótulo, tempo e selos são apoio.
+**Norte criativo: "Sinal de longe".** Quem atende vê o painel de relance, do outro lado do salão ou da expedição. Cada card é um bloco de cor que diz uma coisa só: há um chamado, e em que estado ele está. A informação principal (o número, o nome) é o que se lê primeiro; rótulo, tempo e selos são apoio.
 
-**Características:**
+### Regras fixas
 
-- Preenchimento cheio, sem bordas: o card salta do piso (`--cc-piso`) pela cor, não por contorno.
-- A cor do card é o estado (espera, atenção ou atraso); o painel escolhe só a cor de espera.
-- O card não muda de tamanho ao mudar de estado: a faixa de urgência já reserva a altura no prazo.
-- Nada de corpo de itens, contadores ou gráficos dentro do card.
+Valem em todo painel, com qualquer escolha do lojista ou do projeto:
 
-### Cores
+- **Cor cheia, sem contorno:** o card salta do piso (`--cc-piso`) pela cor; sem borda, contorno ou sombra, e o `.cc-mais` sem borda tracejada.
+- **Regra do estado no preenchimento.** O card inteiro leva a cor do seu estado, e só dela (`--cc-cor`). O estado nunca é só cor: todo estado além do de partida (a espera, no prazo) se diz também por ícone e rótulo, na faixa `.cc-urgencia` ou numa peça do card ("Atenção · passou de 5 min"); num painel sem estado de partida (kanban), todos levam ícone e rótulo.
+- **Tinta calculada:** o texto e os ícones sobre o preenchimento têm 4,5:1 ou mais com qualquer cor. A tinta (`--cc-tinta`), o véu da faixa e dos selos (`--cc-veu`) e o respiro (`--cc-respiro`) saem do motor (`tintaSobre`, `veuSobre` e `respiroDe`, de `colibri-esquema.js`), nunca da escolha do lojista. A tinta é o branco ou o texto principal do kit (`#1d2733`), o de mais contraste; nas cores médias, em que nenhum dos dois chega a 4,5:1 (vermelho puro, cinza médio), o preto. O véu escurece sob tinta clara e clareia sob tinta escura, e o contraste só aumenta.
+- **Só o estado mais grave respira:** o atraso (`.cc-sinal--atraso`) ou, num painel com estados próprios, o card com `.cc-sinal--respira`. Uma camada `::before` vai até a cor do respiro e volta a cada 1,2 s, só em opacidade, parada com `prefers-reduced-motion`. Nenhum outro estado pisca nem pulsa.
+- **Altura estável:** o card não muda de altura ao mudar de estado. A faixa `.cc-urgencia` vazia reserva a altura da preenchida, e o rodapé, a de um selo.
+- **Uma informação principal**, a maior do card (`.cc-sinal__valor`, em display mono, ou `.cc-sinal__valor--texto`, o nome); o resto fica menor.
+- **Invariantes do kit:** caixa de frase e nenhum texto em caixa alta; cantos de 6 px no card e no `.cc-mais` e de 3 px no selo e na faixa; piso Chrome 101 (sem `:has()`, `@container`, `color-mix()` com variável, `oklch()` nem `scale:`/`translate:` separados); sem cartão dentro de cartão e sem corpo de itens, contadores ou gráficos no card.
 
-**Regra do estado no preenchimento.** O card inteiro leva a cor do seu estado, e só dela (`--cc-cor`). No prazo, a cor de espera (`--cc-espera`): por padrão `var(--cm-palette-azul)`; o painel pode trocá-la por outra cor da paleta curada, pelo nome (`var(--cm-palette-petroleo)` nos entregadores), nunca por hex. Em atenção, âmbar `#875800`; em atraso, vermelho `#b02637`, que respira até `#6a1720` a cada 1,2 s numa camada `::before` animada só em opacidade, parada com `prefers-reduced-motion`. Atenção e atraso são fixos e iguais nos dois temas; os limites de tempo são configuráveis. A tinta é branca (`--cc-tinta`), com 4,5:1 ou mais sobre as três cores. A urgência nunca é só cor: a faixa `.cc-urgencia` traz ícone e rótulo ("Atenção · passou de 5 min", "Atrasado · passou de 10 min"); o atraso usa `bi-exclamation-octagon-fill`, e a atenção, `bi-hourglass-split` nos entregadores e `bi-exclamation-triangle-fill` no garçom, como aprovado (pendência: unificar o ícone de atenção).
+### Escolhas do painel
+
+Cada painel escolhe, dentro das regras fixas:
+
+- **Cor de cada estado.** Padrões: espera `var(--cm-palette-azul)`, atenção `#875800` e atraso `#b02637`, os três com tinta branca (4,5:1 ou mais). O lojista pode trocar qualquer um por outra cor da paleta curada ou por um hex livre; com cor livre, o painel troca junto a tinta e o véu do estado pelos do motor (`--cc-tinta-<estado>: tintaSobre(cor)`, `--cc-veu-<estado>: veuSobre(cor)`) e, no atraso, o respiro (`--cc-atraso-respiro: respiroDe(cor)`). Os limites de tempo também são do painel.
+- **Quantidade e nome dos estados.** Espera, atenção e atraso são os do chamado; um kanban pode ter outros ("Na fila", "Separando", "Pronto"). Estado próprio: a aplicação grava no card `--cc-cor`, `--cc-tinta` e `--cc-veu` (e `--cc-respiro` no mais grave, com `.cc-sinal--respira`), e a faixa preenchida leva `.cc-urgencia--ativa`.
+- **Ícone de cada estado**, de Bootstrap Icons. O atraso padrão usa `bi-exclamation-octagon-fill`; a atenção, o do painel (`bi-exclamation-triangle-fill` no garçom, `bi-hourglass-split` nos entregadores).
+- **Ordem, posição e presença das peças.** Topo, valor, faixa, rodapé e selos são peças, não molde obrigatório: o painel ordena, junta ou omite o que o cenário pede (o painel de senhas não tem tempo nem faixa), desde que a informação principal continue a maior e a altura continue estável.
+- **Fundo do painel.** Claro ou escuro pelo tema Colibri (`data-theme`: só o piso muda), ou cor própria do lojista como semente `ambiente` de `derivarEsquema`, que deriva piso, superfícies e textos com o contraste garantido e decide claro ou escuro. O painel voltado ao cliente usa `.cc-painel--cliente`: piso, preenchimento e tinta da espera vêm do esquema do canal (`--ct-bg`, `--ct-brand` e `--ct-on-brand`), os mesmos do preço preenchido do cardápio.
+- **Escala:** fixa (prévia no admin, tablet) ou da TV (`.cc-painel--tv`, abaixo).
 
 Os tokens ficam em `colibri-cards.css`, não na base, porque só o card os usa:
 
-| Token | Claro | Escuro | Uso |
+| Token | Padrão | Sobrescrevível | Uso |
 |---|---|---|---|
-| `--cc-piso` | `#dce2e9` (`line`) | `#0b1822` (`bg`) | Fundo do painel |
-| `--cc-espera` | `var(--cm-palette-azul)` | `var(--cm-palette-azul)` | Card no prazo; o painel troca por outra `--cm-palette-*` |
-| `--cc-cor` | `--cc-espera`, `--cc-atencao` ou `--cc-atraso` | igual | Preenchimento corrente do card |
-| `--cc-tinta` | `#ffffff` | `#ffffff` | Texto e ícones sobre o preenchimento |
-| `--cc-atencao` | `#875800` | `#875800` | Card em atenção |
-| `--cc-atraso` | `#b02637` | `#b02637` | Card em atraso |
-| `--cc-atraso-respiro` | `#6a1720` | `#6a1720` | Ponto escuro do respiro do atraso |
-| `--cc-veu` | `rgba(0, 0, 0, .24)` | igual | Faixa de urgência e selos sobre o preenchimento |
-
-**Tema.** Os painéis da equipe (garçom, entregadores) seguem o tema Colibri por `data-theme`: só o piso muda entre claro e escuro. O painel voltado ao cliente (senhas) usa `.cc-painel--cliente`: piso, preenchimento e tinta vêm do esquema do canal (`--ct-bg`, `--ct-brand` e `--ct-on-brand`, de `colibri-esquema.js`), os mesmos do preço preenchido do cardápio, nunca hex.
+| `--cc-piso` | `#dce2e9` (`line`) no claro, `#0b1822` (`bg`) no escuro | Pelo tema; com cor própria, `--ct-bg` do esquema | Fundo do painel |
+| `--cc-espera`, `--cc-atencao`, `--cc-atraso` | `var(--cm-palette-azul)`, `#875800` e `#b02637`, nos dois temas | Sim, no painel: paleta curada ou hex livre do lojista | Cor de cada estado |
+| `--cc-tinta-espera`, `--cc-tinta-atencao`, `--cc-tinta-atraso` | `#ffffff` | Só pelo motor: `tintaSobre(cor do estado)` | Texto e ícones de cada estado |
+| `--cc-veu-espera`, `--cc-veu-atencao`, `--cc-veu-atraso` | `rgba(0, 0, 0, .24)` | Só pelo motor: `veuSobre(cor do estado)` | Faixa e selos de cada estado |
+| `--cc-atraso-respiro` | `#6a1720` (calibrado à mão) | Só pelo motor: `respiroDe(cor do atraso)` | Ponto do respiro do atraso |
+| `--cc-cor`, `--cc-tinta`, `--cc-veu` | Os do estado do card | No card, para estado próprio (tinta e véu do motor) | Preenchimento, texto e véu correntes |
+| `--cc-respiro` | `--cc-atraso-respiro` no atraso; sem ele, o véu | No card com `.cc-sinal--respira`: `respiroDe(--cc-cor)` | Ponto do respiro do estado mais grave |
 
 ### Escala da TV
 
@@ -606,39 +615,45 @@ O painel (`.cc-painel`) tem escala própria (`--cc-t-sm`, `--cc-t`, `--cc-t-xl`,
 | `--cc-gap` | 12 px | `max(12px, 1.05vw)` | 20 px | Entre cards e entre as partes do card |
 | `--cc-pad` | 14 px | `max(14px, 1.25vw)` | 24 px | Margem da grade e base do recuo do card |
 
-### Anatomia do card de sinal
+### Peças do card de sinal
 
-- **Topo** (`.cc-sinal__topo`): o rótulo (`.cc-sinal__rotulo`, ex.: "Mesa") à esquerda e o tempo desde o chamado (`.cc-sinal__timer`, mono) à direita.
-- **Valor** (`.cc-sinal__valor`): o número da mesa ou da senha em display mono; com `.cc-sinal__valor--texto`, o nome no lugar do número.
-- **Faixa de urgência** (`.cc-urgencia`): ícone e rótulo sobre o véu. No prazo fica vazia e reserva a altura, para o card não pular ao entrar em atenção.
-- **Rodapé** (`.cc-sinal__rodape`): o motivo do chamado (ex.: "Conta", "Cardápio") e os selos `.cc-veu` sobre o preenchimento (ex.: "A caminho", "2 sacolas").
+Peças que o painel ordena e escolhe (escolha do painel, acima); a marcação de cada uma está em `exemplo-toque.html#chamados`:
+
+- **Topo** (`.cc-sinal__topo`): rótulo (`.cc-sinal__rotulo`, ex.: "Mesa", com ícone opcional) e tempo desde o chamado (`.cc-sinal__timer`, mono).
+- **Valor** (`.cc-sinal__valor`): a informação principal, o número da mesa ou da senha em display mono; com `.cc-sinal__valor--texto`, o nome no lugar do número.
+- **Faixa de urgência** (`.cc-urgencia`): ícone e rótulo do estado sobre o véu. Vazia, reserva a altura da preenchida; num estado próprio, a preenchida leva `.cc-urgencia--ativa`.
+- **Rodapé** (`.cc-sinal__rodape`): o motivo do chamado (ex.: "Conta", "Cardápio"), com a altura de um selo reservada.
+- **Selos** (`.cc-veu`): sobre o preenchimento, no véu do estado (ex.: "A caminho", "2 sacolas").
 - **Transbordo** (`.cc-mais`): o que não cabe no painel vira um bloco neutro "+N chamados", em `surface-2`, com texto `ink-2` e o número em `ink` mono, sem borda tracejada.
 - **Grade** (`.cc-grade`): colunas `auto-fill` que cabem na largura; os cards alinham ao topo e não esticam até a altura do vizinho.
-- Cantos de 6 px no card e no `.cc-mais` e de 3 px no selo e na faixa; nenhum texto em caixa alta; piso Chrome 101 (sem `:has()`, `@container`, `color-mix()` com variável, `oklch()` nem `scale:`/`translate:` separados).
 
-### Variantes
+### Exemplos
 
-- **Garçom:** cor de espera padrão (azul), rótulo "Mesa" e número em display mono; atenção com `bi-exclamation-triangle-fill`.
-- **Entregadores:** cor de espera petróleo (`--cc-espera: var(--cm-palette-petroleo)` no painel), nome em `.cc-sinal__valor--texto`, selos no véu e `.cc-mais` para o que não cabe; atenção com `bi-hourglass-split`.
+Os painéis de `exemplo-toque.html#chamados` são exemplos do perfil, não modelos: mostram escolhas possíveis dentro das regras fixas.
+
+- **Garçom:** cor de espera padrão (azul), topo com "Mesa" e o tempo, número em display mono e o motivo no rodapé; atenção com `bi-exclamation-triangle-fill`.
+- **Entregadores:** espera petróleo (`--cc-espera: var(--cm-palette-petroleo)` no painel), rótulo com `bi-bicycle`, nome em `.cc-sinal__valor--texto`, selos no véu e `.cc-mais` para o que não cabe; atenção com `bi-hourglass-split`.
 - **Senhas** (voltado ao cliente): `.cc-painel--cliente`, com o esquema do canal; sem tempo e sem faixa de urgência, porque não há prazo voltado ao cliente.
+- **Cor livre do lojista:** um card de espera num amarelo claro escolhido pelo lojista, com a tinta escura e o véu claro calculados por `tintaSobre` e `veuSobre`.
 
 ### Faça / Não faça no perfil Cards
 
 **Faça**
 
-- Card inteiro na cor do estado, com ícone e rótulo na faixa de urgência em atenção e em atraso.
-- Trocar a cor de espera do painel só por outra cor da paleta curada, pelo nome.
-- Reservar a altura da faixa no card no prazo.
-- Conferir o painel nos dois temas, na TV em 1920 px, em 4K e em 1366×768, e com mais chamados do que cabem.
+- Card inteiro na cor do estado, com ícone e rótulo em todo estado além do de partida.
+- Calcular a tinta, o véu e o respiro de toda cor livre pelo motor (`tintaSobre`, `veuSobre`, `respiroDe`).
+- Reservar a altura da faixa e do rodapé, para o card não pular ao mudar de estado.
+- Escolher o ícone de cada estado e a ordem das peças pelo cenário do painel.
+- Conferir o painel nos dois temas (e com a cor própria, se houver), na TV em 1920 px, em 4K e em 1366×768, com mais chamados do que cabem e com uma cor clara e uma média em algum estado.
 
 **Não faça**
 
 - Borda, contorno ou sombra para separar o card do piso, ou borda tracejada no `.cc-mais`.
-- Cor de espera em hex, ou cores de atenção e atraso configuráveis.
-- Urgência só pela cor, ou faixa que aparece e empurra o conteúdo.
+- Tinta escolhida pelo lojista, ou cor livre sem a tinta e o véu calculados.
+- Estado só pela cor, ou faixa que aparece e empurra o conteúdo.
 - Corpo de itens no card de sinal (isso é o `.cp-card` do perfil Produção), ou tempo e urgência no painel de senhas.
-- Respiro que anima cor ou fundo em vez de opacidade, ou que continua com movimento reduzido.
+- Mais de um estado respirando, respiro que anima cor ou fundo em vez de opacidade, ou que continua com movimento reduzido.
 
 ## 12. Implementação neste projeto
 
-_Preencher ao adotar:_ os perfis usados (Admin, Operação, Produção e/ou Cards, com as superfícies), onde está o CSS (`colibri-ui.css` ou `colibri-touch.css` e, se usados, os adaptadores), onde ficam fontes, ícones e `logos/`, de onde a entrada HTML serve o ícone da aba, qual página recebe `.cm-page--home`, a biblioteca de componentes e o tema usados (com versão) e como cada componente é implementado no framework do projeto (componentes, diretivas, templates). No perfil Operação: a classe de superfície, o alvo de build (Chrome 101), onde o esquema de cada canal é gravado, como chega ao app e como é aplicado antes de pintar, e as cores da paleta escolhidas para tipos de pedido e estações. No perfil Produção: onde o modo de cada estação é configurado e como a grade empilha os cards. No perfil Cards: quais painéis existem (garçom, entregadores, senhas), a cor de espera de cada um (o nome da cor da paleta curada), onde os limites de atenção e atraso são configurados, quais painéis usam a escala da TV e, no painel voltado ao cliente, de qual canal vem o esquema.
+_Preencher ao adotar:_ os perfis usados (Admin, Operação, Produção e/ou Cards, com as superfícies), onde está o CSS (`colibri-ui.css` ou `colibri-touch.css` e, se usados, os adaptadores), onde ficam fontes, ícones e `logos/`, de onde a entrada HTML serve o ícone da aba, qual página recebe `.cm-page--home`, a biblioteca de componentes e o tema usados (com versão) e como cada componente é implementado no framework do projeto (componentes, diretivas, templates). No perfil Operação: a classe de superfície, o alvo de build (Chrome 101), onde o esquema de cada canal é gravado, como chega ao app e como é aplicado antes de pintar, e as cores da paleta escolhidas para tipos de pedido e estações. No perfil Produção: onde o modo de cada estação é configurado e como a grade empilha os cards. No perfil Cards: quais painéis existem (garçom, entregadores, senhas, kanban) e, em cada um, as escolhas do painel: os estados, a cor de cada um (nome da paleta curada ou hex livre do lojista, onde é configurada e onde a tinta, o véu e o respiro são calculados pelo motor), o ícone de cada estado, as peças do card e a ordem delas, o fundo (tema Colibri ou cor própria pelo `derivarEsquema`), onde os limites de tempo são configurados, se usa a escala da TV e, no painel voltado ao cliente, de qual canal vem o esquema.

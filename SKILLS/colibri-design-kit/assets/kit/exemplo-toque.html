@@ -497,6 +497,25 @@
                 <div class="cc-mais"><b>+2</b>chamados</div>
             </div>
         </section>
+        <!-- Cor livre do lojista: espera num amarelo claro (#f5d76e); a tinta e o véu não são escolha dele, vêm do
+             motor (tintaSobre('#f5d76e') = #1d2733, veuSobre('#f5d76e') = rgba(255, 255, 255, .45)), gravados no painel -->
+        <section class="cc-painel" style="--cc-espera: #f5d76e; --cc-tinta-espera: #1d2733; --cc-veu-espera: rgba(255, 255, 255, .45)" aria-label="Chamados de retirada, com cor do lojista">
+            <div class="demo-cc-barra"><span class="demo-cc-barra__titulo">Retirada (cor do lojista)</span><span class="demo-cc-barra__apoio">2 chamados</span><span class="demo-cc-barra__hora">19:42</span></div>
+            <div class="cc-grade">
+                <article class="cc-sinal">
+                    <div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-bag" aria-hidden="true"></i>Retirada</span><span class="cc-sinal__timer">01:05</span></div>
+                    <div class="cc-sinal__valor">#491</div>
+                    <div class="cc-urgencia"></div>
+                    <div class="cc-sinal__rodape"><span class="cc-veu"><i class="bi bi-person-walking" aria-hidden="true"></i>A caminho</span><span>Carla</span></div>
+                </article>
+                <article class="cc-sinal cc-sinal--atencao">
+                    <div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-bag" aria-hidden="true"></i>Retirada</span><span class="cc-sinal__timer">03:20</span></div>
+                    <div class="cc-sinal__valor">#488</div>
+                    <div class="cc-urgencia"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Atenção · passou de 3 min</div>
+                    <div class="cc-sinal__rodape"><span>Marcos</span></div>
+                </article>
+            </div>
+        </section>
         <!-- Senhas prontas: voltado ao cliente, piso e preenchimento do esquema do canal; sem tempo e sem urgência -->
         <section class="cc-painel cc-painel--cliente" aria-label="Senhas prontas">
             <div class="demo-cc-barra"><span class="demo-cc-barra__titulo">Senhas prontas</span><span class="demo-cc-barra__hora">19:42</span></div>

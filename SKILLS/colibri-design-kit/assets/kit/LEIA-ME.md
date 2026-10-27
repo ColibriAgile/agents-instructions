@@ -12,8 +12,8 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 | `colibri-base.css` | Base comum: tokens `--cm-*` dos temas claro e escuro, fontes locais e camadas. Sem regras de elemento nem componentes. Importada por `colibri-ui.css` e por `colibri-touch.css`. |
 | `colibri-touch.css` | Implementação de referência do perfil Operação (prefixo `ct-`): escala por superfície (tablet, totem, KDS, TV), cabeçalho, categorias, botões, quantidade, selos, cartão de produto, folha, opções, avisos, cartão de pedido do KDS (com estado de preparo do item e cartão de agrupamento), barra da estação, painel da produção e pedidos prontos. Importa `colibri-base.css`. Piso Chrome 101. |
 | `colibri-producao.css` | Implementação de referência do perfil Produção (prefixo `cp-`), sobre o perfil Operação: card de produção do KDS (`.cp-card`) com o cabeçalho na cor do tempo, a coluna de estado do item, os modos toque e bump e as faixas do card. Carregado depois do `colibri-touch.css`. Piso Chrome 101. |
-| `colibri-cards.css` | Implementação de referência do perfil Cards (prefixo `cc-`), sobre o perfil Operação: card de sinal dos painéis de chamado (`.cc-sinal`: garçom, entregadores, senhas) com o card inteiro na cor do estado, a faixa de urgência, o bloco de transbordo `.cc-mais`, o painel voltado ao cliente (`.cc-painel--cliente`) e a escala fluida da TV (`.cc-painel--tv`). Carregado depois do `colibri-touch.css`. Piso Chrome 101. |
-| `colibri-esquema.js` | Motor do esquema de cores por canal (perfil Operação): três sementes (ambiente, ação, marca) → tokens `--ct-*` em hex com contraste garantido por ajuste. ES2019, sem dependências. `colibri-esquema.d.ts` traz os tipos. |
+| `colibri-cards.css` | Implementação de referência do perfil Cards (prefixo `cc-`), sobre o perfil Operação: card de sinal dos painéis de chamado e de kanban (`.cc-sinal`: garçom, entregadores, senhas) com o card inteiro na cor do estado, cor, tinta e véu por estado sobrescrevíveis (cor livre com a tinta do motor), a faixa de urgência, o bloco de transbordo `.cc-mais`, o painel voltado ao cliente (`.cc-painel--cliente`) e a escala fluida da TV (`.cc-painel--tv`). Carregado depois do `colibri-touch.css`. Piso Chrome 101. |
+| `colibri-esquema.js` | Motor do esquema de cores por canal (perfil Operação): três sementes (ambiente, ação, marca) → tokens `--ct-*` em hex com contraste garantido por ajuste. No perfil Cards, a tinta, o véu e o respiro sobre a cor livre de um card (`tintaSobre`, `veuSobre`, `respiroDe`). ES2019, sem dependências. `colibri-esquema.d.ts` traz os tipos. |
 | `exemplo-toque.html` | Demonstração do perfil Operação: `#tablet`, `#tablet-folha`, `#tablet-carrinho`, `#tablet-passos`, `#tablet-leitor`, `#totem`, `#kds`, `#kds-claro`, `#bump`, `#bump-claro`, `#consolidado`, `#painel`, `#pronto`, `#chamados`, `#chamados-claro` (acrescente `-limpo` para esconder a barra do exemplo). O seletor de esquema precisa da página servida por um servidor local (módulos ES não carregam em `file://`). |
 | `colibri-ui.css` | Implementação de referência do perfil Admin em CSS puro (prefixo `cm-`), sem dependência de framework. Importa `colibri-base.css`, que fica na mesma pasta. |
 | `colibri-ui.bootstrap3.css` | Adaptador opcional para projetos com Bootstrap 3, AngularJS, angular-growl, pnotify (`pnotify-colibri` 1.2 ou PNotify 5), chosen (com ou sem `chosen-bootstrap.css`), bootstrap-daterangepicker 2.1, c3 ou Dropzone. |
@@ -55,10 +55,10 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 ### Perfil Cards (painéis de chamado)
 
-1. Copie também `colibri-cards.css` para a mesma pasta e carregue-o depois do `colibri-touch.css` nas telas de chamado (garçom, entregadores, senhas).
+1. Copie também `colibri-cards.css` para a mesma pasta e carregue-o depois do `colibri-touch.css` nas telas de chamado (garçom, entregadores, senhas); com cor livre do lojista ou cor própria de fundo, também o `colibri-esquema.js`.
 2. Marque a raiz do painel com `cc-painel` (na TV, também `cc-painel--tv`; no painel voltado ao cliente, `cc-painel--cliente`) e a grade com `cc-grade`; monte o card com a marcação de `exemplo-toque.html#chamados` e `#chamados-claro`.
-3. Escolha a cor de espera de cada painel pelo nome da paleta curada (`--cc-espera: var(--cm-palette-*)`; padrão azul), troque a classe do card (`cc-sinal--atencao`, `cc-sinal--atraso`) pelos limites de tempo configurados e transforme o que não cabe em `cc-mais` (seção 11 do `DESIGN.md`).
-4. Confira o painel nos dois temas, na TV em 1920 px, em 4K e em 1366×768, e com mais chamados do que cabem.
+3. Escolha a cor de cada estado do painel (padrões do kit, paleta curada pelo nome ou hex livre do lojista; com hex livre, grave junto `--cc-tinta-<estado>` e `--cc-veu-<estado>` de `tintaSobre` e `veuSobre` e, no atraso, `--cc-atraso-respiro` de `respiroDe`) e o ícone de cada um, troque a classe do card (`cc-sinal--atencao`, `cc-sinal--atraso`) pelos limites de tempo configurados e transforme o que não cabe em `cc-mais` (seção 11 do `DESIGN.md`).
+4. Confira o painel nos dois temas (e com a cor própria, se houver), na TV em 1920 px, em 4K e em 1366×768, com mais chamados do que cabem e com uma cor clara e uma média em algum estado.
 
 ## Observações
 
@@ -71,23 +71,25 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
-- **27/10/2026 (perfil Cards: painéis de chamado):** quarto perfil da linha, genérico, sobre o perfil Operação. Traz para o kit os cards dos painéis de chamado (garçom, entregadores, senhas) que a entrada de 26/10 deixou de fora, com os desvios do ColibriTablet revistos contra a paleta curada. Visual aprovado: o dos cards de garçom e de entregadores da proposta do perfil.
-  - **Implementação:** `colibri-cards.css` novo (prefixo `cc-`, depois do `colibri-touch.css`, tokens `--cc-*` próprios nos dois temas) e as telas `#chamados` (tema escuro) e `#chamados-claro` (tema claro) de `exemplo-toque.html`, com os painéis de garçom, entregadores e senhas.
-  - **Regras** (`DESIGN.md`, seção 11 nova; "Implementação neste projeto" passa a 12):
-    - regra do estado no preenchimento: o card inteiro na cor do estado; a espera vem da paleta curada (padrão azul, trocada pelo nome), e atenção (`#875800`) e atraso (`#b02637`) são fixos nos dois temas, com os limites de tempo configuráveis;
-    - o atraso respira até `#6a1720` a cada 1,2 s, só em opacidade, parado com movimento reduzido;
-    - urgência nunca só cor: faixa `.cc-urgencia` com ícone e rótulo, que reserva a altura no card no prazo;
-    - anatomia do card de sinal (topo com rótulo e tempo, valor em display mono ou nome, rodapé com selos no véu), transbordo neutro `.cc-mais` e grade `auto-fill` alinhada ao topo;
-    - painel voltado ao cliente (`.cc-painel--cliente`) com o esquema do canal, sem tempo nem urgência, e escala fluida da TV (`.cc-painel--tv`) em `max(piso, N vw)`, igual ao kit em 1920 px.
+- **27/10/2026 (perfil Cards: painéis de chamado):** quarto perfil da linha, genérico, sobre o perfil Operação, em regras fixas e escolhas do painel. Traz para o kit os cards dos painéis de chamado e de kanban (garçom, entregadores, senhas) que a entrada de 26/10 deixou de fora, com os desvios do ColibriTablet absorvidos: a cor livre do lojista entra no perfil, com a tinta calculada pelo motor. Visual aprovado: o dos cards de garçom e de entregadores da proposta do perfil.
+  - **Implementação:** `colibri-cards.css` novo (prefixo `cc-`, depois do `colibri-touch.css`, tokens `--cc-*` próprios, com cor, tinta e véu por estado sobrescrevíveis no painel e no card) e as telas `#chamados` (tema escuro) e `#chamados-claro` (tema claro) de `exemplo-toque.html`, com os exemplos de garçom, entregadores e senhas e um card de cor livre. `colibri-esquema.js` (e o `.d.ts`) ganha `tintaSobre`, `veuSobre` e `respiroDe`, portados do painel do tablet, com o preto de reserva nas cores médias, e o `scripts/verificar-esquema.mjs` confere o contraste delas numa grade de cores.
+  - **Regras fixas** (`DESIGN.md`, seção 11 nova; "Implementação neste projeto" passa a 12):
+    - card de cor cheia, sem borda, contorno nem sombra;
+    - regra do estado no preenchimento: o card inteiro na cor do estado, e o estado sempre também com ícone e rótulo, nunca só cor;
+    - tinta calculada: texto com 4,5:1 ou mais sobre qualquer cor, com a tinta, o véu e o respiro do motor, nunca escolhidos pelo lojista;
+    - só o estado mais grave respira (o atraso ou `.cc-sinal--respira`), a cada 1,2 s, só em opacidade, parado com movimento reduzido;
+    - altura estável (a faixa vazia e o rodapé reservam a altura) e uma informação principal, a maior do card;
+    - invariantes do kit: caixa de frase, cantos de 6 e 3 px, piso Chrome 101, sem cartão dentro de cartão e sem corpo de itens (isso é o `.cp-card`).
+  - **Escolhas do painel:** a cor de cada estado (padrões: espera `var(--cm-palette-azul)`, atenção `#875800`, atraso `#b02637`; paleta curada ou hex livre do lojista), a quantidade e o nome dos estados (kanban), o ícone de cada estado, a ordem e a presença das peças (topo, valor, faixa, rodapé, selos), o fundo (tema Colibri por `data-theme`, cor própria como semente `ambiente` do `derivarEsquema` ou o esquema do canal no painel voltado ao cliente) e a escala, fixa ou da TV (`.cc-painel--tv`, em `max(piso, N vw)`, igual ao kit em 1920 px). Garçom, entregadores e senhas são exemplos, não modelos.
   - **Mudanças no perfil Operação** (seção 9): o `.cc-sinal` e o `.cc-mais` entram entre os cartões permitidos; o `.ct-ready` continua para aplicações sem o perfil Cards; a regra da urgência legível, os cantos e a escala da TV remetem à seção 11.
-  - **Desvios do tablet tratados:**
-    1. cor livre por estado: vira a regra do estado no preenchimento; cor em hex livre não vira regra;
-    2. respiro do atraso: vira regra, com 1,2 s; os 0,8 s do tablet são ajuste do projeto;
-    3. tema "Cor própria": fica como pendência; Claro e Escuro são o tema Colibri;
+  - **Desvios do tablet absorvidos:**
+    1. cor livre por estado: vira escolha do painel, com a tinta, o véu e o respiro calculados pelo motor (o `corDoTexto` do tablet fica abaixo de 4,5:1 nas cores médias, como o vermelho puro; o `tintaSobre` do kit usa o preto nelas);
+    2. respiro do atraso: vira regra, com 1,2 s; os 0,8 s do tablet continuam desvio do projeto, até ele adotar o kit;
+    3. tema "Cor própria": vira escolha do painel, pelo `derivarEsquema` com a cor como semente `ambiente`;
     4. escala fluida: vira a `.cc-painel--tv`.
-    Pendência: unificar o ícone de atenção (`bi-hourglass-split` nos entregadores, `bi-exclamation-triangle-fill` no garçom, como aprovado).
-  - **Rubrica e mapeamento:** a rubrica de aderência passa à v5, com o grupo H (perfil Cards) e as exceções do perfil em O5 e O6. O mapeamento ganha a seção 11, a regra do estado no preenchimento e o checklist do perfil.
-  - **Projetos afetados:** ColibriTablet (painel de chamados de garçom); Colibri KDS (painéis de entregadores e de senhas). Copiar o `colibri-cards.css` e adotar o card de sinal nos painéis de chamado.
+    O ícone de atenção é escolha do painel: `bi-exclamation-triangle-fill` no garçom e `bi-hourglass-split` nos entregadores.
+  - **Rubrica e mapeamento:** a rubrica de aderência passa à v5, com o grupo H (regras fixas do perfil Cards, sem cobrar cor, ícone nem ordem das peças) e as exceções do perfil em O5 e O6. O mapeamento ganha a seção 11, a regra do estado no preenchimento e o checklist do perfil.
+  - **Projetos afetados:** ColibriTablet (painel de chamados de garçom: trocar `corDoTexto` e `corDoRespiro` por `tintaSobre` e `respiroDe`); Colibri KDS (painéis de entregadores e de senhas). Copiar o `colibri-cards.css` (e o `colibri-esquema.js`, com cor livre ou cor própria) e adotar o card de sinal nos painéis de chamado.
 - **26/10/2026 (perfil Produção: card de produção do KDS):** terceiro perfil da linha, sobre o perfil Operação, específico do KDS. Nasce com o card de produção do KDS (`.cp-card`), desenhado com o usuário em oito rodadas a partir do painel de chamados de garçom do ColibriTablet; os cards dos painéis de chamado (garçom, entregadores, senhas) ficam para o perfil Cards, genérico, numa próxima entrada, porque carregam desvios do tablet (cor livre por estado, escala fluida da TV) que ainda precisam ser revistos contra a paleta curada.
   - **Implementação:** `colibri-producao.css` novo (prefixo `cp-`, depois do `colibri-touch.css`, tokens `--cp-*` próprios nos dois temas) e as telas `#kds` (modo toque) e `#bump` (modo bump) de `exemplo-toque.html`, que passam a usar o card novo.
   - **Regras** (`DESIGN.md`, seção 10 nova; "Implementação neste projeto" passa a 11):
