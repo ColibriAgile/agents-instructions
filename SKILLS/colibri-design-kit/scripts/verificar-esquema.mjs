@@ -7,6 +7,8 @@
 //    automático e nos dois modos forçados, todo token sai em hex e todo par texto/fundo e
 //    preenchimento/fundo atinge o contraste exigido.
 // 3. O código não usa APIs acima do piso Chrome 101.
+// 4. Perfil Cards: para uma grade de cores livres de card, a tinta (tintaSobre) tem 4,5:1 ou mais sobre a
+//    cor e sobre o respiro (respiroDe), e o véu (veuSobre) acompanha a tinta.
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -14,7 +16,7 @@ import { dirname, join } from 'node:path';
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'kit');
 const motorPath = join(raiz, 'colibri-esquema.js');
-const { derivarEsquema, contraste, ESTADOS_BASE, CONTRASTE } = await import('file://' + motorPath.replace(/\\/g, '/'));
+const { derivarEsquema, contraste, ESTADOS_BASE, CONTRASTE, tintaSobre, veuSobre, respiroDe } = await import('file://' + motorPath.replace(/\\/g, '/'));
 
 const falhas = [];
 const falhar = (msg) => falhas.push(msg);
@@ -108,6 +110,21 @@ if (padrao.tokens['--ct-bg'] !== '#0b1822') falhar(`Esquema padrão: --ct-bg ${p
 // Cor inválida é recusada.
 try { derivarEsquema({ ambiente: 'azul' }); falhar('Cor inválida não foi recusada'); } catch { /* esperado */ }
 
+// 4. Perfil Cards: cor livre do card com tinta, véu e respiro calculados
+const cardsLivres = ['#000000', '#ffffff', '#808080', '#777777', '#5a5a5a', '#c0c0c0', '#ff0000', '#e8590c', '#f5d76e', '#ffe066',
+    '#00ffff', '#ff00ff', '#00c853', '#1d62ad', '#875800', '#b02637', '#0e6d77', '#6a1b9a', '#f2f5f9', '#123', '#f80', '#9e9e9e'];
+const comPaleta = cardsLivres.concat([...base.matchAll(/--cm-palette-[\w-]+:\s*(#[0-9a-fA-F]{6})\s*;/g)].map((m) => m[1]));
+for (const cor of comPaleta) {
+    const tinta = tintaSobre(cor), respiro = respiroDe(cor), veu = veuSobre(cor);
+    const c = contraste(tinta, cor), cr = contraste(tinta, respiro);
+    if (c < CONTRASTE.texto) falhar(`tintaSobre(${cor}) = ${tinta}: ${c.toFixed(2)}:1 (mínimo ${CONTRASTE.texto})`);
+    if (cr < CONTRASTE.texto) falhar(`respiroDe(${cor}) = ${respiro}: tinta ${tinta} com ${cr.toFixed(2)}:1 (mínimo ${CONTRASTE.texto})`);
+    if (!/^#[0-9a-f]{6}$/.test(respiro)) falhar(`respiroDe(${cor}) = ${respiro} não é hex #rrggbb`);
+    if (veu !== (tinta === '#ffffff' ? 'rgba(0, 0, 0, .24)' : 'rgba(255, 255, 255, .45)')) falhar(`veuSobre(${cor}) = ${veu} não acompanha a tinta ${tinta}`);
+}
+// Padrões do kit (colibri-cards.css): tinta branca nas três cores; a cor livre do lojista é que passa pelo motor.
+for (const cor of ['#1d62ad', '#875800', '#b02637']) if (tintaSobre(cor) !== '#ffffff') falhar(`tintaSobre(${cor}) = ${tintaSobre(cor)} (padrão do kit com tinta branca)`);
+
 // 3. Piso Chrome 101
 const fonte = readFileSync(motorPath, 'utf8');
 const acima101 = [/\.toSorted\(/, /\.toReversed\(/, /\.toSpliced\(/, /\.with\(/, /Object\.groupBy/, /Map\.groupBy/, /isWellFormed/, /Array\.fromAsync/, /\/[a-z]*v[a-z]*\.test/];
@@ -119,7 +136,7 @@ if (falhas.length) {
     if (falhas.length > 40) console.error(` … e mais ${falhas.length - 40}`);
     process.exit(1);
 }
-console.log(`OK: estados iguais à base; neutros dos temas claro e escuro reproduzidos; paleta curada com ${paleta.length} cores legíveis com texto branco; ${combinacoes} combinações de sementes e modo (automático, claro e escuro forçados) com contraste garantido (${comAjuste} com ajuste); sem APIs acima do Chrome 101.`);
+console.log(`OK: estados iguais à base; neutros dos temas claro e escuro reproduzidos; paleta curada com ${paleta.length} cores legíveis com texto branco; ${comPaleta.length} cores livres de card com tinta e respiro em 4,5:1 ou mais; ${combinacoes} combinações de sementes e modo (automático, claro e escuro forçados) com contraste garantido (${comAjuste} com ajuste); sem APIs acima do Chrome 101.`);
 for (const [nome, s] of [['padrão Colibri', {}], ['totem atual', { ambiente: '#0b1120', acao: '#f59e0b' }], ['tablet atual', { ambiente: '#020617', acao: '#f99c00' }], ['claro creme', { ambiente: '#fdf6e3', acao: '#c62828', marca: '#1b5e20' }]]) {
     const e = derivarEsquema(s);
     console.log(`  ${nome}: modo ${e.modo}; bg ${e.tokens['--ct-bg']}, surface ${e.tokens['--ct-surface']}, ink-3 ${e.tokens['--ct-ink-3']}, action ${e.tokens['--ct-action']}/${e.tokens['--ct-on-action']}, brand-ink ${e.tokens['--ct-brand-ink']}; ajustes: ${e.ajustes.map((a) => a.token).join(', ') || 'nenhum'}`);

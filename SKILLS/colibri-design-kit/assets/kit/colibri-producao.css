@@ -242,6 +242,16 @@
     font-weight: var(--cp-peso-nome);
     line-height: var(--cp-lh-item);
 }
+/* Nome que abre a ficha técnica: botão sem aparência de botão, com a tipografia do card. */
+.cp-card__nome-btn {
+    display: block;
+    padding: 0;
+    font-family: inherit;
+    text-align: left;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
 /* Cinco estados, cinco formas (a cor acompanha, nunca sozinha). */
 .cp-card__item.is-aguardando .cp-card__estado { color: var(--ct-ink-3); }
 .cp-card__item.is-preparo .cp-card__estado { color: var(--ct-action-ink); }
@@ -321,6 +331,48 @@
 }
 .cp-card__ritmo .bi { font-size: .9em; line-height: 1; }
 .cp-card__ritmo--agora { color: var(--ct-warning); }
+
+/* ---------- Quebra em colunas ----------
+ * Card de altura limitada (max-height posto pela aplicação): cabeçalho em .cp-card__topo e faixa e
+ * rodapé em .cp-card__base, de altura fixa; a lista ocupa o resto. Quando os itens não cabem, a
+ * aplicação mede as linhas na lista oculta (.cp-card__medida, na largura de uma coluna da grade) e
+ * reparte os itens em .cp-card__coluna: a que continua termina em "Continua →" (bi-arrow-right) e a
+ * seguinte começa em "Continuação" (bi-arrow-up), ambos .cp-card__continua. */
+.cp-card__topo,
+.cp-card__base { flex: 0 0 auto; }
+.cp-card__itens--limitada { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.cp-card__colunas {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+.cp-card__coluna {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+}
+.cp-card__coluna + .cp-card__coluna { border-left: 1px solid var(--cp-divisor); }
+.cp-card__coluna > .cp-card__itens { flex: 1 1 auto; overflow: hidden; }
+.cp-card__continua {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 2px 12px;
+    color: var(--ct-ink-2);
+    font-size: var(--cp-text-sm);
+    font-weight: 600;
+    line-height: var(--cp-lh-apoio);
+}
+.cp-card__medida {
+    position: absolute;
+    top: 0;
+    left: -99999px;
+    visibility: hidden;
+    pointer-events: none;
+}
 
 /* ---------- Modo toque ----------
  * O ícone de estado vira botão: toque avança o item, toque longo põe ou tira da espera. A área de
