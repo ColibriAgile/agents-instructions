@@ -6,9 +6,13 @@
  * (claro ou escuro). As cores de estado (sucesso, aviso, erro) não são configuráveis: são os tokens
  * de colibri-base.css do modo decidido, emitidos também como --ct-*.
  *
+ * No perfil Cards, a cor de cada estado do card (e o fundo do painel) pode ser livre do lojista; a tinta,
+ * o véu e o respiro sobre ela saem daqui (tintaSobre, veuSobre, respiroDe), nunca da escolha dele, para o
+ * texto do card ter 4,5:1 ou mais com qualquer cor.
+ *
  * Uma implementação só: a prévia do admin e o app em execução usam este arquivo.
- * Sintaxe ES2019, sem dependências (piso Chrome 101). Saída sempre em hex (#rrggbb).
- * Regras de uso: ver DESIGN.md do kit, seção "Perfil Operação".
+ * Sintaxe ES2019, sem dependências (piso Chrome 101). Saída sempre em hex (#rrggbb), menos o véu (rgba).
+ * Regras de uso: ver DESIGN.md do kit, seções "Perfil Operação" e "Perfil Cards".
  */
 
 export const ESQUEMA_VERSAO = 'colibri-esquema/1';
@@ -315,4 +319,66 @@ export function aplicarEsquema(esquema, alvo) {
     el.setAttribute('data-ct-tokens', Object.keys(esquema.tokens).join(' '));
     el.setAttribute('data-ct-mode', esquema.modo);
     if (!alvo && raiz) raiz.setAttribute('data-theme', esquema.modo);
+}
+
+/* ---------- Card de cor livre (perfil Cards) ----------
+ * A cor do estado (ou do card) é do lojista; o que vai sobre ela é calculado. Os padrões do kit (espera
+ * azul, atenção âmbar, atraso vermelho) já trazem tinta branca e o respiro calibrado em colibri-cards.css;
+ * estas funções são para a cor que o lojista escolhe. Mesma lógica do painel de chamados do ColibriTablet
+ * (corDoTexto e corDoRespiro), com a tinta de reserva para as cores médias. */
+
+/* Tintas do card: branco, o texto principal do tema claro (--cm-ink) e, de reserva, o preto. Branco e
+ * --cm-ink não chegam a 4,5:1 nas cores médias (vermelho puro, cinza médio: perto de 4:1); com o preto,
+ * uma das duas pontas sempre passa (o pior caso, entre branco e preto, tem 4,58:1). */
+var TINTA_CLARA = '#ffffff';
+var TINTA_ESCURA = '#1d2733';
+var TINTA_RESERVA = '#000000';
+
+/* Véu sob a faixa de urgência e os selos: escurece sob tinta clara e clareia sob tinta escura (o contraste
+ * do texto só aumenta). Alfa fixo, e não color-mix() com variável (piso Chrome 101). */
+var VEU_ESCURO = 'rgba(0, 0, 0, .24)';
+var VEU_CLARO = 'rgba(255, 255, 255, .45)';
+
+/* Quanto o respiro pode puxar a cor do card para o preto ou o branco. */
+var RESPIRO_MAXIMO = 0.45;
+
+/**
+ * Tinta (texto e ícones) sobre a cor de um card: o branco ou o texto principal do kit, o que tiver mais
+ * contraste; se nenhum dos dois chegar a 4,5:1, o preto.
+ * @param {string} fundo cor do card (#rgb ou #rrggbb)
+ * @returns {string} '#ffffff', '#1d2733' ou '#000000'
+ */
+export function tintaSobre(fundo) {
+    var f = rgbParaHex(hexParaRgb(fundo));
+    var tinta = contraste(TINTA_CLARA, f) >= contraste(TINTA_ESCURA, f) ? TINTA_CLARA : TINTA_ESCURA;
+    return contraste(tinta, f) >= CONTRASTE.texto ? tinta : TINTA_RESERVA;
+}
+
+/**
+ * Véu da faixa de urgência e dos selos sobre a cor de um card: escuro sob tinta branca, claro sob tinta
+ * escura.
+ * @param {string} fundo cor do card (#rgb ou #rrggbb)
+ * @returns {string} 'rgba(0, 0, 0, .24)' ou 'rgba(255, 255, 255, .45)'
+ */
+export function veuSobre(fundo) {
+    return tintaSobre(fundo) === TINTA_CLARA ? VEU_ESCURO : VEU_CLARO;
+}
+
+/**
+ * Cor do respiro do estado mais grave: o card vai e volta entre a sua cor e esta. É a mesma cor puxada
+ * para o preto ou para o branco (até 45%), o lado que mais se destaca dela sem deixar a tinta do card
+ * abaixo de 4,5:1.
+ * @param {string} fundo cor do card (#rgb ou #rrggbb)
+ * @returns {string} hex (#rrggbb)
+ */
+export function respiroDe(fundo) {
+    var f = rgbParaHex(hexParaRgb(fundo));
+    var tinta = tintaSobre(f);
+    return ['#000000', '#ffffff'].map(function (alvo) {
+        for (var peso = RESPIRO_MAXIMO; peso > 0.01; peso -= 0.01) {
+            var cor = misturar(alvo, f, peso);
+            if (contraste(tinta, cor) >= CONTRASTE.texto) return cor;
+        }
+        return f;
+    }).reduce(function (melhor, cor) { return contraste(f, cor) > contraste(f, melhor) ? cor : melhor; });
 }
