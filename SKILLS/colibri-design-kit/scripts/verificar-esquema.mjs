@@ -81,13 +81,12 @@ for (const modoForcado of modos) for (const ambiente of ambientes) for (const ac
     }
 }
 
-// Paleta curada (colibri-touch.css): cada cor com 4,5:1 ou mais sobre texto branco.
-const touch = readFileSync(join(raiz, 'colibri-touch.css'), 'utf8');
-const paleta = [...touch.matchAll(/--ct-palette-([\w-]+):\s*(#[0-9a-fA-F]{6})\s*;/g)];
-if (paleta.length !== 8) falhar(`Paleta curada com ${paleta.length} cores em colibri-touch.css (esperado 8)`);
+// Paleta curada (colibri-base.css, desde 21/10/2026): cada cor com 4,5:1 ou mais sobre texto branco.
+const paleta = [...base.matchAll(/--cm-palette-([\w-]+):\s*(#[0-9a-fA-F]{6})\s*;/g)];
+if (paleta.length !== 8) falhar(`Paleta curada com ${paleta.length} cores em colibri-base.css (esperado 8)`);
 for (const [, nome, cor] of paleta) {
     const c = contraste(cor, '#ffffff');
-    if (c < CONTRASTE.texto) falhar(`--ct-palette-${nome} ${cor} sobre branco = ${c.toFixed(2)}:1 (mínimo ${CONTRASTE.texto})`);
+    if (c < CONTRASTE.texto) falhar(`--cm-palette-${nome} ${cor} sobre branco = ${c.toFixed(2)}:1 (mínimo ${CONTRASTE.texto})`);
 }
 
 // Com o plano de cada tema como ambiente, o motor reproduz os neutros da base (a escada vem dela).

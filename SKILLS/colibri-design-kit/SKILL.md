@@ -1,16 +1,16 @@
 ---
 name: colibri-design-kit
-description: 'Colibri Design Kit leva a linha visual das aplicações Colibri (perfis Admin e Operação) a um repositório e mede a aderência a ela, sobre a skill impeccable 4.x. Use para adotar o kit num frontend Colibri ou atualizar a versão adotada (inclusive migrar artefatos do impeccable 3.x), medir a aderência de uma página ou do frontend ao kit com nota e ranking de páginas, refatorar uma página para o kit ou registrar um desvio do kit. Não use para projetos fora da linha Colibri, para backend nem para crítica de UX sem relação com o kit (use impeccable critique).'
+description: 'Colibri Design Kit leva a linha visual das aplicações Colibri (perfis Admin, Operação e Cards) a um repositório e mede a aderência a ela, sobre a skill impeccable 4.x. Use para adotar o kit num frontend Colibri ou atualizar a versão adotada (inclusive migrar artefatos do impeccable 3.x), medir a aderência de uma página ou do frontend ao kit com nota e ranking de páginas, refatorar uma página para o kit ou registrar um desvio do kit. Não use para projetos fora da linha Colibri, para backend nem para crítica de UX sem relação com o kit (use impeccable critique).'
 argument-hint: '[adotar | aderencia | refatorar | desvio] [alvo] — ex.: "aderencia src/pages/Clientes.razor", "adotar src/web, Blazor DevExpress"; vazio abre o menu'
 ---
 
 # Colibri Design Kit
 
-Leva a linha visual Colibri a um repositório, deixa o projeto pronto para o impeccable trabalhar sobre ela e mede quanto o projeto segue o kit. A linha tem dois perfis sobre a mesma base: **Admin** (painéis, admins e ferramentas internas) e **Operação** (telas cheias de toque: cardápio do tablet, totem, produção do KDS, pedidos prontos). Um projeto adota um perfil ou os dois. Depois da adoção, o repositório tem:
+Leva a linha visual Colibri a um repositório, deixa o projeto pronto para o impeccable trabalhar sobre ela e mede quanto o projeto segue o kit. A linha tem dois perfis sobre a mesma base: **Admin** (painéis, admins e ferramentas internas) e **Operação** (telas cheias de toque: cardápio do tablet, totem, produção do KDS, pedidos prontos). Sobre o Operação, o perfil **Cards** traz os cards de dados lidos de longe (hoje, o card de produção do KDS). Um projeto adota um perfil ou mais. Depois da adoção, o repositório tem:
 
 | Arquivo | Conteúdo | Quem grava |
 |---|---|---|
-| `<estáticos>/colibri-ui/` | `colibri-base.css`, `fonts/`, `logos/`, `icons/`; no perfil Admin, `colibri-ui.css` e os adaptadores usados; no perfil Operação, `colibri-touch.css` e, com canal de consumidor, `colibri-esquema.js` (+ `.d.ts` em TypeScript) | `adotar` |
+| `<estáticos>/colibri-ui/` | `colibri-base.css`, `fonts/`, `logos/`, `icons/`; no perfil Admin, `colibri-ui.css` e os adaptadores usados; no perfil Operação, `colibri-touch.css` e, com canal de consumidor, `colibri-esquema.js` (+ `.d.ts` em TypeScript); no perfil Cards, `colibri-cards.css` | `adotar` |
 | `PRODUCT.md` | usuários, propósito, contexto, compromissos da marca, princípios (modelo do kit preenchido) | impeccable `init` |
 | `DESIGN.md` | regras visuais do kit no formato do impeccable + implementação no projeto | impeccable `document` |
 | `.impeccable/design.json` | sidecar: metadados de cor, sombras, movimento, breakpoints, componentes | impeccable `document` |
@@ -81,7 +81,7 @@ O kit em `./assets/kit/` é mantido diretamente nesta skill e é a fonte da verd
 
 Ao alterar o kit:
 
-- Mude a regra e a implementação juntas: `DESIGN.md` e `colibri-ui.css` (tokens, temas e fontes ficam em `colibri-base.css`), mais os adaptadores afetados (`colibri-ui.bootstrap3.css`, `colibri-ui.devexpress.css`) e a marcação de `exemplo.html` quando o componente aparece nela. No perfil Operação, `colibri-touch.css`, `colibri-esquema.js` e `exemplo-toque.html`.
+- Mude a regra e a implementação juntas: `DESIGN.md` e `colibri-ui.css` (tokens, temas e fontes ficam em `colibri-base.css`), mais os adaptadores afetados (`colibri-ui.bootstrap3.css`, `colibri-ui.devexpress.css`) e a marcação de `exemplo.html` quando o componente aparece nela. No perfil Operação, `colibri-touch.css`, `colibri-esquema.js` e `exemplo-toque.html`; no perfil Cards, `colibri-cards.css` e as telas `#kds` e `#bump` de `exemplo-toque.html`.
 - Mudou `colibri-esquema.js` ou os estados de `colibri-base.css`: rode `node scripts/verificar-esquema.mjs` (estados iguais à base, contraste garantido numa grade de sementes, nada acima do Chrome 101). Falhou, não publique.
 - Regra nova ou alterada entra no checklist de `./references/mapeamento-impeccable.md` (e na tabela, se o `DESIGN.md` mudou de estrutura) e na rubrica de `./references/aderencia.md` (item novo ou alterado, com a busca dele, e a versão da rubrica incrementada); comportamento por framework vai para `./references/adocao-por-framework.md`.
 - Acrescente no topo de "Versões" do `LEIA-ME.md` uma entrada com a data e o que mudou.

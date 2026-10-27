@@ -1,6 +1,6 @@
 ---
 name: Colibri UI
-description: Linha visual das aplicações Colibri — perfis Admin e Operação, sóbria, precisa e direta
+description: Linha visual das aplicações Colibri — perfis Admin, Operação e Cards, sóbria, precisa e direta
 colors:
   action: "#1b6ec2"
   action-hover: "#175fa9"
@@ -51,6 +51,18 @@ colors:
   palette-petroleo: "#0e6d77"
   palette-marrom: "#7d5130"
   palette-grafite: "#4d5a68"
+  card-attention: "#875800"
+  card-late: "#b02637"
+  card-late-breath: "#6a1720"
+  card-item: "#0b1015"
+  card-faded: "#98a2ad"
+  card-divider: "#e4e9ef"
+  card-action: "#e3e8ee"
+  dark-card-neutral: "#2e4a60"
+  dark-card-hold: "#1b3142"
+  dark-card-item: "#ffffff"
+  dark-card-faded: "#5a6d7f"
+  dark-card-divider: "#243b4e"
   chart-1: "#1b6ec2"
   chart-2: "#eb6834"
   chart-3: "#1baf7a"
@@ -76,6 +88,10 @@ typography:
   caption: { fontFamily: "Google Sans Flex", fontSize: "12px", fontWeight: 400, lineHeight: 1.3 }
   micro: { fontFamily: "Google Sans Flex", fontSize: "11px", fontWeight: 400, lineHeight: 1 }
   data: { fontFamily: "Google Sans Mono", fontSize: "12px", fontWeight: 500, lineHeight: 1.4 }
+  card-item: { fontFamily: "Google Sans Flex", fontSize: "17px", fontWeight: 400, lineHeight: "24px" }
+  card-sub: { fontFamily: "Google Sans Flex", fontSize: "15px", fontWeight: 400, lineHeight: "23px" }
+  card-data: { fontFamily: "Google Sans Mono", fontSize: "15px", fontWeight: 700, lineHeight: "26px" }
+  card-note: { fontFamily: "Google Sans Flex", fontSize: "12px", fontWeight: 600, lineHeight: "18px" }
 rounded:
   control: "3px"
   small: "4px"
@@ -85,6 +101,7 @@ rounded:
   touch-card: "6px"
   touch-sheet: "6px"
   touch-tag: "3px"
+  card-allergen: "999px"
 sizes:
   control-height: "32px"
   topbar-height: "56px"
@@ -94,6 +111,7 @@ sizes:
   touch-target-tablet: "48px"
   touch-target-totem: "max(56px, 4.4vh)"
   touch-target-kds: "56px"
+  touch-target-card: "40px"
 motion:
   ease: "cubic-bezier(.22, 1, .36, 1)"
   state: "120-200ms"
@@ -104,7 +122,7 @@ motion:
 
 # Colibri UI — linha visual das aplicações Colibri
 
-Este documento descreve a linha visual comum das aplicações Colibri e orienta a refatoração visual de cada uma delas. A linha tem dois perfis sobre a mesma base (`colibri-base.css`: tokens dos dois temas, fontes e camadas): **Admin** (seções 1 a 8), para painéis, admins e ferramentas internas, e **Operação** (seção 9), as telas cheias de toque do cardápio do tablet, do totem, da produção do KDS e do painel de pedidos prontos. As seções 1 a 8 valem para o perfil Operação no que a seção 9 não muda (cores de estado, fontes, ícones, foco, tema por token). A implementação de referência do perfil Admin está em `colibri-ui.css` (CSS puro, prefixo `cm-`); a do perfil Operação, em `colibri-touch.css` (prefixo `ct-`), com o motor de esquema de cores `colibri-esquema.js` e a demonstração `exemplo-toque.html`; `colibri-ui.bootstrap3.css` e `colibri-ui.devexpress.css` são adaptadores opcionais; `logos/colibri-colorido.svg` é a marca da página inicial; `logos/colibri.ico` é o ícone da aba; `logos/colibri-marca.svg` é a marca da tela de entrada; `exemplo.html` mostra a marcação de cada componente e `exemplo-entrada.html`, a tela de entrada e a página de erro.
+Este documento descreve a linha visual comum das aplicações Colibri e orienta a refatoração visual de cada uma delas. A linha tem dois perfis sobre a mesma base (`colibri-base.css`: tokens dos dois temas, fontes e camadas): **Admin** (seções 1 a 8), para painéis, admins e ferramentas internas, e **Operação** (seção 9), as telas cheias de toque do cardápio do tablet, do totem, da produção do KDS e do painel de pedidos prontos. Sobre o perfil Operação, o perfil **Cards** (seção 10) define os cards de dados lidos de longe; hoje, o card de produção do KDS. As seções 1 a 8 valem para o perfil Operação no que a seção 9 não muda (cores de estado, fontes, ícones, foco, tema por token), e a seção 9 vale para o perfil Cards no que a seção 10 não muda. A implementação de referência do perfil Admin está em `colibri-ui.css` (CSS puro, prefixo `cm-`); a do perfil Operação, em `colibri-touch.css` (prefixo `ct-`), com o motor de esquema de cores `colibri-esquema.js` e a demonstração `exemplo-toque.html`; a do perfil Cards, em `colibri-cards.css` (prefixo `cc-`), demonstrada em `exemplo-toque.html#kds` e `#bump`; `colibri-ui.bootstrap3.css` e `colibri-ui.devexpress.css` são adaptadores opcionais; `logos/colibri-colorido.svg` é a marca da página inicial; `logos/colibri.ico` é o ícone da aba; `logos/colibri-marca.svg` é a marca da tela de entrada; `exemplo.html` mostra a marcação de cada componente e `exemplo-entrada.html`, a tela de entrada e a página de erro.
 
 Ao adotar em um repositório, copie este arquivo para a raiz como `DESIGN.md`, escreva o `PRODUCT.md` do produto (modelo em `PRODUCT.template.md`) e registre na seção "Implementação neste projeto" onde o CSS e os componentes ficam.
 
@@ -319,7 +337,7 @@ Telas cheias de toque: cardápio do tablet (Mesa, Comanda e Autoficha), totem de
 **Características:**
 
 - Uma tarefa por tela ou folha; a ação principal fica sempre visível e ao alcance.
-- Alvo de toque grande em toda ação; nada depende de hover, teclado ou gesto escondido (o único gesto oculto permitido é o acesso do atendente ao menu de serviço).
+- Alvo de toque grande em toda ação; nada depende de hover, teclado ou gesto escondido (os únicos gestos ocultos permitidos são o acesso do atendente ao menu de serviço e, no perfil Cards, o toque longo no estado do item, seção 10).
 - Telas voltadas ao cliente da loja usam o esquema de cores do canal; telas de produção do KDS usam o tema Colibri.
 - A informação principal é grande: preço, senha, timer, quantidade.
 - Funciona sem internet e no piso Chrome 101.
@@ -345,7 +363,7 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 |---|---|---|---|---|
 | Tablet (paisagem, referência 1024×600) | `.ct-app--tablet` | 48 px | 16 px | 40 px |
 | Totem (retrato, de 800×1280 a 2160×3840) | `.ct-app--totem` | `max(56px, 4.4vh)` | `max(16px, 1.45vh)` | `max(40px, 6vh)` |
-| KDS (monitor ou TV, 1 a 3 m, com o zoom da estação) | `.ct-app--kds` | 56 px | 18 px | 48 px |
+| KDS (monitor ou TV, 1 a 3 m, com o zoom da estação; o card de produção segue a escala do perfil Cards, seção 10) | `.ct-app--kds` | 56 px | 18 px | 48 px |
 | Pedidos prontos (TV, 2 a 5 m, só leitura) | `.ct-app--tv` | 56 px | 24 px | 96 px |
 
 - Nenhum alvo de toque fica abaixo do mínimo da superfície, inclusive +/− de quantidade, fechar e ações de linha; entre alvos vizinhos, no mínimo 8 px.
@@ -362,13 +380,13 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 - **Folha** (`.ct-sheet`): sobe da base em retrato; centralizada (`.ct-sheet--center`) em paisagem. Título, fechar com alvo inteiro, corpo rolável e rodapé em `surface-2` com a ação principal maior. Tocar no véu fecha; Esc também, quando houver teclado.
 - **Painel lateral** (`.ct-sheet--side`): a mesma folha presa à direita, na altura toda, com até 448 px, para o que acompanha o cardápio sem escondê-lo (carrinho, sacola); o cardápio continua visível sob o véu, à esquerda. Só em paisagem; em retrato, a folha que sobe.
 - **Tela cheia dividida** (`.ct-split`): para escolhas em vários passos (jornada de opções, montagem de combo). O produto fica à vista à esquerda, em 35% da largura (foto em `.ct-split__media`, selos em `.ct-split__tags`, nome e descrição em `.ct-split__info`), e a tarefa à direita: título do passo e instrução (`.ct-split__head`), fechar com alvo inteiro, conteúdo rolável (`.ct-split__body`) e o `.ct-footer` com Voltar, o total e a ação principal. Em retrato, a foto vai para cima, com 28% da altura. Tarefa de um passo só fica na folha.
-- **Cartões** são permitidos onde são a unidade da tarefa: produto (`.ct-product`) e pedido (`.ct-order`, `.ct-ready`). Sem cartões de métrica e sem cartão dentro de cartão.
+- **Cartões** são permitidos onde são a unidade da tarefa: produto (`.ct-product`) e pedido (`.ct-order`, `.ct-ready` e o card de produção `.cc-producao` do perfil Cards). Sem cartões de métrica e sem cartão dentro de cartão.
 - KDS: barra da estação no topo (`.ct-bar`: identidade da estação à esquerda em `.ct-bar__station`, contagens de atenção e atraso como etiquetas de estado e as ações da estação em `.ct-bar__actions`, à direita, com o alvo da superfície) e grade de colunas (`.ct-orders`, `--ct-cols`), cartões alinhados ao topo. A visão por produto (consolidado) usa a mesma grade com o cartão de agrupamento (`.ct-order--group`), um por produto.
 - **Painel da produção** (TV de indicadores do KDS, tema Colibri): `.ct-board` na superfície da TV onde fica (`.ct-app--kds` ou `--tv`), com a barra no topo e até seis números numa linha (`.ct-board__stats` > `.ct-stat`: rótulo em `.ct-stat__label`, valor grande em mono em `.ct-stat__value`, unidade em `small`). Os números ficam no plano, separados por divisores, nunca em cartões de métrica; um número fora da meta leva um selo de estado com ícone e rótulo (`.ct-tag--warning`, `--danger`), não só a cor do valor. Gráficos seguem a seção 2 ("Gráficos"): medida única no azul de ação, séries na paleta `chart-1` a `chart-8`, títulos de bloco em `.ct-board__title`.
 
 ### Componentes
 
-- **Cantos discretos, com os valores do perfil Admin (3 e 6 px):** 3 px em controles (botões, abas de categoria, quantidade, campos, confirmação) e em selos, marcas de opção e observações, o raio do botão do Admin (`--cm-btn-radius`; os selos não seguem os 10 px das etiquetas do Admin); 6 px em cartões, folhas e diálogos, o raio das superfícies do Admin (`--cm-radius`). Os tokens `--ct-radius-*` apontam para os da base. Nenhuma forma de pílula; só o rádio é redondo. Na folha centralizada, o rodapé, quando é o último filho direto da folha, leva o raio de baixo dela, para o fundo dele não deixar os cantos retos.
+- **Cantos discretos, com os valores do perfil Admin (3 e 6 px):** 3 px em controles (botões, abas de categoria, quantidade, campos, confirmação) e em selos, marcas de opção e observações, o raio do botão do Admin (`--cm-btn-radius`; os selos não seguem os 10 px das etiquetas do Admin); 6 px em cartões, folhas e diálogos, o raio das superfícies do Admin (`--cm-radius`). Os tokens `--ct-radius-*` apontam para os da base. Nenhuma forma de pílula; só o rádio é redondo (e, no perfil Cards, a tag de alérgeno, seção 10). Na folha centralizada, o rodapé, quando é o último filho direto da folha, leva o raio de baixo dela, para o fundo dele não deixar os cantos retos.
 - **Botões** (`.ct-btn`): altura do alvo da superfície, texto de `--ct-text-lg` peso 600, cantos de 3 px. Principal `.ct-btn--primary` (ação com o texto derivado), secundário (`surface-2` com linha), `.ct-btn--ghost` (texto na cor de ação), `.ct-btn--danger` (texto de erro sobre o fundo suave de erro, nunca vermelho preenchido), `.ct-btn--block` e `.ct-btn--lg`. Ícone dentro do botão é permitido. Retorno de toque por `transform: scale(.97)` e a cor pressionada; desabilitado continua visível, apagado. Botão só com ícone: `.ct-icon-btn`, com o alvo inteiro e `aria-label` obrigatório.
 - **Quantidade** (`.ct-qty`): − valor +, cada botão com o alvo inteiro, valor com algarismos tabulares e anunciado a leitores de tela.
 - **Selos** (`.ct-tag`, cantos de 3 px): neutro, `--brand` (Destaque), `--success`, `--warning`, `--danger` e os categóricos `--combo` e `--rodizio`, sempre com texto.
@@ -379,13 +397,13 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 - **Texto sobre imagem** (`.ct-scrim`, dentro de um contêiner posicionado com a foto): degradê escuro de baixo para cima com título (`.ct-scrim__title`, `--ct-text-2xl`) e texto (`.ct-scrim__text`) brancos, e o preço preenchido na cor da marca (`.ct-price--fill`, com o "a partir de" na cor do texto do preenchimento). Foto apagada sob texto, como na tela de descanso: `.ct-media-dim` (fundo preto e a foto a 40%), que escurece em qualquer esquema.
 - **Leitor de QR** (`.ct-scan`, com `.is-camera` quando a câmera nativa fica atrás da tela): barras sólidas de superfície em cima (título e fechar) e embaixo (alternativa manual, ex.: "Digitar o número"), e a mira (`.ct-scan__aim`, a partir de 224 px) com borda branca e véu escuro em volta. Sem câmera, a mesma tela no fundo do esquema com o campo manual.
 - **Avisos** (`.ct-notice`, variantes de estado) com ícone e texto; confirmação curta (`.ct-toast`, "adicionado") centralizada embaixo, some sozinha; vazio (`.ct-empty`) com ícone e uma frase; carregamento com `bi-arrow-repeat ct-spin` e texto.
-- **Cartão de pedido** (`.ct-order`): cabeçalho na cor do tipo de pedido (`.ct-order--balcao`, `--retirada`, `--entrega`, `--mesa`, `--ficha`; ou `--ct-order-color` vindo da configuração, sempre da paleta), com tipo (ícone e rótulo), número do pedido e timer em mono, texto branco; faixa de dados do pedido (`.ct-order__meta`); itens com quantidade em mono, nome e complemento; observação (`.ct-order__note`, fundo de aviso com ícone) e alérgeno (`.ct-order__allergen`, fundo de erro com ícone) no próprio item, nunca só na ficha; rodapé com as ações do alvo da superfície, a principal à direita e maior. Em espera: borda tracejada e selo "Em espera". Selecionado pela bump bar ou teclado: contorno de foco de 3 px. No delivery, cliente, canal e entregador ficam na faixa de dados, e a situação do despacho vai num selo de estado com ícone ("Aguardando entregador" em aviso; "Despachado" em sucesso).
+- **Cartão de pedido** (`.ct-order`; na tela de produção da estação, o card de produção é o `.cc-producao` do perfil Cards, seção 10, e o que segue vale para o cartão de agrupamento e para aplicações que ainda não adotaram o perfil Cards): cabeçalho na cor do tipo de pedido (`.ct-order--balcao`, `--retirada`, `--entrega`, `--mesa`, `--ficha`; ou `--ct-order-color` vindo da configuração, sempre da paleta), com tipo (ícone e rótulo), número do pedido e timer em mono, texto branco; faixa de dados do pedido (`.ct-order__meta`); itens com quantidade em mono, nome e complemento; observação (`.ct-order__note`, fundo de aviso com ícone) e alérgeno (`.ct-order__allergen`, fundo de erro com ícone) no próprio item, nunca só na ficha; rodapé com as ações do alvo da superfície, a principal à direita e maior. Em espera: borda tracejada e selo "Em espera". Selecionado pela bump bar ou teclado: contorno de foco de 3 px. No delivery, cliente, canal e entregador ficam na faixa de dados, e a situação do despacho vai num selo de estado com ícone ("Aguardando entregador" em aviso; "Despachado" em sucesso).
   - **Leitura dos itens:** nome do item na cor do texto (`ink`), peso 600, nunca em cor de destaque; quantidade sempre em mono, e a de 2 ou mais num selo neutro invertido (`.ct-order__qty--multi`: fundo na cor do texto, número na cor da superfície), que se lê de longe sem usar cor de estado.
   - **Estado de preparo do item:** marca na própria linha (`.ct-order__state`, ícone e rótulo). Aguardando é o padrão, sem marca; em preparo (`.ct-order__item.is-preparing`), a linha no fundo suave da ação com "Em preparo" em `action-ink`; pronto (`.is-ready`), quantidade e nome em `ink-3` com `bi-check2-circle` e "Pronto" em sucesso, sem opacidade, para o rótulo manter 4,5:1 de longe. Nenhum estado de preparo pisca nem pulsa (só o atraso pulsa) e nenhum é configurável. O rodapé do cartão continua com as ações do pedido (Iniciar, Concluir).
 - **Cartão de agrupamento** (`.ct-order--group`, visão por produto e consolidado): cabeçalho neutro (`surface-2`, texto `ink`) com o produto (`.ct-order__title`) e o total em mono (`.ct-order__total`); cada linha é um pedido de origem, com a quantidade, o tipo em selo da paleta (`.ct-tag--balcao`, `--retirada`, `--entrega`, `--mesa`, `--ficha`), o número e o tempo em mono (`.ct-order__origin`, `.ct-order__ref`) e o estado de preparo do item. A urgência do cartão é a do pior pedido, com a faixa nomeando o pedido ("Atrasado · #471 passou de 10 min"); o principal do rodapé conclui o produto em todos os pedidos ("Concluir 5").
 - **Pedidos prontos** (`.ct-ready`): tipo (ícone e rótulo), número em display mono na cor de texto da marca, nome do cliente e barra de expiração na cor de ação. Usa o esquema do canal `pedido-pronto`.
 
-**Regra da urgência legível.** A urgência do pedido nunca é só cor: atenção e atraso são uma borda de 3 px sobreposta (o cartão não muda de tamanho) mais uma faixa (`.ct-order__urgency`) com ícone e rótulo ("Atenção · passou de 5 min", "Atrasado · passou de 10 min"), nas cores de aviso e erro da base. As cores não são configuráveis; os limites de tempo são. Só o atraso pulsa (halo interno de 1,2 s); com movimento reduzido, fica a borda fixa.
+**Regra da urgência legível.** No cartão `.ct-order` (o card de produção do perfil Cards segue a regra do tempo no preenchimento, seção 10), a urgência do pedido nunca é só cor: atenção e atraso são uma borda de 3 px sobreposta (o cartão não muda de tamanho) mais uma faixa (`.ct-order__urgency`) com ícone e rótulo ("Atenção · passou de 5 min", "Atrasado · passou de 10 min"), nas cores de aviso e erro da base. As cores não são configuráveis; os limites de tempo são. Só o atraso pulsa (halo interno de 1,2 s); com movimento reduzido, fica a borda fixa.
 
 ### Compatibilidade
 
@@ -409,7 +427,7 @@ Folha sobe em 260 ms com `--cm-ease` e o painel lateral desliza da direita no me
 - Mostrar observação e alérgeno no próprio item do pedido.
 - Conferir cada tela de produção nos temas claro e escuro, e cada tela de consumidor com um esquema claro e um escuro.
 - Identificar cada estação pelo nome, pela cor da paleta e por um ícone da lista curada, na barra da estação.
-- Mostrar o estado de preparo de cada item na própria linha, com ícone e rótulo, e a quantidade de 2 ou mais no selo neutro.
+- No cartão `.ct-order`, mostrar o estado de preparo de cada item na própria linha, com ícone e rótulo, e a quantidade de 2 ou mais no selo neutro (o card de produção do perfil Cards tem a coluna de estado, seção 10).
 
 **Não faça**
 
@@ -418,14 +436,111 @@ Folha sobe em 260 ms com `--cm-ease` e o painel lateral desliza da direita no me
 - Alvo de toque abaixo do mínimo da superfície, ou ação que só aparece no hover.
 - Classes de cor da paleta do Tailwind, propriedades `scale`/`translate` separadas, `:has()` ou `color-mix()` com variável.
 - Emojis como ícone, inclusive o ícone da estação; `confirm()` e `alert()` do navegador no lugar de uma folha.
-- Quantidade, nome do item ou estado de preparo em cor de destaque ou de estado (quantidade amarela, nome azul) ou piscando: só o atraso pulsa.
+- Quantidade, nome do item ou estado de preparo em cor de destaque ou de estado (quantidade amarela, nome azul) ou piscando: só o atraso pulsa. No perfil Cards, o ícone de estado leva a cor junto com uma forma própria de cada estado (seção 10).
 - Painel da produção com cartões de métrica ou número fora da meta indicado só pela cor.
 - Texto do esquema sobre foto ou câmera, ou cor fixa escrita fora de imagem.
 - Faixa lateral colorida para marcar item ativo; cartões de métrica nas telas de toque.
 - A ação do cartão de produto preenchida (`.ct-btn--primary`) numa grade: a ação principal da tela é a do pedido.
-- Cantos acima da escala do perfil ou botões, abas e selos em forma de pílula.
+- Cantos acima da escala do perfil ou botões, abas e selos em forma de pílula (a única pílula é a tag de alérgeno do perfil Cards).
 - Texto todo em maiúsculas para dar ênfase (`text-transform: uppercase` ou frase escrita em caixa alta), ou nome do PDV em maiúsculas na tela.
 
-## 10. Implementação neste projeto
+## 10. Perfil Cards
 
-_Preencher ao adotar:_ os perfis usados (Admin e/ou Operação, com as superfícies), onde está o CSS (`colibri-ui.css` ou `colibri-touch.css` e, se usados, os adaptadores), onde ficam fontes, ícones e `logos/`, de onde a entrada HTML serve o ícone da aba, qual página recebe `.cm-page--home`, a biblioteca de componentes e o tema usados (com versão) e como cada componente é implementado no framework do projeto (componentes, diretivas, templates). No perfil Operação: a classe de superfície, o alvo de build (Chrome 101), onde o esquema de cada canal é gravado, como chega ao app e como é aplicado antes de pintar, e as cores da paleta escolhidas para tipos de pedido e estações.
+Cards de dados lidos de longe sobre uma tela do perfil Operação. Hoje, o card de produção do KDS (`.cc-producao`), na tela da estação; os cards dos painéis de chamado (garçom, entregadores, senhas) entram depois. Implementação em `colibri-cards.css` (prefixo `cc-`), carregado depois do `colibri-touch.css`; demonstração em `exemplo-toque.html#kds` (modo toque) e `#bump` (modo bump). O perfil Operação continua valendo no que esta seção não muda: barra da estação, tema Colibri por `data-theme`, paleta curada, piso Chrome 101, caixa de frase e nenhum texto em caixa alta.
+
+**Norte criativo: "Leitura de longe".** O cozinheiro lê o card de relance, de onde está e com as mãos ocupadas. O que produzir aparece primeiro e limpo; o que é de apoio (tipo, senha, pessoa, local) fica menor, no cabeçalho. A altura do card é economizada sem custar legibilidade.
+
+**Características:**
+
+- Preenchimento cheio, sem bordas: o card salta do piso (`.cc-piso`) pelo fundo, não por contorno.
+- A altura é crítica, porque o card pode transbordar com muitos itens: o que não é o que produzir fica compacto, nunca ilegível. Pedidos fora do padrão ficam com o transbordo de card e de monitor.
+- Um sinal por informação: nada confuso, nada repetido.
+
+### Cores
+
+**Regra do tempo no preenchimento.** O cabeçalho do card leva a cor do tempo, e só dele: neutro no prazo (`--cc-neutro`), âmbar em atenção (`#875800`, com `bi-hourglass-split` antes do tempo) e vermelho em atraso (`#b02637`, com `bi-exclamation-octagon-fill`; o fundo respira até `#6a1720` a cada 1,2 s e fica parado com movimento reduzido). O tipo do pedido vai num selo branco com a cor da paleta no texto (`.cc-producao__tipo--mesa` etc.), nunca no preenchimento: o laranja da retirada e o vinho colidiriam com atenção e atraso. A urgência nunca é só cor: o ícone antes do tempo diz o estado. Em espera, listras diagonais no cabeçalho e a marca "Em espera" no lugar do tempo; cancelado, a marca "Cancelado" em vermelho.
+
+Os tokens ficam em `colibri-cards.css`, não na base, porque só o card os usa:
+
+| Token | Claro | Escuro | Uso |
+|---|---|---|---|
+| `--cc-piso` | `#dce2e9` (`line`) | `#0b1822` (`bg`) | Fundo da área dos cards |
+| `--cc-corpo` | `#ffffff` | `#152838` | Corpo do card |
+| `--cc-neutro` | `#4d5a68` (Grafite) | `#2e4a60` | Cabeçalho no prazo |
+| `--cc-pausa` | `#c7d0da` | `#1b3142` | Cabeçalho em espera |
+| `--cc-item` | `#0b1015` | `#ffffff` | Nome e quantidade do item |
+| `--cc-esmaecido` | `#98a2ad` | `#5a6d7f` | Item pronto |
+| `--cc-divisor` | `#e4e9ef` | `#243b4e` | Traço entre itens |
+| `--cc-acao` | `#e3e8ee` | `#2e4a60` | Botões secundários e fundo do botão de estado |
+| `--cc-selecao` | `#1b6ec2` | `#5fa9ec` | Seleção e cursor da bump bar (`accent-ink`) |
+
+- Nome e quantidade do item em tinta pura (`--cc-item`); os itens do combo em `ink-2`. A diferença de tinta, o tamanho e o recuo separam o item do combo, sem negrito.
+- **Pronto esmaecido de propósito:** quantidade, nome, observações e itens do combo do item pronto em `--cc-esmaecido`, com 2,6:1 (claro) e 2,8:1 (escuro), abaixo de 4,5:1 por decisão: o item já foi feito e não pede ação, e o estado fica no check, em sucesso cheio. Os alérgenos do item pronto ficam com metade da opacidade. Nunca use a tinta esmaecida em algo que ainda peça ação. Pausado e cancelado ficam em `ink-3` (4,5:1 ou mais).
+
+### Tipografia e escala
+
+| Uso | Tamanho | Peso | Altura da linha |
+|---|---|---|---|
+| Nome do item e quantidade (mono, tabulares) | 17 px | nome 400 no modo toque e 500 no bump; quantidade 500 | 24 px |
+| Item do combo (quantidade em mono) | 15 px | 400; quantidade 500 | 23 px |
+| Senha e tempo (mono, tabulares) | 15 px | 700 | 26 px |
+| Observação, alteração e ritmo de preparo | 12 px | 600 | 18 px |
+| Pessoa e local | 12 px | 500 | 20 px |
+| Selo do tipo, índice e marcas do cabeçalho | 12 px | 600 | 21 px |
+| Alérgeno | 12 px | 600 | 20 px |
+
+- As alturas de linha são fixas e maiores que o texto: o respiro entre as linhas tira a densidade sem crescer o card. Ícones dentro da observação e da linha de apoio levam `line-height: 1`, para não esticar a linha.
+- A distância (TV a 1–3 m) é tratada pelo zoom da estação, que multiplica tudo, e pelo peso 500 do nome no modo bump; não há outra escala. O card não usa os `--ct-text-*` de `.ct-app--kds`.
+- O nome do item vai em caixa de frase; a observação, como foi gravada no PDV (regra do perfil Operação).
+
+### Anatomia do card
+
+- **Cabeçalho**, em duas linhas: (1) índice (só no modo bump), selo do tipo, senha e, à direita, o tempo; (2) menor, pessoa (`bi-person`) e local (`bi-geo-alt`). Sem faixa de urgência nem faixa de dados.
+- **Itens:** grade `estado | quantidade | nome`, numa linha só; a coluna de estado é fixa e sempre ocupada. Um traço de 1 px (`--cc-divisor`) separa os itens, sem espaço entre eles.
+- **Cinco estados, cinco formas** (a cor acompanha a forma, nunca sozinha): aguardando `bi-clock` em `ink-3`, em preparo `bi-fire` em `action-ink`, pronto `bi-check-circle-fill` em sucesso, pausado `bi-pause-circle-fill` em `ink-2`, cancelado `bi-x-circle-fill` em erro.
+- **Observação:** `bi-arrow-right` e o texto, na cor de aviso. **Alteração:** `bi-pencil-square`, na mesma cor; a linha alterada acende em `warning-soft` pelo tempo que a aplicação definir, sem bloco extra que empurre o card.
+- **Combo:** os itens um embaixo do outro, com a quantidade em mono numa coluna alinhada e a observação de cada um logo abaixo dele.
+- **Alérgeno:** tag em pílula (`.cc-producao__alergeno`, raio de 999 px) em `danger-soft`, com `bi-exclamation-triangle-fill` e só o nome ("Glúten"), sem a palavra "Alérgeno"; várias na mesma linha. É a única pílula do kit: a forma separa a informação de segurança de todo o resto do card.
+- **Ritmo de preparo:** "Iniciar em N min" com `bi-stopwatch` em `ink-2`; "Iniciar agora" com `bi-alarm` na cor de aviso (`.cc-producao__ritmo--agora`). Nunca o relógio, que é o aguardando.
+
+### Modos
+
+O modo é configurado por estação (todos os monitores de uma estação no mesmo modo) e marcado na raiz da grade: `.cc-modo-toque` ou `.cc-modo-bump`.
+
+- **Toque** (tablet ao alcance do cozinheiro): rodapé com botões só de texto, de 40 px (`.cc-producao__acao`): Espera ou Iniciar e Concluir (`--principal`, com o dobro da largura); Remover (`--perigo`) no cancelado. O ícone de estado é o botão do item (`.cc-producao__estado-btn`, 30 px visíveis): o toque avança de aguardando para em preparo e para pronto, o toque no pronto volta para em preparo (é o desfazer), e o toque longo põe ou tira o item da espera. O nome continua abrindo a ficha técnica. Num combo, a ação vale para a linha toda.
+- **Bump** (TV operada pela bump bar): sem rodapé. O card selecionado (`.is-selecionado`) tem contorno de 4 px na cor de seleção, afastado 3 px, e o índice aceso. O cursor (`.is-cursor`) fica no cabeçalho, com contorno interno na tinta do cabeçalho, ou num item, com contorno interno de 2 px e `action-soft`. Ao chegar num card, o cursor para no primeiro item não pronto; quando um item fica pronto, ele pula para o próximo.
+- **Faixas do card** (`.cc-producao__faixa`): "Enter de novo para concluir", só no card selecionado e enquanto espera o segundo Enter; "Tudo pronto · Enter conclui" (`--pronto`), quando todos os itens estão prontos. O card nunca conclui sozinho.
+
+**Regra da bump bar em dois níveis.** O cursor fica no cabeçalho (o card inteiro) ou num item, e a mesma tecla age no nível dele: 8 e 2 andam entre os itens, e acima do primeiro está o cabeçalho; 4 e 6 vão ao card anterior e ao próximo na ordem da fila, que o índice mostra; 0 avança o item ou inicia o card; `.` põe na espera o item ou o card; Enter sempre conclui o card, com a confirmação do segundo Enter; 5 vai ao primeiro card e Esc limpa a seleção. As teclas continuam configuráveis.
+
+### Alvos de toque
+
+- Rodapé com 40 px, abaixo dos 56 px de `.ct-app--kds`: o modo toque é um tablet ao alcance da mão, e a altura do card é crítica.
+- Botão de estado com área de toque de 42 px de largura por toda a altura da linha (34 px numa linha simples), encostada à do item vizinho, sem os 8 px entre vizinhos e sem invadir a linha do lado: o traço separa os alvos. A ação é reversível (o toque no pronto volta), e é isso que permite o alvo menor.
+- O toque longo é o segundo gesto oculto permitido no kit: a espera do card continua visível no rodapé e, no bump, a espera do item tem a tecla `.`.
+
+### Grade
+
+- Sem altura mínima: cada card tem a altura do conteúdo.
+- Empilhamento: cada card entra na coluna mais baixa, na ordem da fila, e as posições só mudam quando um pedido entra ou sai (um card que muda de altura não pula de coluna). Um card maior que a altura disponível transborda para colunas vizinhas e entra a partir do ponto mais baixo entre elas. A alvenaria nativa da grade não existe no Chrome 101: a aplicação posiciona os cards em JavaScript.
+
+### Faça / Não faça no perfil Cards
+
+**Faça**
+
+- Cabeçalho na cor do tempo, com o ícone de urgência antes do tempo, e o tipo do pedido no selo.
+- Estado, quantidade e nome numa linha, primeiro e limpos.
+- Conferir o card nos dois temas e nos dois modos, com um pedido grande (combo, observações, alérgenos e item alterado).
+
+**Não faça**
+
+- Borda ou contorno para separar o card do piso, ou faixa de urgência que empurra os itens.
+- Tipo do pedido no preenchimento do cabeçalho.
+- Negrito no nome do item ou selo invertido na quantidade.
+- Tinta esmaecida em item que ainda pede ação.
+- Relógio para outra coisa que não o aguardando (ex.: ritmo de preparo).
+- Concluir o card sozinho quando todos os itens ficam prontos.
+
+## 11. Implementação neste projeto
+
+_Preencher ao adotar:_ os perfis usados (Admin, Operação e/ou Cards, com as superfícies), onde está o CSS (`colibri-ui.css` ou `colibri-touch.css` e, se usados, os adaptadores), onde ficam fontes, ícones e `logos/`, de onde a entrada HTML serve o ícone da aba, qual página recebe `.cm-page--home`, a biblioteca de componentes e o tema usados (com versão) e como cada componente é implementado no framework do projeto (componentes, diretivas, templates). No perfil Operação: a classe de superfície, o alvo de build (Chrome 101), onde o esquema de cada canal é gravado, como chega ao app e como é aplicado antes de pintar, e as cores da paleta escolhidas para tipos de pedido e estações. No perfil Cards: onde o modo de cada estação é configurado e como a grade empilha os cards.

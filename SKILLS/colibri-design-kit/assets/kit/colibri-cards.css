@@ -1,0 +1,426 @@
+/*
+ * Colibri UI — perfil Cards da linha visual Colibri: cards de dados lidos de longe, sobre uma tela do
+ * perfil Operação. Hoje, o card de produção do KDS (.cc-producao).
+ * CSS puro, prefixo `cc-`. Piso Chrome 101: sem :has(), @container, color-mix() nem oklch().
+ * Requisitos: colibri-touch.css carregado antes (tokens --ct-* e a tela .ct-app); Bootstrap Icons.
+ * Regras de uso: ver DESIGN.md do kit, seção "Perfil Cards".
+ */
+
+/* ---------- Tokens do perfil ----------
+ * O preenchimento do cabeçalho é o tempo (neutro, atenção, atraso); o tipo do pedido vai num selo.
+ * Os valores ficam aqui, não na base, porque só o card os usa. */
+:root {
+    --cc-piso: var(--cm-line);
+    --cc-corpo: var(--cm-surface);
+    --cc-neutro: var(--cm-palette-grafite);
+    --cc-neutro-ink: #fff;
+    --cc-atencao: #875800;
+    --cc-atraso: #b02637;
+    --cc-atraso-respiro: #6a1720;
+    --cc-urgencia-ink: #fff;
+    --cc-pausa: var(--cm-line-strong);
+    --cc-pausa-ink: var(--cm-ink);
+    --cc-listra: rgba(255, 255, 255, .45);
+    --cc-marca: rgba(0, 0, 0, .14);
+    --cc-acao: #e3e8ee;
+    --cc-acao-ink: var(--cm-ink);
+    /* Nome e quantidade do item em tinta pura; itens do combo em ink-2; o pronto, esmaecido. */
+    --cc-item: #0b1015;
+    --cc-esmaecido: #98a2ad;
+    --cc-divisor: #e4e9ef;
+    /* Seleção da bump bar: o azul de ação, forte o bastante para ser visto de longe. */
+    --cc-selecao: var(--cm-accent-ink);
+
+    --cc-raio: var(--cm-radius);
+    --cc-raio-controle: var(--cm-btn-radius);
+    --cc-alvo: 40px;
+
+    /* Escala do card. O zoom da estação multiplica tudo; a distância é tratada por ele. As alturas de
+     * linha são fixas e maiores que o texto: o respiro entre as linhas é o que tira a densidade. */
+    --cc-text-sm: 12px;
+    --cc-text: 15px;
+    --cc-text-lg: 17px;
+    --cc-lh-cabecalho: 26px;
+    --cc-lh-selo: 21px;
+    --cc-lh-apoio: 20px;
+    --cc-lh-item: 24px;
+    --cc-lh-sub: 23px;
+    --cc-lh-obs: 18px;
+    --cc-lh-tag: 20px;
+    --cc-peso-nome: 400;
+    --cc-peso-qtd: 500;
+}
+:root[data-theme="dark"] {
+    --cc-piso: var(--cm-bg);
+    --cc-corpo: var(--cm-surface-2);
+    --cc-neutro: var(--cm-line-strong);
+    --cc-neutro-ink: var(--cm-ink);
+    --cc-pausa: #1b3142;
+    --cc-pausa-ink: var(--cm-ink-2);
+    --cc-listra: rgba(255, 255, 255, .05);
+    --cc-marca: rgba(255, 255, 255, .08);
+    --cc-acao: var(--cm-line-strong);
+    --cc-acao-ink: var(--cm-ink);
+    --cc-item: #fff;
+    --cc-esmaecido: #5a6d7f;
+    --cc-divisor: #243b4e;
+}
+
+/* ---------- Modos ----------
+ * Na raiz da grade (ou da tela), conforme a estação: toque (tablet perto do cozinheiro, com rodapé de
+ * botões) ou bump (TV operada pela bump bar, sem botões). No bump, o nome sobe para 500. */
+.cc-modo-bump {
+    --cc-peso-nome: 500;
+}
+/* Fundo da área dos cards: os cards brancos (claro) e azul petróleo (escuro) saltam dele. */
+.cc-piso {
+    background: var(--cc-piso);
+}
+
+/* ---------- Card de produção ---------- */
+.cc-producao {
+    --cc-cor: var(--cc-neutro);
+    --cc-tinta: var(--cc-neutro-ink);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    color: var(--ct-ink);
+    background: var(--cc-corpo);
+    border-radius: var(--cc-raio);
+}
+.cc-producao--atencao { --cc-cor: var(--cc-atencao); --cc-tinta: var(--cc-urgencia-ink); }
+.cc-producao--atraso { --cc-cor: var(--cc-atraso); --cc-tinta: var(--cc-urgencia-ink); }
+.cc-producao--pausa { --cc-cor: var(--cc-pausa); --cc-tinta: var(--cc-pausa-ink); }
+
+/* Cabeçalho na cor do tempo. Linha 1: índice (bump), tipo, senha e tempo; linha 2: pessoa e local. */
+.cc-producao__head {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 6px 10px 7px;
+    color: var(--cc-tinta);
+    background: var(--cc-cor);
+    border-radius: var(--cc-raio) var(--cc-raio) 0 0;
+}
+.cc-producao--pausa .cc-producao__head {
+    background-image: repeating-linear-gradient(135deg, var(--cc-listra) 0 10px, transparent 10px 20px);
+}
+/* Só o atraso respira: o fundo escurece e volta a cada 1,2 s; parado com movimento reduzido. */
+.cc-producao--atraso .cc-producao__head::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    background: var(--cc-atraso-respiro);
+    border-radius: inherit;
+    opacity: 0;
+    animation: cc-respirar 1.2s ease-in-out infinite;
+}
+@keyframes cc-respirar {
+    0%, 100% { opacity: 0; }
+    45% { opacity: 1; }
+}
+.cc-producao__linha {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    font-size: var(--cc-text-sm);
+    font-weight: 600;
+}
+.cc-producao__indice {
+    display: inline-grid;
+    place-items: center;
+    min-width: var(--cc-lh-selo);
+    height: var(--cc-lh-selo);
+    color: var(--cc-cor);
+    background: var(--cc-tinta);
+    border-radius: var(--cc-raio-controle);
+    font-family: var(--cm-mono);
+    font-weight: 700;
+}
+/* Tipo do pedido: selo branco com a cor da paleta no texto (o preenchimento é do tempo). */
+.cc-producao__tipo {
+    --cc-tipo: var(--ct-palette-grafite);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 6px;
+    color: var(--cc-tipo);
+    background: #fff;
+    border-radius: var(--cc-raio-controle);
+    line-height: var(--cc-lh-selo);
+}
+.cc-producao__tipo--balcao { --cc-tipo: var(--ct-order-balcao); }
+.cc-producao__tipo--retirada { --cc-tipo: var(--ct-order-retirada); }
+.cc-producao__tipo--entrega { --cc-tipo: var(--ct-order-entrega); }
+.cc-producao__tipo--mesa { --cc-tipo: var(--ct-order-mesa); }
+.cc-producao__tipo--ficha { --cc-tipo: var(--ct-order-ficha); }
+.cc-producao__senha,
+.cc-producao__tempo {
+    font-family: var(--cm-mono);
+    font-size: var(--cc-text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: var(--cc-lh-cabecalho);
+}
+.cc-producao__tempo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    white-space: nowrap;
+}
+.cc-producao__tempo .bi { font-size: .9em; }
+/* Marca no lugar do tempo: "Em espera" e "Cancelado". */
+.cc-producao__marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    padding: 0 6px;
+    background: var(--cc-marca);
+    border-radius: var(--cc-raio-controle);
+    line-height: var(--cc-lh-selo);
+}
+.cc-producao__marca--cancelado { color: #fff; background: var(--cc-atraso); }
+.cc-producao__apoio {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 12px;
+    min-width: 0;
+    font-size: var(--cc-text-sm);
+    font-weight: 500;
+    line-height: var(--cc-lh-apoio);
+}
+.cc-producao__apoio .bi { margin-right: 4px; font-size: .9em; line-height: 1; }
+
+/* ---------- Itens ----------
+ * estado | quantidade | nome, numa linha. A coluna de estado é fixa e sempre ocupada; um traço de 1 px
+ * separa os itens, sem espaço entre eles. */
+.cc-producao__itens {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+}
+.cc-producao__item {
+    display: grid;
+    grid-template-columns: 1.15em 2.1em minmax(0, 1fr);
+    column-gap: 6px;
+    align-items: baseline;
+    padding: 5px 6px;
+    border-radius: var(--cc-raio-controle);
+}
+.cc-producao__item + .cc-producao__item { border-top: 1px solid var(--cc-divisor); }
+.cc-producao__estado {
+    font-size: var(--cc-text);
+    line-height: 1;
+    transform: translateY(1px);
+}
+.cc-producao__qtd {
+    color: var(--cc-item);
+    font-family: var(--cm-mono);
+    font-size: var(--cc-text-lg);
+    font-weight: var(--cc-peso-qtd);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--cc-lh-item);
+}
+.cc-producao__corpo {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+.cc-producao__nome {
+    color: var(--cc-item);
+    font-size: var(--cc-text-lg);
+    font-weight: var(--cc-peso-nome);
+    line-height: var(--cc-lh-item);
+}
+/* Cinco estados, cinco formas (a cor acompanha, nunca sozinha). */
+.cc-producao__item.is-aguardando .cc-producao__estado { color: var(--ct-ink-3); }
+.cc-producao__item.is-preparo .cc-producao__estado { color: var(--ct-action-ink); }
+.cc-producao__item.is-pronto .cc-producao__estado { color: var(--ct-success); }
+.cc-producao__item.is-pausado .cc-producao__estado { color: var(--ct-ink-2); }
+.cc-producao__item.is-cancelado .cc-producao__estado { color: var(--ct-danger); }
+/* Pronto esmaecido de propósito (abaixo de 4,5:1): já foi feito e não pede ação; o estado fica no
+ * check, em sucesso cheio. Pausado e cancelado em ink-3. */
+.cc-producao__item.is-pronto .cc-producao__qtd,
+.cc-producao__item.is-pronto .cc-producao__corpo,
+.cc-producao__item.is-pronto .cc-producao__nome,
+.cc-producao__item.is-pronto .cc-producao__sub,
+.cc-producao__item.is-pronto .cc-producao__obs,
+.cc-producao__item.is-pronto .cc-producao__alt { color: var(--cc-esmaecido); }
+.cc-producao__item.is-pronto .cc-producao__alergenos { opacity: .5; }
+.cc-producao__item.is-pausado .cc-producao__qtd,
+.cc-producao__item.is-pausado .cc-producao__nome,
+.cc-producao__item.is-cancelado .cc-producao__qtd,
+.cc-producao__item.is-cancelado .cc-producao__nome { color: var(--ct-ink-3); }
+/* Item alterado: só a linha acende, pelo tempo que a aplicação definir. */
+.cc-producao__item.is-alterado { background: var(--ct-warning-soft); }
+
+/* Itens do combo, um embaixo do outro, com a quantidade numa coluna alinhada. */
+.cc-producao__sub {
+    display: grid;
+    grid-template-columns: 2em minmax(0, 1fr);
+    color: var(--ct-ink-2);
+    font-size: var(--cc-text);
+    line-height: var(--cc-lh-sub);
+}
+.cc-producao__sub b {
+    font-family: var(--cm-mono);
+    font-weight: var(--cc-peso-qtd);
+}
+.cc-producao__sub .cc-producao__obs { grid-column: 2; }
+/* Observação (texto como veio do PDV) e alteração, na cor de aviso. */
+.cc-producao__obs,
+.cc-producao__alt {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    color: var(--ct-warning);
+    font-size: var(--cc-text-sm);
+    font-weight: 600;
+    line-height: var(--cc-lh-obs);
+}
+.cc-producao__obs .bi,
+.cc-producao__alt .bi { font-size: .9em; line-height: 1; }
+/* Alérgeno: tag em pílula, ícone de alerta e só o nome. */
+.cc-producao__alergenos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 3px;
+}
+.cc-producao__alergeno {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 1px 10px 1px 8px;
+    color: var(--ct-danger);
+    background: var(--ct-danger-soft);
+    border-radius: 999px;
+    font-size: var(--cc-text-sm);
+    font-weight: 600;
+    line-height: var(--cc-lh-tag);
+}
+/* Ritmo de preparo: "Iniciar em N min" (bi-stopwatch) e "Iniciar agora" (bi-alarm). */
+.cc-producao__ritmo {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    color: var(--ct-ink-2);
+    font-size: var(--cc-text-sm);
+    font-weight: 600;
+    line-height: var(--cc-lh-obs);
+}
+.cc-producao__ritmo .bi { font-size: .9em; line-height: 1; }
+.cc-producao__ritmo--agora { color: var(--ct-warning); }
+
+/* ---------- Modo toque ----------
+ * O ícone de estado vira botão: toque avança o item, toque longo põe ou tira da espera. A área de
+ * toque (o ::after, preso à linha) cobre a coluna de estado com o respiro em volta, em toda a altura
+ * da linha, sem invadir a vizinha: o traço separa os alvos. */
+.cc-modo-toque .cc-producao__item {
+    position: relative;
+    grid-template-columns: 30px 2.1em minmax(0, 1fr);
+    align-items: start;
+}
+.cc-producao__estado-btn {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    margin: -3px 0;
+    padding: 0;
+    color: inherit;
+    background: var(--cc-acao);
+    border: 0;
+    border-radius: var(--cc-raio-controle);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.cc-producao__estado-btn::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 42px;
+    content: '';
+}
+.cc-producao__estado-btn .cc-producao__estado { transform: none; }
+.cc-producao__item.is-pronto .cc-producao__estado-btn { background: transparent; }
+.cc-producao__estado-btn:active .cc-producao__estado { transform: scale(.88); }
+.cc-producao__estado-btn:focus-visible { outline: 2px solid var(--cc-selecao); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) {
+    .cc-producao--atraso .cc-producao__head::before { animation: none; }
+    .cc-producao__estado-btn:active .cc-producao__estado { transform: none; }
+}
+
+/* Rodapé: botões só texto, 40 px. Espera ou Iniciar + Concluir (principal); Remover no cancelado. */
+.cc-producao__foot {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+    padding: 2px 6px 6px;
+}
+.cc-producao__acao {
+    flex: 1;
+    min-height: var(--cc-alvo);
+    padding: 0 10px;
+    color: var(--cc-acao-ink);
+    background: var(--cc-acao);
+    border: 0;
+    border-radius: var(--cc-raio-controle);
+    font: 600 var(--cc-text) var(--cm-font);
+    cursor: pointer;
+}
+.cc-producao__acao--principal { flex: 2; color: #fff; background: var(--ct-action); }
+.cc-producao__acao--perigo { color: var(--ct-danger); background: var(--ct-danger-soft); }
+.cc-producao__acao:focus-visible { outline: 2px solid var(--cc-selecao); outline-offset: 2px; }
+
+/* ---------- Modo bump ----------
+ * Sem rodapé. Card selecionado: contorno de 4 px afastado e o índice aceso. O cursor fica no
+ * cabeçalho (card inteiro) ou num item (contorno interno de 2 px e fundo suave da ação). */
+.cc-modo-bump .cc-producao { padding-bottom: 4px; }
+.cc-modo-bump .cc-producao__foot { display: none; }
+.cc-producao.is-selecionado { outline: 4px solid var(--cc-selecao); outline-offset: 3px; }
+.cc-producao.is-selecionado .cc-producao__indice { color: #fff; background: var(--ct-action); }
+.cc-producao__head.is-cursor { box-shadow: inset 0 0 0 2px var(--cc-tinta); }
+.cc-producao__item.is-cursor {
+    background: var(--ct-action-soft);
+    box-shadow: inset 0 0 0 2px var(--cc-selecao);
+}
+/* Faixa do card selecionado: confirmação do Concluir (segundo Enter) ou "Tudo pronto". */
+.cc-producao__faixa {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 2px 4px 0;
+    padding: 6px 10px;
+    color: #fff;
+    background: var(--ct-action);
+    border-radius: var(--cc-raio-controle);
+    font-size: var(--cc-text-sm);
+    font-weight: 700;
+    line-height: var(--cc-lh-apoio);
+}
+.cc-producao__faixa--pronto { color: var(--ct-success); background: var(--ct-success-soft); }
+.cc-producao__tecla {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.7em;
+    height: 1.6em;
+    padding: 0 5px;
+    color: var(--ct-action);
+    background: #fff;
+    border-radius: var(--cc-raio-controle);
+    font-family: var(--cm-mono);
+    font-weight: 700;
+}
+.cc-producao__faixa--pronto .cc-producao__tecla { color: #fff; background: var(--ct-success); }

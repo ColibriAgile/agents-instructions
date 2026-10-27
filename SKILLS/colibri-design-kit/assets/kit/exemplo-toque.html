@@ -7,6 +7,7 @@
     <link rel="icon" href="logos/colibri.ico">
     <link rel="stylesheet" href="icons/bootstrap-icons.min.css">
     <link rel="stylesheet" href="colibri-touch.css">
+    <link rel="stylesheet" href="colibri-cards.css">
     <script>
         /* Tema antes de pintar (só vale sem esquema: KDS). #claro força o tema claro. */
         document.documentElement.setAttribute('data-theme', location.hash.indexOf('claro') >= 0 ? 'light' : 'dark');
@@ -33,6 +34,7 @@
         .demo-lines li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--ct-line); }
         .demo-lines .demo-line__name { flex: 1; min-width: 0; font-size: var(--ct-text-lg); }
         .demo-lines .ct-price { font-size: var(--ct-text-lg); }
+        .demo-pilha { display: grid; gap: var(--ct-gap); align-content: start; }
     </style>
 </head>
 <body>
@@ -244,45 +246,116 @@
     <!-- Barra da estação: ícone da lista curada sobre a cor da estação (paleta), contagens em selos de estado, ações à direita -->
     <div class="ct-bar" style="--ct-station-color: var(--ct-palette-laranja)">
         <span class="ct-bar__station"><i class="bi bi-fire" aria-hidden="true"></i>Chapa</span>
-        <span class="ct-tag ct-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>2 em atenção</span>
-        <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>1 atrasado</span>
+        <span class="ct-tag ct-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>1 em atenção</span>
+        <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>1 atrasado</span>
         <div class="ct-bar__actions"><a class="ct-btn" href="#consolidado">Por produto</a></div>
     </div>
-    <div class="demo-scroll">
-        <div class="ct-orders" style="--ct-cols: 4">
-            <article class="ct-order ct-order--mesa">
-                <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa 12</span><span class="ct-order__ticket">#482</span><span class="ct-order__timer">03:12</span></div>
-                <ul class="ct-order__items">
-                    <li class="ct-order__item is-preparing"><span class="ct-order__qty ct-order__qty--multi">2×</span><span class="ct-order__name">X-salada da casa<span class="ct-order__state"><i class="bi bi-fire" aria-hidden="true"></i>Em preparo</span><span class="ct-order__note"><i class="bi bi-chat-left-text" aria-hidden="true"></i>Sem cebola</span></span></li>
-                    <li class="ct-order__item is-ready"><span class="ct-order__qty">1×</span><span class="ct-order__name">Batata média<span class="ct-order__state"><i class="bi bi-check2-circle" aria-hidden="true"></i>Pronto</span></span></li>
+    <!-- Perfil Cards, modo toque (tablet perto do cozinheiro): o ícone de estado é o botão do item, o rodapé age no card.
+         Na aplicação, a grade empilha os cards na coluna mais baixa, na ordem da fila; aqui, a pilha é manual. -->
+    <div class="demo-scroll cc-piso">
+        <div class="ct-orders cc-modo-toque" style="--ct-cols: 3">
+            <article class="cc-producao">
+                <header class="cc-producao__head">
+                    <div class="cc-producao__linha"><span class="cc-producao__tipo cc-producao__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cc-producao__senha">12</span><span class="cc-producao__tempo">03:12</span></div>
+                    <div class="cc-producao__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Ana</span><span><i class="bi bi-geo-alt" aria-hidden="true"></i>Varanda</span></div>
+                </header>
+                <ul class="cc-producao__itens">
+                    <li class="cc-producao__item is-preparo is-alterado"><button type="button" class="cc-producao__estado-btn" aria-label="X-salada da casa: em preparo. Tocar marca pronto"><i class="bi bi-fire cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">2×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">X-salada da casa</span><span class="cc-producao__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>SEM CEBOLA</span><span class="cc-producao__alt"><i class="bi bi-pencil-square" aria-hidden="true"></i>Ponto da carne: bem passado</span></span></li>
+                    <li class="cc-producao__item is-pronto"><button type="button" class="cc-producao__estado-btn" aria-label="Batata média: pronto. Tocar volta para em preparo"><i class="bi bi-check-circle-fill cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Batata média</span><span class="cc-producao__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>SEM SAL</span></span></li>
+                    <li class="cc-producao__item is-aguardando"><button type="button" class="cc-producao__estado-btn" aria-label="Refrigerante lata: aguardando. Tocar inicia"><i class="bi bi-clock cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Refrigerante lata</span></span></li>
                 </ul>
-                <div class="ct-order__foot"><button class="ct-btn" type="button">Iniciar</button><button class="ct-btn ct-btn--primary" type="button">Concluir</button></div>
+                <div class="cc-producao__foot"><button type="button" class="cc-producao__acao">Espera</button><button type="button" class="cc-producao__acao cc-producao__acao--principal">Concluir</button></div>
             </article>
-            <article class="ct-order ct-order--entrega ct-order--attention">
-                <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="ct-order__ticket">#479</span><span class="ct-order__timer">07:40</span></div>
-                <div class="ct-order__urgency"><i class="bi bi-hourglass-split" aria-hidden="true"></i>Atenção · passou de 5 min</div>
-                <div class="ct-order__meta">Mariana · iFood</div>
-                <ul class="ct-order__items">
-                    <li class="ct-order__item"><span class="ct-order__qty">1×</span><span class="ct-order__name">Combo família<span class="ct-order__sub">4 X-salada · batata grande · refrigerante 2 L</span><span class="ct-order__allergen"><i class="bi bi-exclamation-octagon" aria-hidden="true"></i>Alérgeno: glúten</span></span></li>
+            <article class="cc-producao cc-producao--atencao">
+                <header class="cc-producao__head">
+                    <div class="cc-producao__linha"><span class="cc-producao__tipo cc-producao__tipo--entrega"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="cc-producao__senha">#479</span><span class="cc-producao__tempo"><i class="bi bi-hourglass-split" aria-label="Atenção"></i>07:40</span></div>
+                    <div class="cc-producao__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Mariana</span><span>iFood</span></div>
+                </header>
+                <ul class="cc-producao__itens">
+                    <li class="cc-producao__item is-aguardando"><button type="button" class="cc-producao__estado-btn" aria-label="Combo família: aguardando. Tocar inicia"><i class="bi bi-clock cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Combo família</span><span class="cc-producao__sub"><b>4×</b><span>X-salada</span><span class="cc-producao__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>2 SEM PICLES</span></span><span class="cc-producao__sub"><b>1×</b><span>Batata grande</span></span><span class="cc-producao__sub"><b>1×</b><span>Refrigerante 2 L</span></span><span class="cc-producao__alergenos"><span class="cc-producao__alergeno"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Glúten</span><span class="cc-producao__alergeno"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Lactose</span></span></span></li>
+                    <li class="cc-producao__item is-aguardando"><button type="button" class="cc-producao__estado-btn" aria-label="Pudim: aguardando. Tocar inicia"><i class="bi bi-clock cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">2×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Pudim</span><span class="cc-producao__ritmo"><i class="bi bi-stopwatch" aria-hidden="true"></i>Iniciar em <span class="ct-mono">6</span> min</span></span></li>
                 </ul>
-                <div class="ct-order__foot"><button class="ct-btn" type="button">Pausar</button><button class="ct-btn ct-btn--primary" type="button">Concluir</button></div>
+                <div class="cc-producao__foot"><button type="button" class="cc-producao__acao">Iniciar</button><button type="button" class="cc-producao__acao cc-producao__acao--principal">Concluir</button></div>
             </article>
-            <article class="ct-order ct-order--balcao ct-order--late is-selected">
-                <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="ct-order__ticket">#471</span><span class="ct-order__timer">12:05</span></div>
-                <div class="ct-order__urgency"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Atrasado · passou de 10 min</div>
-                <ul class="ct-order__items">
-                    <li class="ct-order__item"><span class="ct-order__qty ct-order__qty--multi">3×</span><span class="ct-order__name">Pastel de carne</span></li>
+            <div class="demo-pilha">
+                <article class="cc-producao cc-producao--atraso">
+                    <header class="cc-producao__head">
+                        <div class="cc-producao__linha"><span class="cc-producao__tipo cc-producao__tipo--balcao"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="cc-producao__senha">A47</span><span class="cc-producao__tempo"><i class="bi bi-exclamation-octagon-fill" aria-label="Atrasado"></i>12:05</span></div>
+                    </header>
+                    <ul class="cc-producao__itens">
+                        <li class="cc-producao__item is-aguardando"><button type="button" class="cc-producao__estado-btn" aria-label="Pastel de carne: aguardando. Tocar inicia"><i class="bi bi-clock cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">3×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Pastel de carne</span></span></li>
+                        <li class="cc-producao__item is-preparo"><button type="button" class="cc-producao__estado-btn" aria-label="Caldo de cana 500 ml: em preparo. Tocar marca pronto"><i class="bi bi-fire cc-producao__estado" aria-hidden="true"></i></button><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Caldo de cana 500 ml</span></span></li>
+                    </ul>
+                    <div class="cc-producao__foot"><button type="button" class="cc-producao__acao">Iniciar</button><button type="button" class="cc-producao__acao cc-producao__acao--principal">Concluir</button></div>
+                </article>
+                <article class="cc-producao">
+                    <header class="cc-producao__head">
+                        <div class="cc-producao__linha"><span class="cc-producao__tipo cc-producao__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cc-producao__senha">7</span><span class="cc-producao__marca cc-producao__marca--cancelado"><i class="bi bi-x-circle" aria-hidden="true"></i>Cancelado</span></div>
+                    </header>
+                    <ul class="cc-producao__itens">
+                        <li class="cc-producao__item is-cancelado"><i class="bi bi-x-circle-fill cc-producao__estado" aria-label="Cancelado"></i><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Risoto de cogumelos</span></span></li>
+                    </ul>
+                    <div class="cc-producao__foot"><button type="button" class="cc-producao__acao cc-producao__acao--perigo">Remover</button></div>
+                </article>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Perfil Cards, modo bump (TV operada pela bump bar): sem botões; o card selecionado tem o contorno de foco e o índice
+     aceso, e o cursor fica num item (contorno interno) ou no cabeçalho (o card inteiro) -->
+<div class="ct-app ct-app--kds demo-surface" id="bump">
+    <div class="ct-bar" style="--ct-station-color: var(--ct-palette-laranja)">
+        <span class="ct-bar__station"><i class="bi bi-fire" aria-hidden="true"></i>Chapa</span>
+        <span class="ct-tag ct-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>1 em atenção</span>
+        <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>1 atrasado</span>
+    </div>
+    <div class="demo-scroll cc-piso">
+        <div class="ct-orders cc-modo-bump" style="--ct-cols: 3">
+            <article class="cc-producao is-selecionado">
+                <header class="cc-producao__head">
+                    <div class="cc-producao__linha"><span class="cc-producao__indice">1</span><span class="cc-producao__tipo cc-producao__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cc-producao__senha">21</span><span class="cc-producao__tempo">04:30</span></div>
+                    <div class="cc-producao__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Família Souza</span><span><i class="bi bi-geo-alt" aria-hidden="true"></i>Salão 2</span></div>
+                </header>
+                <ul class="cc-producao__itens">
+                    <li class="cc-producao__item is-preparo"><i class="bi bi-fire cc-producao__estado" aria-label="Em preparo"></i><span class="cc-producao__qtd">2×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Picanha na chapa</span><span class="cc-producao__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>MAL PASSADA</span></span></li>
+                    <li class="cc-producao__item is-aguardando is-cursor"><i class="bi bi-clock cc-producao__estado" aria-label="Aguardando"></i><span class="cc-producao__qtd">3×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Arroz branco</span></span></li>
+                    <li class="cc-producao__item is-aguardando"><i class="bi bi-clock cc-producao__estado" aria-label="Aguardando"></i><span class="cc-producao__qtd">2×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Feijão tropeiro</span></span></li>
+                    <li class="cc-producao__item is-pronto"><i class="bi bi-check-circle-fill cc-producao__estado" aria-label="Pronto"></i><span class="cc-producao__qtd">2×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Batata frita</span></span></li>
                 </ul>
-                <div class="ct-order__foot"><button class="ct-btn ct-btn--primary" type="button">Concluir</button></div>
+                <!-- Só no card selecionado: confirmação do Concluir, enquanto espera o segundo Enter (3 s) -->
+                <div class="cc-producao__faixa"><span class="cc-producao__tecla">Enter</span>de novo para concluir</div>
             </article>
-            <article class="ct-order ct-order--ficha is-waiting">
-                <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-ticket-perforated" aria-hidden="true"></i>Ficha</span><span class="ct-order__ticket">#485</span><span class="ct-order__timer">00:40</span></div>
-                <div class="ct-order__meta"><span class="ct-tag"><i class="bi bi-pause-circle" aria-hidden="true"></i>Em espera</span></div>
-                <ul class="ct-order__items">
-                    <li class="ct-order__item"><span class="ct-order__qty">1×</span><span class="ct-order__name">Brownie</span></li>
+            <article class="cc-producao cc-producao--atencao">
+                <header class="cc-producao__head">
+                    <div class="cc-producao__linha"><span class="cc-producao__indice">2</span><span class="cc-producao__tipo cc-producao__tipo--entrega"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="cc-producao__senha">#479</span><span class="cc-producao__tempo"><i class="bi bi-hourglass-split" aria-label="Atenção"></i>07:40</span></div>
+                    <div class="cc-producao__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Mariana</span><span>iFood</span></div>
+                </header>
+                <ul class="cc-producao__itens">
+                    <li class="cc-producao__item is-pronto"><i class="bi bi-check-circle-fill cc-producao__estado" aria-label="Pronto"></i><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Combo família</span><span class="cc-producao__sub"><b>4×</b><span>X-salada</span></span><span class="cc-producao__sub"><b>1×</b><span>Batata grande</span></span></span></li>
                 </ul>
-                <div class="ct-order__foot"><button class="ct-btn" type="button">Retomar</button></div>
+                <!-- Todos os itens prontos: o card avisa, mas não conclui sozinho -->
+                <div class="cc-producao__faixa cc-producao__faixa--pronto"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Tudo pronto · <span class="cc-producao__tecla">Enter</span>conclui</div>
             </article>
+            <div class="demo-pilha">
+                <article class="cc-producao cc-producao--atraso">
+                    <header class="cc-producao__head">
+                        <div class="cc-producao__linha"><span class="cc-producao__indice">3</span><span class="cc-producao__tipo cc-producao__tipo--balcao"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="cc-producao__senha">A47</span><span class="cc-producao__tempo"><i class="bi bi-exclamation-octagon-fill" aria-label="Atrasado"></i>12:05</span></div>
+                    </header>
+                    <ul class="cc-producao__itens">
+                        <li class="cc-producao__item is-aguardando"><i class="bi bi-clock cc-producao__estado" aria-label="Aguardando"></i><span class="cc-producao__qtd">3×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Pastel de carne</span></span></li>
+                        <li class="cc-producao__item is-preparo"><i class="bi bi-fire cc-producao__estado" aria-label="Em preparo"></i><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Caldo de cana 500 ml</span></span></li>
+                    </ul>
+                </article>
+                <article class="cc-producao cc-producao--pausa">
+                    <header class="cc-producao__head">
+                        <div class="cc-producao__linha"><span class="cc-producao__indice">4</span><span class="cc-producao__tipo cc-producao__tipo--ficha"><i class="bi bi-ticket-perforated" aria-hidden="true"></i>Ficha</span><span class="cc-producao__senha">485</span><span class="cc-producao__marca"><i class="bi bi-pause-circle" aria-hidden="true"></i>Em espera</span></div>
+                    </header>
+                    <ul class="cc-producao__itens">
+                        <li class="cc-producao__item is-pausado"><i class="bi bi-pause-circle-fill cc-producao__estado" aria-label="Pausado"></i><span class="cc-producao__qtd">1×</span><span class="cc-producao__corpo"><span class="cc-producao__nome">Brownie</span></span></li>
+                    </ul>
+                </article>
+            </div>
         </div>
     </div>
 </div>
@@ -355,7 +428,7 @@
 </div>
 
 <div class="demo-bar" id="demo-bar">
-    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>) · <a href="#totem">Totem</a> (<a href="#portas">portas</a>) · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>, <a href="#consolidado">por produto</a>, <a href="#painel">painel</a>) · <a href="#pronto">Pronto</a>
+    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>) · <a href="#totem">Totem</a> (<a href="#portas">portas</a>) · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>, <a href="#bump">bump</a>, <a href="#bump-claro">bump claro</a>, <a href="#consolidado">por produto</a>, <a href="#painel">painel</a>) · <a href="#pronto">Pronto</a>
     <span id="demo-esquema" hidden>
         | <label>Ambiente <input type="color" id="s-ambiente" value="#0b1120"></label>
         <label>Ação <input type="color" id="s-acao" value="#f59e0b"></label>
