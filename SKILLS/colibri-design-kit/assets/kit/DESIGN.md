@@ -120,7 +120,7 @@ sizes:
   button-group-min-width: "120px"
   touch-target-tablet: "48px"
   touch-target-totem: "max(56px, 4.4vh)"
-  touch-target-kds: "56px"
+  touch-target-kds: "40px"
   touch-target-card: "40px"
   sinal-gap: "12px"
   sinal-pad: "14px"
@@ -382,10 +382,11 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 |---|---|---|---|---|
 | Tablet (paisagem, referência 1024×600) | `.ct-app--tablet` | 48 px | 16 px | 40 px |
 | Totem (retrato, de 800×1280 a 2160×3840) | `.ct-app--totem` | `max(56px, 4.4vh)` | `max(16px, 1.45vh)` | `max(40px, 6vh)` |
-| KDS (monitor ou TV, 1 a 3 m, com o zoom da estação; o card de produção segue a escala do perfil Produção, seção 10) | `.ct-app--kds` | 56 px | 18 px | 48 px |
+| KDS (monitor ou TV, 1 a 3 m, com o zoom da estação; o card de produção segue a escala do perfil Produção, seção 10) | `.ct-app--kds` | 40 px, com controles em 15 px | 18 px | 48 px |
 | Pedidos prontos (TV, 2 a 5 m, só leitura; os painéis de chamado seguem a escala da TV do perfil Cards, seção 11) | `.ct-app--tv` | 56 px | 24 px | 96 px |
 
 - Nenhum alvo de toque fica abaixo do mínimo da superfície, inclusive +/− de quantidade, fechar e ações de linha; entre alvos vizinhos, no mínimo 8 px.
+- **KDS, controles no tamanho do card:** na `.ct-app--kds`, botões, chips, quantidade, barra da estação e folhas usam o alvo e o texto dos botões do card de produção (40 px e 15 px, `--ct-control-text`); o texto de leitura (pedido, timer, nomes) fica na escala da superfície. Com 56 px, os controles da barra e das folhas pesavam mais que os pedidos.
 - Preço, senha, timer, quantidade e número do pedido são a informação principal e podem ser grandes (a regra da informação primeiro, seção 3, é do perfil Admin). Timer, senha e números de pedido em Google Sans Mono com algarismos tabulares; preço em Google Sans Flex com algarismos tabulares.
 - Quiosque (tablet de mesa, totem, TV): `.ct-app--kiosk` tira a seleção de texto, o zoom por toque duplo e a rolagem elástica.
 - **Nomes que chegam em maiúsculas** do PDV (categorias, materiais, opções e títulos de passo do combo, linhas do carrinho e da conta): na tela, em caixa de frase ("Filé à parmegiana"), com a primeira letra maiúscula mesmo depois de números; nome que já tem minúsculas fica como gravado, porque a grafia foi escolhida por alguém. Só a exibição muda: pedido, cupom, busca, `alt` e o `aria-label` das ações usam o valor gravado. As observações do PDV ("SEM CEBOLA") ficam como gravadas. É a regra das listas do perfil Admin (seção 7) levada às telas de toque.
@@ -406,7 +407,7 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 ### Componentes
 
 - **Cantos discretos, com os valores do perfil Admin (3 e 6 px):** 3 px em controles (botões, abas de categoria, quantidade, campos, confirmação) e em selos, marcas de opção e observações, o raio do botão do Admin (`--cm-btn-radius`; os selos não seguem os 10 px das etiquetas do Admin); 6 px em cartões, folhas e diálogos, o raio das superfícies do Admin (`--cm-radius`). No perfil Cards, o card `.cc-sinal` e o bloco `.cc-mais` levam 6 px, e o selo `.cc-veu` e a faixa `.cc-urgencia`, 3 px (seção 11). Os tokens `--ct-radius-*` apontam para os da base. Nenhuma forma de pílula; só o rádio é redondo (e, no perfil Produção, a tag de alérgeno, seção 10). Na folha centralizada, o rodapé, quando é o último filho direto da folha, leva o raio de baixo dela, para o fundo dele não deixar os cantos retos.
-- **Botões** (`.ct-btn`): altura do alvo da superfície, texto de `--ct-text-lg` peso 600, cantos de 3 px. Principal `.ct-btn--primary` (ação com o texto derivado), secundário (`surface-2` com linha), `.ct-btn--ghost` (texto na cor de ação), `.ct-btn--danger` (texto de erro sobre o fundo suave de erro, nunca vermelho preenchido), `.ct-btn--block` e `.ct-btn--lg`. Ícone dentro do botão é permitido. Retorno de toque por `transform: scale(.97)` e a cor pressionada; desabilitado continua visível, apagado. Botão só com ícone: `.ct-icon-btn`, com o alvo inteiro e `aria-label` obrigatório.
+- **Botões** (`.ct-btn`): altura do alvo da superfície, texto de `--ct-control-text` (padrão `--ct-text-lg`; 15 px no KDS) peso 600, cantos de 3 px. Principal `.ct-btn--primary` (ação com o texto derivado), secundário (`surface-2` com linha), `.ct-btn--ghost` (texto na cor de ação), `.ct-btn--danger` (texto de erro sobre o fundo suave de erro, nunca vermelho preenchido), `.ct-btn--block` e `.ct-btn--lg`. Ícone dentro do botão é permitido. Retorno de toque por `transform: scale(.97)` e a cor pressionada; desabilitado continua visível, apagado. Botão só com ícone: `.ct-icon-btn`, com o alvo inteiro e `aria-label` obrigatório.
 - **Quantidade** (`.ct-qty`): − valor +, cada botão com o alvo inteiro, valor com algarismos tabulares e anunciado a leitores de tela.
 - **Selos** (`.ct-tag`, cantos de 3 px): neutro, `--brand` (Destaque), `--success`, `--warning`, `--danger` e os categóricos `--combo` e `--rodizio`, sempre com texto.
 - **Cartão de produto** (`.ct-product`): foto 4:3 (ícone em `ink-3` sem foto), selos sobre a foto, nome, descrição de até duas linhas, preço (`.ct-price`, na cor de texto da marca; "a partir de" em `ink-3`) e a ação ("Adicionar", "Montar", "Escolher") como **botão comum** (`.ct-btn`, com ícone e o nome do produto no `aria-label`), nunca o principal: numa grade de produtos, cada cartão preenchido somaria uma ação principal por cartão, e a única ação principal da tela é a do pedido, no rodapé ("Finalizar pedido"). Formato linha (`.ct-product--row`) com a foto à esquerda. Indisponível (`.is-unavailable`): continua na lista, apagado, com o motivo num selo e a ação desabilitada.
@@ -538,7 +539,7 @@ O modo é configurado por estação (todos os monitores de uma estação no mesm
 
 ### Alvos de toque
 
-- Rodapé com 40 px, abaixo dos 56 px de `.ct-app--kds`: o modo toque é um tablet ao alcance da mão, e a altura do card é crítica.
+- Rodapé com 40 px, o alvo de `.ct-app--kds`: o modo toque é um tablet ao alcance da mão, e a altura do card é crítica. Os controles da tela da estação (barra, folhas) usam o mesmo alvo.
 - Botão de estado com área de toque de 42 px de largura por toda a altura da linha (34 px numa linha simples), encostada à do item vizinho, sem os 8 px entre vizinhos e sem invadir a linha do lado: o traço separa os alvos. A ação é reversível (o toque no pronto volta), e é isso que permite o alvo menor.
 - O toque longo é o segundo gesto oculto permitido no kit: a espera do card continua visível no rodapé e, no bump, a espera do item tem a tecla `.`.
 

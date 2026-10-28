@@ -97,7 +97,7 @@ Contradição entre o `DECISOES.md` e o código também entra no relatório, com
 | ID | Item | Verif. |
 |---|---|---|
 | O1 ★ | Contêiner `.ct-app` com a classe da superfície (`--tablet`, `--totem`, `--kds`, `--tv`); quiosque com `.ct-app--kiosk`. | E |
-| O2 ★ | Alvos de toque no mínimo da superfície, inclusive +/−, fechar e ações de linha, com 8 px entre vizinhos; nenhuma ação só no hover. No card do perfil Produção, valem as exceções da seção 10 (rodapé de 40 px; botão de estado com 42 px pela altura da linha, sem os 8 px). | E, N |
+| O2 ★ | Alvos de toque no mínimo da superfície, inclusive +/−, fechar e ações de linha, com 8 px entre vizinhos; nenhuma ação só no hover. No KDS, o mínimo é 40 px, com os controles em 15 px (seção 9); no card do perfil Produção, vale a exceção da seção 10 (botão de estado com 42 px pela altura da linha, sem os 8 px). | E, N |
 | O3 | Regra do esquema por sementes: telas de consumidor só com `--ct-*` de `colibri-esquema.js`, esquema aplicado antes de pintar; tipo de pedido e estação só da paleta curada; KDS no tema Colibri. | E, N |
 | O4 ★ | Chrome 101: alvo declarado no build; nenhum `oklch()`, `lab()`, `color-mix()` com variável, classe de cor da paleta do Tailwind, `scale:`/`translate:` separados, `:has()` ou `@container` no CSS entregue. | E |
 | O5 | Composição: uma ação principal por tela (a do cartão de produto é botão comum); cartões só de produto e de pedido (o `.cc-sinal` e o `.cc-mais` do perfil Cards também são permitidos); sem faixa lateral colorida; cantos de 3 e 6 px, sem pílula (a tag de alérgeno do perfil Produção é a exceção). | E |
