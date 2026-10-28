@@ -389,7 +389,7 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 - **KDS, controles no tamanho do card:** na `.ct-app--kds`, botões, chips, quantidade, barra da estação e folhas usam o alvo e o texto dos botões do card de produção (40 px e 15 px, `--ct-control-text`); o texto de leitura (pedido, timer, nomes) fica na escala da superfície. Com 56 px, os controles da barra e das folhas pesavam mais que os pedidos.
 - Preço, senha, timer, quantidade e número do pedido são a informação principal e podem ser grandes (a regra da informação primeiro, seção 3, é do perfil Admin). Timer, senha e números de pedido em Google Sans Mono com algarismos tabulares; preço em Google Sans Flex com algarismos tabulares.
 - Quiosque (tablet de mesa, totem, TV): `.ct-app--kiosk` tira a seleção de texto, o zoom por toque duplo e a rolagem elástica.
-- **Nomes que chegam em maiúsculas** do PDV (categorias, materiais, opções e títulos de passo do combo, linhas do carrinho e da conta): na tela, em caixa de frase ("Filé à parmegiana"), com a primeira letra maiúscula mesmo depois de números; nome que já tem minúsculas fica como gravado, porque a grafia foi escolhida por alguém. Só a exibição muda: pedido, cupom, busca, `alt` e o `aria-label` das ações usam o valor gravado. As observações do PDV ("SEM CEBOLA") ficam como gravadas. É a regra das listas do perfil Admin (seção 7) levada às telas de toque.
+- **Nomes que chegam em maiúsculas** do PDV (categorias, materiais, opções e títulos de passo do combo, linhas do carrinho e da conta): na tela, em caixa de frase ("Filé à parmegiana"), com a primeira letra maiúscula mesmo depois de números; nome que já tem minúsculas fica como gravado, porque a grafia foi escolhida por alguém. Só a exibição muda: pedido, cupom, busca, `alt` e o `aria-label` das ações usam o valor gravado. As observações do PDV seguem a mesma regra ("SEM CEBOLA" → "Sem cebola"), em todas as telas, inclusive a produção do KDS; observação composta (várias juntadas por " · " ou por vírgula) é convertida parte a parte, e o que o cliente digitou com minúsculas fica como digitado. É a regra das listas do perfil Admin (seção 7) levada às telas de toque.
 - **Sem caixa alta:** títulos, rótulos, avisos e chamadas em caixa de frase, nunca escritos em maiúsculas nem com `text-transform: uppercase`. A ênfase de um aviso vem do peso, do tamanho e da cor do estado, não das maiúsculas. Códigos (pedido, pareamento), siglas e marcas ficam como são.
 
 ### Composição
@@ -511,7 +511,7 @@ Os tokens ficam em `colibri-producao.css`, não na base, porque só o card os us
 
 - As alturas de linha são fixas e maiores que o texto: o respiro entre as linhas tira a densidade sem crescer o card. Ícones dentro da observação e da linha de apoio levam `line-height: 1`, para não esticar a linha.
 - A distância (TV a 1–3 m) é tratada pelo zoom da estação, que multiplica tudo, e pelo peso 500 do nome no modo bump; não há outra escala. O card não usa os `--ct-text-*` de `.ct-app--kds`.
-- O nome do item vai em caixa de frase; a observação, como foi gravada no PDV (regra do perfil Operação).
+- O nome do item e a observação vão em caixa de frase (regra do perfil Operação).
 
 ### Anatomia do card
 
