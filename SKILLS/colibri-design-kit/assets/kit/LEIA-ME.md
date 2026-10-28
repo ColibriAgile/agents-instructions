@@ -71,6 +71,11 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **27/10/2026 (KDS: controles no tamanho do card):** na tela da estação do Colibri KDS, os botões da barra e da folha de ajustes, com 56 px e texto de 20 px, ficavam maiores que os do card de produção e disputavam a atenção com os pedidos.
+  - **Implementação:** `colibri-touch.css`: `.ct-app--kds` passa a `--ct-target: 40px` (o `--cp-alvo` do card) e ganha `--ct-control-text: 15px`; `.ct-btn`, `.ct-chip` e `.ct-qty__value` leem `var(--ct-control-text, var(--ct-text-lg))`, então as outras superfícies não mudam. O texto de leitura do KDS (`--ct-text*`) fica como estava.
+  - **Regra** (`DESIGN.md`, seção 9, "Escala por superfície", e seção 10, "Alvos de toque"): alvo mínimo do KDS de 56 para 40 px, com os controles em 15 px; o rodapé do card deixa de ser exceção.
+  - **Rubrica:** o O2 cita o mínimo de 40 px do KDS (ainda na v6, do mesmo dia).
+  - **Projetos afetados:** Colibri KDS (copiar o `colibri-touch.css` novo e retirar o desvio da barra e da folha de ajustes do `DECISOES.md`; Delivery, Expedição e as outras telas da `.ct-app--kds` também ficam com os controles de 40 px).
 - **27/10/2026 (perfil Produção: regras da adoção no KDS):** a adoção do perfil Produção na tela da estação do Colibri KDS fechou regras que a entrada de 26/10 deixava em aberto, e os dois desvios registrados lá viram regras do kit, e as peças do card que o KDS mantinha no próprio CSS passam ao kit.
   - **Implementação:** `colibri-producao.css` ganha a seção "Quebra em colunas", com `.cp-card__topo`, `.cp-card__base`, `.cp-card__itens--limitada`, `.cp-card__colunas`, `.cp-card__coluna`, `.cp-card__continua` e `.cp-card__medida`, e o `.cp-card__nome-btn` (nome do item que abre a ficha técnica). Vindas dos `.kds-card__*` e do `.kds-nome-btn` do KDS, sem mudança de valor.
   - **Bump bar** (`DESIGN.md`, seção 10, "Modos"): o cursor procura o próximo item pendente, pulando pronto e espera; no card cancelado, o cabeçalho é a única linha do cursor; o 0 no cabeçalho inicia só os itens aguardando; num combo, o 0 e o `.` valem para a linha toda; a confirmação do segundo Enter dura 3 s; o item pronto fica no card, esmaecido, até a conclusão do card.
