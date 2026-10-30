@@ -12,7 +12,7 @@
         .demo-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; align-items: start; }
         .demo-table { --cm-cols: minmax(200px, 2fr) minmax(110px, .8fr) minmax(100px, .8fr) 90px minmax(120px, 1fr) 104px; }
         .demo-dialog { max-width: 520px; }
-        .demo-lists-grupos { --cm-cols: minmax(120px, 1fr) 64px; }
+        .demo-lists-grupos { --cm-cols: 16px minmax(120px, 1fr) 64px; }
         .demo-lists-produtos { --cm-cols: 80px minmax(180px, 2fr) 110px; }
     </style>
 </head>
@@ -367,11 +367,11 @@
         <section class="cm-lists__col">
             <div class="cm-section__head"><h2 class="cm-section__title">Grupos</h2><span class="cm-section__count">4</span></div>
             <div class="cm-table demo-lists-grupos">
-                <div class="cm-table__head"><span>Grupo</span><span class="cm-cell--end">Itens</span></div>
-                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell cm-cell--main">Pratos</div><div class="cm-cell cm-cell--end cm-mono">30</div></div></div>
-                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell cm-cell--main">Bebidas</div><div class="cm-cell cm-cell--end cm-mono">12</div></div></div>
-                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell cm-cell--main">Sobremesas</div><div class="cm-cell cm-cell--end cm-mono">8</div></div></div>
-                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell cm-cell--main">Molhos e adicionais</div><div class="cm-cell cm-cell--end cm-mono">5</div></div></div>
+                <div class="cm-table__head"><span></span><span>Grupo</span><span class="cm-cell--end">Itens</span></div>
+                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell"><span class="cm-drag-handle" draggable="true" title="Arraste para mudar a ordem" aria-hidden="true"><i class="bi bi-grip-vertical"></i></span></div><div class="cm-cell cm-cell--main">Pratos</div><div class="cm-cell cm-cell--end cm-mono">30</div></div></div>
+                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell"><span class="cm-drag-handle" draggable="true" title="Arraste para mudar a ordem" aria-hidden="true"><i class="bi bi-grip-vertical"></i></span></div><div class="cm-cell cm-cell--main">Bebidas</div><div class="cm-cell cm-cell--end cm-mono">12</div></div></div>
+                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell"><span class="cm-drag-handle" draggable="true" title="Arraste para mudar a ordem" aria-hidden="true"><i class="bi bi-grip-vertical"></i></span></div><div class="cm-cell cm-cell--main">Sobremesas</div><div class="cm-cell cm-cell--end cm-mono">8</div></div></div>
+                <div class="cm-table__item"><div class="cm-table__row"><div class="cm-cell"><span class="cm-drag-handle" draggable="true" title="Arraste para mudar a ordem" aria-hidden="true"><i class="bi bi-grip-vertical"></i></span></div><div class="cm-cell cm-cell--main">Molhos e adicionais</div><div class="cm-cell cm-cell--end cm-mono">5</div></div></div>
             </div>
         </section>
         <section class="cm-lists__col">

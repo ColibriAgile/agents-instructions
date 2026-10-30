@@ -4,9 +4,9 @@ Procedimento do verbo `aderencia`. Mede quanto o código de UI e a aplicação e
 
 A avaliação é somente leitura. A única gravação é o relatório `docs/design/ADERENCIA.md`.
 
-## Rubrica v7
+## Rubrica v8
 
-Mudanças desde a v6 (28/10/2026): o T4 cobra também as observações do PDV em caixa de frase (antes ficavam como gravadas). Mudanças da v5 para a v6 (27/10/2026): o grupo H passa a regras fixas (estado no preenchimento com tinta calculada pelo motor, estado com ícone e rótulo, altura estável, só o estado mais grave respira, uma informação principal, grade e transbordo, fundo e escala) e deixa de cobrar cor, ícone e ordem das peças, que viram escolhas do painel; o R5 passa a cobrar o span calculado pelo card, os indicadores da quebra em colunas e o transbordo entre monitores pelos cards inteiros. Mudanças da v4 para a v5 (27/10/2026): grupo H novo, para o card de sinal do perfil Cards (estado no preenchimento, urgência legível, anatomia, grade e transbordo, tema e escala); O5 e O6 ganham as exceções do perfil Cards. Mudanças da v3 para a v4 (26/10/2026): grupo R novo, para o card do perfil Produção (tempo no preenchimento, itens, observação e alérgeno, modos e grade); O6 e O7 passam a valer só para o cartão `.ct-order`; O2 e O5 ganham as exceções do perfil Produção. Mudanças da v2 para a v3 (21/10/2026): O7 e O8 novos, para o KDS: leitura dos itens e estado de preparo, cartão de agrupamento, identidade da estação por ícone curado e painel da produção sem cartões de métrica. Mudanças da v1 para a v2: C1 ganha a exceção do código QR em `.cm-qr` (preto sobre branco fixos, perfil Admin). Notas de uma versão não se comparam com as de outra sem recalcular.
+Mudanças desde a v7 (30/10/2026): item K7 novo (reordenar por arrasto pela alça, com a barra de soltura do kit). Mudanças da v6 para a v7 (28/10/2026): o T4 cobra também as observações do PDV em caixa de frase (antes ficavam como gravadas). Mudanças da v5 para a v6 (27/10/2026): o grupo H passa a regras fixas (estado no preenchimento com tinta calculada pelo motor, estado com ícone e rótulo, altura estável, só o estado mais grave respira, uma informação principal, grade e transbordo, fundo e escala) e deixa de cobrar cor, ícone e ordem das peças, que viram escolhas do painel; o R5 passa a cobrar o span calculado pelo card, os indicadores da quebra em colunas e o transbordo entre monitores pelos cards inteiros. Mudanças da v4 para a v5 (27/10/2026): grupo H novo, para o card de sinal do perfil Cards (estado no preenchimento, urgência legível, anatomia, grade e transbordo, tema e escala); O5 e O6 ganham as exceções do perfil Cards. Mudanças da v3 para a v4 (26/10/2026): grupo R novo, para o card do perfil Produção (tempo no preenchimento, itens, observação e alérgeno, modos e grade); O6 e O7 passam a valer só para o cartão `.ct-order`; O2 e O5 ganham as exceções do perfil Produção. Mudanças da v2 para a v3 (21/10/2026): O7 e O8 novos, para o KDS: leitura dos itens e estado de preparo, cartão de agrupamento, identidade da estação por ícone curado e painel da produção sem cartões de métrica. Mudanças da v1 para a v2: C1 ganha a exceção do código QR em `.cm-qr` (preto sobre branco fixos, perfil Admin). Notas de uma versão não se comparam com as de outra sem recalcular.
 
 Cada item é **aprovado**, **reprovado**, **n/a** (não se aplica ao alvo, com o motivo), **desvio** (há linha em "Desvios do kit" do `DECISOES.md` com o ID do item na coluna "Regra do kit" e o escopo que cobre o caso) ou **não verificado** (a evidência exige o que não está disponível, como navegador ou aparelho). A regra de cada item está no `DESIGN.md` do kit, na seção indicada; leia a seção antes de julgar o item.
 
@@ -84,6 +84,7 @@ Contradição entre o `DECISOES.md` e o código também entra no relatório, com
 | K4 | Formulários: `.cm-field` com rótulo visível e erro associado; Salvar e Cancelar agrupados à direita; caixas e rádios do kit. | E |
 | K5 | Camadas: diálogo `.cm-dialog` com o principal à direita (também em exclusão), Tab circulando, Enter e Esc; nenhum `confirm()` ou `alert()` do navegador; notificações no canto superior direito. | E, N |
 | K6 | Plano por padrão: nenhuma sombra decorativa em cartão ou botão; hover não levanta nem desloca; cantos só da escala do kit (3, 4, 6 e 10 px, pelos tokens `--cm-btn-radius`, `--cm-radius-sm` e `--cm-radius` quando existem). | E |
+| K7 | Reordenar por arrasto: só a alça `.cm-drag-handle` é arrastável (nenhuma linha inteira com `draggable`); a arrastada em `.is-dragging` e o alvo com `.is-drop-top` / `.is-drop-bottom` do kit, no lado onde o item cai; nenhuma alça nem barra de soltura com CSS próprio; setas subir/descer como alternativa. | E, N |
 
 ### A. Acessibilidade e movimento (página; kit seções 2 "Foco", 4 e 8)
 
@@ -138,6 +139,7 @@ Busque no código de UI do projeto, excluindo a pasta copiada do kit (`colibri-u
 - T4: `text-transform:\s*uppercase|\buppercase\b`
 - S3: `cm-page--home`
 - K3: `rowAlternationEnabled|table-striped|striped|showBorders`
+- K7: `draggable|drag-handle|is-drop-|onDragOver|dragover` (linha inteira arrastável, alça ou barra de soltura com CSS próprio)
 - K5: `\bconfirm\(|\balert\(`
 - K6: `box-shadow|border-radius`
 - A1: `outline:\s*(none|0)`

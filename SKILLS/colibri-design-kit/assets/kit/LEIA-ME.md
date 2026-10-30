@@ -71,6 +71,12 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **30/10/2026 (reordenar por arrasto: alça e barra de soltura):** o arrasto passa a ser peça do kit. Antes cada aplicação tinha a sua: o ColibriTablet desenhava a barra só nas classes do cardápio e em três telas com `useRowDrag`, e a lista de produtos (dele e do Colibri Totem) arrastava pela linha inteira, sem mostrar onde o item ia cair. Pedido do usuário na conferência dos alérgenos do totem.
+  - **Implementação:** `colibri-ui.css`: `.cm-drag-handle` (alça com a mãozinha; na `.cm-table`, alvo de 16 × 32 px), `.is-dragging` (arrastada a 50 %), `.is-drop-top` / `.is-drop-bottom` (barra de 3 px em `--cm-accent-ink`, visível nos dois temas; na tabela fica na `.cm-table__row`, para o hover não a cobrir). `exemplo.html`: a tabela de Grupos em Listas ganha a alça. Adaptadores sem mudança.
+  - **Regra** (`DESIGN.md`, seção 7, "Navegação e listas", e "Não faça"): só a alça arrasta; o resto da linha segue com o clique (abrir o registro); a barra fica no lado onde o item cai (em cima ao subir, embaixo ao descer; só em cima onde o item entra sempre antes do alvo, como numa árvore); setas subir/descer como alternativa de teclado.
+  - **Mapeamento:** item Tabelas do checklist. Rubrica **v8**, com o item K7 novo e a busca dele.
+  - **Projetos afetados:** Colibri Totem e ColibriTablet (painel: alérgenos, classes e produtos do cardápio; no Tablet também destaques, tela de descanso e motivos de chamado): copiar o `colibri-ui.css` novo, trocar `adm-drag-handle` por `cm-drag-handle` e apagar as regras locais de alça, arrastada e barra.
+
 - **30/10/2026 (tela cheia dividida: rodapé sempre na tela em retrato):** num totem em retrato, um passo com muitas opções (os ingredientes de uma massa montada) empurrava o `.ct-footer` da `.ct-split` para baixo da borda da tela: a lista não rolava e o Continuar ficava fora de alcance. Em retrato a `.ct-split` vira coluna, e o `.ct-split__main` não tinha `min-height: 0`, então crescia do tamanho do conteúdo em vez de encolher e deixar o `.ct-split__body` rolar. Em paisagem nada muda.
   - **Implementação:** `colibri-touch.css`: `.ct-split__main` ganha `min-height: 0`.
   - **Regra** (`DESIGN.md`, seção 9, "Composição", tela cheia dividida): o rodapé fica sempre na tela; quem rola é só o conteúdo do passo.

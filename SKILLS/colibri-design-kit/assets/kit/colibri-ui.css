@@ -794,6 +794,24 @@ pre.log,
 .cm-table__item:hover > .cm-table__row { background: var(--cm-hover); }
 .cm-table__item.is-disabled .cm-table__row > :not(.cm-cell--actions) { color: var(--cm-ink-3); }
 .cm-table__item.is-disabled .cm-cell__strike { text-decoration: line-through; }
+/* Reordenar por arrasto: a alça é o único pegador e o único ponto com a mãozinha; o resto da
+   linha segue com o clique dela. A arrastada fica apagada; o alvo mostra uma barra de 3 px no
+   lado onde o item vai cair: em cima quando sobe, embaixo quando desce. Na tabela a barra fica
+   na linha (.cm-table__row), para o fundo do hover não a cobrir; nas outras listas, no item. */
+.cm-drag-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cm-ink-3);
+    cursor: grab;
+}
+.cm-drag-handle:active { cursor: grabbing; }
+.cm-table .cm-drag-handle { width: 16px; height: 32px; }
+.is-dragging { opacity: .5; }
+.cm-table__item.is-drop-top > .cm-table__row,
+.is-drop-top:not(.cm-table__item) { box-shadow: inset 0 3px 0 0 var(--cm-accent-ink); }
+.cm-table__item.is-drop-bottom > .cm-table__row,
+.is-drop-bottom:not(.cm-table__item) { box-shadow: inset 0 -3px 0 0 var(--cm-accent-ink); }
 .cm-cell { min-width: 0; overflow-wrap: anywhere; }
 .cm-cell--main {
     display: flex;
