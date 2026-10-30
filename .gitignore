@@ -12,3 +12,10 @@ __pycache__/
 skills-lock.json
 banks/
 claude/
+
+# Node CLI
+node_modules/
+dist/
+*.tgz
+.colibri-skills.json
+.colibri-skills.json.lock

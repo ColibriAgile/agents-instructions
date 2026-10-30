@@ -1,0 +1,31 @@
+# Requisitos declarados de execução; não são detecção de ferramentas nem garantia de compatibilidade.
+# Cobertura inicial: somente as skills abaixo foram catalogadas. Ausência de entrada significa desconhecido.
+# PowerShell 7 é o runtime de referência adotado para fluxos pwsh; não foi auditada a versão mínima dos scripts.
+version: 1
+skills:
+  # SKILLS/delphi-xe2-build/SKILL.md, Passo 2; scripts/Invoke-XE2Build.ps1.
+  delphi-xe2-build:
+    platforms: [win32]
+    tools: [Delphi XE2]
+    notes:
+      - Também requer MSBuild .NET Framework 4, cmd.exe, bibliotecas XE2 e a configuração SISTEMA_COLIBRI.
+      - Os caminhos de RAD Studio e bibliotecas precisam corresponder à instalação local.
+  # SKILLS/assign-bundles/SKILL.md e scripts que carregam Skills.Common.ps1 da raiz do clone.
+  assign-bundles:
+    tools: [PowerShell 7]
+    notes:
+      - Usa o executável pwsh; PowerShell 7 é o runtime de referência, sem auditoria de versão mínima.
+      - Execute no clone de agents-instructions; os scripts dependem de Skills.Common.ps1 e bundles.yaml da raiz.
+  # SKILLS/colibri-cis-testes/SKILL.md e scripts/Invoke-CisSnapshot.ps1.
+  colibri-cis-testes:
+    platforms: [win32]
+    tools: [PowerShell 7, sqlcmd, SQL Server, ambiente local Colibri CIS]
+    notes:
+      - Requer executáveis, serviços, configuração local do CIS e permissões de acesso ao banco de testes.
+      - PowerShell 7 é o runtime de referência para pwsh; a versão mínima não foi auditada.
+  # SKILLS/deep-review/SKILL.md; ferramentas extras são condicionais às opções utilizadas.
+  deep-review:
+    tools: [Python 3, Git]
+    notes:
+      - Os exemplos usam PowerShell; para os scripts Python, use py -3 no Windows ou python3 em macOS/Linux.
+      - Revisão de PR exige gh autenticado; runtimes não nativos exigem compozy e suas configurações.
