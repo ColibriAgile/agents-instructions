@@ -601,7 +601,9 @@
 .ct-split__info { padding: 12px var(--ct-pad); border-top: 1px solid var(--ct-line); }
 .ct-split__name { margin: 0; font-size: var(--ct-text-xl); font-weight: 700; line-height: 1.2; }
 .ct-split__desc { margin: 4px 0 0; color: var(--ct-ink-2); font-size: var(--ct-text-sm); line-height: 1.4; }
-.ct-split__main { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+/* O min-height: 0 segura o rodapé na tela em retrato, onde o .ct-split vira coluna: sem ele,
+   esta metade cresce do tamanho da lista, o .ct-split__body não rola e a ação sai da tela. */
+.ct-split__main { display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; }
 .ct-split__head { display: flex; align-items: flex-start; gap: 12px; padding: 8px 8px 8px var(--ct-pad); }
 .ct-split__heading { flex: 1; min-width: 0; padding-top: 8px; }
 .ct-split__title { margin: 0; font-size: var(--ct-text-xl); font-weight: 650; line-height: 1.2; }

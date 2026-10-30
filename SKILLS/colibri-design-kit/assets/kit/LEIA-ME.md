@@ -71,6 +71,12 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **30/10/2026 (tela cheia dividida: rodapé sempre na tela em retrato):** num totem em retrato, um passo com muitas opções (os ingredientes de uma massa montada) empurrava o `.ct-footer` da `.ct-split` para baixo da borda da tela: a lista não rolava e o Continuar ficava fora de alcance. Em retrato a `.ct-split` vira coluna, e o `.ct-split__main` não tinha `min-height: 0`, então crescia do tamanho do conteúdo em vez de encolher e deixar o `.ct-split__body` rolar. Em paisagem nada muda.
+  - **Implementação:** `colibri-touch.css`: `.ct-split__main` ganha `min-height: 0`.
+  - **Regra** (`DESIGN.md`, seção 9, "Composição", tela cheia dividida): o rodapé fica sempre na tela; quem rola é só o conteúdo do passo.
+  - **Mapeamento:** o checklist do perfil Operação cobra o rodapé na tela. A rubrica fica na v7: a correção vem no CSS do kit, e o projeto que o copia não faz nada diferente.
+  - **Projetos afetados:** Colibri Totem (copiar o `colibri-touch.css` novo e retirar o `min-h-0` que o `WizardModal` pôs no `.ct-split__main` em 29/10); quem usar a `.ct-split` em retrato.
+
 - **28/10/2026 (observações do PDV em caixa de frase):** as observações do PDV ("SEM CEBOLA") passam à mesma regra dos nomes que chegam em maiúsculas: na tela, em caixa de frase ("Sem cebola"), em todas as telas, inclusive o card de produção do KDS. Antes ficavam como gravadas. Vinda do ColibriTablet, que já as mostrava assim no admin e no cardápio (27/10), porque a observação em maiúsculas destoava dos nomes de produto.
   - **Regra** (`DESIGN.md`, seção 9, "Nomes que chegam em maiúsculas", e seção 10, card de produção): só a exibição muda (pedido, cupom, busca e rótulos de leitor de tela usam o texto gravado); observação composta, juntada por " · " ou por vírgula, é convertida parte a parte; o que o cliente digitou com minúsculas fica como digitado. Sem mudança de CSS.
   - **Exemplo:** as observações do `#kds` e do `#bump` de `exemplo-toque.html` em caixa de frase.
