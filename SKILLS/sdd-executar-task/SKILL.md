@@ -21,6 +21,6 @@ argument-hint: --task tasks/prd-nome/task_01.md
 
 ## Decisões e falhas
 
-- Registre candidata a ADR só para decisão duradoura com alternativas e trade-off que governe contratos, fronteiras ou atributos de qualidade. Use `TXX-ADR-NN`, título, contexto, decisão, alternativas, consequências, evidência e relação com TechSpec; caso contrário, `Nenhuma`. A promoção ocorre depois de QA.
+- Registre candidata a ADR só para decisão duradoura com alternativas e trade-off que governe contratos, fronteiras ou atributos de qualidade. Use `TXX-ADR-NN`, título, contexto, decisão, alternativas, consequências, evidência e relação com TechSpec; caso contrário, `Nenhuma`. Linha de `Alternativas descartadas` com `ADR: sim` cujo `DEC` esta task implementa é candidata nesta task. A promoção ocorre depois de QA.
 - Desvio arquitetural ou de escopo exige decisão humana, salvo autorização existente que o cubra. Registre o conflito e leve-o ao usuário ou ao chamador; não invente aprovação.
 - Ambiente indisponível ou dependência pendente mantém aceite afetado sem marcar; registre comando/erro/impacto. Retry corrige somente a falha; após duas tentativas sem evidência nova, levante bloqueio para decisão. Informe um bloqueio levantado como task `blocked` pelo mesmo protocolo.

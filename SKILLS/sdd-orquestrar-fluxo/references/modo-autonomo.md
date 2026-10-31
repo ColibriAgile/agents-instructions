@@ -62,6 +62,7 @@ Ao escalonar: conclua antes as unidades independentes, grave o checkpoint com `s
 | HIL 0 | Nível da rubrica de `sdd-triar`; `pontual` segue o ramo pontual dela |
 | Recorte de PRDs ou frentes | A divisão proposta pela skill dona |
 | HIL 1 | Aprova o PRD depois da conferência de cobertura; pendência bloqueante vira premissa registrada ou escalonamento |
+| Resolução de design e teto de design | Seção Revisão de design, abaixo |
 | Refatoração preparatória | Segue a recomendação da TechSpec |
 | HIL 2 | Aprova TechSpec e plano depois das conferências da skill; autoriza implementação e correções dentro do contrato |
 | Exceção | Rubrica de escalonamento |
@@ -70,6 +71,13 @@ Ao escalonar: conclua antes as unidades independentes, grave o checkpoint com `s
 | HIL 3 | Aceite automático, abaixo |
 
 **Aceite automático.** Com a última revisão `APROVADO`, ou `APROVADO COM RESSALVAS` com as ressalvas destinadas, nenhuma obrigação bloqueante aberta e nenhuma validação manual essencial pendente, marque o checkpoint `concluido`, o snapshot `encerrado` e registre no log `aceite automático` com o caminho da revisão. Conferência visual ou outra validação manual essencial pendente impede a conclusão: escalone, com o roteiro de aceite manual e o resumo do log no HIL 3. Candidatas a ADR e pendências aceitas entram no resumo final: as candidatas serão movidas para `docs/adr/` quando a skill `commit` remover os artefatos, e as pendências aceitas sairiam junto com eles.
+
+### Revisão de design
+
+No nível `sdd-egm`, os gates de `sdd-revisar-design` são decididos assim:
+
+- **Resolução.** Aplique todos os `CORRIGIR`; `CONTESTAR` e `RECUSAR` ficam como classificados. Num `ESCALAR`, confirme sem mudança e registre o fato como premissa no artefato do escopo (o PRD em `produto`, a TechSpec em `projeto`), com o ID do log. Se um item da rubrica de escalonamento valer, escalone: área crítica sem decisão nas specs, mudança no escopo aprovado do PRD ou contradição sem base para escolher.
+- **Teto ou churn.** Sem achado `Bloqueante` aberto, reaberto ou corrigido sem re-auditoria, aceite com pendências e registre cada uma no log. Com algum deles, nenhuma opção é sustentável pelas fontes: escalone.
 
 ## Contexto e sessão
 

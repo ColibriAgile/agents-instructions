@@ -3,6 +3,7 @@
   "generation": 1,
   "feature": "",
   "workspace": "",
+  "nivel": "sdd-completo",
   "phase": "produto",
   "status": "ativo",
   "safe_to_stop": false,
@@ -17,6 +18,7 @@
     "techspec": null,
     "tasks": null,
     "review": null,
+    "design_review": null,
     "snapshot": null
   },
   "review_status": null,

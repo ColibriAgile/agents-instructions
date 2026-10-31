@@ -14,7 +14,15 @@
 
 | ID | Obrigações do PRD | Decisão | Razão e evidência | Alternativas e trade-offs |
 | --- | --- | --- | --- | --- |
-| DEC-01 | RF-01, RNF-01 | [decisão] | [evidência] | [alternativas] |
+| DEC-01 | RF-01, RNF-01 | [decisão] | [evidência] | [alternativas; no nível `sdd-egm`, só os trade-offs da escolha, com as rejeitadas em `Alternativas descartadas`] |
+
+## Alternativas descartadas
+
+[Exclusiva do nível `sdd-egm`; remova nos demais. Registra o que foi rejeitado para que uma sessão futura não proponha de novo. `ADR: sim` quando a decisão governa contrato, fronteira ou atributo de qualidade e deve sobreviver à remoção dos artefatos.]
+
+| DEC | Alternativa | Prós | Contras | Motivo da rejeição | ADR |
+| --- | --- | --- | --- | --- | --- |
+| DEC-01 | [opção rejeitada] | [benefícios] | [custos] | [motivo concreto] | sim/não |
 
 ## Componentes e fluxo
 
@@ -90,5 +98,15 @@ Hits que já existiam nos arquivos alvo antes da implementação. Hit listado aq
 
 ## Arquivos relevantes
 
+[No nível `sdd-egm`, substituída por `Plano de implementação detalhado`.]
+
 - Modificar: `[caminho]`
 - Criar: `[caminho, se necessário]`
+
+## Plano de implementação detalhado
+
+[Exclusiva do nível `sdd-egm`. Todo arquivo de produção, teste, configuração, schema ou script que a feature cria, modifica ou exclui. Sem código: assinaturas, pseudocódigo e schemas são permitidos. Quem implementa não toma decisão de design.]
+
+| Arquivo | Operação | Mudança | Motivo | Origem |
+| --- | --- | --- | --- | --- |
+| `[caminho]` | Criar / Modificar / Excluir | [tipos, assinaturas, regras, casos de teste] | [por que esta mudança é necessária] | [CMP, DEC, TC] |

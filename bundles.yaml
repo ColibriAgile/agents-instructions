@@ -70,6 +70,7 @@ bundles:
       - sdd-planejar-refatoracao
       - sdd-planejar-tasks
       - sdd-revisar-codigo
+      - sdd-revisar-design
       - sdd-snapshot
       - sdd-triar
 
