@@ -10,12 +10,12 @@ A triagem gasta pouco para evitar gastar muito: levanta sinais com evidência, a
 
 | Nível | Caminho |
 | --- | --- |
-| `sdd-egm` | `sdd-completo` mais `sdd-revisar-design`: Goldfish de contexto zero testam o PRD antes do HIL 1 (2 lentes, até 2 rodadas) e TechSpec e tasks antes do HIL 2 (5 lentes por rodada, convergência em duas rodadas limpas, teto de 3); de 12 a 19 execuções de subagente além do fluxo completo, sem contar retries nem rodada extra, e a TechSpec ganha plano de implementação detalhado e alternativas descartadas |
+| `sdd-egm` | `sdd-completo` mais duas etapas. Antes do PRD, `sdd-explorar-conceito`: entrevista sem código com o humano, primeira proposta técnica e 6 lentes Goldfish por iteração do brief, com HIL Hipótese e HIL Brief sempre perguntados ao humano. Antes dos HILs 1 e 2, `sdd-revisar-design`: Goldfish de contexto zero testam o PRD (2 lentes, até 2 rodadas) e TechSpec e tasks (5 lentes por rodada, convergência em duas rodadas limpas, teto de 3). São de 18 a 25 execuções de subagente além do fluxo completo, sem contar retries, rodada extra nem iterações do brief, e a TechSpec ganha plano de implementação detalhado e alternativas descartadas |
 | `sdd-completo` | `sdd-orquestrar-fluxo` com todos os gates |
 | `sdd-enxuto` | `sdd-orquestrar-fluxo` com PRD curto (problema, RF com aceite, fora de escopo), HIL 1 e HIL 2 fundidos numa só decisão, plano de uma a duas tasks e revisão independente mantida |
 | `pontual` | Ramo pontual desta skill, fora do SDD |
 
-1. **Entender.** Extraia tipo (feature, correção, refatoração), resultado principal e comportamento esperado. Com checkpoint existente para o pedido, pare e retome por `sdd-orquestrar-fluxo`. Com mais de um resultado principal, o caminho é `sdd-orquestrar-prds`: siga aos passos 2 e 3 só para escolher entre `sdd-completo` e `sdd-egm`, que valem para todos os recortes.
+1. **Entender.** Extraia tipo (feature, correção, refatoração), resultado principal e comportamento esperado. Com checkpoint existente para o pedido, pare e retome por `sdd-orquestrar-fluxo`. Com mais de um resultado principal, o caminho é `sdd-orquestrar-prds`: siga aos passos 2 a 4 só para escolher entre `sdd-completo` e `sdd-egm`, que valem para todos os recortes.
    **Saída:** pedido com um resultado principal identificado, ou encaminhamento de retomada ou recorte.
 2. **Levantar sinais.** Leia as instruções locais (`CLAUDE.md`, `AGENTS.md`) para áreas críticas, skills de risco e comandos. Localize os pontos de mudança prováveis pelo grafo de contexto do repositório quando houver um (ex.: `graft ask`, `graft callers <símbolo> --depth 2`), ou por busca direta. Preencha cada sinal com evidência `caminho:linha` ou `não medido`:
 
@@ -40,7 +40,7 @@ A triagem gasta pouco para evitar gastar muito: levanta sinais com evidência, a
    - `sdd-enxuto` nos demais casos.
    Sinal `não medido` que decidiria o nível conta como presente.
    **Saída:** nível da rubrica com os sinais decisivos.
-4. **HIL 0.** Apresente o nível que a rubrica recomenda, os sinais decisivos com evidência e o que cada nível custa em artefatos, HILs e revisão. Pergunte com a ferramenta de pergunta disponível, recomendado primeiro. Silêncio mantém a decisão pendente. Com `--modo auto`, não pergunte: o nível da rubrica é a decisão, registrada como autônoma, e o protocolo de `references/modo-autonomo.md` da skill `sdd-orquestrar-fluxo` vale daqui em diante. Acrescente uma linha a `tasks/triagem-log.jsonl` com data, pedido resumido, sinais, nível da rubrica e decisão humana, ou `autonoma` no modo auto.
+4. **HIL 0.** Apresente o nível que a rubrica recomenda, os sinais decisivos com evidência e o que cada nível custa em artefatos, HILs e revisão. Pergunte com a ferramenta de pergunta disponível, recomendado primeiro. Silêncio mantém a decisão pendente. Com `--modo auto`, não pergunte, salvo quando a rubrica indicar `sdd-egm`, cuja Fase Elefante depende do humano: o nível da rubrica é a decisão, registrada como autônoma, e o protocolo de `references/modo-autonomo.md` da skill `sdd-orquestrar-fluxo` vale daqui em diante. Acrescente uma linha a `tasks/triagem-log.jsonl` com data, pedido resumido, sinais, nível da rubrica e decisão humana, ou `autonoma` no modo auto.
    **Saída:** nível decidido pelo humano e registrado.
 5. **Seguir.** `sdd-egm`, `sdd-completo` e `sdd-enxuto` voltam a `sdd-orquestrar-fluxo`, repassando `--modo` e `--log-decisoes` quando informados, e o fluxo registra a triagem como decisão em `workflow.md` e o nível em `nivel` do checkpoint; em `sdd-enxuto`, registre também a fusão de HIL 1 e HIL 2 como modificação de paradas. `pontual` segue o ramo abaixo.
    **Saída:** próximo passo iniciado no caminho decidido.

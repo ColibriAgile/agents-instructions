@@ -62,6 +62,7 @@ bundles:
       - sdd-criar-techspec
       - sdd-executar-correcoes
       - sdd-executar-task
+      - sdd-explorar-conceito
       - sdd-orquestrar-fluxo
       - sdd-orquestrar-prds
       - sdd-orquestrar-tasks

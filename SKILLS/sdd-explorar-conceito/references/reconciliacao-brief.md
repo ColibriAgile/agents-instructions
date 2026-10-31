@@ -1,0 +1,11 @@
+# Reconciliar o artefato com o brief
+
+Vale para `sdd-criar-prd` e `sdd-criar-techspec` quando a pasta da feature tem um `brief.md` aprovado. Nenhum Goldfish lê o brief, por isso só a sessão que redige o artefato pode conferir se ele honra o que foi decidido na Fase Elefante.
+
+1. **Ler.** Leia o brief antes das demais fontes da etapa. Transcreva no artefato o conteúdo que aproveitar do brief, sem citar IDs `BD-NN` e `CL-NN` nem linkar o brief. Os Goldfish de `sdd-revisar-design` não leem o brief, e uma citação que eles não conseguem abrir vira lacuna. O PRD tira dele problema, objetivos, não objetivos, alternativas de produto descartadas e decisões de produto. A TechSpec tira dele a proposta técnica aceita, as alternativas técnicas descartadas, as decisões técnicas e as respostas às lentes. O que o brief deixou em `Perguntas abertas` continua aberto até o artefato decidir ou o humano responder.
+2. **Comparar antes de gravar.** Com o rascunho pronto, compare-o com o brief:
+   - **Contradição:** o brief decidiu uma questão e o artefato a decide de outro jeito. Reporte cada uma, em uma linha, citando o trecho do brief e o do artefato.
+   - **Adição:** o artefato decide uma questão que o brief não levantou. Reporte só a que muda a arquitetura, uma interface externa ou uma dependência.
+3. **Decidir.** Leve as contradições ao humano, primeiro, e as adições depois, e aguarde. O rascunho pode estar certo, porque a redação lê código que a entrevista não leu: não ajuste o artefato ao brief nem o brief ao artefato por conta própria. Grave cada decisão no artefato antes de entregá-lo ao HIL e, sob o fluxo, também em `workflow.md` com ID e o trecho do brief que ela supera, para que a próxima redação não encontre de novo a mesma contradição. Sem divergência, diga isso em uma linha. Com o checkpoint em `mode: auto`, decida pelas regras de `references/modo-autonomo.md` da skill `sdd-orquestrar-fluxo`. Uma contradição com o brief aprovado se enquadra em "contradição entre fontes" e é escalonada quando as specs não dão base para escolher.
+
+**Concluído quando:** cada contradição e cada adição relevante tem decisão registrada no artefato (e, sob o fluxo, em `workflow.md`), ou não há divergência. Uma contradição já decidida em `workflow.md` não volta ao humano.

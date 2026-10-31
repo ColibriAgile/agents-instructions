@@ -40,6 +40,14 @@
 
 - [limite explícito]
 
+## Alternativas descartadas
+
+[Exclusiva do nível `sdd-egm` ou de pasta com `brief.md` aprovado; remova nos demais. Alternativas de produto rejeitadas, vindas do brief: não fazer, reaproveitar o que existe, outro escopo.]
+
+| Alternativa | Motivo da rejeição |
+| --- | --- |
+| [opção] | [motivo concreto] |
+
 ## Premissas e fontes
 
 - Premissa: [afirmação, origem e impacto se estiver errada]

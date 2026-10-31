@@ -1,6 +1,6 @@
 # Continuidade de sessão
 
-As skills SDD gravam artefatos e código na sessão que as executa; subagentes são exploradores somente leitura, exceto o revisor delegado da revisão e os Goldfish de `sdd-revisar-design`. O trabalho acumula num único contexto, e este protocolo segue sozinho entre unidades até o contexto encher, gravando o que a sessão aprendeu antes de sugerir uma sessão nova. O snapshot que a pausa grava pertence à skill `sdd-snapshot`: toda gravação segue o ramo Gravar dela.
+As skills SDD gravam artefatos e código na sessão que as executa; subagentes são exploradores somente leitura, exceto o revisor delegado da revisão e os Goldfish de `sdd-explorar-conceito` e `sdd-revisar-design`. O trabalho acumula num único contexto, e este protocolo segue sozinho entre unidades até o contexto encher, gravando o que a sessão aprendeu antes de sugerir uma sessão nova. O snapshot que a pausa grava pertence à skill `sdd-snapshot`: toda gravação segue o ramo Gravar dela.
 
 ## Pausa de sessão
 

@@ -148,7 +148,7 @@ Fase 1 implementada. Divergências em relação às seções 3.2 e 3.3:
 - O snapshot não mudou: o contrato do Goldfish já proíbe enviar e ler `snapshot-contexto.md`.
 - O custo citado no HIL 0 foi recalculado para 12 a 19 execuções de subagente: o PRD com 2 lentes em 1 a 2 rodadas e TechSpec mais tasks com 5 lentes em 2 a 3 rodadas.
 
-A fase 2 (`sdd-explorar-conceito`) continua pendente.
+A fase 2 foi implementada depois; ver a seção 5.2.
 
 ### Verificação da fase 1
 
@@ -170,6 +170,52 @@ A fase 2 (`sdd-explorar-conceito`) continua pendente.
     - a recuperação de rodada interrompida foi definida.
   - Os demais itens passaram, e CLI e papéis de helpers não se aplicam.
 - Não houve execução real de uma feature `sdd-egm`. O custo da seção 3.2 segue estimado.
+
+## 5.2 Fase 2 — Fase Elefante (2026-10-31)
+
+Skill nova `sdd-explorar-conceito`. Os oito passos rodam na pasta da feature, antes do PRD:
+
+1. preparar;
+2. entrevistar pela skill `grilling`, sob `references/postura-elefante.md`;
+3. propor a primeira proposta técnica, gravada no brief;
+4. HIL Hipótese;
+5. as 6 lentes em `conceito_[num]/`;
+6. sintetizar no `brief.md`;
+7. HIL Brief;
+8. devolver.
+
+O que entrou nesta fase, em relação à seção 3.1:
+
+- **Lentes:** as seis lentes ficam num único arquivo, `references/lentes-conceito.md`, com contrato e formato próprios. Cada lente grava só o seu arquivo e termina com `Fim do relatório.`, como na revisão de design.
+- **Reconciliação:** a regra brief↔artefato é fonte única em `references/reconciliacao-brief.md` e é seguida por `sdd-criar-prd` e `sdd-criar-techspec`. Contradições vão ao humano; o rascunho não é alinhado ao brief por conta própria.
+- **Templates:** o PRD ganhou a seção `Alternativas descartadas` (de produto), exclusiva do nível egm. A TechSpec passou a herdar as alternativas técnicas do brief.
+- **Estado do fluxo:**
+  - fase `conceito` no checkpoint;
+  - `sources.brief`;
+  - gates HIL Hipótese e HIL Brief;
+  - retomada de lente interrompida generalizada para `conceito_[num]/`.
+- **Recorte:** com recorte, `sdd-orquestrar-prds` roda a Fase Elefante por recorte, entre a aprovação do recorte e a redação de cada PRD.
+- **Modo auto (D3):** a Fase Elefante sempre pergunta ao humano e segue a pausa monitorada. Contradição com o brief aprovado entra na rubrica de escalonamento.
+- **Custo citado no HIL 0:** de 18 a 25 execuções de subagente, sem contar retries, rodada extra nem iterações do brief.
+
+### Verificação da fase 2
+
+- `validate-metadata.py` passou para as skills alteradas; o JSON do checkpoint, os links locais e `git diff --check` também.
+- Um revisor independente simulou cinco cenários:
+  - feature única monitorada, com uma lente falhando, uma iteração e uma contradição entre a TechSpec e o brief;
+  - modo auto com o ContextBrake reiniciando a sessão no meio da entrevista;
+  - dois recortes;
+  - retomada com uma pasta de lentes incompleta;
+  - uso avulso.
+- A primeira passada encontrou 15 problemas. Os mais graves:
+  - lente que não rodou era despachada de novo para sempre (o mesmo defeito existia em `sdd-revisar-design` e foi corrigido lá também);
+  - a primeira proposta técnica furava a regra "Dono decide arquitetura";
+  - recortes rodavam sem checkpoint;
+  - a entrevista se perdia num reinício;
+  - o estado do brief era ambíguo.
+- A segunda passada confirmou 12 resolvidos e 3 parciais, e apontou 3 problemas novos, entre eles a triagem decidindo `sdd-egm` sem o humano no modo auto. Corrigi os parciais e os novos, sem uma terceira passada do revisor.
+- No checklist de `writing-skills`, todos os itens passam na segunda passada.
+- Não houve execução real de uma feature.
 
 ## 6. Decisões tomadas (2026-10-31)
 

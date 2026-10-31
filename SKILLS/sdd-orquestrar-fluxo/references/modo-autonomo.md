@@ -9,7 +9,7 @@ No modo auto, o usuário delega as decisões do fluxo para conduzir a feature do
 - `--modo auto` em `sdd-orquestrar-fluxo` ou em `sdd-triar`, que o repassa ao fluxo. O fluxo grava `mode` no checkpoint ao criá-lo e registra a ativação em `workflow.md` como decisão humana: é ela que autoriza as decisões autônomas dentro deste protocolo.
 - `decision_log` recebe `decisoes-autonomas.md` por padrão no modo auto. `--log-decisoes <caminho>` troca o arquivo (relativo à pasta da feature); `--log-decisoes false` grava `null` e desliga o log, decisão que também vai para `workflow.md`.
 - Retomada sem `--modo` mantém o modo do checkpoint. `--modo` diferente do gravado troca o modo e é registrado em `workflow.md`. Em `monitorado`, as decisões autônomas anteriores continuam válidas.
-- Com recorte em vários PRDs ou frentes, cada checkpoint aberto herda `mode` e `decision_log`.
+- Com recorte em vários PRDs ou frentes, cada checkpoint aberto herda `nivel`, `mode` e `decision_log`.
 - O nível escolhido por `sdd-triar` em modo auto, antes de existir a pasta da feature, vira a primeira entrada do log quando o fluxo cria a pasta.
 
 ## Conferir o ContextBrake
@@ -29,7 +29,7 @@ Quando houver aviso, sugira o comando que corrige tudo de uma vez: `npx context-
 
 ## Decidir sem perguntar
 
-Em todo ponto em que o modo monitorado perguntaria ao usuário — gates HIL 0 a 3, exceção, ressalvas, conferência visual, perguntas das skills de etapa que este fluxo executa e escolhas da pausa de sessão —:
+Em todo ponto em que o modo monitorado perguntaria ao usuário — gates HIL 0 a 3, exceção, ressalvas, conferência visual, perguntas das skills de etapa que este fluxo executa e escolhas da pausa de sessão —, exceto na Fase Elefante (tabela Gates):
 
 1. Monte a pergunta como ela seria feita: contexto, opções e a recomendada.
 2. Confira a rubrica de escalonamento abaixo. Se algum item vale, escalone.
@@ -48,7 +48,7 @@ Pergunte ao usuário somente quando a decisão:
 - dispara ação externa não autorizada no pedido: push, deploy, publicação, envio de mensagens, chamada a serviço pago ou de produção;
 - toca área crítica declarada pelas instruções locais (pagamento, fiscal, autenticação, caixa, segurança) e PRD e TechSpec não a decidem;
 - muda o escopo aprovado do PRD, acrescentando ou removendo obrigação;
-- depende de contradição entre PRD, TechSpec e código sem base nas specs para escolher;
+- depende de contradição entre brief aprovado, PRD, TechSpec e código sem base nas specs para escolher;
 - depende de ambiente, credencial ou validação manual essencial indisponível, sem outra unidade elegível;
 - atinge a regra de estagnação do fluxo (duas rodadas de correção sem progresso);
 - não tem nenhuma opção sustentável pelas fontes.
@@ -59,7 +59,8 @@ Ao escalonar: conclua antes as unidades independentes, grave o checkpoint com `s
 
 | Gate | Decisão autônoma |
 | --- | --- |
-| HIL 0 | Nível da rubrica de `sdd-triar`; `pontual` segue o ramo pontual dela |
+| HIL 0 | Nível da rubrica de `sdd-triar`; `pontual` segue o ramo pontual dela. Rubrica em `sdd-egm` escalona o HIL 0, porque a Fase Elefante seguinte depende do humano |
+| Fase Elefante (entrevista, HIL Hipótese, HIL Brief) | Não decide: pergunta ao humano como no modo monitorado, porque a fase existe para colher o julgamento dele. O modo auto passa a decidir a partir do brief aprovado |
 | Recorte de PRDs ou frentes | A divisão proposta pela skill dona |
 | HIL 1 | Aprova o PRD depois da conferência de cobertura; pendência bloqueante vira premissa registrada ou escalonamento |
 | Resolução de design e teto de design | Seção Revisão de design, abaixo |
@@ -81,7 +82,7 @@ No nível `sdd-egm`, os gates de `sdd-revisar-design` são decididos assim:
 
 ## Contexto e sessão
 
-No modo auto, o fluxo não estima o uso de contexto nem pergunta sobre continuidade. Em cada fronteira da pausa de sessão:
+No modo auto, o fluxo não estima o uso de contexto nem pergunta sobre continuidade, exceto na Fase Elefante, em que a pausa de sessão segue o protocolo monitorado de `continuidade-sessao.md`. Nas demais fronteiras da pausa de sessão:
 
 | Situação | Destino |
 | --- | --- |

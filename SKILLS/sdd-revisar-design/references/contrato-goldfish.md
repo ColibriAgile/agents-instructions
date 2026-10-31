@@ -19,7 +19,7 @@ Envie, nesta ordem e sem mais nada:
 - workspace absoluto, pasta da feature e slug;
 - caminho resolvido deste contrato e da persona da lente;
 - caminhos dos artefatos alvo do escopo e o arquivo de saída `designreview_[num]/[lente].md`;
-- o nível da feature: `nivel` do checkpoint, ou `sdd-completo` sem checkpoint;
+- o nível da feature: `nivel` do checkpoint; sem checkpoint, `sdd-egm` quando a pasta tem `brief.md` aprovado e `sdd-completo` nos demais casos;
 - para a lente `critico`, o caminho resolvido de `assets/techspec.template.md` da skill `sdd-criar-techspec`;
 - o pedido: "Leia o contrato e a persona, audite os artefatos alvo e grave o resultado no arquivo de saída."
 

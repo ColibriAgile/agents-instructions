@@ -36,7 +36,7 @@ Este fluxo não tem etapa de QA; o estado `qa` não é usado.
 
 | Valor do checkpoint | `state` da feature |
 | --- | --- |
-| phase `produto`, `projeto-plano` | `planning` |
+| phase `conceito`, `produto`, `projeto-plano` | `planning` |
 | phase `implementacao` | `active` |
 | phase `revisao` | `review`, `round` = o número da revisão |
 | phase `correcoes` | `fixing`, `round` = o número da revisão em correção |
