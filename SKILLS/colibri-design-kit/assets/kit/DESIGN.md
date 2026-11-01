@@ -214,6 +214,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 
 - Plano por padrão: superfícies e divisores de 1 px organizam a informação. Sem sombra decorativa em cartões ou botões. Camadas flutuantes (diálogos, menus, gaveta, notificações) têm sombra funcional.
 - Hover muda a superfície; não levanta cartões nem desloca listas.
+- **Cantos aninhados:** peça a menos de 4 px da borda de uma superfície arredondada leva, nos cantos que ficam junto dela, o raio da superfície menos o vão (encostada, vão 0, o mesmo raio: é o rodapé da folha centralizada, seção 9). Com vão de 4 px ou mais, cada peça fica com o próprio raio da escala.
 - Transições de estado de 120–200 ms com `--cm-ease`. Painéis laterais deslizam da direita ao abrir e fechar (260–280 ms). Tudo respeita `prefers-reduced-motion` (troca por esmaecimento ou nada).
 
 **Regra do movimento com motivo.** Movimento só existe para dar retorno a um gesto, mostrar de onde uma camada vem e para onde vai ou marcar uma mudança de estado; nunca para enfeitar. Cada animação é decidida nesta ordem:
@@ -232,6 +233,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 - **Rótulos da lateral:** sempre completos e em uma linha. A lateral cresce até o rótulo mais longo, em qualquer idioma da aplicação, e 230 px é o mínimo. Nunca use reticências, quebra de linha ou texto abreviado só para caber. Recolher um grupo esconde a lista (atributo `hidden`) sem mudar a largura da lateral.
 - **Barra superior:** título da página (`.cm-topbar__title`) à esquerda; à direita, alternância de tema (`.cm-topbar__action` só com ícone, `bi-moon` no claro e `bi-sun` no escuro, com `aria-label` e `title` dizendo o tema que vai ligar), idioma (menu `.cm-menu`), divisor e "Entrar" ou nome do usuário com opção de sair.
 - **Avisos globais:** `.cm-banner--danger` / `--warning` logo abaixo da barra superior.
+- **Pular para o conteúdo:** o primeiro elemento da página é `<a class="cm-skip" href="#conteudo">Pular para o conteúdo</a>`, escondido até receber o foco (o primeiro Tab o mostra no canto superior esquerdo); a área de conteúdo é `<div class="cm-content" id="conteudo" tabindex="-1">`. Sem ele, quem usa teclado atravessa a lateral inteira a cada página.
 - **Celular e zoom (320 px):** com 320 px de largura (celular, ou o navegador em 400% numa janela de 1280 px) e com zoom de 200%, nada fica cortado, sobreposto ou fora de alcance, e a página não rola na horizontal; só tabelas e grades rolam por dentro (seção 7, "Responsivo"). Até 480 px, o CSS do kit faz o resto: botão de grupo quebra o rótulo em duas linhas em vez de cortá-lo; no rodapé do diálogo, os botões do grupo dividem a largura e a ação à parte (`.cm-dialog__aside`) vai para a linha de baixo, na largura toda; no campo unido, o campo fica com no mínimo 104 px e os complementos encolhem com reticências, com o texto inteiro em `title`; grades de cartões, opções e pares de campos nunca exigem mais que a largura disponível; o texto do código QR quebra o endereço e vai para baixo do código quando não cabe ao lado (o contêiner dos dois quebra a linha). Layout próprio do projeto segue o mesmo princípio: nenhuma largura mínima fixa maior que a tela (`minmax(min(240px, 100%), 1fr)`, não `minmax(240px, 1fr)`). Texto cortado com reticências (nome longo numa célula, por exemplo) tem o texto inteiro acessível, na dica (`title`) ou no detalhe do registro; onde o kit proíbe o corte (rótulos da lateral, categorias do perfil Operação), não há reticências.
 - **Ícone da aba:** toda aplicação Colibri usa `logos/colibri.ico` (colibri branco sobre o degradê azul da lateral, de 16 a 256 px no mesmo arquivo) como ícone da aba e dos atalhos, declarado na entrada HTML com `<link rel="icon" href="…/colibri.ico">`. É o mesmo nos dois temas e em todos os produtos.
   - Use o arquivo do kit sem alterar cores, recorte ou tamanhos; não troque pelo ícone padrão do framework (React, Blazor, Angular), por um ícone da identidade anterior nem pelo de outro produto.
@@ -265,6 +267,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 ### Botões
 
 - 32 px de altura, texto regular de 13 px em `#495057`, fundo branco, borda `#d7dee7`, cantos de 3 px (`.cm-btn`). Principal: `.cm-btn--primary` (`#1b6ec2`, borda `#0f5aa6`). Menor: `.cm-btn--sm` (28 px).
+- **Pressionado:** o fundo vai na hora para `line` (principal: `action-border`; ação de ícone: `action-line`, ou `danger-line` na destrutiva) e volta com a transição ao soltar. Sem escala nem deslocamento: o retorno por escala é do perfil Operação.
 - **Ações de linha** (`.cm-icon-btn`): somente ícone, sem moldura; `title` e `aria-label` obrigatórios; destrutivas por último, vermelhas só no hover; ações indisponíveis ficam desabilitadas (não somem) para manter o alinhamento das colunas.
 - **Ação destrutiva secundária** (excluir um item dentro do diálogo de edição dele): botão comum com o texto em `danger` (`.cm-btn--danger-text`), à esquerda no rodapé, fora do grupo Cancelar | Confirmar (`.cm-dialog__aside`). O vermelho preenchido fica para quando a destruição é a ação principal.
 
@@ -363,6 +366,9 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Halo de foco só no campo de um conjunto unido, cortado pelo botão ou invadindo a borda dele.
 - Animar o que a pessoa repete o dia todo, `transition: all`, animar largura, altura ou posição fora das exceções da seção 4, `ease-in`, animação de interface acima de 300 ms, camada que entra animada e some de uma vez, ou entrada a partir de `scale(0)`.
 - Excluir ou zerar num clique só, sem confirmação nem "Desfazer".
+- Emoji como ícone, ou desenho feito à mão em SVG ou CSS no lugar de um ícone do kit, da foto ou da marca real.
+- Faixa colorida num lado só (borda esquerda de cor) para marcar estado, destaque ou item ativo: estado vai em etiqueta ou faixa de estado com ícone e rótulo; ativo, no fundo de seleção.
+- Dado, número, depoimento ou logo inventado na aplicação para a tela parecer cheia: sem o dado real, o estado vazio (`.cm-empty`) diz o que falta. Dado fictício só em tela de demonstração que se declara como tal, como o `exemplo.html` do kit.
 
 ## 9. Perfil Operação
 

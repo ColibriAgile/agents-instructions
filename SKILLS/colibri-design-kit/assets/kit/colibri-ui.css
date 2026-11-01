@@ -359,6 +359,24 @@ pre.log,
     background: var(--cm-scroll-bg);
 }
 .cm-content { padding: 20px 24px 32px; }
+.cm-content[tabindex="-1"]:focus { outline: none; }
+/* Pular para o conteúdo: primeiro item do Tab, escondido acima da janela até receber o foco. */
+.cm-skip,
+.cm-skip:hover,
+.cm-skip:focus {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: var(--cm-layer-toast, 2000);
+    padding: 8px 14px;
+    color: #fff !important;
+    background: var(--cm-accent);
+    border-radius: var(--cm-btn-radius);
+    font: 600 13px var(--cm-font);
+    text-decoration: none !important;
+}
+.cm-skip:not(:focus) { transform: translateY(-200%); }
+.cm-skip:focus { outline: none; box-shadow: var(--cm-focus-ring); }
 
 /* ---------- Avisos globais ---------- */
 .cm-banner {
@@ -437,6 +455,12 @@ pre.log,
     background: var(--cm-accent-hover);
     border-color: var(--cm-accent-border);
 }
+/* Pressionado: a cor muda na hora (sem esperar a transição) e volta com ela ao soltar. Sem escala: o Admin é
+ * plano; o retorno por escala é do perfil Operação. */
+.cm-btn:active:not([disabled]) { background: var(--cm-line); transition-duration: 0ms; }
+.cm-btn--primary:active:not([disabled]) { background: var(--cm-accent-border); }
+.cm-icon-btn:active:not([disabled]) { background: var(--cm-accent-line); transition-duration: 0ms; }
+.cm-icon-btn--danger:active:not([disabled]) { background: var(--cm-danger-line); }
 .cm-btn--sm,
 .cm-btn--sm:hover,
 .cm-btn--sm:focus {

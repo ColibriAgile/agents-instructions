@@ -52,6 +52,7 @@ Leia também as linhas `-`. Perder um sinal é regressão mesmo quando nenhuma l
 | `.cm-btn-group` desfeito | K1 |
 | diálogo ou folha de confirmação, "Desfazer" | K8 |
 | classe de superfície `.ct-app--*` ou `.ct-app--kiosk` | O1 |
+| `.cm-skip` ou o `id="conteudo"` da área de conteúdo | S1 |
 
 Substituição equivalente não é achado: o sinal voltou de outra forma, como um `title` que virou dica do kit.
 
