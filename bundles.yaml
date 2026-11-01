@@ -33,7 +33,6 @@ bundles:
       - colibri-connection-string
       - colibri-logging
       - colibri-ports
-      - csharp-string-optimization
       - csharp-tests
       - csharp-tests-refactor
       - dotnet-efficient-validation
@@ -86,7 +85,6 @@ bundles:
   jira-pm:
     description: Gestão de tarefas no Jira e migração de tarefas do ClickUp.
     skills:
-      - clickup-to-jira-task-conversion
       - jira-aashari-mcp
       - jira-issue-description-generator
       - jira-mcp-issue-management
