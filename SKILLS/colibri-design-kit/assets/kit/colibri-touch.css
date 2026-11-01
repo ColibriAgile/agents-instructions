@@ -82,6 +82,19 @@
     --ct-text-xl: 22px;
     --ct-text-2xl: 28px;
     --ct-text-display: 40px;
+
+    /* Pesos e molduras. Estes são os valores do KDS e da TV (leitura de longe). As telas de consumidor
+     * trocam pela hierarquia leve (bloco "Telas de consumidor", abaixo). */
+    --ct-w-title: 700;    /* nome da loja, título de folha e de passo, texto sobre foto */
+    --ct-w-strong: 700;   /* preço, total, quantidade */
+    --ct-w-name: 650;     /* nome do produto, título do passo */
+    --ct-w-active: 650;   /* categoria ativa */
+    --ct-w-control: 600;  /* botão, selo, rótulo de campo */
+    --ct-w-primary: 700;  /* botão principal */
+    /* Tokens que dependem de outros (--ct-btn-line, --ct-option-checked, --ct-price-text,
+     * --ct-btn-lg-text) não são declarados aqui: um var() na raiz seria resolvido na raiz e chegaria
+     * pronto ao KDS (outra escala) e à prévia do esquema (outro contêiner). Cada uso tem o valor
+     * reserva; as telas de consumidor os declaram no próprio contêiner. */
 }
 
 /* ---------- Escala por superfície ----------
@@ -106,6 +119,28 @@
     --ct-text-xl: max(22px, 2.1vh);
     --ct-text-2xl: max(28px, 2.8vh);
     --ct-text-display: max(40px, 6vh);
+}
+/* Telas de consumidor (tablet e totem): regra da hierarquia leve (DESIGN.md, seção 9). O alvo de
+ * toque não muda; muda o que se vê: um destaque firme (preço, total, títulos em 600) e o resto leve
+ * (nome em 500, botões e selos em 500), texto de controle no corpo, botão secundário sem moldura,
+ * opção escolhida marcada pela marca, sem pintar a linha. */
+.ct-app--tablet,
+.ct-app--totem {
+    --ct-control-text: var(--ct-text);
+    --ct-w-title: 600;
+    --ct-w-strong: 600;
+    --ct-w-name: 500;
+    --ct-w-active: 600;
+    --ct-w-control: 500;
+    --ct-w-primary: 600;
+    --ct-btn-line: transparent;
+    --ct-option-checked: transparent;
+    --ct-price-text: var(--ct-text-lg);
+    --ct-btn-lg-text: var(--ct-text-lg);
+    /* Selos menores e discretos, ainda cheios: sobre a foto, o fundo suave some. */
+    --ct-tag-h: 1.7em;
+    --ct-tag-pad: .55em;
+    --ct-tag-text: calc(var(--ct-text-sm) * .92);
 }
 /* KDS: leitura a 1–3 m, mãos ocupadas; o zoom por estação multiplica tudo. Os controles (barra da
  * estação, folhas, botões e chips) ficam no tamanho dos botões do card de produção (--cp-alvo, 40 px,
@@ -187,7 +222,7 @@
     overflow: hidden;
     color: var(--ct-brand-ink);
     font-size: var(--ct-text-xl);
-    font-weight: 700;
+    font-weight: var(--ct-w-title);
     letter-spacing: -.01em;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -218,7 +253,7 @@
     background: transparent;
     border: 0;
     border-radius: var(--ct-radius-control);
-    font-size: var(--ct-text-lg);
+    font-size: var(--ct-control-text, var(--ct-text-lg));
     text-align: left;
     cursor: pointer;
 }
@@ -227,7 +262,7 @@
 .ct-rail__item[aria-current="true"] {
     color: var(--ct-action-ink);
     background: var(--ct-action-soft);
-    font-weight: 650;
+    font-weight: var(--ct-w-active);
 }
 
 /* Faixa de categorias (retrato) e subcategorias. Ativa preenchida com a cor de ação. */
@@ -265,7 +300,7 @@
     color: var(--ct-on-action);
     background: var(--ct-action);
     border-color: var(--ct-action);
-    font-weight: 650;
+    font-weight: var(--ct-w-active);
 }
 /* Categoria com foto ou ícone, na faixa e no rail: desenho em cima, nome embaixo, centrados.
    Lado a lado, o desenho comia a largura e o nome saía cortado; empilhado, o nome quebra em
@@ -312,10 +347,10 @@
     padding: 0 22px;
     color: var(--ct-ink);
     background: var(--ct-surface-2);
-    border: 1px solid var(--ct-line);
+    border: 1px solid var(--ct-btn-line, var(--ct-line));
     border-radius: var(--ct-radius-control);
     font-size: var(--ct-control-text, var(--ct-text-lg));
-    font-weight: 600;
+    font-weight: var(--ct-w-control);
     line-height: 1.2;
     text-align: center;
     text-decoration: none;
@@ -328,7 +363,7 @@
     color: var(--ct-on-action);
     background: var(--ct-action);
     border-color: var(--ct-action);
-    font-weight: 700;
+    font-weight: var(--ct-w-primary);
 }
 .ct-btn--primary:active:not(:disabled) { background: var(--ct-action-pressed); border-color: var(--ct-action-pressed); }
 .ct-btn--ghost { color: var(--ct-action-ink); background: transparent; border-color: transparent; }
@@ -336,7 +371,7 @@
 /* Destrutivo: texto de erro sobre o fundo suave de erro, nunca vermelho preenchido sobre a superfície. */
 .ct-btn--danger { color: var(--ct-danger); background: var(--ct-danger-soft); border-color: var(--ct-danger-line); }
 .ct-btn--block { display: flex; width: 100%; }
-.ct-btn--lg { min-height: calc(var(--ct-target) * 1.25); font-size: var(--ct-text-xl); }
+.ct-btn--lg { min-height: calc(var(--ct-target) * 1.25); font-size: var(--ct-btn-lg-text, var(--ct-text-xl)); }
 .ct-btn:disabled,
 .ct-btn[aria-disabled="true"] {
     color: var(--ct-disabled-ink);
@@ -392,7 +427,7 @@
 .ct-qty__value {
     min-width: 2.2em;
     font-size: var(--ct-control-text, var(--ct-text-lg));
-    font-weight: 700;
+    font-weight: var(--ct-w-strong);
     font-variant-numeric: tabular-nums;
     text-align: center;
 }
@@ -402,14 +437,14 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    min-height: 1.9em;
-    padding: 0 .7em;
+    min-height: var(--ct-tag-h, 1.9em);
+    padding: 0 var(--ct-tag-pad, .7em);
     color: var(--ct-ink-2);
     background: var(--ct-surface-2);
     border: 1px solid var(--ct-line);
     border-radius: var(--ct-radius-tag);
-    font-size: var(--ct-text-sm);
-    font-weight: 600;
+    font-size: var(--ct-tag-text, var(--ct-text-sm));
+    font-weight: var(--ct-w-control);
     line-height: 1.2;
     white-space: nowrap;
 }
@@ -459,7 +494,7 @@
 }
 .ct-product__tags { position: absolute; top: 10px; left: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
 .ct-product__body { display: flex; flex: 1; flex-direction: column; gap: 6px; padding: 12px 14px 14px; }
-.ct-product__name { margin: 0; font-size: var(--ct-text-lg); font-weight: 650; line-height: 1.25; }
+.ct-product__name { margin: 0; font-size: var(--ct-text-lg); font-weight: var(--ct-w-name); line-height: 1.25; }
 .ct-product__desc {
     display: -webkit-box;
     margin: 0;
@@ -473,7 +508,7 @@
 .ct-product__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 6px; }
 /* No cartão, a ação usa o corpo de texto: cabe ao lado do preço em três colunas de tablet. */
 .ct-product__foot .ct-btn { padding: 0 16px; font-size: var(--ct-text); }
-.ct-price { color: var(--ct-brand-ink); font-size: var(--ct-text-xl); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ct-price { color: var(--ct-brand-ink); font-size: var(--ct-price-text, var(--ct-text-xl)); font-weight: var(--ct-w-strong); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ct-price__from { display: block; color: var(--ct-ink-3); font-size: var(--ct-text-sm); font-weight: 500; }
 /* Linha (formato detalhado): foto à esquerda. */
 .ct-product--row { flex-direction: row; }
@@ -482,6 +517,19 @@
 .ct-product.is-unavailable .ct-product__media img,
 .ct-product.is-unavailable .ct-product__name,
 .ct-product.is-unavailable .ct-price { opacity: .5; }
+
+/* Telas de consumidor (regra da hierarquia leve): as ações do cabeçalho são de texto, em ink-2, e não
+ * competem com o nome da loja; a ação do cartão de produto é discreta, na cor de ação, porque o
+ * cartão é a unidade e a única ação preenchida da tela é a do pedido. O alvo de toque continua. */
+:is(.ct-app--tablet, .ct-app--totem) .ct-header .ct-btn:not(.ct-btn--primary),
+:is(.ct-app--tablet, .ct-app--totem) .ct-product__foot .ct-btn:not(.ct-btn--primary) {
+    background: transparent;
+    border-color: transparent;
+}
+:is(.ct-app--tablet, .ct-app--totem) .ct-header .ct-btn:not(.ct-btn--primary) { color: var(--ct-ink-2); }
+:is(.ct-app--tablet, .ct-app--totem) .ct-product__foot .ct-btn:not(.ct-btn--primary) { margin-right: -10px; padding: 0 10px; color: var(--ct-action-ink); }
+:is(.ct-app--tablet, .ct-app--totem) .ct-header .ct-btn:not(.ct-btn--primary):active:not(:disabled),
+:is(.ct-app--tablet, .ct-app--totem) .ct-product__foot .ct-btn:not(.ct-btn--primary):active:not(:disabled) { background: var(--ct-surface-2); }
 
 /* ---------- Rodapé de pedido ---------- */
 .ct-footer {
@@ -493,7 +541,7 @@
     border-top: 1px solid var(--ct-line);
 }
 .ct-footer__summary { margin-right: auto; color: var(--ct-ink-2); font-size: var(--ct-text); }
-.ct-footer__total { display: block; color: var(--ct-ink); font-size: var(--ct-text-xl); font-weight: 700; font-variant-numeric: tabular-nums; }
+.ct-footer__total { display: block; color: var(--ct-ink); font-size: var(--ct-text-xl); font-weight: var(--ct-w-strong); font-variant-numeric: tabular-nums; }
 
 /* ---------- Folha (painel que sobe da base) e diálogo ---------- */
 .ct-backdrop {
@@ -539,7 +587,7 @@
     padding: 8px 8px 8px var(--ct-pad);
     border-bottom: 1px solid var(--ct-line);
 }
-.ct-sheet__title { flex: 1; margin: 0; font-size: var(--ct-text-xl); font-weight: 700; }
+.ct-sheet__title { flex: 1; margin: 0; font-size: var(--ct-text-xl); font-weight: var(--ct-w-title); }
 .ct-sheet__body { flex: 1; padding: var(--ct-pad); overflow-y: auto; }
 .ct-sheet__foot {
     display: flex;
@@ -600,17 +648,35 @@
 .ct-split__media > .bi { font-size: 56px; }
 .ct-split__tags { position: absolute; top: 12px; left: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
 .ct-split__info { padding: 12px var(--ct-pad); border-top: 1px solid var(--ct-line); }
-.ct-split__name { margin: 0; font-size: var(--ct-text-xl); font-weight: 700; line-height: 1.2; }
+.ct-split__name { margin: 0; font-size: var(--ct-text-xl); font-weight: var(--ct-w-title); line-height: 1.2; }
 .ct-split__desc { margin: 4px 0 0; color: var(--ct-ink-2); font-size: var(--ct-text-sm); line-height: 1.4; }
 /* O min-height: 0 segura o rodapé na tela em retrato, onde o .ct-split vira coluna: sem ele,
    esta metade cresce do tamanho da lista, o .ct-split__body não rola e a ação sai da tela. */
 .ct-split__main { display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; }
 .ct-split__head { display: flex; align-items: flex-start; gap: 12px; padding: 8px 8px 8px var(--ct-pad); }
 .ct-split__heading { flex: 1; min-width: 0; padding-top: 8px; }
-.ct-split__title { margin: 0; font-size: var(--ct-text-xl); font-weight: 650; line-height: 1.2; }
+.ct-split__title { margin: 0; font-size: var(--ct-text-xl); font-weight: var(--ct-w-title); line-height: 1.2; }
 .ct-split__hint { margin: 2px 0 0; color: var(--ct-ink-2); font-size: var(--ct-text); }
 .ct-split__body { flex: 1; min-height: 0; padding: 0 var(--ct-pad) var(--ct-pad); overflow-y: auto; }
 .ct-split > .ct-split__main > .ct-footer { flex-shrink: 0; }
+/* Paisagem: grade de três linhas. A última é a mesma nas duas colunas, então a linha de cima do nome
+ * do produto e a do rodapé ficam sempre na mesma altura, com qualquer descrição e em qualquer escala.
+ * As duas metades viram display: contents e seus filhos (foto e nome; cabeçalho, conteúdo e rodapé)
+ * entram direto na grade. */
+@media (orientation: landscape) {
+    .ct-split {
+        display: grid;
+        grid-template-columns: 35% minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+    .ct-split__aside,
+    .ct-split__main { display: contents; }
+    .ct-split__media { grid-column: 1; grid-row: 1 / 3; border-right: 1px solid var(--ct-line); }
+    .ct-split__info { grid-column: 1; grid-row: 3; background: var(--ct-surface); border-right: 1px solid var(--ct-line); }
+    .ct-split__head { grid-column: 2; grid-row: 1; }
+    .ct-split__body { grid-column: 2; grid-row: 2; }
+    .ct-split > .ct-split__main > .ct-footer { grid-column: 2; grid-row: 3; }
+}
 @media (orientation: portrait) {
     .ct-split { flex-direction: column; }
     .ct-split__aside { flex: 0 0 auto; border-right: 0; border-bottom: 1px solid var(--ct-line); }
@@ -630,7 +696,7 @@
     color: #fff;
     background: linear-gradient(to top, rgba(0, 0, 0, .85), rgba(0, 0, 0, .5) 55%, rgba(0, 0, 0, 0));
 }
-.ct-scrim__title { margin: 0; color: #fff; font-size: var(--ct-text-2xl); font-weight: 700; line-height: 1.15; text-shadow: 0 1px 2px rgba(0, 0, 0, .6); }
+.ct-scrim__title { margin: 0; color: #fff; font-size: var(--ct-text-2xl); font-weight: var(--ct-w-title); line-height: 1.15; text-shadow: 0 1px 2px rgba(0, 0, 0, .6); }
 .ct-scrim__text { margin: 4px 0 0; color: rgba(255, 255, 255, .85); font-size: var(--ct-text-sm); }
 .ct-price--fill {
     display: inline-block;
@@ -732,7 +798,7 @@
 .ct-scan__bar { display: flex; align-items: center; gap: 12px; padding: 8px var(--ct-pad); background: var(--ct-surface); }
 .ct-scan__bar--top { justify-content: space-between; border-bottom: 1px solid var(--ct-line); }
 .ct-scan__bar--bottom { flex-wrap: wrap; justify-content: center; border-top: 1px solid var(--ct-line); }
-.ct-scan__title { margin: 0; font-size: var(--ct-text-xl); font-weight: 700; }
+.ct-scan__title { margin: 0; font-size: var(--ct-text-xl); font-weight: var(--ct-w-title); }
 .ct-scan__view { position: relative; display: flex; flex: 1; align-items: center; justify-content: center; min-height: 0; overflow: hidden; }
 .ct-scan__aim {
     width: max(224px, 35vmin);
@@ -768,7 +834,7 @@
 .ct-option__text { flex: 1; font-size: var(--ct-text-lg); }
 .ct-option__extra { color: var(--ct-ink-2); font-size: var(--ct-text); font-variant-numeric: tabular-nums; }
 .ct-option.is-selected,
-.ct-option[aria-checked="true"] { background: var(--ct-action-soft); }
+.ct-option[aria-checked="true"] { background: var(--ct-option-checked, var(--ct-action-soft)); }
 .ct-option.is-selected .ct-option__mark,
 .ct-option[aria-checked="true"] .ct-option__mark { color: var(--ct-on-action); background: var(--ct-action); border-color: var(--ct-action); }
 /* Opção como botão (precisa receber o toque): perde a aparência de botão e fica a linha. */
@@ -785,9 +851,9 @@ button.ct-option {
     border-radius: 0;
 }
 button.ct-option.is-selected,
-button.ct-option[aria-checked="true"] { background: var(--ct-action-soft); }
+button.ct-option[aria-checked="true"] { background: var(--ct-option-checked, var(--ct-action-soft)); }
 .ct-option:active:not(:disabled) { background: var(--ct-surface-2); }
-.ct-option[aria-checked="true"]:active:not(:disabled) { background: var(--ct-action-soft); }
+.ct-option[aria-checked="true"]:active:not(:disabled) { background: var(--ct-option-checked, var(--ct-action-soft)); }
 /* Bloqueada (o passo já está cheio): continua visível, apagada, e não recebe o toque. */
 .ct-option:disabled,
 .ct-option[aria-disabled="true"] { cursor: not-allowed; opacity: .45; }
@@ -834,7 +900,7 @@ button.ct-option[aria-checked="true"] { background: var(--ct-action-soft); }
  * Rótulo sempre visível acima do campo; campo da altura do alvo de toque. O contorno de foco
  * é o de .ct-app :focus-visible; a borda acompanha. */
 .ct-field { display: flex; flex-direction: column; gap: 6px; }
-.ct-field__label { color: var(--ct-ink-2); font-size: var(--ct-text-sm); font-weight: 600; }
+.ct-field__label { color: var(--ct-ink-2); font-size: var(--ct-text-sm); font-weight: var(--ct-w-control); }
 .ct-field__required { color: var(--ct-action-ink); }
 .ct-field__hint { color: var(--ct-ink-3); font-size: var(--ct-text-sm); }
 .ct-field__error { display: flex; align-items: center; gap: 6px; color: var(--ct-danger); font-size: var(--ct-text-sm); font-weight: 600; }
