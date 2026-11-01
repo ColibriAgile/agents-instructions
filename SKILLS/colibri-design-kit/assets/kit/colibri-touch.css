@@ -645,6 +645,77 @@
 /* Foto apagada sob texto (tela de descanso): o fundo preto faz da opacidade um escurecimento. */
 .ct-media-dim { background: #000; }
 .ct-media-dim > img { opacity: .4; }
+
+/* ---------- Carrossel de destaques e tela de descanso (tablet e totem) ----------
+ * Marketing do cardápio: atrai e encanta antes de a pessoa procurar. Movimento de conteúdo
+ * (DESIGN.md, seção 4): troca por esmaecimento a cada 6–8 s, conduzida pela aplicação, que põe
+ * .is-active no destaque da vez e .is-on no ponto correspondente. Para no toque e volta depois
+ * de um tempo sem uso. Os pontos só dizem a posição (não são controles). Na vitrine web nada
+ * gira sozinho: este componente não é usado lá. */
+.ct-destaques {
+    position: relative;
+    height: var(--ct-destaques-h, 220px);
+    overflow: hidden;
+    color: #fff;
+    background: #000;
+    border-radius: var(--ct-radius-card);
+}
+.ct-destaques__item {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 700ms var(--ct-ease), visibility 0s linear 700ms;
+}
+.ct-destaques__item.is-active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 700ms var(--ct-ease), visibility 0s;
+}
+/* A foto (img, picture ou um fundo) ocupa o destaque inteiro; o texto vai num .ct-scrim. */
+.ct-destaques__foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Aproximação lenta da foto (Ken Burns), escolha do lojista: contínua, por isso linear. */
+.ct-destaques--aproximar .ct-destaques__item.is-active .ct-destaques__foto { animation: ct-aproximar 12s linear both; }
+@keyframes ct-aproximar { from { transform: scale(1); } to { transform: scale(1.08); } }
+.ct-destaques__pos {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.ct-destaques__pos > li {
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, .45);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .25);
+}
+.ct-destaques__pos > li.is-on { background: #fff; }
+/* Tela de descanso: o mesmo componente em tela cheia, acima de tudo, com o convite para tocar.
+ * Tocar só acorda a tela (o toque não chega ao que está embaixo). */
+.ct-destaques--descanso {
+    position: fixed;
+    inset: 0;
+    z-index: var(--cm-layer-modal);
+    height: auto;
+    border-radius: 0;
+}
+.ct-destaques--descanso .ct-scrim { padding-bottom: calc(var(--ct-pad) * 3 + var(--ct-target)); }
+.ct-destaques__convite {
+    position: absolute;
+    right: 0;
+    bottom: calc(var(--ct-pad) * 2);
+    left: 0;
+    color: #fff;
+    font-size: var(--ct-text-lg);
+    font-weight: 600;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
+}
 /* Leitor de QR: a câmera fica atrás da tela (.is-camera deixa o fundo transparente). Barras
  * sólidas de superfície em cima e embaixo, legíveis sobre qualquer cena; mira branca com véu
  * escuro em volta. */
@@ -1101,4 +1172,8 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
     .ct-door:active:not(:disabled) { transform: none; }
     .ct-order--late::before { animation: none; }
     .ct-spin { animation: none; }
+    /* Destaques: a aplicação não gira (fica no primeiro); sem aproximação nem esmaecimento. */
+    .ct-destaques__item,
+    .ct-destaques__item.is-active { transition: none; }
+    .ct-destaques--aproximar .ct-destaques__item.is-active .ct-destaques__foto { animation: none; }
 }
