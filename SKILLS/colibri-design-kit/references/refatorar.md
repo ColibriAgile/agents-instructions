@@ -36,7 +36,7 @@ Conclua quando o impeccable terminar a refatoração da página.
 
 ## 4. Medir depois
 
-Execute de novo [`./aderencia.md`](./aderencia.md) na página, do mesmo modo (sem o fechamento de próximos passos); a tendência do relatório mostra antes → depois. Com navegador, confira também o alinhamento em 1440, 1920 e ~900 px, o zoom de 200% (640 px) e os dois temas (Operação: a resolução real da superfície e, no consumidor, um esquema claro e um escuro).
+Execute de novo [`./aderencia.md`](./aderencia.md) na página, do mesmo modo (sem o fechamento de próximos passos); a tendência do relatório mostra antes → depois. Com navegador, confira também o alinhamento em 1440, 1920, ~900 e 320 px e os dois temas (Operação: a resolução real da superfície e, no consumidor, um esquema claro e um escuro).
 
 Item que passou de aprovado para reprovado é regressão: corrija antes de concluir. Conclua quando a página não tiver regressões nem item ★ reprovado, ou quando cada reprovação restante tiver motivo escrito (desvio confirmado, dependência de outra página, verificação impossível aqui).
 

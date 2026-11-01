@@ -152,4 +152,4 @@ Somente o contêiner da página inicial recebe `cm-page--home` (`<div class="cm-
 
 ## Refatoração página a página
 
-Depois do shell, refatore uma página por vez com o verbo `refatorar <página>` ([`./refatorar.md`](./refatorar.md)), começando pela mais usada ou pela pior colocada no ranking da `aderencia`. Ele mede a página, pede ao impeccable a refatoração já enquadrada no kit, confere o alinhamento em 1440, 1920 e ~900 px e o zoom de 200% (640 px) e marca a página em `docs/design/DECISOES.md`.
+Depois do shell, refatore uma página por vez com o verbo `refatorar <página>` ([`./refatorar.md`](./refatorar.md)), começando pela mais usada ou pela pior colocada no ranking da `aderencia`. Ele mede a página, pede ao impeccable a refatoração já enquadrada no kit, confere o alinhamento em 1440, 1920, ~900 e 320 px e marca a página em `docs/design/DECISOES.md`.

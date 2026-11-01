@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="colibri-ui.css">
     <style>
         /* Apenas para esta página de exemplo */
-        .demo-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; align-items: start; }
+        .demo-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 20px; align-items: start; }
         .demo-table { --cm-cols: minmax(200px, 2fr) minmax(110px, .8fr) minmax(100px, .8fr) 90px minmax(120px, 1fr) 104px; }
         .demo-dialog { max-width: 520px; }
         .demo-lists-grupos { --cm-cols: 16px minmax(120px, 1fr) 64px; }
@@ -235,9 +235,9 @@
                                 <div class="cm-field">
                                     <label class="cm-field__label" for="url">Endereço</label>
                                     <div class="cm-input-group">
-                                        <span class="cm-input-addon cm-mono">https://</span>
+                                        <span class="cm-input-addon cm-mono" title="https://">https://</span>
                                         <input id="url" class="cm-input cm-mono" value="minha-loja">
-                                        <span class="cm-input-addon cm-mono">.colibricloud.com/</span>
+                                        <span class="cm-input-addon cm-mono" title=".colibricloud.com/">.colibricloud.com/</span>
                                     </div>
                                     <span class="cm-field__hint">Informe apenas o subdomínio.</span>
                                 </div>
@@ -291,7 +291,7 @@
                                 </div>
                             </div>
                             <!-- Código QR: branco fixo nos dois temas, preto e branco literais no código (cor da imagem, não da interface) -->
-                            <div class="cm-panel" style="display:flex;gap:16px;align-items:flex-start;padding:16px">
+                            <div class="cm-panel" style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;padding:16px">
                                 <div class="cm-qr">
                                     <svg width="96" height="96" viewBox="0 0 21 21" shape-rendering="crispEdges" role="img" aria-label="Código QR de exemplo">
                                         <rect width="21" height="21" fill="#ffffff"/>

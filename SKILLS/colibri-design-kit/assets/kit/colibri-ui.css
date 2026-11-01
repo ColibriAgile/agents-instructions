@@ -939,7 +939,7 @@ pre.log,
 }
 .cm-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
     gap: 12px;
 }
 .cm-card {
@@ -1055,6 +1055,7 @@ a.cm-card:hover .cm-card__go { color: var(--cm-accent-ink); }
     min-width: 0;
     font-size: 13px;
     color: var(--cm-ink-2);
+    overflow-wrap: anywhere;
 }
 .cm-import {
     display: flex;
@@ -1301,7 +1302,7 @@ a.cm-card:hover .cm-card__go { color: var(--cm-accent-ink); }
 .cm-fieldset > legend + * { clear: both; }
 .cm-form-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
     gap: 12px 16px;
 }
 .cm-fieldset > .cm-field + .cm-form-row,
@@ -1389,6 +1390,8 @@ label.cm-field__label {
 .cm-field.is-invalid .cm-input-group > .cm-input { position: relative; z-index: 2; }
 .cm-input-group > .cm-input:focus { position: relative; z-index: 3; box-shadow: none; }
 .cm-input-group > .cm-btn { flex: 0 0 auto; }
+/* O campo encolhe entre os complementos; sem isso, a largura própria do <input> empurra o conjunto para fora no celular. */
+.cm-input-group > .cm-input { min-width: 0; }
 .cm-input-addon {
     display: inline-flex;
     align-items: center;
@@ -1442,7 +1445,7 @@ label.cm-field__label {
 .cm-file-input::file-selector-button:hover { background: var(--cm-btn-hover); }
 .cm-choices {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
     overflow: hidden;
     background: var(--cm-surface);
     border: 1px solid var(--cm-line);
@@ -1595,7 +1598,7 @@ label.cm-field__label {
     border-color: var(--cm-accent);
 }
 .cm-settings-list { --cm-cols: minmax(180px, 300px) minmax(0, 1fr) 40px; }
-.cm-cards--wide { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.cm-cards--wide { grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); }
 
 /* ---------- Caixas de seleção, rádios e grupos de alternância ---------- */
 input[type="checkbox"],
@@ -1915,6 +1918,37 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
 .cm-dialog__foot > .cm-dialog__aside + .cm-btn {
     border-top-left-radius: var(--cm-btn-radius);
     border-bottom-left-radius: var(--cm-btn-radius);
+}
+/* Celular (até 480 px; o piso é 320 px): botão de grupo quebra o rótulo em duas linhas em vez de cortá-lo, e
+ * no rodapé do diálogo Cancelar | Confirmar dividem a largura, com a ação à parte na linha de baixo. */
+@media (max-width: 480px) {
+    .cm-btn-group .cm-btn,
+    .cm-btn-group .cm-btn:hover,
+    .cm-btn-group .cm-btn:focus,
+    .cm-dialog__foot > .cm-btn {
+        min-width: 0;
+        height: auto;
+        min-height: var(--cm-control-h);
+        padding-top: 6px;
+        padding-bottom: 6px;
+        line-height: 1.2;
+        white-space: normal;
+        text-align: center;
+    }
+    /* Campo unido: o campo fica com no mínimo 104 px e os complementos encolhem com reticências (texto inteiro no title). */
+    .cm-input-group > .cm-input { flex: 1 0 104px; }
+    .cm-input-group > .cm-input-addon {
+        flex-shrink: 1;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        display: block;
+        line-height: calc(var(--cm-control-h) - 2px);
+    }
+    .cm-dialog__foot { flex-wrap: wrap; row-gap: 8px; }
+    .cm-dialog__foot > .cm-btn { flex: 1 1 0; }
+    .cm-dialog__foot > .cm-dialog__aside { order: 1; flex-basis: 100%; margin-right: 0; }
 }
 .cm-dialog {
     background: var(--cm-surface);
