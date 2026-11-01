@@ -10,10 +10,10 @@
 // <repo>/.claude/settings.local.json, preservando o restante do arquivo.
 
 import { execFileSync } from 'node:child_process'
-import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, realpathSync, writeFileSync, mkdirSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve, sep } from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const OVERRIDE_STATE = 'user-invocable-only'
@@ -312,4 +312,18 @@ function main() {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main()
+// Compara caminhos reais: instalada via junction/symlink (.claude/skills -> .agents/skills),
+// argv[1] traz o caminho do link e import.meta.url o real, e main() nunca rodaria.
+export function isEntryPoint(argv1, moduleUrl) {
+  if (!argv1) return false
+  const real = p => {
+    try {
+      return realpathSync(p)
+    } catch {
+      return resolve(p)
+    }
+  }
+  return normalizePath(real(argv1)) === normalizePath(real(fileURLToPath(moduleUrl)))
+}
+
+if (isEntryPoint(process.argv[1], import.meta.url)) main()

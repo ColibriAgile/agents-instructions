@@ -1,9 +1,11 @@
 // Executar: node --test SKILLS/auditar-skills/scripts/auditar-skills.test.mjs
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, symlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import { apply, audit, availableSkills, parseArgs } from './auditar-skills.mjs'
 
@@ -145,4 +147,20 @@ test('parseArgs valida números e flags', () => {
   assert.deepEqual(parseArgs(['--days', '7', '--override', 'a', '--override', 'b']).overrides, ['a', 'b'])
   assert.throws(() => parseArgs(['--days', 'x']), /--days/)
   assert.throws(() => parseArgs(['--nope']), /desconhecido/)
+})
+
+test('roda e imprime o JSON quando chamado por uma junction/symlink', () => {
+  const base = mkdtempSync(join(tmpdir(), 'auditar-skills-link-'))
+  const link = join(base, 'scripts-link')
+  symlinkSync(dirname(fileURLToPath(import.meta.url)), link, 'junction')
+  const empty = join(base, 'empty')
+  mkdirSync(empty)
+
+  const run = spawnSync(process.execPath, [join(link, 'auditar-skills.mjs'), '--repo', empty, '--home', empty], {
+    encoding: 'utf8',
+  })
+
+  assert.equal(run.status, 0, run.stderr)
+  assert.ok(run.stdout.trim(), 'saída vazia: main() não rodou')
+  assert.deepEqual(JSON.parse(run.stdout).warnings, ['Nenhum transcript encontrado para este repositório.'])
 })
