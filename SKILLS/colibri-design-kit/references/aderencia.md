@@ -2,17 +2,17 @@
 
 Procedimento do verbo `aderencia`. Mede quanto o código de UI e a aplicação em execução seguem as regras do kit, com nota de 0 a 100 e ranking de páginas. Não mede usabilidade: crítica de UX (heurísticas, personas, carga cognitiva) é do `impeccable critique`. A conferência completa do `DESIGN.md` gerado contra o kit é o checklist de fidelidade de [`./mapeamento-impeccable.md`](./mapeamento-impeccable.md), que roda no `adotar`; aqui, o item B6 confere só a estrutura e as regras nomeadas.
 
-A avaliação é somente leitura. A única gravação é o relatório `docs/design/ADERENCIA.md`.
+A avaliação é somente leitura. A única gravação é o relatório `docs/design/ADERENCIA.md`. Para julgar só o que uma mudança causou (branch, PR ou trabalho local), use o verbo `revisar` ([`./revisar.md`](./revisar.md)), que aplica esta mesma rubrica ao diff.
 
-## Rubrica v8
+## Rubrica v9
 
-Mudanças desde a v7 (30/10/2026): item K7 novo (reordenar por arrasto pela alça, com a barra de soltura do kit). Mudanças da v6 para a v7 (28/10/2026): o T4 cobra também as observações do PDV em caixa de frase (antes ficavam como gravadas). Mudanças da v5 para a v6 (27/10/2026): o grupo H passa a regras fixas (estado no preenchimento com tinta calculada pelo motor, estado com ícone e rótulo, altura estável, só o estado mais grave respira, uma informação principal, grade e transbordo, fundo e escala) e deixa de cobrar cor, ícone e ordem das peças, que viram escolhas do painel; o R5 passa a cobrar o span calculado pelo card, os indicadores da quebra em colunas e o transbordo entre monitores pelos cards inteiros. Mudanças da v4 para a v5 (27/10/2026): grupo H novo, para o card de sinal do perfil Cards (estado no preenchimento, urgência legível, anatomia, grade e transbordo, tema e escala); O5 e O6 ganham as exceções do perfil Cards. Mudanças da v3 para a v4 (26/10/2026): grupo R novo, para o card do perfil Produção (tempo no preenchimento, itens, observação e alérgeno, modos e grade); O6 e O7 passam a valer só para o cartão `.ct-order`; O2 e O5 ganham as exceções do perfil Produção. Mudanças da v2 para a v3 (21/10/2026): O7 e O8 novos, para o KDS: leitura dos itens e estado de preparo, cartão de agrupamento, identidade da estação por ícone curado e painel da produção sem cartões de métrica. Mudanças da v1 para a v2: C1 ganha a exceção do código QR em `.cm-qr` (preto sobre branco fixos, perfil Admin). Notas de uma versão não se comparam com as de outra sem recalcular.
+Mudanças desde a v8 (01/11/2026): grupo A refeito. A1 passa a ★. A2 ★ novo (nome acessível), A3 ★ novo (zoom de 200% e texto cortado), A4 ★ (movimento reduzido, antes parte do A2) e A5 a A7 novos, para a regra do movimento com motivo (duração e curva, propriedades animadas, frequência, saída e hover). C3 e O6 passam a ★. K8 ★ novo (ação destrutiva em dois passos), que vale também no perfil Operação. Seção "Gatilhos de bloqueio" nova, usada também pelo `revisar`. Mudanças da v7 para a v8 (30/10/2026): item K7 novo (reordenar por arrasto pela alça, com a barra de soltura do kit). Mudanças da v6 para a v7 (28/10/2026): o T4 cobra também as observações do PDV em caixa de frase (antes ficavam como gravadas). Mudanças da v5 para a v6 (27/10/2026): o grupo H passa a regras fixas (estado no preenchimento com tinta calculada pelo motor, estado com ícone e rótulo, altura estável, só o estado mais grave respira, uma informação principal, grade e transbordo, fundo e escala) e deixa de cobrar cor, ícone e ordem das peças, que viram escolhas do painel; o R5 passa a cobrar o span calculado pelo card, os indicadores da quebra em colunas e o transbordo entre monitores pelos cards inteiros. Mudanças da v4 para a v5 (27/10/2026): grupo H novo, para o card de sinal do perfil Cards (estado no preenchimento, urgência legível, anatomia, grade e transbordo, tema e escala); O5 e O6 ganham as exceções do perfil Cards. Mudanças da v3 para a v4 (26/10/2026): grupo R novo, para o card do perfil Produção (tempo no preenchimento, itens, observação e alérgeno, modos e grade); O6 e O7 passam a valer só para o cartão `.ct-order`; O2 e O5 ganham as exceções do perfil Produção. Mudanças da v2 para a v3 (21/10/2026): O7 e O8 novos, para o KDS: leitura dos itens e estado de preparo, cartão de agrupamento, identidade da estação por ícone curado e painel da produção sem cartões de métrica. Mudanças da v1 para a v2: C1 ganha a exceção do código QR em `.cm-qr` (preto sobre branco fixos, perfil Admin). Notas de uma versão não se comparam com as de outra sem recalcular.
 
 Cada item é **aprovado**, **reprovado**, **n/a** (não se aplica ao alvo, com o motivo), **desvio** (há linha em "Desvios do kit" do `DECISOES.md` com o ID do item na coluna "Regra do kit" e o escopo que cobre o caso) ou **não verificado** (a evidência exige o que não está disponível, como navegador ou aparelho). A regra de cada item está no `DESIGN.md` do kit, na seção indicada; leia a seção antes de julgar o item.
 
 Verificação: **E** estática (busca no código, padrões na tabela "Buscas"), **D** detector (`impeccable detect --json`), **N** navegador (aplicação rodando). Item com E e N é aprovado pela parte estática e reprovado por qualquer uma das duas; sem navegador, a parte N fica registrada como não verificada no próprio item. ★ marca item crítico.
 
-Escopo: itens de **projeto** são avaliados uma vez por execução; itens de **página**, em cada página do alvo. Página do perfil Admin usa todos os grupos, menos O. Página do perfil Operação usa B, C1, C3, T1, T2, T4, A e O; com o card do perfil Produção, também R; com o perfil Cards, também H.
+Escopo: itens de **projeto** são avaliados uma vez por execução; itens de **página**, em cada página do alvo. Página do perfil Admin usa todos os grupos, menos O. Página do perfil Operação usa B, C1, C3, T1, T2, T4, K8, A e O; com o card do perfil Produção, também R; com o perfil Cards, também H.
 
 ### Perfil da página
 
@@ -41,7 +41,7 @@ Contradição entre o `DECISOES.md` e o código também entra no relatório, com
 |---|---|---|
 | C1 ★ | Cor só por token: CSS e marcação do projeto sem cor literal (hex, `rgb()`, `hsl()`, nome de cor) fora de definição de token; o detector não acusa cor fora do `DESIGN.md`. Exceções do kit: `transparent`, `currentColor`, `inherit`, o texto branco sobre foto ou câmera do perfil Operação e o preto e branco literais de um código QR dentro de `.cm-qr` (seção 2, "Código QR na tela"). | E, D |
 | C2 | Regra da ação rara: o azul de ação só em ação, link, seleção e item ativo; nenhum painel, seção ou cabeçalho com fundo de acento. | E, N |
-| C3 | Estado nunca só por cor: todo uso de sucesso, aviso e erro tem rótulo ou ícone. | E |
+| C3 ★ | Estado nunca só por cor: todo uso de sucesso, aviso e erro tem rótulo ou ícone. | E |
 | C4 | Tema escuro: alternância na barra superior grava `data-theme` no `<html>`, aplicado antes de pintar; nenhum código do projeto testa o tema para escolher cor; popups e componentes de biblioteca no escuro. | E, N |
 | C5 | Gráficos: medida única no azul de ação, séries na paleta `chart-1` a `chart-8` na ordem, tema de visualização com `--cm-font` claro e escuro. n/a sem gráficos. | E |
 
@@ -85,13 +85,19 @@ Contradição entre o `DECISOES.md` e o código também entra no relatório, com
 | K5 | Camadas: diálogo `.cm-dialog` com o principal à direita (também em exclusão), Tab circulando, Enter e Esc; nenhum `confirm()` ou `alert()` do navegador; notificações no canto superior direito. | E, N |
 | K6 | Plano por padrão: nenhuma sombra decorativa em cartão ou botão; hover não levanta nem desloca; cantos só da escala do kit (3, 4, 6 e 10 px, pelos tokens `--cm-btn-radius`, `--cm-radius-sm` e `--cm-radius` quando existem). | E |
 | K7 | Reordenar por arrasto: só a alça `.cm-drag-handle` é arrastável (nenhuma linha inteira com `draggable`); a arrastada em `.is-dragging` e o alvo com `.is-drop-top` / `.is-drop-bottom` do kit, no lado onde o item cai; nenhuma alça nem barra de soltura com CSS próprio; setas subir/descer como alternativa. | E, N |
+| K8 ★ | Ação destrutiva em dois passos: excluir, zerar ou cancelar passa pela confirmação que nomeia o alvo (`.cm-dialog`; no perfil Operação, a folha), ou executa na hora com "Desfazer" na notificação; nenhuma exclusão num clique só. | E, N |
 
-### A. Acessibilidade e movimento (página; kit seções 2 "Foco", 4 e 8)
+### A. Acessibilidade e movimento (página; kit seções 2 "Foco", 4, 5 "Zoom de 200%" e 8; Operação, seção 9 "Movimento")
 
 | ID | Item | Verif. |
 |---|---|---|
-| A1 | Foco do kit visível: nenhum `outline: none` sem substituto; o fluxo principal funciona com Tab, Enter e Esc. | E, N |
-| A2 | Animações do projeto respeitam `prefers-reduced-motion`; transições de 120–200 ms (folhas e painéis, 260–280 ms). | E |
+| A1 ★ | Foco do kit visível: nenhum `outline: none` sem substituto; o fluxo principal funciona com Tab, Enter e Esc, sem depender do mouse. | E, N |
+| A2 ★ | Nome acessível: todo controle sem texto visível (ação de ícone, fechar, +/−, alternância de tema) tem `aria-label`; imagem de conteúdo com `alt`; ícone decorativo com `aria-hidden="true"`. | E |
+| A3 ★ | Zoom de 200% (perfil Admin): com 640 px de largura (200% numa janela de 1280 px), nada cortado, sobreposto ou fora de alcance e nenhuma rolagem horizontal da página (só tabelas e grades, por dentro); texto cortado com reticências tem o texto inteiro na dica ou no detalhe, e não há reticências onde o kit proíbe o corte. n/a no perfil Operação (resolução fixa da superfície, avaliada em O2). | E, N |
+| A4 ★ | Movimento reduzido: toda animação e transição do projeto tem o tratamento de `prefers-reduced-motion` (nada desliza, pisca, pulsa nem se desloca; a camada aparece no estado final ou esmaece em até 120 ms); nenhum estado indicado só por animação. | E |
+| A5 | Duração e curva: estado em 120–200 ms, painel lateral e folha em 260–280 ms, nada de interface acima de 300 ms fora dos ritmos nomeados (giro do carregamento, respiro de 1,2 s); curva do kit (`--cm-ease`, `--ct-ease`), `linear` só em movimento contínuo, nenhum `ease-in`. | E |
+| A6 | Propriedades animadas: deslocamento, entrada e saída só por `transform` e `opacity`; nenhum `transition: all`; nenhuma animação de largura, altura, margem, recuo, `top`/`left`/`right`/`bottom` ou colunas da grade fora das duas exceções do kit (recolher da lateral, barra de progresso); nada surge de `scale(0)`. | E |
+| A7 | Frequência, saída e hover: o que se repete o dia todo (troca de página, filtro, ordenação, atalho; no toque, categoria, quantidade, item do KDS) muda sem animar o conteúdo; camada que entra animada sai animada (perfil Operação: `.is-closing` no contêiner até o `animationend`); deslocamento no hover só dentro de `@media (hover: hover) and (pointer: fine)`. | E, N |
 
 ### O. Perfil Operação (página de toque; kit seção 9)
 
@@ -102,7 +108,7 @@ Contradição entre o `DECISOES.md` e o código também entra no relatório, com
 | O3 | Regra do esquema por sementes: telas de consumidor só com `--ct-*` de `colibri-esquema.js`, esquema aplicado antes de pintar; tipo de pedido e estação só da paleta curada; KDS no tema Colibri. | E, N |
 | O4 ★ | Chrome 101: alvo declarado no build; nenhum `oklch()`, `lab()`, `color-mix()` com variável, classe de cor da paleta do Tailwind, `scale:`/`translate:` separados, `:has()` ou `@container` no CSS entregue. | E |
 | O5 | Composição: uma ação principal por tela (a do cartão de produto é botão comum); cartões só de produto e de pedido (o `.cc-sinal` e o `.cc-mais` do perfil Cards também são permitidos); sem faixa lateral colorida; cantos de 3 e 6 px, sem pílula (a tag de alérgeno do perfil Produção é a exceção). | E |
-| O6 | Regra da urgência legível no cartão `.ct-order`: borda de 3 px mais faixa com ícone e rótulo; só o atraso pulsa. n/a sem KDS ou sem `.ct-order` (o card do perfil Produção é avaliado em R1) e n/a no `.cc-sinal` do perfil Cards (avaliado em H1 e H2). | E, N |
+| O6 ★ | Regra da urgência legível no cartão `.ct-order`: borda de 3 px mais faixa com ícone e rótulo; só o atraso pulsa. n/a sem KDS ou sem `.ct-order` (o card do perfil Produção é avaliado em R1) e n/a no `.cc-sinal` do perfil Cards (avaliado em H1 e H2). | E, N |
 | O7 | Cartão `.ct-order` legível (n/a no card do perfil Produção, avaliado em R2): nome do item na cor do texto e quantidade em mono, a de 2 ou mais no selo neutro (`.ct-order__qty--multi`); estado de preparo do item na linha com ícone e rótulo (`.ct-order__state`, `is-preparing`, `is-ready`), sem piscar; visão por produto em `.ct-order--group` com o tipo em selo da paleta; situação do despacho do delivery em selo de estado com ícone. n/a sem KDS. | E, N |
 | O8 | Estação e painel: estação identificada por nome, cor da paleta e ícone da lista curada na barra `.ct-bar`; nenhum emoji ou imagem como ícone de estação; painel da produção em `.ct-board` com até seis `.ct-stat` no plano, sem cartões de métrica, e número fora da meta com selo de estado. n/a sem KDS. | E |
 
@@ -126,6 +132,21 @@ Contradição entre o `DECISOES.md` e o código também entra no relatório, com
 | H4 | Grade e transbordo: `.cc-grade` em `auto-fill`, cards alinhados ao topo, sem esticar até o vizinho; o que não cabe vira `.cc-mais` "+N chamados", neutro (`surface-2`, `ink-2`, número em `ink` mono), sem borda tracejada. | E, N |
 | H5 | Fundo e escala: painel da equipe pelo tema Colibri (`data-theme`) ou com cor própria como semente `ambiente` de `derivarEsquema` (piso e textos do esquema, nunca hex solto); painel voltado ao cliente em `.cc-painel--cliente`, com piso, preenchimento e tinta do esquema do canal (`--ct-*`), sem tempo nem urgência; na TV, `.cc-painel--tv` (cada tamanho em `max(piso, N vw)`), sem cortar em 1366×768; tamanhos pelos tokens `--cc-t-*`, `--cc-gap` e `--cc-pad`. | E, N |
 
+## Gatilhos de bloqueio
+
+Falhas que impedem alguém de concluir a tarefa ou de entender a tela. O item que cobre cada uma é ★: reprovado, limita a faixa a **Parcial** na `aderencia` e decide o veredito **Bloquear** no `revisar`. Nunca é rebaixado porque a página é pequena, pouco usada ou porque o resto vai bem.
+
+| Gatilho | Itens |
+|---|---|
+| Sem foco visível ou fluxo só pelo mouse | A1 |
+| Controle sem nome acessível | A2 (no perfil Admin, também K2) |
+| Conteúdo ou controle cortado, sobreposto ou fora de alcance com zoom de 200%; texto cortado sem acesso ao texto inteiro | A3 |
+| Movimento reduzido ignorado; estado indicado só por animação | A4 |
+| Significado só pela cor (estado, urgência, tipo de pedido) | C3; nos perfis de toque, também O6, R1 e H2 |
+| Cor fora dos tokens, com o contraste deixado ao acaso | C1 |
+| Exclusão ou zeragem num clique só | K8 |
+| Alvo de toque abaixo do mínimo da superfície, ou ação só no hover | O2 |
+
 ## Buscas
 
 Busque no código de UI do projeto, excluindo a pasta copiada do kit (`colibri-ui/`), dependências (`node_modules/`, `wwwroot/lib/`, `vendor/`) e saídas de build (`bin/`, `obj/`, `dist/`, `build/`). Cada ocorrência é candidata: confirme no contexto antes de reprovar.
@@ -142,8 +163,14 @@ Busque no código de UI do projeto, excluindo a pasta copiada do kit (`colibri-u
 - K7: `draggable|drag-handle|is-drop-|onDragOver|dragover` (linha inteira arrastável, alça ou barra de soltura com CSS próprio)
 - K5: `\bconfirm\(|\balert\(`
 - K6: `box-shadow|border-radius`
+- K8: `excluir|remover|zerar|delete|remove|onDelete|DeleteAsync` (handler de exclusão que executa sem diálogo de confirmação nem "Desfazer")
 - A1: `outline:\s*(none|0)`
-- A2: `animation|transition|prefers-reduced-motion`
+- A2: `<(button|a)\b[^>]*>\s*<i\b` (botão ou link só com ícone: confira o `aria-label`) e, com `rg -P`, `<img\b(?![^>]*\balt=)` (imagem sem `alt`)
+- A3: `text-overflow:\s*ellipsis|line-clamp|white-space:\s*nowrap|min-width:\s*\d{3,}px|width:\s*\d{4,}px` (corte sem dica, largura fixa que força rolagem); a medição em 640 px é a parte N
+- A4: `animation|transition|prefers-reduced-motion` (animação sem o bloco de movimento reduzido)
+- A5: `\d+(\.\d+)?m?s\b|ease-in[;,) ]|cubic-bezier` (duração acima de 300 ms fora dos ritmos nomeados, `ease-in`, curva própria)
+- A6: `transition(-property)?:\s*all|transition:[^;]*\b(width|height|margin|padding|top|left|right|bottom|grid-template)|scale\(0\)` e as propriedades de cada `@keyframes` do projeto
+- A7: `:hover[^{]*\{[^}]*(transform|translate)|@media\s*\(hover|is-closing|\.hidden\s*=\s*true|hidden=\{` (deslocamento no hover sem a consulta de mouse, camada escondida sem a saída)
 - O4: `oklch\(|lab\(|color-mix\(|:has\(|@container|\bscale:|\btranslate:|\b(bg|text|border|ring|fill|stroke)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}\b`
 - O7: `animate-pulse|animation:|ct-order__qty|ct-order__state` (pulso fora do `.ct-order--late`, quantidade e nome com cor própria)
 - R1: `cp-card--(atencao|atraso|pausa)|ct-order__urgency|border[^;]*cp-card` (urgência por borda ou faixa no card de produção)

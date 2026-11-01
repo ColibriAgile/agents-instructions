@@ -136,6 +136,8 @@ motion:
   state: "120-200ms"
   drawer: "260-280ms"
   sheet: "260ms"
+  exit: "200ms"
+  max: "300ms"
   alert: "1.2s"
 ---
 
@@ -214,6 +216,15 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 - Hover muda a superfície; não levanta cartões nem desloca listas.
 - Transições de estado de 120–200 ms com `--cm-ease`. Painéis laterais deslizam da direita ao abrir e fechar (260–280 ms). Tudo respeita `prefers-reduced-motion` (troca por esmaecimento ou nada).
 
+**Regra do movimento com motivo.** Movimento só existe para dar retorno a um gesto, mostrar de onde uma camada vem e para onde vai ou marcar uma mudança de estado; nunca para enfeitar. Cada animação é decidida nesta ordem:
+
+1. **Frequência.** Ação repetida o dia todo (trocar de página, filtrar, ordenar, atalho de teclado, abrir um grupo da lateral; nos perfis de toque, trocar de categoria, avançar o item, concluir no bump) muda na hora, sem animar o conteúdo; fica só o retorno da cor ou do toque. A animação padrão é para o que acontece de vez em quando: diálogo, painel lateral, folha, notificação.
+2. **Propriedades.** Deslocamento, entrada e saída só por `transform` e `opacity`; transição de estado (hover, foco, seleção) também por cor, fundo, borda e sombra. Nunca `transition: all` e nunca animar largura, altura, margem, recuo, `top`/`left`/`right`/`bottom` ou colunas da grade. Exceções do kit, só estas: o recolher da lateral (colunas do `.cm-shell`, 200 ms) e a barra de progresso (largura, 200 ms linear, porque o valor chega da aplicação como largura).
+3. **Duração e curva.** Estado em 120–200 ms; painel lateral e folha em 260–280 ms; nenhuma animação de interface acima de 300 ms. Curva `--cm-ease` (rápida no começo, desacelera ao chegar) em entradas, saídas e estados; `linear` só em movimento contínuo (giro do carregamento, barra de progresso); nunca `ease-in`, que demora a responder ao gesto. Fora do limite de 300 ms ficam só os ritmos nomeados: o giro do carregamento e o respiro de 1,2 s dos perfis de toque.
+4. **Entrada e saída.** Camada que entra animada sai animada, pelo mesmo caminho e um pouco mais depressa (painel lateral: entra em 280 ms, sai em 260 ms; folha de toque: sobe em 260 ms, desce em 200 ms). Nada surge do zero (`scale(0)`): esmaece, ou desliza da borda de onde vem.
+5. **Hover.** Hover muda a superfície ou a cor. Deslocamento no hover (o chevron do cartão-link anda 2 px) só dentro de `@media (hover: hover) and (pointer: fine)`, para não ficar preso numa tela de toque.
+6. **Movimento reduzido desde a primeira linha.** Com `prefers-reduced-motion`, nada desliza, pisca, pulsa nem se desloca: a camada aparece no estado final, ou esmaece em até 120 ms, e o carregamento gira devagar (perfil Admin) ou para com o texto ao lado (perfis de toque). Nenhum estado é indicado só por animação: o que pulsa tem também a forma fixa (borda, ícone, rótulo).
+
 ## 5. Estrutura da aplicação
 
 - **Shell** (`.cm-shell`): lateral (`.cm-sidebar`, no mínimo 230 px) + área principal (`.cm-main`) com barra superior (`.cm-topbar`, 56 px) e área rolável (`.cm-scroll` > `.cm-content`).
@@ -221,6 +232,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 - **Rótulos da lateral:** sempre completos e em uma linha. A lateral cresce até o rótulo mais longo, em qualquer idioma da aplicação, e 230 px é o mínimo. Nunca use reticências, quebra de linha ou texto abreviado só para caber. Recolher um grupo esconde a lista (atributo `hidden`) sem mudar a largura da lateral.
 - **Barra superior:** título da página (`.cm-topbar__title`) à esquerda; à direita, alternância de tema (`.cm-topbar__action` só com ícone, `bi-moon` no claro e `bi-sun` no escuro, com `aria-label` e `title` dizendo o tema que vai ligar), idioma (menu `.cm-menu`), divisor e "Entrar" ou nome do usuário com opção de sair.
 - **Avisos globais:** `.cm-banner--danger` / `--warning` logo abaixo da barra superior.
+- **Zoom de 200%:** com o navegador em 200% numa janela de 1280 px (640 px de largura útil), nada fica cortado, sobreposto ou fora de alcance, e a página não rola na horizontal; só tabelas e grades rolam por dentro (seção 7, "Responsivo"). Texto cortado com reticências (nome longo numa célula, por exemplo) tem o texto inteiro acessível, na dica (`title`) ou no detalhe do registro; onde o kit proíbe o corte (rótulos da lateral, categorias do perfil Operação), não há reticências.
 - **Ícone da aba:** toda aplicação Colibri usa `logos/colibri.ico` (colibri branco sobre o degradê azul da lateral, de 16 a 256 px no mesmo arquivo) como ícone da aba e dos atalhos, declarado na entrada HTML com `<link rel="icon" href="…/colibri.ico">`. É o mesmo nos dois temas e em todos os produtos.
   - Use o arquivo do kit sem alterar cores, recorte ou tamanhos; não troque pelo ícone padrão do framework (React, Blazor, Angular), por um ícone da identidade anterior nem pelo de outro produto.
   - O ícone é pedido pelo navegador direto da entrada HTML, fora do CSS: sirva o arquivo de uma pasta pública do projeto, no caminho que o `<link>` aponta.
@@ -306,6 +318,7 @@ O tema escuro é o mesmo sistema com outros valores de token: nenhuma regra, med
 
 - **Diálogo** (`.cm-dialog`): cabeçalho branco com título de 16 px e fechar à direita, corpo com 16 px de respiro, rodapé em `surface-2` com botões agrupados. Campos no corpo usam `.cm-field`, com o rótulo junto do controle (letras a cerca de 4 px), como fora do diálogo; a busca (`.cm-search`) mantém o próprio visual, sem o estilo de rótulo solto. Tab circula dentro do diálogo, Enter aciona o botão padrão, Esc cancela. Prefira resolver no próprio conteúdo antes de abrir um diálogo.
 - **Botão padrão do diálogo:** é sempre o principal (à direita do grupo), inclusive em confirmações destrutivas (excluir, zerar): o diálogo já é o segundo passo, nomeia o alvo em negrito e Esc cancela. Com campos, o foco inicial vai para o primeiro campo e Enter em qualquer campo aciona o principal (envio do formulário). Sem campos, o principal recebe o foco ao abrir. Diálogo só de leitura, sem ação, não tem botão padrão: Esc fecha.
+- **Ação destrutiva** (excluir, zerar, cancelar um pedido, desfazer uma integração): sempre em dois passos, com o diálogo de confirmação que nomeia o alvo ou, quando a ação é desfeita com facilidade, executada na hora com "Desfazer" na notificação. Nunca um clique só, e nunca o `confirm()` do navegador.
 - **Painel lateral** (`.cm-drawer`, aberto com `.is-open`): desliza da direita, 420 px, cabeçalho de 56 px, itens separados por divisores.
 - **Notificações:** canto superior direito, abaixo da barra superior; superfície branca, ícone colorido pelo estado, título de 13 px. Vale para qualquer biblioteca de notificação (angular-growl, pnotify 1.2 e PNotify 5 estão no adaptador Bootstrap 3).
 - **Ordem das camadas** (`--cm-layer-*`): menus, lateral e gaveta abaixo do diálogo (`--cm-layer-modal`, 1900); notificações acima de tudo (`--cm-layer-toast`, 2000). Popups de biblioteca abertos dentro de um diálogo (lista suspensa, calendário, dica) ficam entre os dois: no DevExtreme, `DevExpress.ui.dxOverlay.baseZIndex(1950)` (o padrão, 1500, fica atrás do diálogo).
@@ -326,7 +339,7 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Validar WCAG 2.2 AA: contraste, foco visível, Tab, Enter, Esc e movimento reduzido.
 - Exibir a marca-d'água do colibri (`.cm-page--home`) na página inicial.
 - Aplicar a tipografia do kit também aos elementos internos e popups de bibliotecas de componentes (DevExpress, DevExtreme etc.).
-- Conferir alinhamento em 1440, 1920 e ~900 px de largura antes de concluir uma página.
+- Conferir alinhamento em 1440, 1920 e ~900 px de largura e o zoom de 200% (640 px) antes de concluir uma página.
 - Conferir cada página nos dois temas, inclusive popups e componentes de bibliotecas.
 - Usar o ícone da aba do kit (`logos/colibri.ico`).
 - Alinhar à direita o título e o valor das colunas numéricas, em tabelas e grades.
@@ -348,6 +361,8 @@ Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação;
 - Linha inteira arrastável, ou soltar sem mostrar onde o item vai cair.
 - Botão vermelho preenchido para excluir um item dentro do diálogo de edição dele.
 - Halo de foco só no campo de um conjunto unido, cortado pelo botão ou invadindo a borda dele.
+- Animar o que a pessoa repete o dia todo, `transition: all`, animar largura, altura ou posição fora das exceções da seção 4, `ease-in`, animação de interface acima de 300 ms, camada que entra animada e some de uma vez, ou entrada a partir de `scale(0)`.
+- Excluir ou zerar num clique só, sem confirmação nem "Desfazer".
 
 ## 9. Perfil Operação
 
@@ -437,7 +452,7 @@ Uma classe no contêiner da aplicação (`.ct-app` + superfície) define o alvo 
 
 ### Movimento
 
-Folha sobe em 260 ms com `--cm-ease` e o painel lateral desliza da direita no mesmo tempo; véus, diálogos centralizados e a tela cheia dividida esmaecem em 200 ms; retorno de toque em 120 ms. O halo de atraso pulsa a cada 1,2 s (no perfil Cards, o card no estado mais grave respira no mesmo ritmo, seção 11). Animações de foto do produto (aproximação, Ken Burns, brilho) são conteúdo escolhido pelo lojista e param com movimento reduzido. Com `prefers-reduced-motion`, nada desliza, pisca ou gira: folhas e confirmações aparecem, o atraso fica com a borda fixa e o carregamento mostra o ícone parado com o texto.
+Vale a regra do movimento com motivo (seção 4). Folha sobe em 260 ms com `--cm-ease` e o painel lateral desliza da direita no mesmo tempo; véus, diálogos centralizados e a tela cheia dividida esmaecem em 200 ms; retorno de toque em 120 ms. Ao fechar, a camada sai pelo mesmo caminho em 200 ms: a folha desce, o painel lateral volta para a direita e o véu, o diálogo centralizado, a tela cheia dividida e a confirmação curta (`.ct-toast.is-closing`) esmaecem. A aplicação põe `.is-closing` no contêiner da camada (o elemento que recebe o `hidden`) e só a esconde no `animationend` de um filho direto, com um limite de 300 ms caso nenhuma animação rode; reabrir tira o `.is-closing`. No piso Chrome 101 não há `@starting-style`: a entrada é por `@keyframes` ao exibir, e a saída, pela classe. O que se repete o turno todo (trocar de categoria, somar quantidade, avançar o item, concluir no bump) não anima o conteúdo: só o retorno de toque. Os CSS de toque não têm `:hover`. O halo de atraso pulsa a cada 1,2 s (no perfil Cards, o card no estado mais grave respira no mesmo ritmo, seção 11). Animações de foto do produto (aproximação, Ken Burns, brilho) são conteúdo escolhido pelo lojista e param com movimento reduzido. Com `prefers-reduced-motion`, nada desliza, pisca ou gira: folhas e confirmações aparecem e somem na hora (a saída dura 1 ms, para o `animationend` chegar), o atraso fica com a borda fixa e o carregamento mostra o ícone parado com o texto.
 
 ### Faça / Não faça no perfil Operação
 

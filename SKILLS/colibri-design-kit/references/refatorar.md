@@ -23,8 +23,9 @@ Refatore <página> (<arquivo>) seguindo o DESIGN.md do projeto.
 Mundo visual estabelecido: cores, tipografia, anatomia de página e componentes são do Colibri Design Kit.
 Estenda esse mundo; mantenha conteúdo, comportamento e dados da página. Modo Operate.
 Use as classes <cm- (Admin) | ct- (Operação)> com a marcação de <caminho absoluto desta skill>/assets/kit/<exemplo.html | exemplo-toque.html>.
-Corrija estas reprovações da aderência:
+Corrija estas reprovações da aderência, as ★ primeiro:
 - <ID> <item> — <arquivo:linha> — <correção>
+Em cada uma, a correção mais barata que resolve: apagar o CSS ou a marcação própria → classe ou componente do kit → token → corrigir o valor → código novo.
 Desvios já registrados (mantenha): <lista ou "nenhum">.
 Qualquer outro desvio do kit só com a minha confirmação.
 ```
@@ -35,7 +36,7 @@ Conclua quando o impeccable terminar a refatoração da página.
 
 ## 4. Medir depois
 
-Execute de novo [`./aderencia.md`](./aderencia.md) na página, do mesmo modo (sem o fechamento de próximos passos); a tendência do relatório mostra antes → depois. Com navegador, confira também o alinhamento em 1440, 1920 e ~900 px e os dois temas (Operação: a resolução real da superfície e, no consumidor, um esquema claro e um escuro).
+Execute de novo [`./aderencia.md`](./aderencia.md) na página, do mesmo modo (sem o fechamento de próximos passos); a tendência do relatório mostra antes → depois. Com navegador, confira também o alinhamento em 1440, 1920 e ~900 px, o zoom de 200% (640 px) e os dois temas (Operação: a resolução real da superfície e, no consumidor, um esquema claro e um escuro).
 
 Item que passou de aprovado para reprovado é regressão: corrija antes de concluir. Conclua quando a página não tiver regressões nem item ★ reprovado, ou quando cada reprovação restante tiver motivo escrito (desvio confirmado, dependência de outra página, verificação impossível aqui).
 

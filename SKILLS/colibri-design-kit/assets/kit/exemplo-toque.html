@@ -541,8 +541,24 @@
 </div>
 
 <script>
-    function abrir(id) { document.getElementById(id).hidden = false; }
-    function fechar(id) { document.getElementById(id).hidden = true; }
+    function abrir(id) { var el = document.getElementById(id); el.classList.remove('is-closing'); el.hidden = false; }
+    // Saída: .is-closing anima a camada; ela só some no animationend de um filho direto (limite de 300 ms).
+    function fechar(id) {
+        var el = document.getElementById(id);
+        if (el.hidden || el.classList.contains('is-closing')) return;
+        var limite;
+        function fim(e) {
+            if (e && e.target.parentNode !== el) return;
+            clearTimeout(limite);
+            el.removeEventListener('animationend', fim);
+            if (!el.classList.contains('is-closing')) return;
+            el.classList.remove('is-closing');
+            el.hidden = true;
+        }
+        el.classList.add('is-closing');
+        el.addEventListener('animationend', fim);
+        limite = setTimeout(fim, 300);
+    }
     var camadas = ['folha', 'carrinho', 'passos', 'leitor'];
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') camadas.forEach(function (c) { fechar(c + '-tablet'); }); });
     function mostrar() {

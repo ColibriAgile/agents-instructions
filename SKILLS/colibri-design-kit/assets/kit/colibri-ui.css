@@ -78,6 +78,7 @@ pre.log,
     color: var(--cm-ink);
     background: var(--cm-bg);
     font-family: var(--cm-font);
+    /* Exceção nomeada da regra do movimento com motivo (DESIGN.md, seção 4): a única animação de layout do shell. */
     transition: grid-template-columns 200ms var(--cm-ease);
 }
 .cm-shell--collapsed { grid-template-columns: 0 minmax(0, 1fr); }
@@ -989,7 +990,11 @@ a.cm-card:hover { border-color: var(--cm-accent-line); box-shadow: var(--cm-shad
     transition: transform 150ms var(--cm-ease), color 150ms var(--cm-ease);
 }
 .cm-card__head > .cm-tag + .cm-card__go { margin-left: 0; }
-a.cm-card:hover .cm-card__go { color: var(--cm-accent-ink); transform: translateX(2px); }
+a.cm-card:hover .cm-card__go { color: var(--cm-accent-ink); }
+/* Deslocamento no hover só com mouse: numa tela de toque o hover fica preso depois do toque. */
+@media (hover: hover) and (pointer: fine) {
+    a.cm-card:hover .cm-card__go { transform: translateX(2px); }
+}
 .cm-card__value {
     color: var(--cm-ink);
     font-size: 20px;
@@ -1108,6 +1113,7 @@ a.cm-card:hover .cm-card__go { color: var(--cm-accent-ink); transform: translate
     height: 100%;
     background: var(--cm-accent);
     border-radius: 3px;
+    /* Exceção nomeada da regra do movimento com motivo: o valor chega da aplicação como largura. */
     transition: width 200ms linear;
 }
 .cm-processing {

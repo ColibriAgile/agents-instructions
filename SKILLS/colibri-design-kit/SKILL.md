@@ -1,7 +1,7 @@
 ---
 name: colibri-design-kit
-description: 'Colibri Design Kit leva a linha visual das aplicações Colibri (perfis Admin, Operação, Produção e Cards) a um repositório e mede a aderência a ela, sobre a skill impeccable 4.x. Use para adotar o kit num frontend Colibri ou atualizar a versão adotada (inclusive migrar artefatos do impeccable 3.x), medir a aderência de uma página ou do frontend ao kit com nota e ranking de páginas, refatorar uma página para o kit ou registrar um desvio do kit. Não use para projetos fora da linha Colibri, para backend nem para crítica de UX sem relação com o kit (use impeccable critique).'
-argument-hint: '[adotar | aderencia | refatorar | desvio] [alvo] — ex.: "aderencia src/pages/Clientes.razor", "adotar src/web, Blazor DevExpress"; vazio abre o menu'
+description: 'Colibri Design Kit leva a linha visual das aplicações Colibri (perfis Admin, Operação, Produção e Cards) a um repositório e mede a aderência a ela, sobre a skill impeccable 4.x. Use para adotar o kit num frontend Colibri ou atualizar a versão adotada (inclusive migrar artefatos do impeccable 3.x), medir a aderência de uma página ou do frontend ao kit com nota e ranking de páginas, revisar uma branch, PR ou mudança local quanto ao que ela piorou em relação ao kit, refatorar uma página para o kit ou registrar um desvio do kit. Não use para projetos fora da linha Colibri, para backend nem para crítica de UX sem relação com o kit (use impeccable critique).'
+argument-hint: '[adotar | aderencia | revisar | refatorar | desvio] [alvo] — ex.: "aderencia src/pages/Clientes.razor", "revisar 482", "adotar src/web, Blazor DevExpress"; vazio abre o menu'
 ---
 
 # Colibri Design Kit
@@ -27,10 +27,11 @@ Compatibilidade: impeccable 4.x (conferido na 4.4.0): `PRODUCT.md` no schema de 
 |---|---|---|
 | `adotar [caminho, framework]` | Adota o kit ou atualiza a versão adotada: copia os arquivos, aciona `impeccable init` e `document`, registra as decisões | [`references/adotar.md`](references/adotar.md) |
 | `aderencia [alvo]` | Nota de 0 a 100 de aderência ao kit, por grupo de regras, com evidência `arquivo:linha`; sem alvo, avalia o frontend e ranqueia as páginas da menos aderente para a mais. Somente leitura, salvo o relatório | [`references/aderencia.md`](references/aderencia.md) |
+| `revisar [PR \| branch]` | Julga só o que uma mudança causou (sem argumento: a branch atual contra a principal, mais o que não foi commitado): achados introduzidos, regressões e sinais removidos, com a rubrica de aderência e os gatilhos de bloqueio; veredito Bloquear ou Aprovar. Somente leitura, nada gravado | [`references/revisar.md`](references/revisar.md) |
 | `refatorar <página>` | Mede a página, pede ao impeccable a refatoração já enquadrada no kit, mede de novo e marca a página no `DECISOES.md` | [`references/refatorar.md`](references/refatorar.md) |
 | `desvio <descrição>` | Registra um desvio do kit no `DECISOES.md`, com confirmação | seção "Desvio" abaixo |
 
-Roteamento pelo primeiro termo do argumento (com ou sem acento: `aderência`, `aderencia`; `atualizar` é sinônimo de `adotar`):
+Roteamento pelo primeiro termo do argumento (com ou sem acento: `aderência`, `aderencia`; `atualizar` é sinônimo de `adotar`; `revisão` e `review`, de `revisar`):
 
 - **Verbo da tabela:** leia o procedimento dele por inteiro antes de agir e siga-o.
 - **Outro texto** (ex.: `src/web, Blazor DevExpress`): é a entrada do `adotar`; quem usava a skill antes dos verbos continua com o mesmo comando.
@@ -40,6 +41,7 @@ Roteamento pelo primeiro termo do argumento (com ou sem acento: `aderência`, `a
 
 - Sem `docs/design/DECISOES.md` nem `DESIGN.md` → `adotar`.
 - Versão do kit registrada no `DECISOES.md` mais antiga que a primeira entrada de "Versões" do `LEIA-ME.md` do kit, ou `colibri-ui.css` sem `colibri-base.css` ao lado → `adotar` (atualização), citando as entradas de "Versões" que o projeto ainda não tem.
+- Branch à frente da principal ou mudança local em arquivos de interface → `revisar`, antes de abrir ou aprovar o PR.
 - Sem `docs/design/ADERENCIA.md` → `aderencia`, para a nota de partida e a ordem das páginas.
 - Com relatório de aderência → `refatorar <página pior colocada no ranking>`, ou `aderencia` de novo se o relatório é anterior aos últimos commits de UI.
 
@@ -83,7 +85,7 @@ Ao alterar o kit:
 
 - Mude a regra e a implementação juntas: `DESIGN.md` e `colibri-ui.css` (tokens, temas e fontes ficam em `colibri-base.css`), mais os adaptadores afetados (`colibri-ui.bootstrap3.css`, `colibri-ui.devexpress.css`) e a marcação de `exemplo.html` quando o componente aparece nela. No perfil Operação, `colibri-touch.css`, `colibri-esquema.js` e `exemplo-toque.html`; no perfil Produção, `colibri-producao.css` e as telas `#kds` e `#bump` de `exemplo-toque.html`; no perfil Cards, `colibri-cards.css` e as telas `#chamados` e `#chamados-claro` de `exemplo-toque.html`.
 - Mudou `colibri-esquema.js` ou os estados de `colibri-base.css`: rode `node scripts/verificar-esquema.mjs` (estados iguais à base, contraste garantido numa grade de sementes e nas cores livres do perfil Cards, nada acima do Chrome 101). Falhou, não publique.
-- Regra nova ou alterada entra no checklist de `./references/mapeamento-impeccable.md` (e na tabela, se o `DESIGN.md` mudou de estrutura) e na rubrica de `./references/aderencia.md` (item novo ou alterado, com a busca dele, e a versão da rubrica incrementada); comportamento por framework vai para `./references/adocao-por-framework.md`.
+- Regra nova ou alterada entra no checklist de `./references/mapeamento-impeccable.md` (e na tabela, se o `DESIGN.md` mudou de estrutura) e na rubrica de `./references/aderencia.md` (item novo ou alterado, com a busca dele, e a versão da rubrica incrementada; item que cobre uma falha que impede a tarefa é ★ e entra em "Gatilhos de bloqueio"); regra que depende de um atributo ou bloco que alguém pode apagar entra na tabela de sinais removidos de `./references/revisar.md`; comportamento por framework vai para `./references/adocao-por-framework.md`.
 - Acrescente no topo de "Versões" do `LEIA-ME.md` uma entrada com a data e o que mudou.
 - Ajuste descoberto numa aplicação que vale para todas volta para cá; não fica só no projeto.
 

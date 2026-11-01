@@ -501,6 +501,7 @@
     inset: 0;
     z-index: var(--cm-layer-modal-backdrop);
     background: var(--ct-backdrop);
+    animation: ct-fade-in 200ms var(--ct-ease);
 }
 .ct-sheet {
     position: fixed;
@@ -1062,14 +1063,35 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
 @keyframes ct-fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ct-spin { to { transform: rotate(360deg); } }
 @keyframes ct-alert { 0%, 100% { opacity: 0; } 50% { opacity: .45; } }
+@keyframes ct-sheet-out { from { transform: translateY(0); } to { transform: translateY(100%); } }
+@keyframes ct-side-out { from { transform: translateX(0); } to { transform: translateX(100%); } }
+@keyframes ct-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
-/* Movimento reduzido: sem deslocamento nem piscar; o alerta de atraso fica fixo (borda e faixa continuam). */
+/* Saída das camadas: a aplicação põe .is-closing no contêiner da camada (o elemento que recebe o
+ * hidden) e só o esconde no animationend de um filho direto (limite de 300 ms); reabrir tira a classe.
+ * A saída faz o caminho da entrada, mais depressa (200 ms). */
+.is-closing > .ct-backdrop,
+.is-closing > .ct-sheet.ct-sheet--center,
+.is-closing > .ct-split,
+.ct-toast.is-closing { animation: ct-fade-out 200ms var(--ct-ease) forwards; }
+.is-closing > .ct-sheet { animation: ct-sheet-out 200ms var(--ct-ease) forwards; }
+.is-closing > .ct-sheet.ct-sheet--side { animation: ct-side-out 200ms var(--ct-ease) forwards; }
+
+/* Movimento reduzido: sem deslocamento nem piscar; o alerta de atraso fica fixo (borda e faixa continuam).
+ * Entrada e saída duram 1 ms, para o animationend chegar e a aplicação esconder a camada. */
 @media (prefers-reduced-motion: reduce) {
+    .ct-backdrop,
     .ct-sheet,
     .ct-sheet--center,
     .ct-sheet--side,
     .ct-split,
     .ct-toast { animation: ct-fade-in 1ms linear; }
+    .is-closing > .ct-backdrop,
+    .is-closing > .ct-sheet,
+    .is-closing > .ct-sheet.ct-sheet--center,
+    .is-closing > .ct-sheet.ct-sheet--side,
+    .is-closing > .ct-split,
+    .ct-toast.is-closing { animation: ct-fade-out 1ms linear forwards; }
     .ct-btn,
     .ct-icon-btn,
     .ct-door { transition: none; }
