@@ -71,6 +71,10 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **01/11/2026 (etiqueta cheia para alarme):** `.cm-tag--solid`, etiqueta vermelha cheia com texto branco, nasceu no Colibri Totem (página Totens: totem com TEF demo no salão, no meio das etiquetas claras de estado).
+  - **Implementação:** `colibri-ui.css`: `.cm-tag--solid` depois de `.cm-tag--danger`. O vermelho (`#b02637`) é o do tema claro nos dois temas, porque o `--cm-danger` do escuro é rosa claro e não segura texto branco. Adaptadores sem mudança.
+  - **Regra** (`DESIGN.md`, "Etiquetas"): só para o alarme que precisa saltar numa lista de etiquetas claras; uma por lista, no máximo.
+  - **Projetos afetados:** Colibri Totem (já usa; a cópia local fica igual ao kit).
 - **30/10/2026 (reordenar por arrasto: alça e barra de soltura):** o arrasto passa a ser peça do kit. Antes cada aplicação tinha a sua: o ColibriTablet desenhava a barra só nas classes do cardápio e em três telas com `useRowDrag`, e a lista de produtos (dele e do Colibri Totem) arrastava pela linha inteira, sem mostrar onde o item ia cair. Pedido do usuário na conferência dos alérgenos do totem.
   - **Implementação:** `colibri-ui.css`: `.cm-drag-handle` (alça com a mãozinha; na `.cm-table`, alvo de 16 × 32 px), `.is-dragging` (arrastada a 50 %), `.is-drop-top` / `.is-drop-bottom` (barra de 3 px em `--cm-accent-ink`, visível nos dois temas; na tabela fica na `.cm-table__row`, para o hover não a cobrir). `exemplo.html`: a tabela de Grupos em Listas ganha a alça. Adaptadores sem mudança.
   - **Regra** (`DESIGN.md`, seção 7, "Navegação e listas", e "Não faça"): só a alça arrasta; o resto da linha segue com o clique (abrir o registro); a barra fica no lado onde o item cai (em cima ao subir, embaixo ao descer; só em cima onde o item entra sempre antes do alvo, como numa árvore); setas subir/descer como alternativa de teclado.

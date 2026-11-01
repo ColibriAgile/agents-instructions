@@ -571,6 +571,14 @@ pre.log,
     background: var(--cm-danger-soft);
     border-color: var(--cm-danger-line);
 }
+/* Etiqueta CHEIA: só para o alarme que precisa saltar numa lista inteira de etiquetas claras
+   (ex.: um totem com TEF demo no salão). Uma por lista, no máximo. O vermelho é o do tema claro
+   nos dois temas: o --cm-danger do escuro é rosa claro e não segura texto branco. */
+.cm-tag--solid {
+    color: #fff;
+    background: #b02637;
+    border-color: #b02637;
+}
 .cm-tag--muted {
     color: var(--cm-ink-2);
     background: var(--cm-muted-soft);
