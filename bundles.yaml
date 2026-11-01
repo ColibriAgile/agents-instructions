@@ -12,6 +12,7 @@ bundles:
     skills:
       - ai-ready-fix
       - ai-ready-score
+      - auditar-skills
       - caveman
       - commit
       - domain-modeling
