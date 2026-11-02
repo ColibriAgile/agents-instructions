@@ -50,6 +50,8 @@ Leia também as linhas `-`. Perder um sinal é regressão mesmo quando nenhuma l
 | `var(--cm-*)` ou `var(--ct-*)` trocado por cor literal | C1 |
 | `font-variant-numeric: tabular-nums`, `cm-mono` em dado | T2 |
 | `.cm-btn-group` desfeito | K1 |
+| `.cm-origem__logo` ou o nome ao lado dele, `.cm-tag--retirada` trocado por outra etiqueta, `.cm-table--wrap` ou `.cm-table__break` | K9 |
+| tratamento de setas, Enter, Ctrl+Enter, `/` ou Esc na fila, ou o rodapé `.cm-shortcuts` | K10 |
 | diálogo ou folha de confirmação, "Desfazer" | K8 |
 | classe de superfície `.ct-app--*` ou `.ct-app--kiosk` | O1 |
 | `.cp-modo-toque` ou `.cp-modo-bump` na raiz da grade (leva o `--ct-col-min`), limite de colunas no cálculo do empilhamento | O11, R4 |

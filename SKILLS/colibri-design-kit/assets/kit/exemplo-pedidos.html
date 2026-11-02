@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Colibri UI — painel de pedidos</title>
+    <link rel="icon" href="logos/colibri.ico">
+    <link rel="stylesheet" href="icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="colibri-ui.css">
+    <script>
+        /* Tema antes de pintar: #escuro força o tema escuro. */
+        if (location.hash.indexOf('escuro') >= 0) document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
+    <style>
+        /* Apenas para esta página de exemplo */
+        html, body { height: 100%; }
+        body { margin: 0; }
+        .demo-app { display: flex; flex-direction: column; height: 100%; background: var(--cm-scroll-bg); }
+        .demo-app > .cm-topbar .cm-topbar__title { margin-right: 6px; }
+        .demo-ferramentas { padding: 12px 24px; background: var(--cm-topbar-bg); border-bottom: 1px solid var(--cm-line); }
+        .demo-ferramentas .cm-btn-group .cm-btn { min-width: 0; }
+        .demo-ponto { width: 8px; height: 8px; background: var(--cm-success); border-radius: 50%; }
+        .demo-vista[hidden] { display: none !important; }
+        .demo-livre { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+        .demo-pedidos { --cm-cols: 130px 72px minmax(140px, 1.4fr) 82px 170px 64px minmax(120px, 1fr) 84px; }
+        .demo-pedidos .cm-table__item { cursor: pointer; }
+        .demo-pedidos .cm-table__head { position: sticky; top: -16px; z-index: 1; }
+        .demo-itens { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--cm-line); }
+        .demo-itens li { display: grid; grid-template-columns: 2.4em 1fr auto; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--cm-line); }
+        .demo-itens .demo-q { color: var(--cm-ink-2); font-family: var(--cm-mono); font-size: 12px; }
+        .demo-itens .demo-obs { grid-column: 2; color: var(--cm-warning); font-size: 12px; font-weight: 600; }
+        .demo-total { display: flex; justify-content: space-between; padding-top: 6px; font-weight: 650; }
+        .demo-json { margin: 0; padding: 12px; overflow: auto; background: var(--cm-surface-2); border: 1px solid var(--cm-line); border-radius: var(--cm-radius-sm); font-size: 12px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+<!-- Painel de operação no perfil Admin, sem a lateral (ex.: o painel de pedidos do DConnect). Três vistas: #lista
+     (padrão), #livre e #colunado; #escuro, #menu, #detalhe, #origem e #erro abrem estados para as capturas. -->
+<div class="demo-app">
+    <header class="cm-topbar">
+        <h1 class="cm-topbar__title">Pedidos</h1>
+        <span class="cm-tag cm-tag--danger"><i class="bi bi-x-octagon-fill" aria-hidden="true"></i>1 erro</span>
+        <span class="cm-tag cm-tag--warning"><i class="bi bi-chat-left-dots-fill" aria-hidden="true"></i>1 disputa</span>
+        <span class="cm-tag cm-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>3 a confirmar</span>
+        <div class="cm-toolbar__end">
+            <button class="cm-btn" type="button"><span class="demo-ponto" aria-hidden="true"></span>Lojas 4 de 4</button>
+            <button class="cm-icon-btn" type="button" aria-label="Som dos avisos ligado" title="Som dos avisos ligado"><i class="bi bi-volume-up" aria-hidden="true"></i></button>
+        </div>
+    </header>
+    <div class="cm-toolbar demo-ferramentas">
+        <div class="cm-btn-group" role="group" aria-label="Vista dos pedidos">
+            <button class="cm-btn cm-btn--toggle" type="button" data-vista="lista"><i class="bi bi-list-ul" aria-hidden="true"></i>Lista</button>
+            <button class="cm-btn cm-btn--toggle" type="button" data-vista="livre"><i class="bi bi-grid-3x2-gap" aria-hidden="true"></i>Kanban livre</button>
+            <button class="cm-btn cm-btn--toggle" type="button" data-vista="colunado"><i class="bi bi-kanban" aria-hidden="true"></i>Kanban colunado</button>
+        </div>
+        <div class="cm-toolbar__end">
+            <label class="cm-search"><i class="bi bi-search" aria-hidden="true"></i><input id="busca" type="search" placeholder="Número ou cliente  ( / )" aria-label="Buscar pedido por número ou cliente"></label>
+            <button class="cm-btn" type="button" id="filtro-origem" aria-haspopup="menu"><i class="bi bi-funnel" aria-hidden="true"></i>Origem</button>
+        </div>
+    </div>
+
+    <section class="cm-master demo-vista" id="v-lista" aria-label="Lista de pedidos" hidden>
+        <div class="cm-master__list">
+            <div class="cm-table cm-table--wrap demo-pedidos" role="grid" aria-label="Pedidos">
+                <div class="cm-table__head" role="row"><span class="cm-cell">Origem</span><span class="cm-cell">Número</span><span class="cm-cell">Cliente</span><span class="cm-cell">Tipo</span><span class="cm-cell">Estado</span><span class="cm-cell">Chegada</span><span class="cm-cell">Previsão</span><span class="cm-cell cm-cell--end">Valor</span></div>
+                <div id="linhas"></div>
+            </div>
+        </div>
+        <div class="cm-master__detail" id="lista-detalhe"></div>
+    </section>
+    <section class="demo-vista demo-livre" id="v-livre" aria-label="Kanban livre" hidden><ul class="cm-tiles" id="livre"></ul></section>
+    <section class="cm-board demo-vista" id="v-colunado" aria-label="Kanban colunado, uma coluna por estado" hidden></section>
+
+    <footer class="cm-shortcuts" id="rodape"></footer>
+</div>
+
+<ul class="cm-menu cm-menu--float" id="menu" role="menu" hidden></ul>
+<div class="cm-drawer cm-drawer--wide" id="gaveta" role="dialog" aria-label="Detalhes do pedido"></div>
+
+<script>
+// Ações por estado: na aplicação, vêm do backend com o pedido. A terceira posição marca a destrutiva.
+var A = {
+    produzir: ['bi-send', 'Produzir'], vincular: ['bi-link-45deg', 'Vincular'], cancelar: ['bi-x-circle', 'Cancelar', 1],
+    solicitar: ['bi-x-circle', 'Solicitar cancelamento', 1], disputa: ['bi-chat-left-text', 'Responder disputa'],
+    expedir: ['bi-box-arrow-right', 'Expedir'], pronto: ['bi-bag-check', 'Pronto para retirar'], reimprimir: ['bi-printer', 'Reimprimir'],
+    enviar: ['bi-bicycle', 'Enviar'], entregue: ['bi-check2-circle', 'Entregue']
+};
+var COLUNAS = [
+    { nome: 'Erro', icone: 'bi-x-octagon-fill', tom: 'danger', pedidos: [
+        { n: 4790, o: 'Keeta', t: 18, c: 'Pedro Alves', v: '54,00', tipo: 'entrega', prev: '20:40', aviso: ['danger', 'bi-exclamation-octagon-fill', 'Não lançou no POS: produto 1032 sem cadastro'], a: ['produzir', 'vincular', 'cancelar'] } ] },
+    { nome: 'Em disputa', icone: 'bi-chat-left-dots-fill', tom: 'warning', pedidos: [
+        { n: 4772, o: 'iFood', t: 46, c: 'Carla Mendes', v: '112,90', tipo: 'entrega', prev: 'Entregue 19:58', aviso: ['warning', 'bi-hourglass-split', 'Responder até 20:31 · faltam 12 min'], a: ['disputa'] } ] },
+    { nome: 'Agendado', icone: 'bi-calendar-event', tom: 'accent', pedidos: [
+        { n: 4830, o: 'iFood', t: null, hora: '21:10', c: 'Rui Costa', v: '98,00', tipo: 'entrega', prev: 'Produção 21:10 · entrega 21:30', a: ['cancelar'] },
+        { n: 4833, o: '99Food', t: null, hora: '21:25', c: 'Lia Prado', v: '45,50', tipo: 'retirada', prev: 'Produção 21:25 · retirada 21:45', a: ['solicitar'] } ] },
+    { nome: 'A confirmar', icone: 'bi-hourglass-split', tom: 'warning', pedidos: [
+        { n: 4841, o: 'AnotaAi', t: 11, c: 'Bruno Lima', v: '39,90', tipo: 'entrega', prev: '20:55', aviso: ['warning', 'bi-alarm', 'Confirme em 4 min: depois, a AnotaAi recusa'], a: ['produzir', 'vincular', 'cancelar'] },
+        { n: 4842, o: 'iFood', t: 3, c: 'Sofia Reis', v: '72,30', tipo: 'retirada', prev: '20:50', a: ['produzir', 'vincular', 'cancelar'] },
+        { n: 4843, o: 'Keeta', t: 1, c: 'João Pires', v: '58,80', tipo: 'entrega', prev: '21:05', a: ['produzir', 'vincular', 'cancelar'] } ] },
+    { nome: 'Em produção', icone: 'bi-fire', tom: 'accent', pedidos: [
+        { n: 4820, o: 'iFood', t: 22, c: 'Ana Beatriz Moreira', v: '64,00', tipo: 'entrega', prev: '20:35', a: ['expedir', 'reimprimir', 'cancelar'] },
+        { n: 4822, o: '99Food', t: 19, c: 'Marcos Tavares', v: '31,00', tipo: 'retirada', prev: '20:30', a: ['pronto', 'reimprimir', 'solicitar'] },
+        { n: 4824, o: 'iFood', t: 17, c: 'Helena Duarte', v: '128,40', tipo: 'entrega', prev: '20:40', a: ['expedir', 'reimprimir', 'cancelar'] },
+        { n: 4826, o: 'Keeta', t: 15, c: 'Diego Ramos', v: '47,90', tipo: 'entrega', prev: '20:45', a: ['expedir', 'reimprimir', 'cancelar'] },
+        { n: 4828, o: 'AnotaAi', t: 9, c: 'Paula Freitas', v: '55,00', tipo: 'entrega', prev: '20:50', a: ['expedir', 'reimprimir', 'cancelar'] },
+        { n: 4829, o: 'iFood', t: 6, c: 'Tiago Nunes', v: '23,50', tipo: 'retirada', prev: '20:40', a: ['pronto', 'reimprimir', 'cancelar'] } ] },
+    { nome: 'Pronto para retirada', icone: 'bi-bag-check', tom: 'success', pedidos: [
+        { n: 4815, o: 'iFood', t: 28, c: 'Renata Lopes', v: '42,00', tipo: 'retirada', prev: 'Código 7391', a: ['enviar', 'reimprimir', 'cancelar'] },
+        { n: 4818, o: '99Food', t: 24, c: 'Caio Martins', v: '36,90', tipo: 'retirada', prev: '20:25', a: ['enviar', 'reimprimir', 'solicitar'] } ] },
+    { nome: 'Enviado', icone: 'bi-bicycle', tom: 'success', pedidos: [
+        { n: 4801, o: 'iFood', t: 35, c: 'Lucas Araújo', v: '77,00', tipo: 'entrega', prev: 'Entregador Rafael', a: ['entregue', 'cancelar'] },
+        { n: 4805, o: 'Keeta', t: 31, c: 'Beatriz Gomes', v: '52,40', tipo: 'entrega', prev: 'Entregador Joana', a: ['entregue', 'cancelar'] },
+        { n: 4807, o: 'iFood', t: 29, c: 'Gabriel Costa', v: '88,10', tipo: 'entrega', prev: 'Entregador Rafael', a: ['entregue', 'cancelar'] },
+        { n: 4809, o: '99Food', t: 26, c: 'Nina Ferraz', v: '41,00', tipo: 'entrega', prev: 'Entregador Caio', a: ['entregue', 'solicitar'] } ] },
+    { nome: 'Entregue', icone: 'bi-check2-circle', tom: 'success', recolhida: true, conta: 12, pedidos: [] },
+    { nome: 'Cancelado', icone: 'bi-x-circle', tom: '', recolhida: true, conta: 2, pedidos: [] }
+];
+var TIPOS = { entrega: 'Entrega', retirada: 'Retirada' };
+// O kit não traz logos de terceiros: as iniciais ocupam o lugar da imagem que a aplicação fornece.
+var SIGLAS = { iFood: 'iF', Keeta: 'Ke', '99Food': '99', AnotaAi: 'AA' };
+var TAGS = { danger: ' cm-tag--danger', warning: ' cm-tag--warning', accent: '', success: ' cm-tag--success', '': ' cm-tag--muted' };
+var AGORA = 20 * 60 + 31;
+var TODOS = [];
+COLUNAS.forEach(function (col) { col.pedidos.forEach(function (p) { p.col = col; TODOS.push(p); }); });
+var INICIAL = TODOS.filter(function (p) { return p.n === 4841; })[0];
+
+function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function origem(o) { return '<span class="cm-origem"><span class="cm-origem__logo" aria-hidden="true">' + SIGLAS[o] + '</span>' + o + '</span>'; }
+function tipo(t) { return '<span class="cm-tag cm-tag--' + t + '">' + TIPOS[t] + '</span>'; }
+function estado(col) { return '<span class="cm-tag' + TAGS[col.tom] + '"><i class="bi ' + col.icone + '" aria-hidden="true"></i>' + col.nome + '</span>'; }
+function hhmm(min) { return String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0'); }
+function idade(p) { return p.t == null ? -1 : p.t; }
+function tempo(p) { return p.t == null ? '<span class="cm-tile__time" title="Começa a produzir às ' + p.hora + '">' + p.hora + '</span>' : '<span class="cm-tile__time" title="Tempo desde a chegada">' + p.t + ' min</span>'; }
+function aviso(p, bloco) { return p.aviso ? '<div class="cm-notice cm-notice--' + p.aviso[0] + (bloco ? ' cm-notice--block' : '') + '"><i class="bi ' + p.aviso[1] + '" aria-hidden="true"></i><span>' + p.aviso[2] + '</span></div>' : ''; }
+
+function cartao(p, comEstado) {
+    var c = el('article', 'cm-tile');
+    c.tabIndex = -1; c._p = p;
+    c.setAttribute('aria-label', 'Pedido ' + p.n + ', ' + p.o + ', ' + p.c + ', R$ ' + p.v + ', ' + p.col.nome);
+    c.innerHTML =
+        '<div class="cm-tile__line">' + origem(p.o) + tempo(p) +
+        '<button class="cm-icon-btn cm-tile__menu" type="button" tabindex="-1" data-menu aria-haspopup="menu" aria-label="Ações do pedido ' + p.n + '" title="Ações"><i class="bi bi-three-dots" aria-hidden="true"></i></button></div>' +
+        '<div class="cm-tile__line"><button class="cm-tile__id" type="button" tabindex="-1" data-detalhe>#' + p.n + '</button><span class="cm-tile__value">R$ ' + p.v + '</span></div>' +
+        '<div class="cm-tile__title">' + p.c + '</div>' +
+        '<div class="cm-tile__tags">' + tipo(p.tipo) + (comEstado ? estado(p.col) : '') + '<span>' + p.prev + '</span></div>' +
+        aviso(p);
+    return c;
+}
+
+/* Kanban colunado */
+var quadro = document.getElementById('v-colunado');
+COLUNAS.forEach(function (col, ci) {
+    var s = el('section', 'cm-board__col' + (col.tom ? ' cm-board__col--' + col.tom : '') + (col.recolhida ? ' is-collapsed' : ''));
+    s.setAttribute('aria-label', col.nome + ', ' + (col.conta || col.pedidos.length) + ' pedidos');
+    var topo = el('div', 'cm-board__head');
+    topo.appendChild(el('h2', 'cm-board__name', '<i class="bi ' + col.icone + '" aria-hidden="true"></i>' + col.nome));
+    topo.appendChild(el('span', 'cm-tag cm-tag--muted', String(col.conta || col.pedidos.length)));
+    var rec = el('button', 'cm-icon-btn cm-board__collapse', '<i class="bi bi-chevron-bar-left" aria-hidden="true"></i>');
+    rec.type = 'button'; rec.setAttribute('aria-label', 'Recolher a coluna ' + col.nome); rec.title = 'Recolher';
+    rec.addEventListener('click', function (e) { e.stopPropagation(); s.classList.add('is-collapsed'); });
+    topo.appendChild(rec);
+    s.appendChild(topo);
+    s.addEventListener('click', function () { s.classList.remove('is-collapsed'); });
+    var ul = el('ul', 'cm-board__list');
+    col.pedidos.forEach(function (p, pi) { var c = cartao(p); c.dataset.col = ci; c.dataset.idx = pi; var li = el('li'); li.appendChild(c); ul.appendChild(li); });
+    s.appendChild(ul);
+    quadro.appendChild(s);
+});
+
+/* Kanban livre: pendências primeiro, depois a ordem de chegada */
+var livre = document.getElementById('livre');
+function pendencia(p) { return p.col.tom === 'danger' || p.col.nome === 'Em disputa' ? 0 : 1; }
+TODOS.slice().sort(function (a, b) { return pendencia(a) - pendencia(b) || idade(b) - idade(a); })
+    .forEach(function (p, i) { var c = cartao(p, true); c.dataset.idx = i; var li = el('li'); li.appendChild(c); livre.appendChild(li); });
+
+/* Lista: o mais recente em cima; a primeira linha da quebra leva origem, número, cliente e valor */
+var linhas = document.getElementById('linhas');
+TODOS.slice().sort(function (a, b) { return idade(a) - idade(b); }).forEach(function (p) {
+    var item = el('div', 'cm-table__item');
+    item.tabIndex = -1; item._p = p; item.setAttribute('role', 'row');
+    item.innerHTML = '<div class="cm-table__row">' +
+        '<span class="cm-cell cm-cell--first">' + origem(p.o) + '</span>' +
+        '<span class="cm-cell cm-cell--first cm-mono">#' + p.n + '</span>' +
+        '<span class="cm-cell cm-cell--first cm-cell--grow">' + p.c + '</span>' +
+        '<span class="cm-cell">' + tipo(p.tipo) + '</span>' +
+        '<span class="cm-cell">' + estado(p.col) + '</span>' +
+        '<span class="cm-cell cm-mono"><span class="cm-cell__label">Chegada</span>' + (p.t == null ? '—' : hhmm(AGORA - p.t)) + '</span>' +
+        '<span class="cm-cell"><span class="cm-cell__label">Previsão</span>' + (p.hora ? 'Produção ' + p.hora : p.prev) + '</span>' +
+        '<span class="cm-cell cm-cell--first cm-cell--end cm-mono"><b>R$ ' + p.v + '</b></span>' +
+        '<span class="cm-table__break" aria-hidden="true"></span>' +
+        '</div>';
+    linhas.appendChild(item);
+});
+
+/* Detalhe com abas */
+var ABAS = ['Pedido', 'Alertas', 'Cliente', 'Histórico', 'Mais dados', 'JSON de origem'];
+function brl(c) { return 'R$ ' + (c / 100).toFixed(2).replace('.', ','); }
+function pares(l) { return '<dl class="cm-pairs">' + l.map(function (x) { return '<dt>' + x[0] + '</dt><dd' + (x[2] ? ' class="cm-mono"' : '') + '>' + x[1] + '</dd>'; }).join('') + '</dl>'; }
+function conteudo(aba, p) {
+    var cent = Math.round(parseFloat(p.v.replace(',', '.')) * 100);
+    if (aba === 'Pedido') return pares([['Origem', origem(p.o) + ' · loja Centro'], ['Tipo', tipo(p.tipo)], ['Estado', estado(p.col)], ['Chegou', p.t == null ? 'agendado' : hhmm(AGORA - p.t) + ' (há ' + p.t + ' min)'], ['Previsão', p.prev], ['Pagamento', 'Pago no app (crédito)']]) +
+        '<section><h3 class="cm-detail-title">Itens</h3><ul class="demo-itens"><li><span class="demo-q">1×</span><span>X-salada da casa</span><span>' + brl(cent - 1390) + '</span><span class="demo-obs">Sem cebola</span></li><li><span class="demo-q">1×</span><span>Refrigerante lata</span><span>R$ 7,00</span></li></ul>' +
+        '<dl class="cm-pairs" style="grid-template-columns: 1fr auto; column-gap: 0"><dt>Subtotal</dt><dd>' + brl(cent - 690) + '</dd><dt>Taxa de entrega</dt><dd>R$ 6,90</dd></dl><div class="demo-total"><span>Total</span><span>R$ ' + p.v + '</span></div></section>';
+    if (aba === 'Alertas') return aviso(p, true) + '<p class="cm-muted" style="margin: 0">O item chegou com o código 1032, que não existe no POS. Corrija o código ou cadastre o produto e produza de novo.</p>';
+    if (aba === 'Cliente') return pares([['Nome', p.c], ['Telefone', '(11) 98765-4321', 1], ['Endereço', 'Rua das Acácias, 120, apto 32'], ['Bairro', 'Vila Mariana'], ['CEP', '04117-040', 1]]);
+    if (aba === 'Histórico') return pares([[hhmm(AGORA - Math.max(idade(p), 0)), 'Pedido recebido do ' + p.o], [hhmm(AGORA), 'Estado: ' + p.col.nome]]);
+    if (aba === 'Mais dados') return pares([['Id no provedor', 'a1f3-77c2-9e10', 1], ['Loja', 'Centro']]);
+    return '<pre class="demo-json">{\n  "displayId": "' + p.n + '",\n  "customer": { "name": "' + p.c + '" }\n}</pre>';
+}
+function detalhe(alvo, p, comFechar) {
+    var temAlerta = p.col.tom === 'danger', abas = ABAS.filter(function (a) { return a !== 'Alertas' || temAlerta; }), atual = temAlerta ? 'Alertas' : 'Pedido';
+    alvo.innerHTML = '';
+    var d = el('div', 'cm-detail');
+    d.innerHTML = '<div class="cm-detail__head"><h2 class="cm-detail__id">#' + p.n + '</h2>' + origem(p.o) + tipo(p.tipo) + estado(p.col) +
+        (comFechar ? '<button class="cm-icon-btn cm-detail__close" type="button" aria-label="Fechar detalhes" title="Fechar" data-fechar><i class="bi bi-x-lg" aria-hidden="true"></i></button>' : '') + '</div>';
+    var tabs = el('div', 'cm-tabs'); tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', 'Dados do pedido');
+    var corpo = el('div', 'cm-detail__body'); corpo.setAttribute('role', 'tabpanel');
+    function escolher(a, foco) {
+        atual = a;
+        tabs.querySelectorAll('.cm-tab').forEach(function (b) { var on = b.dataset.aba === a; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; if (on && foco) b.focus(); });
+        corpo.innerHTML = conteudo(a, p);
+    }
+    abas.forEach(function (a) {
+        var b = el('button', 'cm-tab', a + (a === 'Alertas' ? '<span class="cm-tab__dot" aria-label="tem alerta"></span>' : ''));
+        b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.aba = a;
+        b.addEventListener('click', function () { escolher(a); });
+        tabs.appendChild(b);
+    });
+    tabs.addEventListener('keydown', function (e) {
+        var i = abas.indexOf(atual), k = { ArrowRight: i + 1, ArrowLeft: i - 1 + abas.length, Home: 0, End: abas.length - 1 }[e.key];
+        if (k != null) { escolher(abas[k % abas.length], true); e.preventDefault(); }
+    });
+    d.appendChild(tabs); d.appendChild(corpo);
+    var pe = el('div', 'cm-detail__foot'), principal = p.a.filter(function (x) { return !A[x][2]; })[0];
+    var bAcoes = el('button', 'cm-btn', '<i class="bi bi-three-dots" aria-hidden="true"></i>Ações'); bAcoes.type = 'button';
+    bAcoes.addEventListener('click', function () { abrirMenu(p, bAcoes, bAcoes); });
+    pe.appendChild(bAcoes);
+    if (principal) { var bp = el('button', 'cm-btn cm-btn--primary', A[principal][1]); bp.type = 'button'; pe.appendChild(bp); }
+    d.appendChild(pe);
+    alvo.appendChild(d);
+    escolher(atual);
+    var f = d.querySelector('[data-fechar]'); if (f) f.addEventListener('click', fecharGaveta);
+}
+
+/* Menu de ações e filtro de origem */
+var menu = document.getElementById('menu');
+function posicionar(ancora, direita) {
+    menu.hidden = false;
+    var r = ancora.getBoundingClientRect(), mw = menu.offsetWidth, mh = menu.offsetHeight, top = r.bottom + 2;
+    if (top + mh > innerHeight - 8) top = r.top - mh - 6;
+    menu.style.left = Math.max(8, Math.min(direita ? r.right - mw : r.left, innerWidth - mw - 8)) + 'px';
+    menu.style.top = Math.max(8, top) + 'px';
+}
+function abrirMenu(p, ancora, volta) {
+    menu.innerHTML = '<li class="cm-menu__title" role="presentation">Pedido #' + p.n + ' · ' + p.col.nome + '</li>';
+    var comuns = p.a.filter(function (x) { return !A[x][2]; }), perigo = p.a.filter(function (x) { return A[x][2]; });
+    function item(x, cls) {
+        var li = el('li', cls || ''); li.setAttribute('role', 'presentation');
+        var a = el('a', '', '<i class="bi ' + A[x][0] + '" aria-hidden="true"></i>' + A[x][1]);
+        a.href = '#'; a.setAttribute('role', 'menuitem'); a.tabIndex = -1;
+        a.addEventListener('click', function (e) { e.preventDefault(); fecharMenu(); });
+        li.appendChild(a); menu.appendChild(li);
+    }
+    comuns.forEach(function (x) { item(x); });
+    if (comuns.length && perigo.length) { var sep = el('li', 'cm-menu__sep'); sep.setAttribute('role', 'separator'); menu.appendChild(sep); }
+    perigo.forEach(function (x) { item(x, 'is-danger'); });
+    menu.appendChild(el('li', 'cm-menu__hint', '↑↓ escolher · Enter confirmar · Esc fechar'));
+    posicionar(ancora, true);
+    menu._volta = volta;
+    var a = menu.querySelector('a'); if (a) a.focus();
+}
+function abrirOrigens(ancora) {
+    var conta = {};
+    TODOS.forEach(function (p) { conta[p.o] = (conta[p.o] || 0) + 1; });
+    menu.innerHTML = '<li class="cm-menu__title" role="presentation">Mostrar pedidos de</li>';
+    Object.keys(SIGLAS).forEach(function (o) {
+        var li = el('li', '', '<a href="#" role="menuitemcheckbox" aria-checked="true" tabindex="-1"><i class="bi bi-check-square-fill" aria-hidden="true"></i>' + origem(o) + '<span class="cm-menu__count">' + (conta[o] || 0) + '</span></a>');
+        li.querySelector('a').addEventListener('click', function (e) {
+            e.preventDefault();
+            var on = this.getAttribute('aria-checked') !== 'true';
+            this.setAttribute('aria-checked', on); this.querySelector('.bi').className = 'bi ' + (on ? 'bi-check-square-fill' : 'bi-square');
+        });
+        menu.appendChild(li);
+    });
+    posicionar(ancora, false);
+    menu._volta = ancora;
+    var a = menu.querySelector('a'); if (a) a.focus();
+}
+function fecharMenu() { if (menu.hidden) return; menu.hidden = true; if (menu._volta) menu._volta.focus(); }
+menu.addEventListener('keydown', function (e) {
+    var itens = Array.prototype.slice.call(menu.querySelectorAll('a')), i = itens.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { itens[(i + 1) % itens.length].focus(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { itens[(i - 1 + itens.length) % itens.length].focus(); e.preventDefault(); }
+    else if (e.key === 'Escape') { fecharMenu(); e.preventDefault(); e.stopPropagation(); }
+    else if (e.key === 'Tab') { e.preventDefault(); }
+});
+document.addEventListener('mousedown', function (e) { if (!menu.hidden && !menu.contains(e.target) && !e.target.closest('[data-menu], #filtro-origem, .cm-detail__foot')) fecharMenu(); });
+document.getElementById('filtro-origem').addEventListener('click', function (e) { abrirOrigens(e.currentTarget); });
+
+/* Painel lateral (Kanbans) */
+var gaveta = document.getElementById('gaveta');
+function abrirGaveta(p, volta) { fecharMenu(); detalhe(gaveta, p, true); gaveta.classList.add('is-open'); gaveta._volta = volta; var t = gaveta.querySelector('.cm-tab[aria-selected="true"]'); if (t) t.focus(); }
+function fecharGaveta() { if (!gaveta.classList.contains('is-open')) return; gaveta.classList.remove('is-open'); if (gaveta._volta) gaveta._volta.focus(); }
+
+/* Cursor do teclado nos Kanbans (roving tabindex): setas andam, Enter abre as ações, Ctrl+Enter o detalhe */
+var cursor = null;
+function focar(c, semFoco) {
+    if (!c) return;
+    if (cursor) { cursor.tabIndex = -1; cursor.classList.remove('is-cursor'); }
+    cursor = c; c.tabIndex = 0; c.classList.add('is-cursor');
+    if (!semFoco) c.focus();
+    c.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+function daColuna(ci) { return Array.prototype.slice.call(quadro.querySelectorAll('.cm-board__col:not(.is-collapsed) .cm-tile[data-col="' + ci + '"]')); }
+function abertas() { return COLUNAS.map(function (_, i) { return i; }).filter(function (i) { return daColuna(i).length; }); }
+function porLinha() { return Math.max(1, Math.floor((livre.clientWidth - 32 + 10) / (250 + 10))); }
+[quadro, livre].forEach(function (raiz) {
+    raiz.addEventListener('click', function (e) {
+        var c = e.target.closest('.cm-tile'); if (!c) return;
+        focar(c);
+        if (e.target.closest('[data-menu]')) abrirMenu(c._p, e.target.closest('[data-menu]'), c);
+        if (e.target.closest('[data-detalhe]')) abrirGaveta(c._p, c);
+    });
+    raiz.addEventListener('keydown', function (e) {
+        var c = e.target.closest('.cm-tile'); if (!c) return;
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { abrirGaveta(c._p, c); e.preventDefault(); return; }
+        if (e.key === 'Enter') { abrirMenu(c._p, c.querySelector('[data-menu]'), c); e.preventDefault(); return; }
+        var alvo = null;
+        if (raiz === quadro) {
+            var ci = +c.dataset.col, pi = +c.dataset.idx, cols = abertas(), k = cols.indexOf(ci);
+            if (e.key === 'ArrowDown') alvo = daColuna(ci)[pi + 1];
+            if (e.key === 'ArrowUp') alvo = daColuna(ci)[pi - 1];
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { var col = cols[k + (e.key === 'ArrowRight' ? 1 : -1)]; if (col != null) { var l = daColuna(col); alvo = l[Math.min(pi, l.length - 1)]; } }
+        } else {
+            var d = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: porLinha(), ArrowUp: -porLinha() }[e.key];
+            if (d) alvo = livre.querySelectorAll('.cm-tile')[+c.dataset.idx + d];
+        }
+        if (/^Arrow/.test(e.key)) { focar(alvo); e.preventDefault(); }
+    });
+});
+
+/* Lista: setas trocam o pedido e o detalhe acompanha; Enter abre as ações; Ctrl+Enter vai às abas */
+var selecionada = null, listaDetalhe = document.getElementById('lista-detalhe');
+function selecionar(item, semFoco) {
+    if (!item) return;
+    if (selecionada) { selecionada.classList.remove('is-selected'); selecionada.tabIndex = -1; selecionada.removeAttribute('aria-selected'); }
+    selecionada = item; item.classList.add('is-selected'); item.tabIndex = 0; item.setAttribute('aria-selected', 'true');
+    if (!semFoco) item.focus();
+    item.scrollIntoView({ block: 'nearest' });
+    detalhe(listaDetalhe, item._p, false);
+}
+linhas.addEventListener('click', function (e) { var it = e.target.closest('.cm-table__item'); if (it) selecionar(it); });
+linhas.addEventListener('keydown', function (e) {
+    var it = e.target.closest('.cm-table__item'); if (!it) return;
+    if (e.key === 'ArrowDown') { selecionar(it.nextElementSibling); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { selecionar(it.previousElementSibling); e.preventDefault(); }
+    else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { var t = listaDetalhe.querySelector('.cm-tab[aria-selected="true"]'); if (t) t.focus(); e.preventDefault(); }
+    else if (e.key === 'Enter') { abrirMenu(it._p, it.querySelector('.cm-mono'), it); e.preventDefault(); }
+});
+
+/* Vistas e rodapé de atalhos */
+var KANBAN = '<span><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> navegar</span><span><kbd>Enter</kbd> ações</span><span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> detalhes</span><span><kbd>/</kbd> buscar</span><span><kbd>Esc</kbd> fechar</span>';
+var ATALHOS = {
+    lista: '<span><kbd>↑</kbd><kbd>↓</kbd> trocar o pedido</span><span><kbd>Enter</kbd> ações</span><span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> ir para as abas</span><span><kbd>←</kbd><kbd>→</kbd> trocar a aba</span><span><kbd>/</kbd> buscar</span>',
+    livre: KANBAN, colunado: KANBAN
+};
+var vista = null;
+function achar(l, p) { return Array.prototype.filter.call(l, function (x) { return x._p === p; })[0]; }
+function mostrar(v, semFoco) {
+    vista = v;
+    fecharMenu(); fecharGaveta();
+    ['lista', 'livre', 'colunado'].forEach(function (x) { document.getElementById('v-' + x).hidden = x !== v; });
+    document.querySelectorAll('[data-vista]').forEach(function (b) { b.classList.toggle('is-active', b.dataset.vista === v); b.setAttribute('aria-pressed', b.dataset.vista === v); });
+    document.getElementById('rodape').innerHTML = ATALHOS[v] + '<span class="cm-shortcuts__end">Atualizado agora · ' + TODOS.length + ' em andamento · 14 finalizados</span>';
+    if (v === 'lista') selecionar(achar(linhas.children, INICIAL), semFoco);
+    if (v === 'livre') focar(achar(livre.querySelectorAll('.cm-tile'), INICIAL), semFoco);
+    if (v === 'colunado') focar(achar(quadro.querySelectorAll('.cm-tile'), INICIAL), semFoco);
+}
+document.querySelectorAll('[data-vista]').forEach(function (b) { b.addEventListener('click', function () { mostrar(b.dataset.vista); }); });
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && menu.hidden) fecharGaveta();
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT') { document.getElementById('busca').focus(); e.preventDefault(); }
+});
+var h = location.hash;
+mostrar(h.indexOf('livre') >= 0 ? 'livre' : h.indexOf('colunado') >= 0 ? 'colunado' : 'lista', true);
+if (h.indexOf('menu') >= 0 && vista !== 'lista' && cursor) abrirMenu(cursor._p, cursor.querySelector('[data-menu]'), cursor);
+if (h.indexOf('detalhe') >= 0 && vista !== 'lista' && cursor) abrirGaveta(cursor._p, cursor);
+if (h.indexOf('origem') >= 0) abrirOrigens(document.getElementById('filtro-origem'));
+if (h.indexOf('erro') >= 0 && vista === 'lista') selecionar(achar(linhas.children, TODOS[0]), true);
+</script>
+</body>
+</html>

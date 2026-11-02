@@ -82,6 +82,20 @@
     --cm-palette-petroleo: #0e6d77;
     --cm-palette-marrom: #7d5130;
     --cm-palette-grafite: #4d5a68;
+    /* Etiqueta do tipo do pedido (perfil Admin, .cm-tag--entrega etc.): fundo suave, linha e texto na cor do
+     * tipo, com 4,5:1 ou mais nos dois temas; a Retirada é cheia, no laranja da paleta (5,2:1 com branco). */
+    --cm-tipo-entrega-soft: #e2edef;
+    --cm-tipo-entrega-line: #b2d0d3;
+    --cm-tipo-entrega-ink: #0e6d77;
+    --cm-tipo-mesa-soft: #e4ecf5;
+    --cm-tipo-mesa-line: #b7cde5;
+    --cm-tipo-mesa-ink: #1d62ad;
+    --cm-tipo-balcao-soft: #e4efe9;
+    --cm-tipo-balcao-line: #b7d4c4;
+    --cm-tipo-balcao-ink: #1e7a46;
+    --cm-tipo-ficha-soft: #ede8f4;
+    --cm-tipo-ficha-line: #d0c2e2;
+    --cm-tipo-ficha-ink: #6d3fa3;
 }
 
 /* ---------- Tema escuro ----------
@@ -135,6 +149,18 @@
     --cm-chart-5: #d55181;
     --cm-chart-7: #9085e9;
     --cm-chart-8: #e66767;
+    --cm-tipo-entrega-soft: #124451;
+    --cm-tipo-entrega-line: #105864;
+    --cm-tipo-entrega-ink: #a3c8cb;
+    --cm-tipo-mesa-soft: #183f67;
+    --cm-tipo-mesa-line: #1b518a;
+    --cm-tipo-mesa-ink: #a9c3e0;
+    --cm-tipo-balcao-soft: #19493e;
+    --cm-tipo-balcao-line: #1b6142;
+    --cm-tipo-balcao-ink: #aaccb9;
+    --cm-tipo-ficha-soft: #383163;
+    --cm-tipo-ficha-line: #533883;
+    --cm-tipo-ficha-ink: #c8b6dc;
 }
 
 /* ---------- Fontes locais (sem dependência de internet) ---------- */

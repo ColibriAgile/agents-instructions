@@ -2135,3 +2135,194 @@ label { font-weight: inherit; }
 }
 .cm-error__icon { color: var(--cm-ink-3); font-size: 24px; line-height: 1; }
 .cm-error__back { margin-top: 8px; text-decoration: none; }
+
+/* ---------- Painel de operação: pedidos em lista e em quadro ----------
+ * Página do perfil Admin sem a lateral (ex.: o painel de pedidos do DConnect, na raiz do Dashboard), operada
+ * com mouse e teclado. Três vistas da mesma fila: Lista (grade-tabela com o detalhe ao lado), Kanban livre
+ * (cartões na ordem da fila) e Kanban colunado (uma coluna por estado). Tudo na escala do Admin: texto de
+ * 13 px, etiquetas .cm-tag, avisos .cm-notice, menu .cm-menu, painel lateral .cm-drawer. */
+
+/* Etiqueta do tipo do pedido: suave, na cor do tipo (paleta curada), sem ícone; a Retirada é cheia, no laranja
+ * da paleta, porque pede a atenção de quem entrega no balcão. Não é a etiqueta de alarme (.cm-tag--solid). */
+.cm-tag--entrega { color: var(--cm-tipo-entrega-ink); background: var(--cm-tipo-entrega-soft); border-color: var(--cm-tipo-entrega-line); }
+.cm-tag--mesa { color: var(--cm-tipo-mesa-ink); background: var(--cm-tipo-mesa-soft); border-color: var(--cm-tipo-mesa-line); }
+.cm-tag--balcao { color: var(--cm-tipo-balcao-ink); background: var(--cm-tipo-balcao-soft); border-color: var(--cm-tipo-balcao-line); }
+.cm-tag--ficha { color: var(--cm-tipo-ficha-ink); background: var(--cm-tipo-ficha-soft); border-color: var(--cm-tipo-ficha-line); }
+.cm-tag--retirada { color: #fff; background: var(--cm-palette-laranja); border-color: var(--cm-palette-laranja); }
+
+/* Origem (provedor, canal): o logo, imagem da aplicação, sempre junto do nome; nunca só um dos dois. */
+.cm-origem { display: inline-flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; }
+.cm-origem__logo {
+    display: inline-grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    overflow: hidden;
+    color: var(--cm-ink-2);
+    background: var(--cm-surface-2);
+    border: 1px solid var(--cm-line);
+    border-radius: var(--cm-radius-sm);
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1;
+    box-sizing: border-box;
+}
+.cm-origem__logo > img { width: 100%; height: 100%; object-fit: contain; }
+
+/* Grade que quebra (.cm-table--wrap): com menos de 1000 px de grade, cada linha vira um bloco de duas linhas
+ * ou mais, em vez de rolar de lado. As células de .cm-cell--first vão para a primeira linha (identificação e
+ * valor), .cm-table__break quebra a linha e as demais vêm depois, com o rótulo .cm-cell__label à vista; a
+ * ordem do HTML continua a do cabeçalho. Sem o modificador, a .cm-table rola de lado, como sempre. */
+.cm-table--wrap { container-type: inline-size; }
+.cm-table__break { display: none; }
+.cm-table__item.is-selected > .cm-table__row,
+.cm-table__item.is-selected:hover > .cm-table__row { background: var(--cm-accent-soft); }
+@container (max-width: 999px) {
+    .cm-table--wrap .cm-table__head { display: none; }
+    .cm-table--wrap .cm-table__row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 16px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+    .cm-table--wrap .cm-table__row > * { order: 2; }
+    .cm-table--wrap .cm-table__row > .cm-cell--first { order: 0; }
+    .cm-table--wrap .cm-table__row > .cm-cell--grow { flex: 1 1 120px; font-weight: 600; }
+    .cm-table--wrap .cm-table__row > .cm-cell--first.cm-cell--end { margin-left: auto; text-align: right; }
+    .cm-table--wrap .cm-table__break { display: block; order: 1; flex: 0 0 100%; height: 0; }
+    .cm-table--wrap .cm-cell__label { display: inline; margin-right: 4px; color: var(--cm-ink-3); font-size: 11px; }
+}
+
+/* Lista com o detalhe ao lado: a grade rola por dentro e o detalhe fica aberto à direita, na largura de
+ * --cm-detail-w (padrão 560 px; 420 px em telas abaixo de 1100 px). */
+.cm-master { display: flex; flex: 1 1 auto; min-height: 0; }
+.cm-master__list { flex: 1 1 auto; min-width: 0; padding: 16px; overflow: auto; }
+.cm-master__detail {
+    display: flex;
+    flex: 0 0 var(--cm-detail-w, 560px);
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--cm-surface);
+    border-left: 1px solid var(--cm-line);
+}
+@media (max-width: 1099px) { .cm-master__detail { flex-basis: var(--cm-detail-w-sm, 420px); } }
+
+/* Abas do detalhe: traço de 2 px embaixo da ativa (indicador de aba, não faixa lateral). Setas trocam a aba. */
+.cm-tabs { display: flex; gap: 2px; padding: 0 12px; overflow-x: auto; border-bottom: 1px solid var(--cm-line); }
+.cm-tab {
+    position: relative;
+    height: 34px;
+    padding: 0 10px;
+    color: var(--cm-ink-2);
+    font-family: var(--cm-font);
+    font-size: 13px;
+    white-space: nowrap;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+.cm-tab:hover { color: var(--cm-ink); }
+.cm-tab[aria-selected="true"] { color: var(--cm-accent-ink); font-weight: 600; }
+.cm-tab[aria-selected="true"]::after { position: absolute; right: 8px; bottom: 0; left: 8px; height: 2px; content: ''; background: var(--cm-accent); }
+.cm-tab:focus-visible { outline-offset: -2px !important; }
+/* Aba com pendência (ex.: alertas): um ponto de erro depois do rótulo, com o nome no aria-label. */
+.cm-tab__dot { display: inline-block; width: 6px; height: 6px; margin-left: 6px; vertical-align: middle; background: var(--cm-danger); border-radius: 50%; }
+
+/* Kanban colunado (.cm-board): uma coluna por estado, cada uma rola por dentro; sem espaço, o quadro rola de
+ * lado. Coluna recolhida (.is-collapsed): uma tira com o nome em pé e a contagem; clicar abre. */
+.cm-board { display: flex; flex: 1 1 auto; gap: 12px; min-height: 0; padding: 16px; overflow-x: auto; }
+.cm-board__col {
+    display: flex;
+    flex: 1 1 240px;
+    flex-direction: column;
+    min-width: 240px;
+    max-width: 340px;
+    min-height: 0;
+    background: var(--cm-surface-2);
+    border: 1px solid var(--cm-line);
+    border-radius: var(--cm-radius);
+}
+.cm-board__head { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 6px 4px 12px; }
+.cm-board__name { display: inline-flex; flex: 1 1 auto; align-items: center; gap: 7px; min-width: 0; margin: 0; font-size: 13px; font-weight: 600; }
+.cm-board__name > .bi { color: var(--cm-board-tone, var(--cm-ink-2)); font-size: 13px; }
+.cm-board__col--danger { --cm-board-tone: var(--cm-danger); }
+.cm-board__col--warning { --cm-board-tone: var(--cm-warning); }
+.cm-board__col--accent { --cm-board-tone: var(--cm-accent-ink); }
+.cm-board__col--success { --cm-board-tone: var(--cm-success); }
+.cm-board__list { display: flex; flex: 1 1 auto; flex-direction: column; gap: 8px; min-height: 0; margin: 0; padding: 2px 8px 8px; overflow-y: auto; list-style: none; }
+.cm-board__col.is-collapsed { flex: 0 0 40px; min-width: 40px; cursor: pointer; }
+.cm-board__col.is-collapsed .cm-board__head { flex-direction: column; gap: 10px; padding: 8px 0; }
+.cm-board__col.is-collapsed .cm-board__name { flex: 0 0 auto; writing-mode: vertical-rl; }
+.cm-board__col.is-collapsed .cm-board__name > .bi { transform: rotate(90deg); }
+.cm-board__col.is-collapsed .cm-board__list,
+.cm-board__col.is-collapsed .cm-board__collapse { display: none; }
+
+/* Kanban livre (.cm-tiles): os cartões na ordem da fila, numa grade que preenche a largura. */
+.cm-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); align-items: start; gap: 10px; margin: 0; padding: 16px; list-style: none; }
+
+/* Cartão de resumo (.cm-tile): origem, tempo e menu de ações; número e valor; o título (cliente); as etiquetas
+ * (tipo e, sem coluna de estado, o estado) com a previsão; o aviso .cm-notice só quando pede ação. O cursor do
+ * teclado (.is-cursor) é o contorno de foco. */
+.cm-tile { display: grid; gap: 4px; padding: 9px 10px 10px 12px; background: var(--cm-surface); border: 1px solid var(--cm-line); border-radius: var(--cm-radius); }
+.cm-tile:hover { border-color: var(--cm-line-strong); }
+.cm-tile.is-cursor { outline: 2px solid var(--cm-focus); outline-offset: 1px; }
+.cm-tile__line { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cm-tile__line > .cm-origem { color: var(--cm-ink-2); font-size: 12px; }
+.cm-tile__time { margin-left: auto; color: var(--cm-ink-2); font-family: var(--cm-mono); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cm-tile__menu.cm-icon-btn { flex-basis: 26px; width: 26px; height: 26px; margin: -4px -4px -4px 0; font-size: 14px; }
+.cm-tile__id { padding: 0; color: var(--cm-ink); font-family: var(--cm-mono); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; background: none; border: 0; cursor: pointer; }
+.cm-tile__id:hover { color: var(--cm-accent-ink); text-decoration: underline; }
+.cm-tile__value { margin-left: auto; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cm-tile__title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cm-tile__tags { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; color: var(--cm-ink-2); font-size: 12px; }
+.cm-tile > .cm-notice { display: flex; flex-wrap: nowrap; align-items: flex-start; gap: 6px; min-height: 0; margin-top: 2px; padding: 5px 8px; color: var(--cm-ink); font-size: 12px; line-height: 1.35; }
+.cm-tile > .cm-notice > .bi { margin-top: 1px; font-size: 12px; }
+
+/* Menu de ações do pedido: o .cm-menu, solto (posição pela aplicação), com título, separador antes da ação
+ * destrutiva, a destrutiva em erro e a dica de teclado no pé. */
+.cm-menu--float { position: fixed; margin: 0; list-style: none; }
+.cm-menu__title { padding: 6px 10px 4px; color: var(--cm-ink-2); font-size: 12px; font-weight: 600; }
+.cm-menu--float > li > a > .bi { color: var(--cm-ink-2); }
+.cm-menu--float > li > a,
+.cm-menu--float > li > a:hover,
+.cm-menu--float > li > a:focus { justify-content: flex-start; }
+.cm-menu > li.is-danger > a,
+.cm-menu > li.is-danger > a > .bi { color: var(--cm-danger) !important; }
+.cm-menu > li.is-danger > a:hover,
+.cm-menu > li.is-danger > a:focus { background: var(--cm-danger-soft); }
+.cm-menu__sep { margin: 4px 0; border-top: 1px solid var(--cm-line); }
+.cm-menu__hint { margin-top: 4px; padding: 6px 10px 4px; color: var(--cm-ink-3); font-size: 11px; border-top: 1px solid var(--cm-line); }
+.cm-menu__count { margin-left: auto; color: var(--cm-ink-3); font-family: var(--cm-mono); font-size: 12px; }
+
+/* Atalhos da vista, sempre à vista no rodapé da página. */
+.cm-shortcuts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; min-height: 30px; padding: 4px 24px; color: var(--cm-ink-2); background: var(--cm-topbar-bg); border-top: 1px solid var(--cm-line); font-size: 12px; }
+.cm-shortcuts > span { display: inline-flex; align-items: center; gap: 5px; }
+.cm-shortcuts__end { margin-left: auto; }
+.cm-shortcuts kbd {
+    display: inline-grid;
+    place-items: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    color: var(--cm-ink-2);
+    background: var(--cm-surface);
+    border: 1px solid var(--cm-line);
+    border-radius: var(--cm-radius-sm);
+    font-size: 11px;
+    box-sizing: border-box;
+}
+
+/* Detalhe do registro (.cm-detail), o mesmo no lado da lista e no painel lateral: cabeçalho com o número e as
+ * etiquetas, abas, corpo que rola (pares .cm-pairs, listas) e o pé com as ações (Ações e a principal à direita). */
+.cm-detail { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+.cm-detail__head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-height: 56px; padding: 10px 12px 10px 20px; box-sizing: border-box; }
+.cm-detail__id { margin: 0 4px 0 0; color: var(--cm-ink); font-family: var(--cm-mono); font-size: 16px; font-weight: 650; }
+.cm-detail__close { margin-left: auto; }
+.cm-detail__body { display: grid; flex: 1 1 auto; align-content: start; gap: 16px; min-height: 0; padding: 12px 20px 16px; overflow-y: auto; }
+.cm-detail__foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px; background: var(--cm-surface-2); border-top: 1px solid var(--cm-line); }
+.cm-drawer--wide { width: min(560px, calc(100vw - 28px)); }

@@ -1,6 +1,6 @@
 # Adoção por framework
 
-Complementa o passo 3 de [`./adotar.md`](./adotar.md). A marcação de cada componente está em `../assets/kit/exemplo.html` (`#historico` abre o painel lateral; `#inicio` mostra a marca-d'água) e a da tela de entrada em `../assets/kit/exemplo-entrada.html` (`#erro` mostra a página de erro).
+Complementa o passo 3 de [`./adotar.md`](./adotar.md). A marcação de cada componente está em `../assets/kit/exemplo.html` (o painel de operação, em `../assets/kit/exemplo-pedidos.html`) (`#historico` abre o painel lateral; `#inicio` mostra a marca-d'água) e a da tela de entrada em `../assets/kit/exemplo-entrada.html` (`#erro` mostra a página de erro).
 
 ## Ordem de carga (todos os frameworks)
 
