@@ -1,7 +1,7 @@
 ---
 name: colibri-design-kit
-description: 'Colibri Design Kit leva a linha visual das aplicações Colibri (perfis Admin, Operação, Produção e Cards) a um repositório e mede a aderência a ela, sobre a skill impeccable 4.x. Use para adotar o kit num frontend Colibri ou atualizar a versão adotada (inclusive migrar artefatos do impeccable 3.x), medir a aderência de uma página ou do frontend ao kit com nota e ranking de páginas, revisar uma branch, PR ou mudança local quanto ao que ela piorou em relação ao kit, refatorar uma página para o kit ou registrar um desvio do kit. Não use para projetos fora da linha Colibri, para backend nem para crítica de UX sem relação com o kit (use impeccable critique).'
-argument-hint: '[adotar | aderencia | revisar | refatorar | desvio] [alvo] — ex.: "aderencia src/pages/Clientes.razor", "revisar 482", "adotar src/web, Blazor DevExpress"; vazio abre o menu'
+description: 'Colibri Design Kit leva a linha visual das aplicações Colibri (perfis Admin, Operação, Produção e Cards) a um repositório e mede a aderência a ela, sobre a skill impeccable 4.x. Use para adotar o kit num frontend Colibri ou atualizar a versão adotada (inclusive migrar artefatos do impeccable 3.x), medir a aderência de uma página ou do frontend ao kit com nota e ranking de páginas, revisar uma branch, PR ou mudança local quanto ao que ela piorou em relação ao kit, refatorar uma página para o kit, registrar um desvio do kit ou pedir ao consultor o que fazer a seguir (ele sugere ou roda os comandos). Não use para projetos fora da linha Colibri, para backend nem para crítica de UX sem relação com o kit (use impeccable critique).'
+argument-hint: '[consultor | adotar | aderencia | revisar | refatorar | desvio] [alvo] — ex.: "consultor auto", "aderencia src/pages/Clientes.razor", "revisar 482", "adotar src/web, Blazor DevExpress"; vazio roda o consultor'
 ---
 
 # Colibri Design Kit
@@ -25,25 +25,18 @@ Compatibilidade: impeccable 4.x (conferido na 4.4.0): `PRODUCT.md` no schema de 
 
 | Comando | O que faz | Procedimento |
 |---|---|---|
+| `consultor [objetivo] [auto]` | Lê o estado do projeto e monta o plano: quais comandos rodar e em que ordem, com motivo e evidência. Sem `auto`, sugere e roda o que o usuário escolher; com `auto`, roda sozinho `revisar` e `aderencia` e pede confirmação antes de `adotar`, `refatorar` e `desvio`. Também roda quando a skill é chamada sem argumento | [`references/consultor.md`](references/consultor.md) |
 | `adotar [caminho, framework]` | Adota o kit ou atualiza a versão adotada: copia os arquivos, aciona `impeccable init` e `document`, registra as decisões | [`references/adotar.md`](references/adotar.md) |
 | `aderencia [alvo]` | Nota de 0 a 100 de aderência ao kit, por grupo de regras, com evidência `arquivo:linha`; sem alvo, avalia o frontend e ranqueia as páginas da menos aderente para a mais. Somente leitura, salvo o relatório | [`references/aderencia.md`](references/aderencia.md) |
 | `revisar [PR \| branch]` | Julga só o que uma mudança causou (sem argumento: a branch atual contra a principal, mais o que não foi commitado): achados introduzidos, regressões e sinais removidos, com a rubrica de aderência e os gatilhos de bloqueio; veredito Bloquear ou Aprovar. Somente leitura, nada gravado | [`references/revisar.md`](references/revisar.md) |
 | `refatorar <página>` | Mede a página, pede ao impeccable a refatoração já enquadrada no kit, mede de novo e marca a página no `DECISOES.md` | [`references/refatorar.md`](references/refatorar.md) |
 | `desvio <descrição>` | Registra um desvio do kit no `DECISOES.md`, com confirmação | seção "Desvio" abaixo |
 
-Roteamento pelo primeiro termo do argumento (com ou sem acento: `aderência`, `aderencia`; `atualizar` é sinônimo de `adotar`; `revisão` e `review`, de `revisar`):
+Roteamento pelo primeiro termo do argumento (com ou sem acento: `aderência`, `aderencia`; `atualizar` é sinônimo de `adotar`; `revisão` e `review`, de `revisar`; `consultar`, `sugerir` e `próximo`, de `consultor`):
 
 - **Verbo da tabela:** leia o procedimento dele por inteiro antes de agir e siga-o.
 - **Outro texto** (ex.: `src/web, Blazor DevExpress`): é a entrada do `adotar`; quem usava a skill antes dos verbos continua com o mesmo comando.
-- **Sem argumento:** apresente o menu abaixo; nunca execute um verbo sem a escolha do usuário.
-
-**Menu.** Leia o estado do projeto e abra com uma ou duas recomendações, cada uma com o motivo em uma linha e o comando pronto para digitar; depois mostre a tabela de comandos.
-
-- Sem `docs/design/DECISOES.md` nem `DESIGN.md` → `adotar`.
-- Versão do kit registrada no `DECISOES.md` mais antiga que a primeira entrada de "Versões" do `LEIA-ME.md` do kit, ou `colibri-ui.css` sem `colibri-base.css` ao lado → `adotar` (atualização), citando as entradas de "Versões" que o projeto ainda não tem.
-- Branch à frente da principal ou mudança local em arquivos de interface → `revisar`, antes de abrir ou aprovar o PR.
-- Sem `docs/design/ADERENCIA.md` → `aderencia`, para a nota de partida e a ordem das páginas.
-- Com relatório de aderência → `refatorar <página pior colocada no ranking>`, ou `aderencia` de novo se o relatório é anterior aos últimos commits de UI.
+- **Sem argumento:** rode o `consultor` no modo sugestão ([`references/consultor.md`](references/consultor.md)); nunca execute um verbo sem a escolha do usuário.
 
 ## Fonte da verdade
 
