@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <!-- viewport-fit=cover: com ele, env(safe-area-inset-bottom) afasta as barras presas embaixo do gesto do iPhone. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Colibri UI — vitrine web</title>
+    <link rel="icon" href="logos/colibri.ico">
+    <link rel="stylesheet" href="icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="colibri-touch.css">
+    <script>
+        /* Sem esquema do canal, a vitrine usa o tema Colibri; #escuro força o escuro. Na aplicação, o
+           esquema do canal "delivery" (colibri-esquema.js) é aplicado antes de pintar. */
+        document.documentElement.setAttribute('data-theme', location.hash.indexOf('escuro') >= 0 ? 'dark' : 'light');
+    </script>
+    <style>
+        /* Apenas para esta página de exemplo */
+        body { margin: 0; }
+        .demo-tela { display: none; }
+        .demo-tela.is-on { display: block; }
+        .demo-capa { width: 100%; height: 100%; background: linear-gradient(120deg, #6b3d1c, #c98a3c 55%, #f0d08a); }
+        .demo-foto-a { background: linear-gradient(150deg, #7a4a12, #d8a24a 60%, #f6e2a8); }
+        .demo-foto-b { background: linear-gradient(150deg, #2b1608, #5d3416 55%, #b07a4a); }
+        .demo-foto-c { background: linear-gradient(150deg, #e9d7c2, #f6ecd9 50%, #c9a27e); }
+    </style>
+</head>
+<body>
+
+<!-- Loja: cabeçalho, busca, abas fixas, destaques estáticos, seções e a barra da sacola -->
+<div class="ct-app ct-app--web demo-tela" id="loja">
+<div class="ct-web">
+    <main class="ct-web__main">
+        <header class="ct-loja">
+            <div class="ct-loja__capa"><div class="demo-capa" role="img" aria-label="Foto do salão da Cantina do Porto"></div></div>
+            <div class="ct-loja__corpo">
+                <div class="ct-loja__logo"><i class="bi bi-shop" aria-hidden="true"></i></div>
+                <div class="ct-loja__dados">
+                    <h1 class="ct-loja__nome">Cantina do Porto</h1>
+                    <div class="ct-loja__estado"><span class="ct-tag ct-tag--success"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Aberto até 23h</span></div>
+                    <ul class="ct-loja__info">
+                        <li><i class="bi bi-clock" aria-hidden="true"></i>35–50 min</li>
+                        <li><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega R$ 6,90</li>
+                        <li><i class="bi bi-bag" aria-hidden="true"></i>Mínimo R$ 25,00</li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <div class="ct-topo">
+        <div class="ct-busca">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input class="ct-input" type="search" placeholder="Buscar no cardápio" aria-label="Buscar no cardápio">
+        </div>
+
+        <nav class="ct-abas" aria-label="Categorias">
+            <a class="ct-aba" href="#destaques">Destaques</a>
+            <a class="ct-aba is-active" href="#pratos" aria-current="true">Pratos</a>
+            <a class="ct-aba" href="#combos">Combos</a>
+            <a class="ct-aba" href="#bebidas">Bebidas</a>
+            <a class="ct-aba" href="#sobremesas">Sobremesas</a>
+        </nav>
+        </div>
+
+        <section class="ct-secao" id="destaques" aria-labelledby="destaques-titulo">
+            <h2 class="ct-secao__titulo" id="destaques-titulo">Destaques</h2>
+        </section>
+        <ul class="ct-faixa" aria-label="Destaques da casa" style="margin-top: 8px">
+            <li><article class="ct-destaque">
+                <div class="ct-destaque__foto"><i class="bi bi-fire" aria-hidden="true"></i></div>
+                <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Moqueca da casa</a></h3>
+                <span class="ct-price"><span class="ct-price__from">a partir de</span>R$ 129,00</span>
+            </article></li>
+            <li><article class="ct-destaque">
+                <div class="ct-destaque__foto"><i class="bi bi-egg-fried" aria-hidden="true"></i></div>
+                <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Risoto de cogumelos</a></h3>
+                <span class="ct-price">R$ 58,90</span>
+            </article></li>
+            <li><article class="ct-destaque">
+                <div class="ct-destaque__foto"><i class="bi bi-cake2" aria-hidden="true"></i></div>
+                <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Pudim da vó</a></h3>
+                <span class="ct-price">R$ 16,00</span>
+            </article></li>
+            <li><article class="ct-destaque">
+                <div class="ct-destaque__foto"><i class="bi bi-basket" aria-hidden="true"></i></div>
+                <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Combo executivo</a></h3>
+                <span class="ct-price">R$ 42,00</span>
+            </article></li>
+            <li><article class="ct-destaque">
+                <div class="ct-destaque__foto"><i class="bi bi-fire" aria-hidden="true"></i></div>
+                <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Costela no bafo</a></h3>
+                <span class="ct-price">R$ 89,00</span>
+            </article></li>
+            <li><article class="ct-destaque">
+                <div class="ct-destaque__foto"><i class="bi bi-cup-straw" aria-hidden="true"></i></div>
+                <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Suco natural 500 ml</a></h3>
+                <span class="ct-price">R$ 12,00</span>
+            </article></li>
+        </ul>
+
+        <section class="ct-secao" id="pratos" aria-labelledby="pratos-titulo">
+            <h2 class="ct-secao__titulo" id="pratos-titulo">Pratos</h2>
+            <ul class="ct-itens">
+                <li><article class="ct-item">
+                    <div class="ct-item__corpo">
+                        <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Risoto de cogumelos</a></h3>
+                        <p class="ct-item__desc">Arroz arbóreo, shiitake, shimeji e parmesão. Com trufas, se quiser.</p>
+                        <span class="ct-price">R$ 58,90</span>
+                    </div>
+                    <div class="ct-item__midia"><i class="bi bi-egg-fried" aria-hidden="true"></i></div>
+                    <!-- Com opção obrigatória (o ponto do arroz): o + abre o produto, como o link. -->
+                    <a class="ct-item__add" href="#produto" aria-label="Escolher opções de Risoto de cogumelos"><i class="bi bi-plus-lg" aria-hidden="true"></i></a>
+                </article></li>
+                <li><article class="ct-item">
+                    <div class="ct-item__corpo">
+                        <div class="ct-item__tags"><span class="ct-tag ct-tag--brand">Destaque</span></div>
+                        <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Moqueca da casa</a></h3>
+                        <p class="ct-item__desc">Peixe do dia, leite de coco e dendê. Serve duas pessoas.</p>
+                        <span class="ct-price"><span class="ct-price__from">a partir de</span>R$ 129,00</span>
+                    </div>
+                    <div class="ct-item__midia"><i class="bi bi-fire" aria-hidden="true"></i></div>
+                    <a class="ct-item__add" href="#produto" aria-label="Escolher opções de Moqueca da casa"><i class="bi bi-plus-lg" aria-hidden="true"></i></a>
+                </article></li>
+                <li><article class="ct-item is-unavailable">
+                    <div class="ct-item__corpo">
+                        <div class="ct-item__tags"><span class="ct-tag ct-tag--warning"><i class="bi bi-slash-circle" aria-hidden="true"></i>Indisponível hoje</span></div>
+                        <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Costela no bafo</a></h3>
+                        <p class="ct-item__desc">Costela bovina assada por 12 horas, mandioca e vinagrete.</p>
+                        <span class="ct-price">R$ 89,00</span>
+                    </div>
+                    <div class="ct-item__midia"><i class="bi bi-fire" aria-hidden="true"></i></div>
+                    <button class="ct-item__add" type="button" disabled aria-label="Adicionar Costela no bafo (indisponível hoje)"><i class="bi bi-plus-lg" aria-hidden="true"></i></button>
+                </article></li>
+            </ul>
+        </section>
+
+        <section class="ct-secao" id="combos" aria-labelledby="combos-titulo">
+            <h2 class="ct-secao__titulo" id="combos-titulo">Combos</h2>
+            <ul class="ct-itens">
+                <li><article class="ct-item">
+                    <div class="ct-item__corpo">
+                        <div class="ct-item__tags"><span class="ct-tag ct-tag--combo">Combo</span></div>
+                        <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Combo executivo</a></h3>
+                        <p class="ct-item__desc">Prato do dia, bebida e sobremesa.</p>
+                        <span class="ct-price">R$ 42,00</span>
+                    </div>
+                    <div class="ct-item__midia"><i class="bi bi-basket" aria-hidden="true"></i></div>
+                    <a class="ct-item__add" href="#produto" aria-label="Montar Combo executivo"><i class="bi bi-plus-lg" aria-hidden="true"></i></a>
+                </article></li>
+            </ul>
+        </section>
+
+        <section class="ct-secao" id="bebidas" aria-labelledby="bebidas-titulo">
+            <h2 class="ct-secao__titulo" id="bebidas-titulo">Bebidas</h2>
+            <ul class="ct-itens">
+                <li><article class="ct-item">
+                    <div class="ct-item__corpo">
+                        <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Suco natural 500 ml</a></h3>
+                        <p class="ct-item__desc">Laranja, limão ou abacaxi com hortelã.</p>
+                        <span class="ct-price">R$ 12,00</span>
+                    </div>
+                    <div class="ct-item__midia"><i class="bi bi-cup-straw" aria-hidden="true"></i></div>
+                    <a class="ct-item__add" href="#produto" aria-label="Escolher sabor de Suco natural 500 ml"><i class="bi bi-plus-lg" aria-hidden="true"></i></a>
+                </article></li>
+                <li><article class="ct-item">
+                    <div class="ct-item__corpo">
+                        <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Água com gás</a></h3>
+                        <span class="ct-price">R$ 6,00</span>
+                    </div>
+                    <div class="ct-item__midia"><i class="bi bi-cup" aria-hidden="true"></i></div>
+                    <!-- Sem opção obrigatória: o + adiciona na hora. -->
+                    <button class="ct-item__add" type="button" aria-label="Adicionar Água com gás"><i class="bi bi-plus-lg" aria-hidden="true"></i></button>
+                </article></li>
+            </ul>
+        </section>
+        <section class="ct-secao" id="sobremesas" aria-labelledby="sobremesas-titulo">
+            <h2 class="ct-secao__titulo" id="sobremesas-titulo">Sobremesas</h2>
+            <!-- Em grade, escolha do lojista: só porque todos os itens têm foto. -->
+            <ul class="ct-itens ct-itens--grade">
+                <li><article class="ct-destaque">
+                    <div class="ct-destaque__foto"><div class="demo-capa demo-foto-a" role="img" aria-label="Foto de Pudim da vó"></div></div>
+                    <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Pudim da vó</a></h3>
+                    <span class="ct-price">R$ 16,00</span>
+                </article></li>
+                <li><article class="ct-destaque">
+                    <div class="ct-destaque__foto"><div class="demo-capa demo-foto-b" role="img" aria-label="Foto de Petit gâteau"></div></div>
+                    <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Petit gâteau</a></h3>
+                    <span class="ct-price">R$ 24,00</span>
+                </article></li>
+                <li><article class="ct-destaque">
+                    <div class="ct-destaque__foto"><div class="demo-capa demo-foto-c" role="img" aria-label="Foto de Sorvete artesanal"></div></div>
+                    <h3 class="ct-item__nome"><a class="ct-item__link" href="#produto">Sorvete artesanal</a></h3>
+                    <span class="ct-price">R$ 14,00</span>
+                </article></li>
+            </ul>
+        </section>
+    </main>
+    <aside class="ct-web__lado" aria-label="Sacola">
+        <section class="ct-sacola" aria-labelledby="sacola-titulo-lado">
+            <div class="ct-sacola__cabeca">
+                <div>
+                    <h2 class="ct-sacola__titulo" id="sacola-titulo-lado">Sua sacola</h2>
+                    <p class="ct-sacola__loja">Cantina do Porto · entrega em 35–50 min</p>
+                </div>
+            </div>
+            <ul class="ct-sacola__itens">
+                <li class="ct-sacola__item">
+                    <p class="ct-sacola__nome">Risoto de cogumelos</p>
+                    <span class="ct-price">R$ 58,90</span>
+                    <p class="ct-sacola__opcoes">Al dente</p>
+                    <div class="ct-sacola__acoes">
+                        <a class="ct-btn ct-btn--ghost" href="#produto" aria-label="Editar Risoto de cogumelos">Editar</a>
+                        <div class="ct-qty"><button class="ct-qty__btn" type="button" aria-label="Remover Risoto de cogumelos"><i class="bi bi-trash3" aria-hidden="true"></i></button><span class="ct-qty__value" aria-live="polite">1</span><button class="ct-qty__btn" type="button" aria-label="Aumentar Risoto de cogumelos"><i class="bi bi-plus-lg" aria-hidden="true"></i></button></div>
+                    </div>
+                </li>
+                <li class="ct-sacola__item">
+                    <p class="ct-sacola__nome">Água com gás</p>
+                    <span class="ct-price">R$ 6,00</span>
+                    <div class="ct-sacola__acoes">
+                        <span></span>
+                        <div class="ct-qty"><button class="ct-qty__btn" type="button" aria-label="Remover Água com gás"><i class="bi bi-trash3" aria-hidden="true"></i></button><span class="ct-qty__value" aria-live="polite">1</span><button class="ct-qty__btn" type="button" aria-label="Aumentar Água com gás"><i class="bi bi-plus-lg" aria-hidden="true"></i></button></div>
+                    </div>
+                </li>
+            </ul>
+            <div class="ct-sacola__resumo">
+                <div class="ct-sacola__linha"><span>Subtotal</span><span>R$ 64,90</span></div>
+                <div class="ct-sacola__linha"><span>Entrega</span><span>R$ 6,90</span></div>
+                <div class="ct-sacola__linha ct-sacola__linha--total"><span>Total</span><span>R$ 71,80</span></div>
+            </div>
+            <div class="ct-sacola__acao"><a class="ct-btn ct-btn--primary" href="#loja"><span>Finalizar pedido</span><span class="ct-num">R$ 71,80</span></a></div>
+        </section>
+    </aside>
+</div>
+
+    <div class="ct-sacola-barra">
+        <a class="ct-btn ct-btn--primary" href="#sacola"><span class="ct-num">2 itens</span><span>Ver sacola</span><span class="ct-num">R$ 64,90</span></a>
+    </div>
+    <!-- Desktop: o produto em modal sobre o cardápio (rota interceptada na aplicação). -->
+    <div id="modal-produto" hidden>
+        <div class="ct-backdrop"></div>
+        <section class="ct-sheet ct-sheet--center ct-produto-modal" role="dialog" aria-modal="true" aria-labelledby="m-nome">
+        <div class="ct-produto">
+            <div class="ct-produto__foto">
+                <i class="bi bi-egg-fried" aria-hidden="true"></i>
+                <a class="ct-icon-btn ct-produto__voltar" href="#loja" aria-label="Fechar"><i class="bi bi-x-lg" aria-hidden="true"></i></a>
+            </div>
+            <div class="ct-produto__corpo">
+                <h2 class="ct-produto__nome" id="m-nome">Risoto de cogumelos</h2>
+                <p class="ct-produto__desc">Arroz arbóreo, shiitake, shimeji e parmesão, finalizado na manteiga. Serve uma pessoa.</p>
+                <span class="ct-price">R$ 58,90</span>
+            </div>
+
+            <section class="ct-grupo" aria-labelledby="m-g1-titulo">
+                <div class="ct-grupo__cabeca">
+                    <div class="ct-grupo__titulos">
+                        <h2 class="ct-grupo__titulo" id="m-g1-titulo">Ponto do arroz</h2>
+                        <p class="ct-grupo__regra">Escolha 1</p>
+                    </div>
+                    <span class="ct-tag">Obrigatório</span>
+                </div>
+                <div class="ct-options" role="radiogroup" aria-labelledby="m-g1-titulo">
+                    <button class="ct-option ct-option--radio" type="button" role="radio" aria-checked="false"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Al dente</span></button>
+                    <button class="ct-option ct-option--radio" type="button" role="radio" aria-checked="false"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Mais cozido</span></button>
+                </div>
+            </section>
+
+            <section class="ct-grupo" aria-labelledby="m-g2-titulo">
+                <div class="ct-grupo__cabeca">
+                    <div class="ct-grupo__titulos">
+                        <h2 class="ct-grupo__titulo" id="m-g2-titulo">Adicionais</h2>
+                        <p class="ct-grupo__regra">Escolha até 2</p>
+                    </div>
+                </div>
+                <div class="ct-options" role="group" aria-labelledby="m-g2-titulo">
+                    <button class="ct-option" type="button" role="checkbox" aria-checked="true"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Trufas</span><span class="ct-option__extra">+ R$ 12,00</span></button>
+                    <button class="ct-option" type="button" role="checkbox" aria-checked="false"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Parmesão extra</span><span class="ct-option__extra">+ R$ 6,00</span></button>
+                </div>
+            </section>
+
+            <div class="ct-produto__obs">
+                <div class="ct-field">
+                    <label class="ct-field__label" for="m-obs">Observação</label>
+                    <textarea id="m-obs" class="ct-input" placeholder="Ex.: sem cebola" aria-describedby="m-obs-dica"></textarea>
+                    <span class="ct-field__hint" id="m-obs-dica">O que mudar o preço não vale aqui.</span>
+                </div>
+            </div>
+
+            <div class="ct-produto__rodape">
+                <p class="ct-produto__falta" id="m-falta"><i class="bi bi-exclamation-circle" aria-hidden="true"></i> Escolha o ponto do arroz para continuar</p>
+                <div class="ct-qty"><button class="ct-qty__btn" type="button" aria-label="Diminuir" disabled><i class="bi bi-dash-lg" aria-hidden="true"></i></button><span class="ct-qty__value" aria-live="polite">1</span><button class="ct-qty__btn" type="button" aria-label="Aumentar"><i class="bi bi-plus-lg" aria-hidden="true"></i></button></div>
+                <button class="ct-btn ct-btn--primary" type="button" disabled aria-describedby="m-falta"><span>Adicionar</span><span class="ct-num">R$ 70,90</span></button>
+            </div>
+        </div>
+        </section>
+    </div>
+</div>
+
+<!-- Produto: página própria no celular (no desktop, o mesmo conteúdo em modal). -->
+<div class="ct-app ct-app--web demo-tela" id="produto">
+    <main class="ct-produto">
+        <div class="ct-produto__foto">
+            <i class="bi bi-egg-fried" aria-hidden="true"></i>
+            <a class="ct-icon-btn ct-produto__voltar" href="#loja" aria-label="Voltar ao cardápio"><i class="bi bi-arrow-left" aria-hidden="true"></i></a>
+        </div>
+        <div class="ct-produto__corpo">
+            <h1 class="ct-produto__nome">Risoto de cogumelos</h1>
+            <p class="ct-produto__desc">Arroz arbóreo, shiitake, shimeji e parmesão, finalizado na manteiga. Serve uma pessoa.</p>
+            <span class="ct-price">R$ 58,90</span>
+        </div>
+
+        <section class="ct-grupo" aria-labelledby="g1-titulo">
+            <div class="ct-grupo__cabeca">
+                <div class="ct-grupo__titulos">
+                    <h2 class="ct-grupo__titulo" id="g1-titulo">Ponto do arroz</h2>
+                    <p class="ct-grupo__regra">Escolha 1</p>
+                </div>
+                <span class="ct-tag">Obrigatório</span>
+            </div>
+            <div class="ct-options" role="radiogroup" aria-labelledby="g1-titulo">
+                <button class="ct-option ct-option--radio" type="button" role="radio" aria-checked="false"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Al dente</span></button>
+                <button class="ct-option ct-option--radio" type="button" role="radio" aria-checked="false"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Mais cozido</span></button>
+            </div>
+        </section>
+
+        <section class="ct-grupo" aria-labelledby="g2-titulo">
+            <div class="ct-grupo__cabeca">
+                <div class="ct-grupo__titulos">
+                    <h2 class="ct-grupo__titulo" id="g2-titulo">Adicionais</h2>
+                    <p class="ct-grupo__regra">Escolha até 2</p>
+                </div>
+            </div>
+            <div class="ct-options" role="group" aria-labelledby="g2-titulo">
+                <button class="ct-option" type="button" role="checkbox" aria-checked="true"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Trufas</span><span class="ct-option__extra">+ R$ 12,00</span></button>
+                <button class="ct-option" type="button" role="checkbox" aria-checked="false"><span class="ct-option__mark"><i class="bi bi-check-lg" aria-hidden="true"></i></span><span class="ct-option__text">Parmesão extra</span><span class="ct-option__extra">+ R$ 6,00</span></button>
+            </div>
+        </section>
+
+        <div class="ct-produto__obs">
+            <div class="ct-field">
+                <label class="ct-field__label" for="obs">Observação</label>
+                <textarea id="obs" class="ct-input" placeholder="Ex.: sem cebola" aria-describedby="obs-dica"></textarea>
+                <span class="ct-field__hint" id="obs-dica">O que mudar o preço não vale aqui.</span>
+            </div>
+        </div>
+
+        <div class="ct-produto__rodape">
+            <p class="ct-produto__falta" id="falta"><i class="bi bi-exclamation-circle" aria-hidden="true"></i> Escolha o ponto do arroz para continuar</p>
+            <div class="ct-qty"><button class="ct-qty__btn" type="button" aria-label="Diminuir" disabled><i class="bi bi-dash-lg" aria-hidden="true"></i></button><span class="ct-qty__value" aria-live="polite">1</span><button class="ct-qty__btn" type="button" aria-label="Aumentar"><i class="bi bi-plus-lg" aria-hidden="true"></i></button></div>
+            <button class="ct-btn ct-btn--primary" type="button" disabled aria-describedby="falta"><span>Adicionar</span><span class="ct-num">R$ 70,90</span></button>
+        </div>
+    </main>
+</div>
+
+<!-- Sacola: página própria no celular (no desktop, a coluna lateral). -->
+<div class="ct-app ct-app--web demo-tela" id="sacola">
+    <section class="ct-sacola ct-sacola--pagina" aria-labelledby="sacola-titulo-pagina">
+            <div class="ct-sacola__cabeca">
+                <a class="ct-icon-btn" href="#loja" aria-label="Voltar ao cardápio"><i class="bi bi-arrow-left" aria-hidden="true"></i></a>
+                <div>
+                    <h2 class="ct-sacola__titulo" id="sacola-titulo-pagina">Sua sacola</h2>
+                    <p class="ct-sacola__loja">Cantina do Porto · entrega em 35–50 min</p>
+                </div>
+            </div>
+            <ul class="ct-sacola__itens">
+                <li class="ct-sacola__item">
+                    <p class="ct-sacola__nome">Risoto de cogumelos</p>
+                    <span class="ct-price">R$ 58,90</span>
+                    <p class="ct-sacola__opcoes">Al dente</p>
+                    <div class="ct-sacola__acoes">
+                        <a class="ct-btn ct-btn--ghost" href="#produto" aria-label="Editar Risoto de cogumelos">Editar</a>
+                        <div class="ct-qty"><button class="ct-qty__btn" type="button" aria-label="Remover Risoto de cogumelos"><i class="bi bi-trash3" aria-hidden="true"></i></button><span class="ct-qty__value" aria-live="polite">1</span><button class="ct-qty__btn" type="button" aria-label="Aumentar Risoto de cogumelos"><i class="bi bi-plus-lg" aria-hidden="true"></i></button></div>
+                    </div>
+                </li>
+                <li class="ct-sacola__item">
+                    <p class="ct-sacola__nome">Água com gás</p>
+                    <span class="ct-price">R$ 6,00</span>
+                    <div class="ct-sacola__acoes">
+                        <span></span>
+                        <div class="ct-qty"><button class="ct-qty__btn" type="button" aria-label="Remover Água com gás"><i class="bi bi-trash3" aria-hidden="true"></i></button><span class="ct-qty__value" aria-live="polite">1</span><button class="ct-qty__btn" type="button" aria-label="Aumentar Água com gás"><i class="bi bi-plus-lg" aria-hidden="true"></i></button></div>
+                    </div>
+                </li>
+            </ul>
+            <div class="ct-sacola__resumo">
+                <div class="ct-sacola__linha"><span>Subtotal</span><span>R$ 64,90</span></div>
+                <div class="ct-sacola__linha"><span>Entrega</span><span>R$ 6,90</span></div>
+                <div class="ct-sacola__linha ct-sacola__linha--total"><span>Total</span><span>R$ 71,80</span></div>
+            </div>
+            <div class="ct-sacola__acao"><a class="ct-btn ct-btn--primary" href="#loja"><span>Finalizar pedido</span><span class="ct-num">R$ 71,80</span></a></div>
+        </section>
+</div>
+
+<script>
+    function mostrar() {
+        var id = location.hash.replace('#', '').split('-')[0];
+        if (['loja', 'produto', 'sacola'].indexOf(id) < 0) id = 'loja';
+        document.querySelectorAll('.demo-tela').forEach(function (el) { el.classList.toggle('is-on', el.id === id); });
+        document.getElementById('modal-produto').hidden = location.hash.indexOf('modal') < 0;
+        // Lado da foto: escolha do lojista (#loja-foto-esquerda).
+        document.querySelectorAll('.ct-item').forEach(function (el) { el.classList.toggle('ct-item--foto-esquerda', location.hash.indexOf('foto-esquerda') >= 0); });
+    }
+    window.addEventListener('hashchange', mostrar);
+    mostrar();
+</script>
+</body>
+</html>

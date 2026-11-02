@@ -6,7 +6,7 @@ argument-hint: '[adotar | aderencia | revisar | refatorar | desvio] [alvo] — e
 
 # Colibri Design Kit
 
-Leva a linha visual Colibri a um repositório, deixa o projeto pronto para o impeccable trabalhar sobre ela e mede quanto o projeto segue o kit. A linha tem dois perfis sobre a mesma base: **Admin** (painéis, admins e ferramentas internas) e **Operação** (telas cheias de toque: cardápio do tablet, totem, produção do KDS, pedidos prontos). Sobre o Operação, o perfil **Produção**, específico do KDS, traz o card de produção da estação, e o perfil **Cards**, genérico, o card de sinal dos painéis de chamados e de kanban colunado (garçom, entregadores, senhas), em regras fixas e escolhas do painel. Um projeto adota um perfil ou mais. Depois da adoção, o repositório tem:
+Leva a linha visual Colibri a um repositório, deixa o projeto pronto para o impeccable trabalhar sobre ela e mede quanto o projeto segue o kit. A linha tem dois perfis sobre a mesma base: **Admin** (painéis, admins e ferramentas internas) e **Operação** (telas cheias de toque: cardápio do tablet, totem, produção do KDS, pedidos prontos; e a vitrine web do Colibri Delivery). Sobre o Operação, o perfil **Produção**, específico do KDS, traz o card de produção da estação, e o perfil **Cards**, genérico, o card de sinal dos painéis de chamados e de kanban colunado (garçom, entregadores, senhas), em regras fixas e escolhas do painel. Um projeto adota um perfil ou mais. Depois da adoção, o repositório tem:
 
 | Arquivo | Conteúdo | Quem grava |
 |---|---|---|

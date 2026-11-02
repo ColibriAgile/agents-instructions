@@ -53,6 +53,8 @@ Leia também as linhas `-`. Perder um sinal é regressão mesmo quando nenhuma l
 | diálogo ou folha de confirmação, "Desfazer" | K8 |
 | classe de superfície `.ct-app--*` ou `.ct-app--kiosk` | O1 |
 | `.cm-skip` ou o `id="conteudo"` da área de conteúdo | S1 |
+| informação da loja (`.ct-loja__info`), taxa ou total antes de finalizar | W2 |
+| `viewport-fit=cover`, `env(safe-area-inset-bottom)`, campo em 16 px, metadados de prévia | W6 |
 
 Substituição equivalente não é achado: o sinal voltou de outra forma, como um `title` que virou dica do kit.
 

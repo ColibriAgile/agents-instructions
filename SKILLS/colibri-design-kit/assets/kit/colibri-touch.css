@@ -125,7 +125,8 @@
  * (nome em 500, botões e selos em 500), texto de controle no corpo, botão secundário sem moldura,
  * opção escolhida marcada pela marca, sem pintar a linha. */
 .ct-app--tablet,
-.ct-app--totem {
+.ct-app--totem,
+.ct-app--web {
     --ct-control-text: var(--ct-text);
     --ct-w-title: 600;
     --ct-w-strong: 600;
@@ -521,15 +522,15 @@
 /* Telas de consumidor (regra da hierarquia leve): as ações do cabeçalho são de texto, em ink-2, e não
  * competem com o nome da loja; a ação do cartão de produto é discreta, na cor de ação, porque o
  * cartão é a unidade e a única ação preenchida da tela é a do pedido. O alvo de toque continua. */
-:is(.ct-app--tablet, .ct-app--totem) .ct-header .ct-btn:not(.ct-btn--primary),
-:is(.ct-app--tablet, .ct-app--totem) .ct-product__foot .ct-btn:not(.ct-btn--primary) {
+:is(.ct-app--tablet, .ct-app--totem, .ct-app--web) .ct-header .ct-btn:not(.ct-btn--primary),
+:is(.ct-app--tablet, .ct-app--totem, .ct-app--web) .ct-product__foot .ct-btn:not(.ct-btn--primary) {
     background: transparent;
     border-color: transparent;
 }
-:is(.ct-app--tablet, .ct-app--totem) .ct-header .ct-btn:not(.ct-btn--primary) { color: var(--ct-ink-2); }
-:is(.ct-app--tablet, .ct-app--totem) .ct-product__foot .ct-btn:not(.ct-btn--primary) { margin-right: -10px; padding: 0 10px; color: var(--ct-action-ink); }
-:is(.ct-app--tablet, .ct-app--totem) .ct-header .ct-btn:not(.ct-btn--primary):active:not(:disabled),
-:is(.ct-app--tablet, .ct-app--totem) .ct-product__foot .ct-btn:not(.ct-btn--primary):active:not(:disabled) { background: var(--ct-surface-2); }
+:is(.ct-app--tablet, .ct-app--totem, .ct-app--web) .ct-header .ct-btn:not(.ct-btn--primary) { color: var(--ct-ink-2); }
+:is(.ct-app--tablet, .ct-app--totem, .ct-app--web) .ct-product__foot .ct-btn:not(.ct-btn--primary) { margin-right: -10px; padding: 0 10px; color: var(--ct-action-ink); }
+:is(.ct-app--tablet, .ct-app--totem, .ct-app--web) .ct-header .ct-btn:not(.ct-btn--primary):active:not(:disabled),
+:is(.ct-app--tablet, .ct-app--totem, .ct-app--web) .ct-product__foot .ct-btn:not(.ct-btn--primary):active:not(:disabled) { background: var(--ct-surface-2); }
 
 /* ---------- Rodapé de pedido ---------- */
 .ct-footer {
@@ -1193,6 +1194,406 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
 .ct-ready__name { max-width: 100%; overflow: hidden; color: var(--ct-ink); font-size: var(--ct-text); white-space: nowrap; text-overflow: ellipsis; }
 .ct-ready__expire { align-self: stretch; height: 6px; margin: 12px -14px 0; background: var(--ct-surface-2); }
 .ct-ready__expire > span { display: block; height: 100%; background: var(--ct-action); transform-origin: left; }
+
+/* ---------- Vitrine web (Colibri Delivery) ----------
+ * O cliente em casa, no celular (a maior parte) ou no computador: jornada encontrar -> montar. Não é
+ * quiosque (sem .ct-app--kiosk): a página rola, o zoom do navegador vale, o texto é selecionável. Nada
+ * gira sozinho. Celular primeiro; a partir de 1024 px, a sacola vira coluna lateral (bloco "Desktop"). */
+.ct-app--web {
+    --ct-target: 44px;
+    --ct-gap: 12px;
+    --ct-pad: 16px;
+    --ct-text-sm: 13px;
+    --ct-text: 15px;
+    --ct-text-lg: 16px;
+    --ct-text-xl: 20px;
+    --ct-text-2xl: 24px;
+    --ct-text-display: 32px;
+    /* Controles e campos em 16 px, não no corpo: o Safari do iPhone aproxima a página ao focar um
+     * campo com texto menor que 16 px. */
+    --ct-control-text: var(--ct-text-lg);
+    --ct-price-text: var(--ct-text);
+}
+.ct-web__main { min-width: 0; padding-bottom: calc(var(--ct-target) + 24px + env(safe-area-inset-bottom)); }
+
+/* Cabeçalho da loja: capa opcional, logo, nome, aberto ou fechado e o que custa e demora a entrega,
+ * tudo antes do primeiro item (custo inesperado é o primeiro motivo de abandono). */
+.ct-loja { background: var(--ct-surface); border-bottom: 1px solid var(--ct-line); }
+.ct-loja__capa { aspect-ratio: 3 / 1; overflow: hidden; background: var(--ct-surface-2); }
+.ct-loja__capa > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ct-loja__corpo { display: flex; align-items: flex-start; gap: 12px; padding: var(--ct-pad); }
+.ct-loja__logo {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    overflow: hidden;
+    color: var(--ct-ink-3);
+    background: var(--ct-surface-2);
+    border: 2px solid var(--ct-surface);
+    border-radius: var(--ct-radius-card);
+    font-size: 28px;
+    object-fit: cover;
+}
+.ct-loja__capa + .ct-loja__corpo .ct-loja__logo { margin-top: calc(-24px - var(--ct-pad)); }
+.ct-loja__dados { flex: 1; min-width: 0; }
+.ct-loja__nome { margin: 0; font-size: var(--ct-text-xl); font-weight: var(--ct-w-title); line-height: 1.2; }
+.ct-loja__estado { margin-top: 6px; }
+.ct-loja__info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin: 8px 0 0;
+    padding: 0;
+    color: var(--ct-ink-2);
+    font-size: var(--ct-text-sm);
+    font-variant-numeric: tabular-nums;
+    list-style: none;
+}
+.ct-loja__info > li { display: inline-flex; align-items: center; gap: 6px; }
+.ct-loja__info .bi { color: var(--ct-ink-3); }
+
+/* Topo preso ao rolar: a busca e as abas juntas, para buscar sem voltar ao início. A faixa da loja
+ * fica acima e some ao rolar. .ct-topo é filho direto da área que rola. */
+.ct-topo { position: sticky; top: 0; z-index: 2; padding-top: 8px; background: var(--ct-bg); }
+.ct-topo > .ct-abas { position: static; margin-top: 8px; }
+.ct-topo > .ct-busca { margin-top: 0; }
+
+/* Busca no cardápio: campo com a lupa dentro. */
+.ct-busca { position: relative; margin: var(--ct-pad) var(--ct-pad) 0; }
+.ct-busca > .bi { position: absolute; top: 50%; left: 14px; color: var(--ct-ink-3); transform: translateY(-50%); pointer-events: none; }
+.ct-busca > .ct-input { padding-left: 40px; }
+
+/* Abas de categoria: presas no topo ao rolar, com a da seção à vista marcada. O traço embaixo é o
+ * indicador de aba, não faixa lateral. .ct-abas é o próprio <nav>, filho direto da área que rola:
+ * dentro de outro bloco, o sticky some junto com ele. */
+.ct-abas {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    gap: 4px;
+    margin: 0;
+    padding: 0 var(--ct-pad);
+    overflow-x: auto;
+    list-style: none;
+    background: var(--ct-bg);
+    border-bottom: 1px solid var(--ct-line);
+    scrollbar-width: none;
+}
+.ct-abas::-webkit-scrollbar { display: none; }
+.ct-abas > li,
+.ct-abas > .ct-aba { flex: 0 0 auto; }
+.ct-aba {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--ct-target);
+    padding: 0 12px;
+    color: var(--ct-ink-2);
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    font-size: var(--ct-control-text);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.ct-aba.is-active,
+.ct-aba[aria-current="true"] { color: var(--ct-ink); border-bottom-color: var(--ct-action); font-weight: var(--ct-w-active); }
+
+/* Faixa de destaques: estática, rola com o dedo. Nunca gira sozinha. */
+.ct-faixa {
+    display: flex;
+    gap: var(--ct-gap);
+    margin: 0;
+    padding: 4px var(--ct-pad);
+    overflow-x: auto;
+    list-style: none;
+    scroll-padding-inline: var(--ct-pad);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+.ct-faixa::-webkit-scrollbar { display: none; }
+.ct-faixa > li { flex: 0 0 min(calc((100% - var(--ct-gap) * 2) / 3.2), 160px); min-width: 0; scroll-snap-align: start; }
+.ct-destaque { position: relative; display: flex; flex-direction: column; gap: 4px; }
+.ct-destaque__foto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    color: var(--ct-ink-3);
+    background: var(--ct-surface-2);
+    border-radius: var(--ct-radius-card);
+    font-size: 32px;
+}
+.ct-destaque__foto > img { width: 100%; height: 100%; object-fit: cover; }
+.ct-destaque .ct-item__nome { margin-top: 4px; font-size: var(--ct-text-sm); line-height: 1.3; }
+.ct-destaque .ct-price { font-size: var(--ct-text-sm); white-space: normal; }
+.ct-destaque .ct-price__from { display: block; margin: 0; }
+
+/* Seção do cardápio (uma por categoria) e item em linha: o item inteiro abre o produto (link
+ * esticado sobre o item) e o + é um botão irmão, por cima. O + adiciona na hora só quando o produto
+ * não tem opção obrigatória; com opção, abre o produto, como o link. */
+.ct-secao { padding: 20px var(--ct-pad) 0; scroll-margin-top: calc(var(--ct-target) * 2 + 24px); }
+.ct-secao__titulo { margin: 0; font-size: var(--ct-text-xl); font-weight: var(--ct-w-title); line-height: 1.2; }
+.ct-itens { display: grid; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
+.ct-item {
+    position: relative;
+    display: flex;
+    gap: 12px;
+    height: 100%;
+    padding: 12px;
+    background: var(--ct-surface);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-card);
+}
+.ct-item__corpo { display: flex; flex: 1; flex-direction: column; gap: 4px; min-width: 0; }
+.ct-item__tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.ct-item__nome {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    font-size: var(--ct-text-lg);
+    font-weight: var(--ct-w-name);
+    line-height: 1.3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+.ct-item__link { color: inherit; text-decoration: none; }
+.ct-item__link::after { content: ""; position: absolute; inset: 0; }
+.ct-item__link:focus-visible { outline: none; }
+.ct-item__link:focus-visible::after { outline: 3px solid var(--ct-focus); outline-offset: 2px; border-radius: var(--ct-radius-card); }
+.ct-item__desc {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    color: var(--ct-ink-2);
+    font-size: var(--ct-text-sm);
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+.ct-item .ct-price,
+.ct-destaque .ct-price { margin-top: auto; padding-top: 4px; }
+.ct-item .ct-price__from { display: inline; margin-right: 4px; }
+.ct-item__midia {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 104px;
+    height: 104px;
+    overflow: hidden;
+    color: var(--ct-ink-3);
+    background: var(--ct-surface-2);
+    border-radius: var(--ct-radius-card);
+    font-size: 36px;
+}
+.ct-item__midia > img { width: 100%; height: 100%; object-fit: cover; }
+/* O + fica no canto da foto, acima do link esticado: 36 px visíveis e 44 px de alvo. Redondo: exceção
+ * do kit, como a tag de alérgeno (seção 9). */
+.ct-item__add {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    color: var(--ct-action-ink);
+    background: var(--ct-surface);
+    border: 1px solid var(--ct-line);
+    border-radius: 50%;
+    box-shadow: var(--ct-shadow-sheet);
+    font-size: 20px;
+    cursor: pointer;
+}
+.ct-item__add::after { content: ""; position: absolute; inset: -4px; }
+.ct-item__add:active:not(:disabled) { background: var(--ct-surface-2); }
+.ct-item__add:disabled { color: var(--ct-disabled-ink); box-shadow: none; cursor: not-allowed; }
+.ct-item.is-unavailable .ct-item__nome,
+.ct-item.is-unavailable .ct-price,
+.ct-item.is-unavailable .ct-item__midia > .bi,
+.ct-item.is-unavailable .ct-item__midia > img { opacity: .5; }
+
+/* Categoria em grade (escolha do lojista): mini cards, três por linha no celular. Só quando todos os
+ * itens da categoria têm foto; sem isso, a categoria fica em lista. */
+.ct-itens--grade { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 12px; }
+
+/* Barra da sacola (celular): presa embaixo, com a quantidade, o rótulo e o total, sem nenhuma altura
+ * em vh (no Safari do iPhone, o vh não desconta a barra do navegador). Só aparece com itens. */
+.ct-sacola-barra {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+    padding: 8px var(--ct-pad) calc(8px + env(safe-area-inset-bottom));
+    background: var(--ct-surface);
+    border-top: 1px solid var(--ct-line);
+}
+.ct-sacola-barra > .ct-btn { display: flex; justify-content: space-between; width: 100%; }
+
+/* Produto (página própria no celular): foto, nome, descrição, preço, grupos de opção com o cabeçalho
+ * preso ao rolar e o rodapé com quantidade e Adicionar, travado e dizendo o que falta. */
+.ct-produto { padding-bottom: calc(var(--ct-target) + 56px + env(safe-area-inset-bottom)); background: var(--ct-surface); }
+.ct-produto__foto {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    color: var(--ct-ink-3);
+    background: var(--ct-surface-2);
+    font-size: 64px;
+}
+.ct-produto__foto > img { width: 100%; height: 100%; object-fit: cover; }
+.ct-produto__voltar { position: absolute; top: 8px; left: 8px; background: var(--ct-surface); box-shadow: var(--ct-shadow-sheet); }
+.ct-produto__corpo { padding: var(--ct-pad); }
+.ct-produto__nome { margin: 0; font-size: var(--ct-text-xl); font-weight: var(--ct-w-title); line-height: 1.25; }
+.ct-produto__desc { margin: 6px 0 0; color: var(--ct-ink-2); font-size: var(--ct-text); line-height: 1.45; }
+.ct-produto__corpo > .ct-price { display: block; margin-top: 10px; }
+.ct-grupo__cabeca {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px var(--ct-pad);
+    background: var(--ct-surface-2);
+}
+.ct-grupo__titulos { flex: 1; min-width: 0; }
+.ct-grupo__titulo { margin: 0; font-size: var(--ct-text-lg); font-weight: var(--ct-w-title); }
+.ct-grupo__regra { margin: 2px 0 0; color: var(--ct-ink-2); font-size: var(--ct-text-sm); }
+.ct-grupo > .ct-options { padding: 0 var(--ct-pad); }
+.ct-produto__obs { padding: var(--ct-pad); }
+.ct-produto__rodape {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px var(--ct-gap);
+    padding: 8px var(--ct-pad) calc(8px + env(safe-area-inset-bottom));
+    background: var(--ct-surface);
+    border-top: 1px solid var(--ct-line);
+}
+.ct-produto__falta { flex: 1 0 100%; margin: 0; color: var(--ct-warning); font-size: var(--ct-text-sm); }
+.ct-produto__rodape > .ct-btn--primary { flex: 1; justify-content: space-between; }
+
+/* Lado da foto no item: à direita por padrão (o nome se lê primeiro); o lojista pode pôr à esquerda. */
+.ct-item--foto-esquerda { flex-direction: row-reverse; }
+.ct-item--foto-esquerda .ct-item__add { right: auto; left: 74px; }
+
+/* Sacola: coluna lateral no desktop e página própria no celular, com o mesmo conteúdo. Cada item
+ * mostra as escolhas, muda a quantidade ali mesmo e tem "Editar", que reabre o produto montado
+ * (ninguém deve precisar remover e montar de novo). Taxa e total aparecem antes de finalizar. */
+.ct-sacola { display: flex; flex-direction: column; min-height: 0; background: var(--ct-surface); }
+.ct-sacola__cabeca { padding: var(--ct-pad); border-bottom: 1px solid var(--ct-line); }
+.ct-sacola__titulo { margin: 0; font-size: var(--ct-text-xl); font-weight: var(--ct-w-title); line-height: 1.2; }
+.ct-sacola__loja { margin: 2px 0 0; color: var(--ct-ink-2); font-size: var(--ct-text-sm); }
+.ct-sacola__itens { flex: 1; min-height: 0; margin: 0; padding: 0 var(--ct-pad); overflow-y: auto; list-style: none; }
+.ct-sacola__item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--ct-line);
+}
+.ct-sacola__nome { margin: 0; font-size: var(--ct-text); font-weight: var(--ct-w-name); }
+.ct-sacola__item > .ct-price { grid-row: 1; grid-column: 2; font-size: var(--ct-text); }
+.ct-sacola__opcoes { grid-column: 1 / -1; margin: 0; color: var(--ct-ink-2); font-size: var(--ct-text-sm); }
+.ct-sacola__acoes { display: flex; grid-column: 1 / -1; align-items: center; justify-content: space-between; margin-top: 6px; }
+.ct-sacola__acoes > .ct-btn--ghost { margin-left: -10px; padding: 0 10px; }
+.ct-sacola__resumo { display: grid; gap: 6px; padding: var(--ct-pad); color: var(--ct-ink-2); font-size: var(--ct-text); font-variant-numeric: tabular-nums; }
+.ct-sacola__linha { display: flex; justify-content: space-between; gap: 12px; }
+.ct-sacola__linha--total { padding-top: 6px; color: var(--ct-ink); font-size: var(--ct-text-lg); font-weight: var(--ct-w-strong); border-top: 1px solid var(--ct-line); }
+.ct-sacola__acao { padding: 0 var(--ct-pad) var(--ct-pad); }
+.ct-sacola__acao > .ct-btn { display: flex; justify-content: space-between; width: 100%; }
+/* Página da sacola no celular: a ação presa embaixo, como a barra. */
+.ct-sacola--pagina { min-height: 100%; padding-bottom: calc(var(--ct-target) + 24px + env(safe-area-inset-bottom)); }
+.ct-sacola--pagina .ct-sacola__cabeca { display: flex; align-items: center; gap: 8px; padding-left: 8px; }
+.ct-sacola--pagina .ct-sacola__itens { overflow: visible; }
+.ct-sacola--pagina .ct-sacola__acao {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+    padding: 8px var(--ct-pad) calc(8px + env(safe-area-inset-bottom));
+    background: var(--ct-surface);
+    border-top: 1px solid var(--ct-line);
+}
+.ct-web__lado { display: none; }
+
+/* Produto em modal (desktop): o mesmo conteúdo da página dentro da folha centralizada; o conteúdo
+ * rola e o rodapé fica no fim da folha. Na aplicação, a rota do produto é interceptada: clicar no
+ * cardápio abre o modal; o link direto abre a página. */
+.ct-sheet.ct-produto-modal { width: min(560px, calc(100vw - 48px)); overflow: hidden; }
+.ct-produto-modal > .ct-produto { flex: 1; min-height: 0; padding-bottom: 0; overflow-y: auto; }
+.ct-produto-modal .ct-produto__rodape { position: sticky; padding-bottom: 8px; }
+.ct-produto-modal .ct-produto__foto { aspect-ratio: 16 / 9; }
+
+/* Duas colunas de itens a partir de 600 px (tablet e desktop); a capa deixa de crescer com a largura. */
+@media (min-width: 600px) {
+    .ct-itens { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .ct-loja__capa { aspect-ratio: auto; height: 180px; }
+    .ct-itens--grade { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+/* Desktop (a partir de 1024 px): conteúdo em até 1240 px, sacola em coluna lateral de 360 px presa ao
+ * rolar; a barra da sacola sai. */
+@media (min-width: 1024px) {
+    .ct-web {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 24px;
+        align-items: start;
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0 var(--ct-pad);
+    }
+    .ct-web__main { padding-bottom: 48px; }
+    .ct-web .ct-loja { margin-top: var(--ct-pad); overflow: hidden; border: 1px solid var(--ct-line); border-radius: var(--ct-radius-card); }
+    .ct-web .ct-loja__capa { height: 120px; }
+    .ct-itens--grade { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .ct-web .ct-abas,
+    .ct-web .ct-busca,
+    .ct-web .ct-topo,
+    .ct-web .ct-faixa,
+    .ct-web .ct-secao { padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; }
+    .ct-web .ct-faixa { scroll-padding-inline: 0; }
+    .ct-web__lado {
+        position: sticky;
+        top: var(--ct-pad);
+        display: flex;
+        max-height: calc(100vh - var(--ct-pad) * 2);
+        margin-top: var(--ct-pad);
+        overflow: hidden;
+        border: 1px solid var(--ct-line);
+        border-radius: var(--ct-radius-card);
+    }
+    .ct-web__lado > .ct-sacola { flex: 1; }
+    .ct-sacola-barra { display: none; }
+}
+/* Com mouse (desktop): o hover só muda cor, nunca desloca nada. */
+@media (hover: hover) and (pointer: fine) {
+    .ct-item:hover .ct-item__nome,
+    .ct-destaque:hover .ct-item__nome { color: var(--ct-action-ink); }
+    .ct-aba:hover { color: var(--ct-ink); }
+    .ct-item__add:hover:not(:disabled) { background: var(--ct-surface-2); }
+}
 
 /* ---------- Movimento ---------- */
 @keyframes ct-sheet-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
