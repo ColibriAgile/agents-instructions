@@ -9,6 +9,8 @@ __pycache__/
 .agents/
 .claude/skills/
 .codex/skills/
+.tmp*/
 skills-lock.json
 banks/
 claude/
+
