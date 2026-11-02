@@ -1690,6 +1690,163 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
     .ct-item__add:hover:not(:disabled) { background: var(--ct-surface-2); }
 }
 
+/* ---------- Acabamento de vidro (telas de consumidor: tablet, totem e vitrine web) ----------
+ * Escolha do canal, desligada por padrão. .ct-app--vidro põe o fundo atrás da tela (fixo, não rola) e
+ * transforma as superfícies em vidro: translúcidas, com o fundo desfocado atrás, linha clara e o fio de luz
+ * no alto. Fundo: a marca Colibri (.ct-app--vidro-escuro, manchas caóticas de cores escuras, ou
+ * .ct-app--vidro-claro, manchas moderadas de luminosidade média), com a marca-d'água do colibri, ou a imagem
+ * do lojista (.ct-app--vidro-imagem com --ct-vidro-imagem). O vidro e os textos sobre ele vêm de tokens
+ * --ct-vidro-*: nos fundos da marca, os valores medidos abaixo (derivarVidro('marca-escura') e ('marca-clara'), com
+ * o texto em 4,5:1 sobre o pior ponto do fundo em seis telas, de 390×844 a 1920×1080); com a imagem do lojista ou com um esquema de
+ * canal, os de derivarVidro (colibri-esquema.js), gravados no contêiner. Ações preenchidas, selos, fotos e
+ * o + continuam cheios: só as superfícies viram vidro. */
+.ct-app--vidro {
+    --ct-vidro-desfoque: 16px;
+    --ct-vidro-filtro: blur(var(--ct-vidro-desfoque)) saturate(1.8) brightness(1.08);
+    --ct-bg: transparent;
+    --ct-surface: rgba(var(--ct-vidro-tinta), var(--ct-vidro-a));
+    --ct-surface-2: rgba(var(--ct-vidro-tinta), var(--ct-vidro-a2));
+    --ct-line: var(--ct-vidro-linha);
+    --ct-ink: var(--ct-vidro-ink);
+    --ct-ink-2: var(--ct-vidro-ink-2);
+    --ct-ink-3: var(--ct-vidro-ink-3);
+    --ct-action-ink: var(--ct-vidro-acao);
+    --ct-brand-ink: var(--ct-vidro-marca, var(--ct-vidro-acao));
+    --ct-focus: var(--ct-vidro-acao);
+    --ct-action-soft: var(--ct-vidro-acao-suave);
+    --ct-shadow-sheet: var(--ct-vidro-sombra);
+    position: relative;
+    isolation: isolate;
+    background: transparent;
+}
+/* Vidro escuro sobre o fundo escuro da marca (manchas caóticas, cores do colibri escurecidas). */
+.ct-app--vidro-escuro {
+    --ct-vidro-tinta: 12, 24, 36;
+    --ct-vidro-a: .31;
+    --ct-vidro-a2: .39;
+    --ct-vidro-economico: .33;
+    --ct-vidro-linha: rgba(255, 255, 255, .16);
+    --ct-vidro-brilho: rgba(255, 255, 255, .2);
+    --ct-vidro-sombra: 0 10px 28px rgba(0, 0, 0, .35);
+    --ct-vidro-ink: #f4f7fa;
+    --ct-vidro-ink-2: #d3dae1;
+    --ct-vidro-ink-3: #c3ccd5;
+    --ct-vidro-acao: #a9d2f8;
+    --ct-vidro-acao-suave: rgba(169, 210, 248, .16);
+    --ct-vidro-marca-opacidade: .34;
+}
+/* Vidro claro sobre o fundo claro da marca (manchas moderadas, luminosidade média). */
+.ct-app--vidro-claro {
+    --ct-vidro-tinta: 255, 255, 255;
+    --ct-vidro-a: .22;
+    --ct-vidro-a2: .3;
+    --ct-vidro-economico: .3;
+    --ct-vidro-linha: rgba(255, 255, 255, .6);
+    --ct-vidro-brilho: rgba(255, 255, 255, .75);
+    --ct-vidro-sombra: 0 8px 24px rgba(15, 30, 50, .16);
+    --ct-vidro-ink: #16202a;
+    --ct-vidro-ink-2: #26313c;
+    --ct-vidro-ink-3: #2c3742;
+    --ct-vidro-acao: #0a3b70;
+    --ct-vidro-acao-suave: rgba(10, 59, 112, .14);
+    --ct-vidro-marca-opacidade: .55;
+}
+/* Fundo: uma camada fixa atrás da tela; a marca-d'água em outra, no canto, como na página inicial do Admin. */
+.ct-app--vidro::before,
+.ct-app--vidro::after {
+    position: fixed;
+    z-index: -1;
+    content: '';
+    pointer-events: none;
+}
+.ct-app--vidro::before { inset: 0; background-color: #043355; }
+.ct-app--vidro-escuro::before {
+    background:
+        radial-gradient(50vmax 22vmax at 20% 16%, rgba(150, 82, 48, .9), transparent),
+        radial-gradient(34vmax 14vmax at 55% 38%, rgba(2, 10, 22, .85), transparent),
+        radial-gradient(40vmax 20vmax at 85% 22%, rgba(22, 104, 118, .9), transparent),
+        radial-gradient(50vmax 20vmax at 70% 62%, rgba(12, 74, 132, .9), transparent),
+        radial-gradient(18vmax 40vmax at 12% 60%, rgba(14, 109, 119, .9), transparent),
+        radial-gradient(40vmax 16vmax at 40% 92%, rgba(150, 82, 48, .85), transparent),
+        radial-gradient(30vmax 18vmax at 92% 88%, rgba(90, 52, 140, .8), transparent),
+        radial-gradient(22vmax 12vmax at 32% 70%, rgba(2, 10, 22, .75), transparent),
+        linear-gradient(135deg, #031f36, #043355 45%, #0a4677 78%, #0e5185);
+}
+.ct-app--vidro-claro::before {
+    background:
+        radial-gradient(42vmax 26vmax at 20% 22%, rgba(240, 150, 104, .8), transparent),
+        radial-gradient(38vmax 24vmax at 82% 30%, rgba(98, 196, 190, .8), transparent),
+        radial-gradient(48vmax 28vmax at 62% 78%, rgba(66, 160, 226, .8), transparent),
+        radial-gradient(26vmax 36vmax at 10% 82%, rgba(160, 140, 225, .65), transparent),
+        radial-gradient(26vmax 14vmax at 50% 50%, rgba(250, 200, 120, .65), transparent),
+        linear-gradient(135deg, #cfe3f3, #a9cfe9 55%, #8fc0e4);
+}
+.ct-app--vidro-imagem::before { background: #0b1822 var(--ct-vidro-imagem) center / cover no-repeat; }
+.ct-app--vidro-escuro::after,
+.ct-app--vidro-claro::after {
+    right: clamp(12px, 3vw, 48px);
+    bottom: clamp(16px, 5vh, 64px);
+    width: min(46vw, 600px);
+    aspect-ratio: 1;
+    background: url('logos/colibri-colorido.svg') no-repeat center / contain;
+    opacity: var(--ct-vidro-marca-opacidade);
+}
+/* No fundo claro, o colibri vai em branco: os tons dele somem no azul médio. */
+.ct-app--vidro-claro::after { filter: brightness(0) invert(1); }
+
+/* Peças de vidro. O mini card de destaque, que fora do vidro não tem moldura, ganha a do vidro. */
+.ct-app--vidro :is(.ct-header, .ct-rail, .ct-footer, .ct-product, .ct-sheet, .ct-loja, .ct-topo, .ct-item, .ct-destaque,
+    .ct-sacola-barra, .ct-sacola, .ct-produto-modal, .ct-produto__corpo, .ct-grupo, .ct-produto__obs, .ct-produto__rodape) {
+    background-color: var(--ct-surface);
+    border-color: var(--ct-line);
+    box-shadow: inset 0 1px 0 var(--ct-vidro-brilho), var(--ct-vidro-sombra);
+    -webkit-backdrop-filter: var(--ct-vidro-filtro);
+    backdrop-filter: var(--ct-vidro-filtro);
+}
+/* Barras presas na largura toda: sem a sombra flutuante, só o fio de luz. */
+.ct-app--vidro :is(.ct-header, .ct-footer, .ct-topo, .ct-loja, .ct-sacola-barra, .ct-produto__rodape) { box-shadow: inset 0 1px 0 var(--ct-vidro-brilho); }
+.ct-app--vidro .ct-rail { border-right: 1px solid var(--ct-line); }
+.ct-app--vidro :is(.ct-product__media, .ct-item__midia, .ct-destaque__foto) { background-color: var(--ct-surface-2); }
+.ct-app--vidro .ct-faixa > li { display: flex; }
+.ct-app--vidro .ct-destaque { flex: 1 1 auto; padding: 6px 6px 10px; border: 1px solid var(--ct-line); border-radius: var(--ct-radius-card); }
+.ct-app--vidro .ct-destaque__foto { border-radius: calc(var(--ct-radius-card) - 3px); }
+.ct-app--vidro .ct-destaque :is(.ct-item__nome, .ct-price) { padding-inline: 4px; }
+/* Nenhum texto direto sobre o fundo: o contraste só é garantido sobre o vidro. O título de seção, que fora do
+ * vidro fica solto na página, vai numa etiqueta de vidro do tamanho do texto. */
+.ct-app--vidro .ct-secao__titulo {
+    width: fit-content;
+    padding: 2px 10px;
+    background-color: var(--ct-surface);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-card);
+    box-shadow: inset 0 1px 0 var(--ct-vidro-brilho);
+    -webkit-backdrop-filter: var(--ct-vidro-filtro);
+    backdrop-filter: var(--ct-vidro-filtro);
+}
+/* Página do produto: cada bloco é um cartão de vidro (o vidro na página inteira prenderia o rodapé fixo). */
+.ct-app--vidro .ct-produto { background: transparent; }
+.ct-app--vidro :is(.ct-produto__corpo, .ct-grupo, .ct-produto__obs) { margin: 10px 12px 0; border: 1px solid var(--ct-line); border-radius: var(--ct-radius-card); }
+.ct-app--vidro .ct-produto__obs { padding: 12px; }
+.ct-app--vidro .ct-grupo__cabeca { background-color: var(--ct-surface-2); border-radius: var(--ct-radius-card) var(--ct-radius-card) 0 0; }
+/* Tela de descanso: a foto é o fundo; o texto vai num cartão de vidro escuro, no lugar do degradê. */
+.ct-app--vidro .ct-destaques--descanso .ct-scrim {
+    right: auto;
+    bottom: calc(var(--ct-pad) * 3 + var(--ct-target));
+    left: calc(var(--ct-pad) * 2);
+    max-width: min(560px, calc(100% - var(--ct-pad) * 4));
+    padding: var(--ct-pad) calc(var(--ct-pad) * 1.4);
+    background: rgba(10, 20, 30, .58);
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: var(--ct-radius-card);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 16px 40px rgba(0, 0, 0, .35);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    backdrop-filter: blur(24px) saturate(1.4);
+}
+/* Modo econômico (.ct-app--vidro-economico, para tablets e TVs fracos): sem desfoque ao vivo; o vidro sobe
+ * até o piso medido no fundo nítido. */
+.ct-app--vidro-economico { --ct-vidro-a: var(--ct-vidro-economico); --ct-vidro-a2: calc(var(--ct-vidro-economico) + .08); }
+.ct-app--vidro-economico * { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+
 /* ---------- Movimento ---------- */
 @keyframes ct-sheet-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes ct-side-in { from { transform: translateX(100%); } to { transform: translateX(0); } }

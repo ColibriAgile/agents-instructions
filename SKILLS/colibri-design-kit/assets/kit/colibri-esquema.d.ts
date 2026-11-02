@@ -45,3 +45,18 @@ export declare function tintaSobre(fundo: string): '#ffffff' | '#1d2733' | '#000
 export declare function veuSobre(fundo: string): string;
 /** Cor do respiro do estado mais grave (hex): a cor do card puxada para o preto ou o branco, com a tinta em 4,5:1 ou mais. */
 export declare function respiroDe(fundo: string): string;
+
+/* Acabamento de vidro (telas de consumidor). */
+export interface Vidro {
+    modo: 'escuro' | 'claro';
+    /** Passe a derivarEsquema(sementes, tema) para os estados e o modo do canal acompanharem o vidro. */
+    tema: 'dark' | 'light';
+    /** 'ct-app--vidro-escuro' ou 'ct-app--vidro-claro', no contêiner .ct-app junto de .ct-app--vidro. */
+    classe: string;
+    opacidade: number;
+    /** --ct-vidro-a, --ct-vidro-a2, --ct-vidro-acao, --ct-vidro-marca, --ct-vidro-acao-suave: grave no contêiner. */
+    tokens: Record<string, string>;
+}
+export declare const VIDROS: Record<'escuro' | 'claro', { classe: string; tema: 'dark' | 'light'; tinta: string; direcao: 1 | -1; acao: string; textos: Record<string, string> }>;
+/** Vidro sobre o fundo: amostras do fundo como o vidro o vê (desfocado e filtrado) ou um fundo da marca. */
+export declare function derivarVidro(amostras: string[] | 'marca-escura' | 'marca-clara', esquema?: Esquema | null, opcoes?: { economico?: boolean; modo?: 'escuro' | 'claro' }): Vidro;

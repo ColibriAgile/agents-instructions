@@ -382,3 +382,119 @@ export function respiroDe(fundo) {
         return f;
     }).reduce(function (melhor, cor) { return contraste(f, cor) > contraste(f, melhor) ? cor : melhor; });
 }
+
+/* ---------- Acabamento de vidro (telas de consumidor: tablet, totem e vitrine web) ----------
+ * O vidro é a superfície translúcida sobre um fundo (a marca Colibri ou a imagem do lojista). O texto sobre
+ * ele precisa de 4,5:1 sobre o pior ponto do fundo, já desfocado e filtrado como o vidro o mostra. Daqui sai
+ * o vidro (claro ou escuro), a menor opacidade com que todos os textos passam e os textos de ação e de marca
+ * ajustados para o vidro. Os textos de apoio são tons próprios do vidro, mais próximos do principal: com o
+ * cinza médio de sempre, o vidro precisaria de 80% a 94% de opacidade e deixaria de ser vidro. */
+export const VIDROS = {
+    escuro: { classe: 'ct-app--vidro-escuro', tema: 'dark', tinta: '#0c1824', direcao: 1, acao: '#a9d2f8',
+        textos: { '--ct-vidro-ink': '#f4f7fa', '--ct-vidro-ink-2': '#d3dae1', '--ct-vidro-ink-3': '#c3ccd5' } },
+    claro: { classe: 'ct-app--vidro-claro', tema: 'light', tinta: '#ffffff', direcao: -1, acao: '#0a3b70',
+        textos: { '--ct-vidro-ink': '#16202a', '--ct-vidro-ink-2': '#26313c', '--ct-vidro-ink-3': '#2c3742' } }
+};
+/* Folga sobre 4,5:1 (as amostras são uma grade, não todos os pixels) e limites da opacidade: abaixo de 22%,
+ * o vidro deixa de se ler como superfície, mesmo com o contraste garantido. */
+var VIDRO_FOLGA = 0.1;
+var VIDRO_MINIMO = 0.22;
+var VIDRO_MINIMO_ECONOMICO = 0.3;
+var VIDRO_MAXIMO = 0.95;
+
+function amostrasUnicas(amostras) {
+    var vistos = {}, r = [];
+    amostras.forEach(function (c) { var h = rgbParaHex(hexParaRgb(c)); if (!vistos[h]) { vistos[h] = 1; r.push(h); } });
+    return r;
+}
+
+/* Para um vidro e uma opacidade: os textos fixos passam? E até onde a ação e a marca precisam ir? */
+function provarVidro(v, a, fundos, acoes) {
+    var vidros = fundos.map(function (f) { return misturar(v.tinta, f, a); });
+    var minimo = CONTRASTE.texto + VIDRO_FOLGA;
+    var ok = function (hex) { return contrasteMinimo(hex, vidros) >= minimo; };
+    if (!Object.keys(v.textos).every(function (k) { return ok(v.textos[k]); })) return null;
+    var ajustadas = acoes.map(function (c) { return ajustarLuminosidade(oklch(c), v.direcao, ok); });
+    return ajustadas.every(ok) ? ajustadas : null;
+}
+
+/**
+ * Vidro sobre um fundo: escolhe o vidro (claro ou escuro) que fica mais aberto, ou o que o lojista escolheu, com a
+ * menor opacidade em que todos os textos têm 4,5:1 sobre todas as amostras. Se nem 95% bastar, devolve 95%.
+ * @param {string[]} amostras cores do fundo como o vidro o vê (desfocado, com saturate(1.8) brightness(1.08);
+ *   no modo econômico, nítido), numa grade sobre a área toda; ou 'marca-escura' / 'marca-clara', os fundos do kit
+ * @param {object} [esquema] o esquema do canal (derivarEsquema): a ação e a marca dele são ajustadas para o vidro
+ * @param {{ economico?: boolean, modo?: 'escuro'|'claro' }} [opcoes] economico: sem desfoque ao vivo (fundo nítido; piso
+ *   visual de 30%, e não 22%); modo: o vidro escolhido pelo lojista no admin (sem ele, o que fica mais aberto)
+ * @returns {{ modo: 'escuro'|'claro', tema: 'dark'|'light', classe: string, opacidade: number, tokens: object }}
+ *   grave os tokens no contêiner .ct-app junto da classe; passe `tema` a derivarEsquema para os estados
+ */
+export function derivarVidro(amostras, esquema, opcoes) {
+    var fundo = typeof amostras === 'string' ? FUNDOS_DO_VIDRO[amostras] : null;
+    if (typeof amostras === 'string' && !fundo) throw new Error('Fundo de vidro desconhecido: ' + amostras);
+    var fundos = amostrasUnicas(fundo ? fundo[opcoes && opcoes.economico ? 'economico' : 'vivo'] : amostras);
+    if (!fundos.length) throw new Error('derivarVidro: sem amostras do fundo');
+    var t = esquema && esquema.tokens ? esquema.tokens : null;
+    var melhor = null;
+    var forcado = opcoes && (opcoes.modo === 'escuro' || opcoes.modo === 'claro') ? opcoes.modo : null;
+    (forcado ? [forcado] : ['escuro', 'claro']).forEach(function (nome) {
+        var v = VIDROS[nome];
+        var acoes = [t ? t['--ct-action-ink'] : v.acao, t ? t['--ct-brand-ink'] : v.acao];
+        for (var p = Math.round((opcoes && opcoes.economico ? VIDRO_MINIMO_ECONOMICO : VIDRO_MINIMO) * 100); p <= Math.round(VIDRO_MAXIMO * 100); p++) {
+            var r = provarVidro(v, p / 100, fundos, acoes);
+            if (r) { if (!melhor || p / 100 < melhor.opacidade) melhor = { nome: nome, opacidade: p / 100, acoes: r }; return; }
+        }
+    });
+    if (!melhor) { var reserva = forcado || 'escuro'; melhor = { nome: reserva, opacidade: VIDRO_MAXIMO, acoes: [VIDROS[reserva].acao, VIDROS[reserva].acao] }; }
+    var v = VIDROS[melhor.nome], acao = hexParaRgb(melhor.acoes[0]).map(function (c) { return Math.round(c * 255); });
+    var tokens = {
+        '--ct-vidro-a': String(melhor.opacidade),
+        '--ct-vidro-a2': String(Math.min(VIDRO_MAXIMO + 0.02, Math.round((melhor.opacidade + 0.08) * 100) / 100)),
+        '--ct-vidro-acao': melhor.acoes[0],
+        '--ct-vidro-marca': melhor.acoes[1],
+        '--ct-vidro-acao-suave': 'rgba(' + acao.join(', ') + ', ' + (melhor.nome === 'escuro' ? '.16' : '.14') + ')'
+    };
+    return { modo: melhor.nome, tema: v.tema, classe: v.classe, opacidade: melhor.opacidade, tokens: tokens };
+}
+
+/* Fundos do vidro da marca Colibri (.ct-app--vidro-escuro e --vidro-claro em colibri-touch.css): as 24 cores mais
+ * escuras e as 24 mais claras de cada fundo, medidas no navegador em seis telas (390×844 a 1920×1080), como o vidro
+ * as vê (vivo: desfocadas e filtradas; economico: nítidas). Mudou o fundo no CSS, meça de novo. */
+var FUNDOS_DO_VIDRO = {
+    'marca-escura': {
+        vivo: [
+            '#001636', '#001637', '#001837', '#001839', '#00183b', '#001938', '#00193a', '#00193c',
+            '#001a39', '#00193e', '#001a3a', '#001a3b', '#001a3d', '#001b3a', '#021b39', '#041b38',
+            '#001a3f', '#001b3c', '#001b3d', '#001c39', '#001b3e', '#001c3b', '#051c38', '#071c37',
+            '#00769b', '#146dca', '#007795', '#007798', '#046fc6', '#007891', '#106ec9', '#086fc6',
+            '#016fc7', '#026fc7', '#00779a', '#007893', '#086fc8', '#007990', '#007992', '#0770c7',
+            '#0570c8', '#007994', '#0271c6', '#007a93', '#007a95', '#007b93', '#007b94', '#007b95'
+        ],
+        economico: [
+            '#02101f', '#021020', '#021120', '#021121', '#021122', '#021221', '#021222', '#021223',
+            '#021322', '#021323', '#031322', '#021324', '#031323', '#021325', '#021424', '#021425',
+            '#031424', '#021426', '#031425', '#021427', '#041426', '#061424', '#081423', '#0a1421',
+            '#6e6e7b', '#6f6e79', '#6e6e7c', '#6f6e7a', '#6f6e7b', '#736e72', '#6f6f79', '#706f78',
+            '#716f76', '#706f79', '#716f77', '#726f75', '#716f78', '#726f76', '#727075', '#737074',
+            '#737075', '#747073', '#747172', '#747173', '#757171', '#767170', '#767171', '#77716f'
+        ]
+    },
+    'marca-clara': {
+        vivo: [
+            '#79b1ff', '#7bb1ff', '#77b2ff', '#73b3ff', '#75b3ff', '#7cb2ff', '#77b3ff', '#78b3ff',
+            '#7eb2ff', '#74b4ff', '#7ab3ff', '#6fb5ff', '#76b4ff', '#71b5ff', '#7db3ff', '#78b4ff',
+            '#73b5ff', '#6db6ff', '#79b4ff', '#7fb3ff', '#6eb6ff', '#7ab4ff', '#75b5ff', '#7bb4ff',
+            '#e1e9f6', '#dceafa', '#dbeafe', '#dceafc', '#deeaf8', '#dceafd', '#deeaf9', '#deeafb',
+            '#e0eaf7', '#daebfd', '#e0eaf9', '#dcebfd', '#dcebff', '#ddebfd', '#deebfb', '#dfebfb',
+            '#dbecff', '#ddecfc', '#ddecfe', '#dbedfe', '#daeeff', '#d9efff', '#daefff', '#d9f0ff'
+        ],
+        economico: [
+            '#54a8e3', '#55a8e3', '#56a8e3', '#56a9e2', '#57a9e2', '#56a9e3', '#57a9e3', '#58a9e3',
+            '#83a2e2', '#84a2e2', '#84a2e3', '#85a2e2', '#81a3e2', '#58aae3', '#85a2e3', '#86a2e2',
+            '#59aae3', '#82a3e2', '#86a2e3', '#5aaae3', '#87a2e2', '#83a3e2', '#5baae3', '#87a2e3',
+            '#c7e5ec', '#cce3f3', '#c9e5e8', '#c9e5e9', '#cfe3ee', '#cde3f3', '#cae5e8', '#d0e3ed',
+            '#cae5e9', '#cee3f3', '#c7e6ec', '#d4e3eb', '#c9e6ea', '#cae6e9', '#cee4f3', '#cae6ea',
+            '#cae6eb', '#cbe6e9', '#cbe6ea', '#cbe7eb', '#cce7ec', '#cce7ed', '#cde7ee', '#cce8ed'
+        ]
+    }
+};

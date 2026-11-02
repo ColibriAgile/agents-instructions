@@ -438,6 +438,7 @@ Telas cheias de toque: cardápio do tablet (Mesa, Comanda e Autoficha), totem de
 | Tela de descanso | O carrossel em tela cheia depois de um tempo sem uso (`.ct-destaques--descanso`) | Tablet e totem |
 | Vitrine web | A loja do Colibri Delivery no navegador do cliente (`.ct-app--web`) | Celular, computador e tablet |
 | Mini card | Foto, nome e preço, sem descrição (`.ct-destaque`) | Destaques da vitrine web e categoria em grade |
+| Acabamento de vidro | Superfícies translúcidas sobre o fundo da marca ou a imagem do lojista (`.ct-app--vidro`) | Tablet, totem e vitrine web, escolha do canal |
 
 **Jornada.** A mesma peça muda de papel conforme o lugar da tela, porque muda o que a pessoa veio fazer:
 
@@ -540,6 +541,34 @@ A loja do Colibri Delivery no navegador do cliente: celular na maior parte, depo
 
 **Web, não quiosque.** Campos e controles em 16 px (com menos, o Safari do iPhone aproxima a página ao focar o campo). Barras presas por `position: fixed` ou `sticky`, com `env(safe-area-inset-bottom)`, e a entrada HTML com `viewport-fit=cover`; nenhuma altura de tela em `vh` no celular, porque no Safari do iPhone o `vh` não desconta a barra do navegador. Navegadores atuais, incluindo o Safari do iPhone (as duas últimas versões do Safari no iOS e do Chrome no Android); o CSS do kit continua dentro do piso Chrome 101. Cores pelo esquema do canal "delivery" (`colibri-esquema.js`, aplicado antes de pintar). A configuração de exibição é a do tablet e do totem: categorias e produtos escondidos, ordem de exibição e observações.
 
+### Acabamento de vidro
+
+Escolha do canal para as telas de consumidor (tablet, totem e vitrine web), desligada por padrão. As superfícies viram vidro: translúcidas, com o fundo desfocado atrás, uma linha clara e o fio de luz no alto. Nunca nas telas de produção (KDS, painel da produção), nos painéis do perfil Cards nem no perfil Admin: lá a leitura é rápida, densa ou de longe. Implementação em `colibri-touch.css` (`.ct-app--vidro`) e no motor (`derivarVidro`, `colibri-esquema.js`); demonstração em `exemplo-toque.html#tablet-vidro`, `#tablet-vidro-claro`, `#totem-vidro`, `#tablet-descanso-vidro` e `exemplo-web.html#loja-vidro-escuro`, `#loja-vidro-claro`.
+
+**Fundo.** Fixo atrás da tela, não rola. Três opções:
+
+- **Marca Colibri escura** (`.ct-app--vidro-escuro`, o padrão): manchas grandes e irregulares (caóticas) com as cores do colibri escurecidas (terracota, petróleo, azul, roxo) sobre o degradê azul da marca, e o colibri colorido a 34% no canto inferior direito, com até 600 px.
+- **Marca Colibri clara** (`.ct-app--vidro-claro`): manchas moderadas com as cores do colibri vivas e de luminosidade média (terracota, verde-água, azul, lilás, âmbar) sobre um azul claro, e o colibri em branco a 55% (os tons coloridos dele somem no azul médio).
+- **Imagem do lojista** (`.ct-app--vidro-imagem` com `--ct-vidro-imagem: url(...)`): a foto da loja ou do salão, sem a marca-d'água.
+
+A marca-d'água fica no mesmo lugar da página inicial do Admin, com mais força: sobre um fundo agitado, os 12% do Admin somem.
+
+**Regra do contraste sobre o vidro.** Todo texto sobre o vidro tem 4,5:1 sobre o pior ponto do fundo, como o vidro o vê (desfocado em 16 px, com `saturate(1.8) brightness(1.08)`). O motor garante: `derivarVidro(amostras, esquema, opções)` escolhe o vidro (claro ou escuro) que fica mais aberto e a menor opacidade em que todos os textos passam, e ajusta a ação e a marca do esquema do canal para o vidro. Opções do lojista no admin: vidro Automático, Claro ou Escuro (`opções.modo`); com a escolha, o motor calcula a opacidade daquele vidro. Detalhes:
+
+- Os textos sobre o vidro são tons próprios dele (`VIDROS` no motor), mais próximos do texto principal: com o cinza médio e o azul de ação de sempre, o vidro precisaria de 80% a 94% de opacidade e deixaria de ser vidro. A hierarquia vem do tamanho e do peso.
+- Piso visual de 22% (30% no modo econômico): abaixo disso, o vidro não se lê como superfície, mesmo com contraste. Teto de 95%.
+- Fundos da marca: valores medidos e gravados (`--ct-vidro-a` .31 no escuro e .22 no claro; .33 e .30 no econômico), conferidos por `scripts/verificar-esquema.mjs` contra o motor. Mudou o desenho do fundo, meça de novo e atualize `FUNDOS_DO_VIDRO` no motor.
+- Imagem do lojista: o admin mede a imagem no envio (amostras numa grade, desfocadas e filtradas como o vidro) e grava a classe e os tokens que o motor devolve, com a prévia. Uma foto agitada fecha mais o vidro: o motor sobe a opacidade sozinho.
+- O esquema do canal continua valendo para o que é cheio (botão principal, selos, preço preenchido); o modo dele acompanha o vidro (`derivarEsquema(sementes, vidro.tema)`).
+
+**Regra do fundo para vidro.** O vidro só aparece com cor e luz variadas atrás; o contraste limita o quanto. Vidro escuro pede fundo de luminosidade baixa (cores saturadas, mas escuras); vidro claro pede fundo vivo de luminosidade média. Um único ponto claro sob vidro escuro, ou escuro sob vidro claro, fecha o vidro inteiro: no fundo da marca, quem limita é a luminosidade do fundo, não só a opacidade do vidro.
+
+**Nenhum texto direto sobre o fundo.** O contraste só é garantido sobre o vidro. O título de seção, que fora do vidro fica solto na página, vai numa etiqueta de vidro do tamanho do texto; a tela de descanso põe o texto num cartão de vidro escuro, no lugar do degradê.
+
+**O que vira vidro:** cabeçalho, categorias em coluna, rodapé do pedido, cartão de produto, folha, faixa da loja, topo preso, item da vitrine, mini card de destaque (que fora do vidro não tem moldura e ganha a do vidro: borda, fio de luz, respiro de 6 px e altura igual na faixa), barra e coluna da sacola, modal do produto e, na página do produto, cada bloco (corpo, grupos de opção, observação, rodapé). **O que fica cheio:** botão principal, selos, preço preenchido, fotos, o + e a ação ativa.
+
+**Desempenho.** O desfoque ao vivo (`backdrop-filter`) roda no piso Chrome 101 e no Safari do iPhone, mas pesa em tablets e TVs fracos com a grade rolando. Para eles, o modo econômico (`.ct-app--vidro-economico`): sem desfoque ao vivo, o vidro sobe até o piso medido no fundo nítido. Meça a rolagem no aparelho de verdade antes de ligar o vidro num modelo novo.
+
 ### Compatibilidade
 
 - Piso Chrome 101 em todas as superfícies do perfil Operação, inclusive Produção e Cards (WebView dos tablets e totens). O `colibri-ui.css` (perfil Admin) nunca carrega numa tela de toque e segue os navegadores de mesa atuais: usa `:has()` e `@container`. O build declara o alvo (`lightningcss` com `targets: { chrome: 101 << 16 }` ou o equivalente do bundler).
@@ -564,6 +593,7 @@ Vale a regra do movimento com motivo (seção 4). Folha sobe em 260 ms com `--cm
 - Mostrar observação e alérgeno no próprio item do pedido.
 - Conferir cada tela de produção nos temas claro e escuro, e cada tela de consumidor com um esquema claro e um escuro.
 - Identificar cada estação pelo nome, pela cor da paleta e por um ícone da lista curada, na barra da estação.
+- No acabamento de vidro, tirar o vidro e os textos dele do motor (`derivarVidro`), deixar o lojista escolher Automático, Claro ou Escuro e medir a rolagem no aparelho real.
 - No cartão `.ct-order`, mostrar o estado de preparo de cada item na própria linha, com ícone e rótulo, e a quantidade de 2 ou mais no selo neutro (o card do perfil Produção tem a coluna de estado, seção 10).
 
 **Não faça**
@@ -573,6 +603,7 @@ Vale a regra do movimento com motivo (seção 4). Folha sobe em 260 ms com `--cm
 - Carrossel que cobre categorias, carrinho ou o rodapé do pedido, que não pausa no toque ou que continua com movimento reduzido; na vitrine web, qualquer destaque que gira sozinho.
 - Campo de cor livre para o lojista fora das três sementes, ou hex livre para tipo de pedido e estação.
 - Urgência, estado ou tipo de pedido indicados só pela cor.
+- No acabamento de vidro, texto direto sobre o fundo, opacidade ou tons de texto escolhidos à mão, vidro abaixo de 22%, ponto claro sob vidro escuro (ou escuro sob vidro claro) no fundo da marca, ou vidro nas telas de produção, nos painéis do perfil Cards e no Admin.
 - Alvo de toque abaixo do mínimo da superfície, ou ação que só aparece no hover.
 - Classes de cor da paleta do Tailwind, propriedades `scale`/`translate` separadas, `:has()` ou `color-mix()` com variável.
 - Emojis como ícone, inclusive o ícone da estação; `confirm()` e `alert()` do navegador no lugar de uma folha.

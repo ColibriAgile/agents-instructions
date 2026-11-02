@@ -620,7 +620,7 @@
 </div>
 
 <div class="demo-bar" id="demo-bar">
-    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>, <a href="#tablet-descanso">descanso</a>) · <a href="#totem">Totem</a> (<a href="#portas">portas</a>) · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>, <a href="#bump">bump</a>, <a href="#bump-claro">bump claro</a>, <a href="#consolidado">por produto</a>, <a href="#painel">painel</a>) · <a href="#chamados">Chamados</a> (<a href="#chamados-claro">claro</a>) · <a href="#pronto">Pronto</a>
+    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>, <a href="#tablet-descanso">descanso</a>) · <a href="#totem">Totem</a> (<a href="#portas">portas</a>) · Vidro (<a href="#tablet-vidro">tablet</a>, <a href="#tablet-vidro-claro">claro</a>, <a href="#totem-vidro">totem</a>, <a href="#tablet-descanso-vidro">descanso</a>) · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>, <a href="#bump">bump</a>, <a href="#bump-claro">bump claro</a>, <a href="#consolidado">por produto</a>, <a href="#painel">painel</a>) · <a href="#chamados">Chamados</a> (<a href="#chamados-claro">claro</a>) · <a href="#pronto">Pronto</a>
     <span id="demo-esquema" hidden>
         | <label>Ambiente <input type="color" id="s-ambiente" value="#0b1120"></label>
         <label>Ação <input type="color" id="s-acao" value="#f59e0b"></label>
@@ -675,6 +675,15 @@
         document.querySelectorAll('.demo-surface').forEach(function (el) { el.classList.toggle('is-on', el.id === id); });
         camadas.forEach(function (c) { if (h.indexOf(c) >= 0) abrir(c + '-tablet'); });
         document.getElementById('demo-bar').hidden = h.indexOf('limpo') >= 0;
+        // Acabamento de vidro, escolha do canal: #...-vidro (escuro), #...-vidro-claro, mais -economico.
+        var vidro = h.indexOf('vidro') >= 0, vidroClaro = h.indexOf('vidro-claro') >= 0;
+        document.querySelectorAll('#tablet, #totem, #portas').forEach(function (el) {
+            el.classList.toggle('ct-app--vidro', vidro);
+            el.classList.toggle('ct-app--vidro-escuro', vidro && !vidroClaro);
+            el.classList.toggle('ct-app--vidro-claro', vidroClaro);
+            el.classList.toggle('ct-app--vidro-economico', vidro && h.indexOf('economico') >= 0);
+        });
+
         document.dispatchEvent(new CustomEvent('demo:superficie', { detail: id }));
     }
     window.addEventListener('hashchange', mostrar);

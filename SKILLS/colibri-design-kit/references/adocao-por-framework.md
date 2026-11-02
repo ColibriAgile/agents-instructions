@@ -146,6 +146,16 @@ Regras em `DESIGN.md` do kit, seção 9; marcação em `../assets/kit/exemplo-to
 - **Comportamentos:** folha (`.ct-sheet`) com véu (`.ct-backdrop`) que fecha ao toque, Esc quando houver teclado e foco devolvido a quem abriu; `.ct-toast` some sozinho (1,6 s), com `.is-closing` antes de sair;
 - **Saída das camadas** (folha, painel lateral, diálogo centralizado, tela cheia dividida): ao fechar, ponha `.is-closing` no contêiner que recebe o `hidden` (ou que sai do DOM) e só esconda no `animationend` de um filho direto, com um limite de 300 ms caso nenhuma animação rode; reabrir tira a classe (e a entrada recomeça do início: o `@keyframes`, única opção no Chrome 101, não continua de onde a saída parou). Véu e folha ficam juntos dentro desse contêiner (num fragmento sem pai, envolva os dois num `div`, que recebe `.is-closing` e `hidden`); a confirmação curta recebe a classe nela mesma (`.ct-toast.is-closing`). Em React, Vue ou Blazor, mantenha a camada montada até esse momento (estado "fechando" entre aberto e fechado), em vez de desmontá-la no clique. Com movimento reduzido, a saída dura 1 ms e o mesmo código serve. Marcação e função de referência: `abrir` e `fechar` em `exemplo-toque.html`; quantidade anunciada (`aria-live`); totem e tablet voltam à tela de descanso por inatividade com aviso antes ("Ainda está aí?") e opção de continuar.
 
+## Acabamento de vidro (tablet, totem e vitrine web)
+
+Regras na seção 9 do `DESIGN.md` ("Acabamento de vidro"); marcação nas demonstrações (`#tablet-vidro`, `#loja-vidro-escuro`).
+
+- **Configuração do canal:** vidro ligado ou não; fundo (marca escura, marca clara ou imagem); vidro Automático, Claro ou Escuro; modo econômico por modelo de aparelho.
+- **Fundo da marca:** ponha `ct-app--vidro ct-app--vidro-escuro` (ou `-claro`) no contêiner `.ct-app`. Sem esquema de canal, os tokens do CSS bastam; com esquema, grave no contêiner os tokens de `derivarVidro('marca-escura', esquema)` (a ação e a marca do canal ajustadas para o vidro) e passe `vidro.tema` a `derivarEsquema`.
+- **Imagem do lojista, no admin, no envio:** desenhe a imagem num `canvas` do tamanho de cada tela-alvo (celular, tablet, totem), com `ctx.filter = 'blur(16px) saturate(1.8) brightness(1.08)'`; leia uma grade de pixels (a cada 6 a 8 px) e passe as cores em hex a `derivarVidro(amostras, esquema, { modo })`; para o modo econômico, a mesma leitura sem o filtro e `{ economico: true }`. Grave a classe e os tokens com o canal e aplique-os no app sem recalcular, como o esquema. Mostre a prévia com o texto por cima.
+- **Desfoque:** `backdrop-filter` com o prefixo `-webkit-` (Safari); já está no CSS do kit. Não anime o vidro nem o fundo.
+- **Fundo fixo:** o fundo é um `::before` com `position: fixed`; não ponha `transform`, `filter` ou `will-change` no `.ct-app`, que prenderiam o fundo dentro dele.
+
 ## Vitrine web (Colibri Delivery, Next.js)
 
 A vitrine é o perfil Operação na superfície `.ct-app--web` (seção 9 do `DESIGN.md`, "Vitrine web"), com a marcação de `exemplo-web.html`. O kit entrega CSS, marcação e regras; a aplicação faz as rotas, os dados e a finalização.

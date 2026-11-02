@@ -396,6 +396,15 @@
         document.getElementById('modal-produto').hidden = location.hash.indexOf('modal') < 0;
         // Lado da foto: escolha do lojista (#loja-foto-esquerda).
         document.querySelectorAll('.ct-item').forEach(function (el) { el.classList.toggle('ct-item--foto-esquerda', location.hash.indexOf('foto-esquerda') >= 0); });
+        var h = location.hash;
+        // Acabamento de vidro, escolha do canal: #...-vidro (escuro), #...-vidro-claro, mais -economico.
+        var vidro = h.indexOf('vidro') >= 0, vidroClaro = h.indexOf('vidro-claro') >= 0;
+        document.querySelectorAll('.ct-app--web').forEach(function (el) {
+            el.classList.toggle('ct-app--vidro', vidro);
+            el.classList.toggle('ct-app--vidro-escuro', vidro && !vidroClaro);
+            el.classList.toggle('ct-app--vidro-claro', vidroClaro);
+            el.classList.toggle('ct-app--vidro-economico', vidro && h.indexOf('economico') >= 0);
+        });
     }
     window.addEventListener('hashchange', mostrar);
     mostrar();

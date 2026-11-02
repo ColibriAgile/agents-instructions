@@ -16,7 +16,7 @@ import { dirname, join } from 'node:path';
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'kit');
 const motorPath = join(raiz, 'colibri-esquema.js');
-const { derivarEsquema, contraste, ESTADOS_BASE, CONTRASTE, tintaSobre, veuSobre, respiroDe } = await import('file://' + motorPath.replace(/\\/g, '/'));
+const { derivarEsquema, contraste, ESTADOS_BASE, CONTRASTE, tintaSobre, veuSobre, respiroDe, derivarVidro, VIDROS } = await import('file://' + motorPath.replace(/\\/g, '/'));
 
 const falhas = [];
 const falhar = (msg) => falhas.push(msg);
@@ -125,6 +125,43 @@ for (const cor of comPaleta) {
 // Padrões do kit (colibri-cards.css): tinta branca nas três cores; a cor livre do lojista é que passa pelo motor.
 for (const cor of ['#1d62ad', '#875800', '#b02637']) if (tintaSobre(cor) !== '#ffffff') falhar(`tintaSobre(${cor}) = ${tintaSobre(cor)} (padrão do kit com tinta branca)`);
 
+// 5. Acabamento de vidro: em qualquer fundo, o vidro devolvido deixa todos os textos em 4,5:1 sobre todas as amostras.
+const mistura = (t, f, a) => '#' + [1, 3, 5].map((i) => Math.round(parseInt(t.slice(i, i + 2), 16) * a + parseInt(f.slice(i, i + 2), 16) * (1 - a)).toString(16).padStart(2, '0')).join('');
+const fundosDeTeste = {
+    'só escuro': ['#000000', '#0b1822', '#102030'],
+    'só claro': ['#ffffff', '#f2f5f9', '#e0e8f0'],
+    'preto e branco': ['#000000', '#ffffff'],
+    'foto quente': ['#2a1a10', '#c98a3c', '#f0d08a', '#8b3a1c', '#5a2e0f', '#fff2d0'],
+    'azul médio': ['#1d62ad', '#2aa3e7', '#0b4f86']
+};
+let vidrosTestados = 0;
+const textosDoVidro = (v, r) => Object.values(VIDROS[r.modo].textos).concat([r.tokens['--ct-vidro-acao'], r.tokens['--ct-vidro-marca']]);
+const conferirVidro = (nome, amostrasV, r) => {
+    vidrosTestados++;
+    const tinta = VIDROS[r.modo].tinta;
+    if (r.opacidade < 0.22 || r.opacidade > 0.95) falhar(`derivarVidro(${nome}): opacidade ${r.opacidade} fora de .22 a .95`);
+    if (r.opacidade >= 0.95) return; // sem saída: devolve o máximo
+    for (const f of amostrasV) for (const t of textosDoVidro(VIDROS, r)) {
+        const c = contraste(t, mistura(tinta, f, r.opacidade));
+        if (c < CONTRASTE.texto) { falhar(`derivarVidro(${nome}, ${r.modo} ${r.opacidade}): ${t} sobre ${f} com ${c.toFixed(2)}:1`); return; }
+    }
+};
+for (const [nome, am] of Object.entries(fundosDeTeste)) {
+    conferirVidro(nome, am, derivarVidro(am));
+    for (const modo of ['escuro', 'claro']) { const r = derivarVidro(am, null, { modo }); if (r.modo !== modo) falhar(`derivarVidro(${nome}, modo ${modo}) devolveu ${r.modo}`); conferirVidro(nome + ' ' + modo, am, r); }
+    for (const sem of [{ ambiente: '#0b1120', acao: '#f59e0b' }, { ambiente: '#fdf6e3', acao: '#c62828', marca: '#1b5e20' }]) conferirVidro(nome + ' com esquema', am, derivarVidro(am, derivarEsquema(sem)));
+}
+// Fundos da marca: os valores de colibri-touch.css batem com o motor.
+const css = readFileSync(join(raiz, 'colibri-touch.css'), 'utf8');
+for (const [fundo, classe] of [['marca-escura', 'escuro'], ['marca-clara', 'claro']]) {
+    const bloco = css.slice(css.indexOf(`.ct-app--vidro-${classe} {`));
+    const valor = (tok) => Number((bloco.match(new RegExp(tok + ':\\s*([0-9.]+)')) || [])[1]);
+    const vivo = derivarVidro(fundo), eco = derivarVidro(fundo, null, { economico: true });
+    if (vivo.modo !== classe) falhar(`derivarVidro('${fundo}') escolheu o vidro ${vivo.modo}`);
+    if (valor('--ct-vidro-a') !== vivo.opacidade) falhar(`colibri-touch.css .ct-app--vidro-${classe}: --ct-vidro-a ${valor('--ct-vidro-a')}, motor ${vivo.opacidade}`);
+    if (valor('--ct-vidro-economico') !== eco.opacidade) falhar(`colibri-touch.css .ct-app--vidro-${classe}: --ct-vidro-economico ${valor('--ct-vidro-economico')}, motor ${eco.opacidade}`);
+}
+
 // 3. Piso Chrome 101
 const fonte = readFileSync(motorPath, 'utf8');
 const acima101 = [/\.toSorted\(/, /\.toReversed\(/, /\.toSpliced\(/, /\.with\(/, /Object\.groupBy/, /Map\.groupBy/, /isWellFormed/, /Array\.fromAsync/, /\/[a-z]*v[a-z]*\.test/];
@@ -136,7 +173,7 @@ if (falhas.length) {
     if (falhas.length > 40) console.error(` … e mais ${falhas.length - 40}`);
     process.exit(1);
 }
-console.log(`OK: estados iguais à base; neutros dos temas claro e escuro reproduzidos; paleta curada com ${paleta.length} cores legíveis com texto branco; ${comPaleta.length} cores livres de card com tinta e respiro em 4,5:1 ou mais; ${combinacoes} combinações de sementes e modo (automático, claro e escuro forçados) com contraste garantido (${comAjuste} com ajuste); sem APIs acima do Chrome 101.`);
+console.log(`OK: estados iguais à base; neutros dos temas claro e escuro reproduzidos; paleta curada com ${paleta.length} cores legíveis com texto branco; ${comPaleta.length} cores livres de card com tinta e respiro em 4,5:1 ou mais; ${combinacoes} combinações de sementes e modo (automático, claro e escuro forçados) com contraste garantido (${comAjuste} com ajuste); vidro com 4,5:1 em ${vidrosTestados} combinações de fundo, modo e esquema, e os fundos da marca iguais no CSS e no motor; sem APIs acima do Chrome 101.`);
 for (const [nome, s] of [['padrão Colibri', {}], ['totem atual', { ambiente: '#0b1120', acao: '#f59e0b' }], ['tablet atual', { ambiente: '#020617', acao: '#f99c00' }], ['claro creme', { ambiente: '#fdf6e3', acao: '#c62828', marca: '#1b5e20' }]]) {
     const e = derivarEsquema(s);
     console.log(`  ${nome}: modo ${e.modo}; bg ${e.tokens['--ct-bg']}, surface ${e.tokens['--ct-surface']}, ink-3 ${e.tokens['--ct-ink-3']}, action ${e.tokens['--ct-action']}/${e.tokens['--ct-on-action']}, brand-ink ${e.tokens['--ct-brand-ink']}; ajustes: ${e.ajustes.map((a) => a.token).join(', ') || 'nenhum'}`);
