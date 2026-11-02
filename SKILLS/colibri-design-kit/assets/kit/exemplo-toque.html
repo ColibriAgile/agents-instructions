@@ -301,9 +301,10 @@
         <div class="ct-bar__actions"><a class="ct-btn" href="#consolidado">Por produto</a></div>
     </div>
     <!-- Perfil Produção, modo toque (tablet perto do cozinheiro): o ícone de estado é o botão do item, o rodapé age no card.
-         Na aplicação, a grade empilha os cards na coluna mais baixa, na ordem da fila; aqui, a pilha é manual. -->
+         Na aplicação, a grade empilha os cards na coluna mais baixa, na ordem da fila; aqui, a pilha é manual.
+         Colunas: as escolhidas no admin (2 a 5), só até onde cada card fica com --cp-card-min (280 px) vezes o zoom. -->
     <div class="demo-scroll cp-piso">
-        <div class="ct-orders cp-modo-toque" style="--ct-cols: 3">
+        <div class="ct-orders cp-modo-toque" style="--ct-cols: 5">
             <article class="cp-card">
                 <header class="cp-card__head">
                     <div class="cp-card__linha"><span class="cp-card__tipo cp-card__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cp-card__senha">12</span><span class="cp-card__tempo">03:12</span></div>
@@ -348,6 +349,28 @@
                     <div class="cp-card__foot"><button type="button" class="cp-card__acao cp-card__acao--perigo">Remover</button></div>
                 </article>
             </div>
+            <article class="cp-card">
+                <header class="cp-card__head">
+                    <div class="cp-card__linha"><span class="cp-card__tipo cp-card__tipo--retirada"><i class="bi bi-bag" aria-hidden="true"></i>Retirada</span><span class="cp-card__senha">R18</span><span class="cp-card__tempo">02:05</span></div>
+                    <div class="cp-card__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Carlos</span></div>
+                </header>
+                <ul class="cp-card__itens">
+                    <li class="cp-card__item is-preparo"><button type="button" class="cp-card__estado-btn" aria-label="Hambúrguer artesanal: em preparo. Tocar marca pronto"><i class="bi bi-fire cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Hambúrguer artesanal</span><span class="cp-card__obs"><i class="bi bi-arrow-right" aria-hidden="true"></i>Sem tomate</span></span></li>
+                    <li class="cp-card__item is-aguardando"><button type="button" class="cp-card__estado-btn" aria-label="Batata rústica: aguardando. Tocar inicia"><i class="bi bi-clock cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">2×</span><span class="cp-card__corpo"><span class="cp-card__nome">Batata rústica</span><span class="cp-card__ritmo cp-card__ritmo--agora"><i class="bi bi-alarm" aria-hidden="true"></i>Iniciar agora</span></span></li>
+                </ul>
+                <div class="cp-card__foot"><button type="button" class="cp-card__acao">Espera</button><button type="button" class="cp-card__acao cp-card__acao--principal">Concluir</button></div>
+            </article>
+            <article class="cp-card">
+                <header class="cp-card__head">
+                    <div class="cp-card__linha"><span class="cp-card__tipo cp-card__tipo--ficha"><i class="bi bi-ticket-perforated" aria-hidden="true"></i>Ficha</span><span class="cp-card__senha">486</span><span class="cp-card__tempo">00:40</span></div>
+                    <div class="cp-card__apoio"><span><i class="bi bi-geo-alt" aria-hidden="true"></i>Totem</span></div>
+                </header>
+                <ul class="cp-card__itens">
+                    <li class="cp-card__item is-aguardando"><button type="button" class="cp-card__estado-btn" aria-label="Misto quente: aguardando. Tocar inicia"><i class="bi bi-clock cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Misto quente</span></span></li>
+                    <li class="cp-card__item is-aguardando"><button type="button" class="cp-card__estado-btn" aria-label="Suco de laranja 300 ml: aguardando. Tocar inicia"><i class="bi bi-clock cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Suco de laranja 300 ml</span></span></li>
+                </ul>
+                <div class="cp-card__foot"><button type="button" class="cp-card__acao">Iniciar</button><button type="button" class="cp-card__acao cp-card__acao--principal">Concluir</button></div>
+            </article>
         </div>
     </div>
 </div>
@@ -361,7 +384,7 @@
         <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>1 atrasado</span>
     </div>
     <div class="demo-scroll cp-piso">
-        <div class="ct-orders cp-modo-bump" style="--ct-cols: 3">
+        <div class="ct-orders cp-modo-bump" style="--ct-cols: 4">
             <article class="cp-card is-selecionado">
                 <header class="cp-card__head">
                     <div class="cp-card__linha"><span class="cp-card__indice">1</span><span class="cp-card__tipo cp-card__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cp-card__senha">21</span><span class="cp-card__tempo">04:30</span></div>
@@ -410,50 +433,61 @@
     </div>
 </div>
 
-<!-- Visão por produto (consolidado): cartão de agrupamento, cabeçalho neutro com o produto e o total; no delivery,
-     entregador na faixa de dados e a situação do despacho em selo de estado -->
+<!-- Visão por produto (consolidado): card de agrupamento do perfil Produção, um por produto, com o cabeçalho na cor
+     do tempo do pior pedido; cada linha é um pedido de origem. A expedição do delivery é o card de produção com a
+     situação do despacho na faixa de aviso. -->
 <div class="ct-app ct-app--kds demo-surface" id="consolidado">
     <div class="ct-bar" style="--ct-station-color: var(--ct-palette-laranja)">
         <span class="ct-bar__station"><i class="bi bi-fire" aria-hidden="true"></i>Chapa · por produto</span>
-        <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>1 atrasado</span>
+        <span class="ct-tag ct-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>1 em atenção</span>
+        <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>1 atrasado</span>
         <div class="ct-bar__actions"><a class="ct-btn" href="#kds">Por pedido</a></div>
     </div>
-    <div class="demo-scroll">
-        <div class="ct-orders" style="--ct-cols: 3">
-            <article class="ct-order ct-order--group ct-order--late">
-                <div class="ct-order__head"><span class="ct-order__title">Pastel de carne</span><span class="ct-order__total">5×</span></div>
-                <div class="ct-order__urgency"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>Atrasado · #471 passou de 10 min</div>
-                <ul class="ct-order__items">
-                    <li class="ct-order__item"><span class="ct-order__qty ct-order__qty--multi">3×</span><span class="ct-order__name"><span class="ct-order__origin"><span class="ct-tag ct-tag--balcao"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="ct-order__ref">#471</span><span class="ct-order__ref">12:05</span></span></span></li>
-                    <li class="ct-order__item is-preparing"><span class="ct-order__qty ct-order__qty--multi">2×</span><span class="ct-order__name"><span class="ct-order__origin"><span class="ct-tag ct-tag--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa 12</span><span class="ct-order__ref">#482</span><span class="ct-order__ref">03:12</span></span><span class="ct-order__state"><i class="bi bi-fire" aria-hidden="true"></i>Em preparo</span></span></li>
+    <div class="demo-scroll cp-piso">
+        <div class="ct-orders cp-modo-toque" style="--ct-cols: 5">
+            <article class="cp-card cp-card--atraso">
+                <header class="cp-card__head">
+                    <div class="cp-card__linha"><span class="cp-card__produto">Pastel de carne</span><span class="cp-card__total">5×</span></div>
+                    <div class="cp-card__apoio"><span><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>Atrasado · 2 pedidos</span></div>
+                </header>
+                <ul class="cp-card__itens">
+                    <li class="cp-card__item is-aguardando"><button type="button" class="cp-card__estado-btn" aria-label="Pastel de carne, Balcão A47: aguardando. Tocar inicia"><i class="bi bi-clock cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">3×</span><span class="cp-card__corpo"><span class="cp-card__origem"><span class="cp-card__tipo cp-card__tipo--balcao"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span><span class="cp-card__ref">A47</span><span class="cp-card__ref-tempo is-atraso"><i class="bi bi-exclamation-octagon-fill" aria-label="Atrasado"></i>12:05</span></span></span></li>
+                    <li class="cp-card__item is-preparo"><button type="button" class="cp-card__estado-btn" aria-label="Pastel de carne, Mesa 12: em preparo. Tocar marca pronto"><i class="bi bi-fire cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">2×</span><span class="cp-card__corpo"><span class="cp-card__origem"><span class="cp-card__tipo cp-card__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cp-card__ref">12</span><span class="cp-card__ref-tempo">03:12</span></span></span></li>
                 </ul>
-                <div class="ct-order__foot"><button class="ct-btn" type="button">Iniciar todos</button><button class="ct-btn ct-btn--primary" type="button">Concluir 5</button></div>
+                <div class="cp-card__foot"><button type="button" class="cp-card__acao">Iniciar todos</button><button type="button" class="cp-card__acao cp-card__acao--principal">Concluir 5</button></div>
             </article>
-            <article class="ct-order ct-order--group">
-                <div class="ct-order__head"><span class="ct-order__title">Batata média</span><span class="ct-order__total">3×</span></div>
-                <ul class="ct-order__items">
-                    <li class="ct-order__item is-ready"><span class="ct-order__qty">1×</span><span class="ct-order__name"><span class="ct-order__origin"><span class="ct-tag ct-tag--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa 12</span><span class="ct-order__ref">#482</span></span><span class="ct-order__state"><i class="bi bi-check2-circle" aria-hidden="true"></i>Pronto</span></span></li>
-                    <li class="ct-order__item"><span class="ct-order__qty ct-order__qty--multi">2×</span><span class="ct-order__name"><span class="ct-order__origin"><span class="ct-tag ct-tag--entrega"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="ct-order__ref">#479</span><span class="ct-order__ref">07:40</span></span></span></li>
+            <article class="cp-card cp-card--atencao">
+                <header class="cp-card__head">
+                    <div class="cp-card__linha"><span class="cp-card__produto">Batata média</span><span class="cp-card__total">3×</span></div>
+                    <div class="cp-card__apoio"><span><i class="bi bi-hourglass-split" aria-hidden="true"></i>Em atenção · 2 pedidos</span></div>
+                </header>
+                <ul class="cp-card__itens">
+                    <li class="cp-card__item is-pronto"><button type="button" class="cp-card__estado-btn" aria-label="Batata média, Mesa 12: pronto. Tocar volta para em preparo"><i class="bi bi-check-circle-fill cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__origem"><span class="cp-card__tipo cp-card__tipo--mesa"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>Mesa</span><span class="cp-card__ref">12</span><span class="cp-card__ref-tempo">03:12</span></span></span></li>
+                    <li class="cp-card__item is-aguardando"><button type="button" class="cp-card__estado-btn" aria-label="Batata média, Entrega #479: aguardando. Tocar inicia"><i class="bi bi-clock cp-card__estado" aria-hidden="true"></i></button><span class="cp-card__qtd">2×</span><span class="cp-card__corpo"><span class="cp-card__origem"><span class="cp-card__tipo cp-card__tipo--entrega"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="cp-card__ref">#479</span><span class="cp-card__ref-tempo is-atencao"><i class="bi bi-hourglass-split" aria-label="Atenção"></i>07:40</span></span></span></li>
                 </ul>
-                <div class="ct-order__foot"><button class="ct-btn ct-btn--primary" type="button">Concluir 2</button></div>
+                <div class="cp-card__foot"><button type="button" class="cp-card__acao cp-card__acao--principal">Concluir 2</button></div>
             </article>
-            <article class="ct-order ct-order--entrega">
-                <div class="ct-order__head"><span class="ct-order__type"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="ct-order__ticket">#468</span><span class="ct-order__timer">14:20</span></div>
-                <div class="ct-order__meta">Joana · site · entregador Rafael <span class="ct-tag ct-tag--warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>Aguardando entregador</span></div>
-                <ul class="ct-order__items">
-                    <li class="ct-order__item is-ready"><span class="ct-order__qty">1×</span><span class="ct-order__name">Combo família<span class="ct-order__state"><i class="bi bi-check2-circle" aria-hidden="true"></i>Pronto</span></span></li>
+            <article class="cp-card">
+                <header class="cp-card__head">
+                    <div class="cp-card__linha"><span class="cp-card__tipo cp-card__tipo--entrega"><i class="bi bi-bicycle" aria-hidden="true"></i>Entrega</span><span class="cp-card__senha">#468</span><span class="cp-card__tempo">05:20</span></div>
+                    <div class="cp-card__apoio"><span><i class="bi bi-person" aria-hidden="true"></i>Joana</span><span>Site</span><span><i class="bi bi-bicycle" aria-hidden="true"></i>Rafael</span></div>
+                </header>
+                <ul class="cp-card__itens">
+                    <li class="cp-card__item is-pronto"><i class="bi bi-check-circle-fill cp-card__estado" aria-label="Pronto"></i><span class="cp-card__qtd">1×</span><span class="cp-card__corpo"><span class="cp-card__nome">Combo família</span></span></li>
                 </ul>
-                <div class="ct-order__foot"><button class="ct-btn ct-btn--primary" type="button">Despachar</button></div>
+                <div class="cp-card__faixa cp-card__faixa--aviso"><i class="bi bi-hourglass-split" aria-hidden="true"></i>Aguardando entregador</div>
+                <div class="cp-card__foot"><button type="button" class="cp-card__acao cp-card__acao--principal">Despachar</button></div>
             </article>
         </div>
     </div>
 </div>
 
-<!-- Painel da produção: TV de indicadores no tema Colibri, números no plano com divisores, sem cartões de métrica -->
+<!-- Painel da produção: TV de indicadores no tema Colibri, números no plano com divisores, sem cartões de métrica;
+     abaixo, a tabela por estação, com a identidade da estação e o estado fora da meta em selo -->
 <div class="ct-app ct-app--tv demo-surface" id="painel">
     <div class="ct-bar">
         <span class="ct-bar__station"><i class="bi bi-speedometer2" aria-hidden="true"></i>Produção de hoje</span>
-        <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>3 atrasados</span>
+        <span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>3 atrasados</span>
     </div>
     <div class="demo-scroll">
         <div class="ct-board">
@@ -463,6 +497,19 @@
                 <div class="ct-stat"><span class="ct-stat__label">Na fila agora</span><span class="ct-stat__value">18</span></div>
                 <div class="ct-stat"><span class="ct-stat__label">Acima de 10 min</span><span class="ct-stat__value">7%</span><span class="ct-tag ct-tag--warning"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i>Meta: até 5%</span></div>
             </div>
+            <section>
+                <h2 class="ct-board__title">Por estação</h2>
+                <table class="ct-board__table">
+                    <thead><tr><th scope="col">Estação</th><th scope="col">Na fila</th><th scope="col">Em preparo</th><th scope="col">Tempo médio</th><th scope="col">Acima de 10 min</th><th scope="col">Situação</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="ct-board__estacao" style="--ct-station-color: var(--ct-palette-laranja)"><i class="bi bi-fire" aria-hidden="true"></i>Chapa</span></td><td class="ct-board__num">7</td><td class="ct-board__num">3</td><td class="ct-board__num">7:50</td><td class="ct-board__num">12%</td><td><span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>2 atrasados</span></td></tr>
+                        <tr><td><span class="ct-board__estacao" style="--ct-station-color: var(--ct-palette-vinho)"><i class="bi bi-egg-fried" aria-hidden="true"></i>Fritura</span></td><td class="ct-board__num">4</td><td class="ct-board__num">2</td><td class="ct-board__num">5:10</td><td class="ct-board__num">6%</td><td><span class="ct-tag ct-tag--danger"><i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>1 atrasado</span></td></tr>
+                        <tr><td><span class="ct-board__estacao" style="--ct-station-color: var(--ct-palette-verde)"><i class="bi bi-fork-knife" aria-hidden="true"></i>Montagem</span></td><td class="ct-board__num">2</td><td class="ct-board__num">2</td><td class="ct-board__num">6:20</td><td class="ct-board__num">9%</td><td><span class="ct-tag ct-tag--warning"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i>Acima da meta</span></td></tr>
+                        <tr><td><span class="ct-board__estacao" style="--ct-station-color: var(--ct-palette-roxo)"><i class="bi bi-cake2" aria-hidden="true"></i>Sobremesas</span></td><td class="ct-board__num">3</td><td class="ct-board__num">0</td><td class="ct-board__num">4:05</td><td class="ct-board__num">3%</td><td><span class="ct-board__ok"><i class="bi bi-check2" aria-hidden="true"></i>No prazo</span></td></tr>
+                        <tr><td><span class="ct-board__estacao" style="--ct-station-color: var(--ct-palette-azul)"><i class="bi bi-cup-straw" aria-hidden="true"></i>Bebidas</span></td><td class="ct-board__num">2</td><td class="ct-board__num">1</td><td class="ct-board__num">1:40</td><td class="ct-board__num">0%</td><td><span class="ct-board__ok"><i class="bi bi-check2" aria-hidden="true"></i>No prazo</span></td></tr>
+                    </tbody>
+                </table>
+            </section>
         </div>
     </div>
 </div>

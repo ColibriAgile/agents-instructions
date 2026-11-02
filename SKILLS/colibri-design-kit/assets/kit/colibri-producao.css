@@ -34,6 +34,9 @@
     --cp-raio: var(--cm-radius);
     --cp-raio-controle: var(--cm-btn-radius);
     --cp-alvo: 40px;
+    /* Menor largura em que o card mostra tudo sem quebrar o cabeçalho (vezes o zoom da estação): a
+     * aplicação usa as colunas escolhidas no admin só até onde cada card fica com essa largura. */
+    --cp-card-min: 280px;
 
     /* Escala do card. O zoom da estação multiplica tudo; a distância é tratada por ele. As alturas de
      * linha são fixas e maiores que o texto: o respiro entre as linhas é o que tira a densidade. */
@@ -71,6 +74,11 @@
  * botões) ou bump (TV operada pela bump bar, sem botões). No bump, o nome sobe para 500. */
 .cp-modo-bump {
     --cp-peso-nome: 500;
+}
+/* Na grade da estação, nenhuma coluna abaixo da largura mínima do card (colibri-touch.css, .ct-orders). */
+.cp-modo-toque,
+.cp-modo-bump {
+    --ct-col-min: var(--cp-card-min);
 }
 /* Fundo da área dos cards: os cards brancos (claro) e azul petróleo (escuro) saltam dele. */
 .cp-piso {
@@ -185,6 +193,7 @@
     background: var(--cp-marca);
     border-radius: var(--cp-raio-controle);
     line-height: var(--cp-lh-selo);
+    white-space: nowrap;
 }
 .cp-card__marca--cancelado { color: #fff; background: var(--cp-atraso); }
 .cp-card__apoio {
@@ -197,6 +206,61 @@
     line-height: var(--cp-lh-apoio);
 }
 .cp-card__apoio .bi { margin-right: 4px; font-size: .9em; line-height: 1; }
+
+/* ---------- Card de agrupamento (visão por produto, consolidado) ----------
+ * O mesmo card, com o produto no lugar do pedido: cabeçalho na cor do tempo do pior pedido, o produto e o
+ * total; na linha de apoio, a urgência por extenso e quantos pedidos. Cada item é um pedido de origem:
+ * estado, quantidade, tipo em selo, número e tempo à direita (na cor e com o ícone da urgência dele). */
+.cp-card__produto {
+    min-width: 0;
+    font-size: var(--cp-text);
+    font-weight: 600;
+    line-height: var(--cp-lh-cabecalho);
+    overflow-wrap: anywhere;
+}
+.cp-card__total {
+    margin-left: auto;
+    font-family: var(--cm-mono);
+    font-size: var(--cp-text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: var(--cp-lh-cabecalho);
+    white-space: nowrap;
+}
+.cp-card__origem {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 8px;
+    min-height: var(--cp-lh-item);
+    font-size: var(--cp-text-sm);
+    font-weight: 600;
+}
+/* No corpo, o selo do tipo ganha o contorno na cor dele: no tema claro, o corpo também é branco. */
+.cp-card__origem .cp-card__tipo { box-shadow: inset 0 0 0 1px currentColor; }
+.cp-card__ref,
+.cp-card__ref-tempo {
+    font-family: var(--cm-mono);
+    font-size: var(--cp-text);
+    font-weight: var(--cp-peso-qtd);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--cp-lh-item);
+}
+.cp-card__ref { color: var(--cp-item); }
+.cp-card__ref-tempo {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    color: var(--ct-ink-2);
+    white-space: nowrap;
+}
+.cp-card__ref-tempo .bi { font-size: .9em; }
+.cp-card__ref-tempo.is-atencao { color: var(--ct-warning); }
+.cp-card__ref-tempo.is-atraso { color: var(--ct-danger); }
+.cp-card__item.is-pronto .cp-card__ref,
+.cp-card__item.is-pronto .cp-card__ref-tempo { color: var(--cp-esmaecido); }
+.cp-card__item.is-pronto .cp-card__origem .cp-card__tipo { opacity: .5; }
 
 /* ---------- Itens ----------
  * estado | quantidade | nome, numa linha. A coluna de estado é fixa e sempre ocupada; um traço de 1 px
@@ -463,6 +527,8 @@
     line-height: var(--cp-lh-apoio);
 }
 .cp-card__faixa--pronto { color: var(--ct-success); background: var(--ct-success-soft); }
+/* Situação que pede atenção fora do preparo (expedição: "Aguardando entregador"), em qualquer modo. */
+.cp-card__faixa--aviso { margin: 2px 6px 4px; color: var(--ct-warning); background: var(--ct-warning-soft); font-weight: 600; }
 .cp-card__tecla {
     display: inline-grid;
     place-items: center;

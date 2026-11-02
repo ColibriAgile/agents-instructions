@@ -52,6 +52,8 @@ Leia também as linhas `-`. Perder um sinal é regressão mesmo quando nenhuma l
 | `.cm-btn-group` desfeito | K1 |
 | diálogo ou folha de confirmação, "Desfazer" | K8 |
 | classe de superfície `.ct-app--*` ou `.ct-app--kiosk` | O1 |
+| `.cp-modo-toque` ou `.cp-modo-bump` na raiz da grade (leva o `--ct-col-min`), limite de colunas no cálculo do empilhamento | O11, R4 |
+| ícone ou rótulo da urgência na linha de origem do card de agrupamento, faixa de aviso do despacho | R6 |
 | `.cm-skip` ou o `id="conteudo"` da área de conteúdo | S1 |
 | informação da loja (`.ct-loja__info`), taxa ou total antes de finalizar | W2 |
 | `viewport-fit=cover`, `env(safe-area-inset-bottom)`, campo em 16 px, metadados de prévia | W6 |

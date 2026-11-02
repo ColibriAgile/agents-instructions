@@ -981,9 +981,11 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
 /* ---------- Cartão de pedido (KDS) ----------
  * O cabeçalho leva a cor do tipo de pedido (paleta curada) com texto branco; a urgência nunca é só cor:
  * borda + faixa com ícone e rótulo. --ct-order-color pode vir da configuração (sempre da paleta). */
+/* Colunas: as --ct-cols escolhidas, mas nenhuma abaixo de --ct-col-min (o perfil Produção põe a largura
+ * mínima do card): sem espaço, a grade usa menos colunas em vez de espremer o card. */
 .ct-orders {
     display: grid;
-    grid-template-columns: repeat(var(--ct-cols, 4), minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(max(var(--ct-col-min, 0px), calc((100% - (var(--ct-cols, 4) - 1) * var(--ct-gap)) / var(--ct-cols, 4) - .5px)), 1fr));
     align-items: start;
     gap: var(--ct-gap);
     padding: var(--ct-pad);
@@ -1116,59 +1118,112 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
 
 /* ---------- Barra da estação (KDS) ----------
  * Identidade da estação (ícone da lista curada sobre a cor da estação, da paleta, e o nome), contagens de
- * atenção e atraso em selos de estado e as ações da estação à direita, com o alvo da superfície. */
+ * atenção e atraso em selos de estado e as ações da estação à direita, com o alvo da superfície.
+ * Regra da barra no tamanho do card: na tela da estação e no painel da produção, a barra é apoio e segue a
+ * escala do card de produção (nome em 17 px e 600, selos em 13 px), em qualquer superfície; quem é lido de
+ * longe são os pedidos e os números. */
 .ct-bar {
+    --ct-tag-h: 26px;
+    --ct-tag-pad: 8px;
+    --ct-tag-text: 13px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px 12px;
-    min-height: var(--ct-target);
-    padding: 8px var(--ct-pad);
+    gap: 8px 10px;
+    min-height: 48px;
+    padding: 4px var(--ct-pad);
     background: var(--ct-surface);
     border-bottom: 1px solid var(--ct-line);
 }
 .ct-bar__station {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     min-width: 0;
     margin-right: auto;
-    font-size: var(--ct-text-lg);
-    font-weight: 700;
+    font-size: 17px;
+    font-weight: 600;
 }
 .ct-bar__station > .bi {
     display: inline-grid;
     flex: 0 0 auto;
     place-items: center;
-    width: 1.8em;
-    height: 1.8em;
+    width: 28px;
+    height: 28px;
     color: #fff;
     background: var(--ct-station-color, var(--ct-palette-grafite));
     border-radius: var(--ct-radius-tag);
-    font-size: .85em;
+    font-size: 14px;
 }
 .ct-bar__actions { display: flex; gap: 8px; }
 
 /* ---------- Painel da produção (TV de indicadores do KDS, tema Colibri) ----------
- * Até seis números grandes numa linha, cada um com rótulo; estado em selo com ícone; nada de cartão de métrica:
- * os números ficam no plano, separados por divisores. Gráficos seguem a seção 2 ("Gráficos"). */
-.ct-board { display: flex; flex-direction: column; gap: 32px; padding: var(--ct-pad); }
+ * Até seis números numa linha, cada um com rótulo; estado em selo com ícone; nada de cartão de métrica:
+ * os números ficam no plano, separados por divisores. Gráficos seguem a seção 2 ("Gráficos").
+ * O número tem o tamanho de --ct-stat-size (três quartos do display da superfície, no máximo 5vw) e cada
+ * coluna reserva a largura de quatro algarismos e a unidade: sem espaço, a linha quebra; nunca transborda.
+ * Abaixo, a tabela por estação (.ct-board__table), com o traço do card entre as linhas. */
+.ct-board {
+    --ct-stat-size: min(calc(var(--ct-text-display) * .75), 5vw);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: var(--ct-pad);
+}
 .ct-board__stats { display: flex; flex-wrap: wrap; row-gap: 24px; }
 .ct-stat {
     display: flex;
     flex: 1 1 0;
     flex-direction: column;
-    gap: 6px;
-    min-width: 10em;
+    gap: 4px;
+    min-width: calc(var(--ct-stat-size) * 3.2 + 48px);
     padding: 4px 24px;
     border-left: 1px solid var(--ct-line);
 }
 .ct-stat:first-child { padding-left: 0; border-left: 0; }
-.ct-stat__label { color: var(--ct-ink-2); font-size: var(--ct-text); font-weight: 600; }
-.ct-stat__value { color: var(--ct-ink); font-family: var(--cm-mono); font-size: var(--ct-text-display); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.05; }
-.ct-stat__value small { margin-left: 6px; color: var(--ct-ink-2); font-size: var(--ct-text-lg); font-weight: 600; }
+.ct-stat__label { color: var(--ct-ink-2); font-size: var(--ct-text-sm); font-weight: 500; }
+.ct-stat__value {
+    color: var(--ct-ink);
+    font-family: var(--cm-mono);
+    font-size: var(--ct-stat-size);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+.ct-stat__value small { margin-left: .15em; color: var(--ct-ink-2); font-size: .32em; font-weight: 500; letter-spacing: 0; }
 .ct-stat > .ct-tag { align-self: flex-start; }
-.ct-board__title { margin: 0 0 12px; font-size: var(--ct-text-lg); font-weight: 700; }
+.ct-board__title { margin: 0 0 8px; color: var(--ct-ink-2); font-size: var(--ct-text-sm); font-weight: 600; }
+.ct-board__table { width: 100%; border-collapse: collapse; font-size: var(--ct-text); }
+.ct-board__table th {
+    padding: 0 16px 8px;
+    color: var(--ct-ink-2);
+    font-size: var(--ct-text-sm);
+    font-weight: 500;
+    text-align: right;
+    white-space: nowrap;
+}
+.ct-board__table td { padding: 10px 16px; border-top: 1px solid var(--ct-line); text-align: right; }
+.ct-board__table th:first-child,
+.ct-board__table td:first-child { padding-left: 0; text-align: left; }
+.ct-board__table th:last-child,
+.ct-board__table td:last-child { padding-right: 0; text-align: left; }
+.ct-board__num { font-family: var(--cm-mono); font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Estação na tabela: o mesmo ícone sobre a cor da estação da barra, no tamanho do texto. */
+.ct-board__estacao { display: inline-flex; align-items: center; gap: 10px; font-weight: 500; }
+.ct-board__estacao > .bi {
+    display: inline-grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 1.5em;
+    height: 1.5em;
+    color: #fff;
+    background: var(--ct-station-color, var(--ct-palette-grafite));
+    border-radius: var(--ct-radius-tag);
+    font-size: .8em;
+}
+.ct-board__ok { display: inline-flex; align-items: center; gap: 6px; color: var(--ct-ink-2); font-size: var(--ct-text-sm); white-space: nowrap; }
 
 /* ---------- Pedidos prontos (TV voltada ao cliente; usa o esquema do canal) ---------- */
 .ct-ready-grid {
