@@ -9,6 +9,7 @@ Esta referência descreve como os repositórios da organização `ColibriAgile` 
 - [Mapa de pacotes conhecidos](#mapa-de-pacotes-conhecidos)
 - [Build](#build)
 - [Deploy](#deploy)
+- [Market-place](#market-place)
 - [Jira](#jira)
 - [Problemas conhecidos](#problemas-conhecidos)
 
@@ -88,6 +89,22 @@ O log mostra o resultado. Use `scripts/conferir-deploy.sh`:
 
 Um deploy com conclusão `success` não prova nada sozinho. Confira sempre o nome do `.cmpkg`.
 
+## Market-place
+
+O Colibri Market Place (`https://marketplace.colibricloud.com`, repositório `market-place`) distribui os pacotes para as lojas. O nonprod fica em `https://marketplace.nonprod.colibricloud.com`.
+
+1. Depois do envio ao S3, o `BuildTools.exe deploy` chama `POST /api/secure/pacote/sync/`. O market-place registra o pacote com `publicado = false` (pendente). Um envio com `Ignorados: 1` não chama o `sync`.
+2. As lojas recebem só a maior versão **publicada** de cada pacote (`POST /api/pacotes/`, com o rodízio do plano de lançamento). Um pacote pendente não chega às lojas.
+3. A publicação usa `PUT /api/pacote/publicar/` (versão 2.9.0 do market-place, de 02/11/2026):
+   - Autenticação: `Authorization: Bearer mkt_...`, o token de publicação da empresa. O administrador da empresa cria e revoga o token na tela da empresa. O token não expira e publica qualquer extensão da empresa dele. A skill lê o token de `COLIBRI_MARKET_TOKEN`.
+   - Corpo: lista em que cada item é o id (`123`) ou `{"id": 123, "nota": "<markdown>"}`. Um item com `id` precisa de `nota`.
+   - A nota substitui o texto das notas do pacote e mantém os campos `jira` e `jql`. A nota entra antes da publicação, por isso a mensagem do Slack já sai com ela.
+   - A rota valida todos os itens antes de mudar algo: um item inválido faz a lista inteira falhar.
+   - Respostas: `200` publicado; `400` corpo mal formado; `401` token ausente, errado ou revogado; `403` pacote de outra empresa; `404` pacote que não existe.
+4. Para achar o id, use `GET /api/pacote/nome/<nome>/` (público). A resposta tem `id`, `versao` (versão completa), `publicado`, `dt_publicacao` e `ultima_nota`. O `nome` é o campo `nome` do manifesto.
+5. A publicação não volta. A API não tem rota para despublicar.
+6. O `BuildTools` (1.2.0) não chama a rota de publicação. Ele só chama o `sync`.
+
 ## Jira
 
 - Site: `https://colibri.atlassian.net`. Obtenha o `cloudId` com `getAccessibleAtlassianResources`.
@@ -115,3 +132,6 @@ Um deploy com conclusão `success` não prova nada sozinho. Confira sempre o nom
 | Testes falham com `MSB4166 Child node exited prematurely` ou `SDK Resolver Failure` | Falha do runner | Execute de novo com `gh run rerun <id> --failed`. |
 | `SonarCloud Code Analysis` com `fail` | Quality gate | Não bloqueia o merge. Registre no relatório. |
 | Versão em produção maior que a do chamado | Outra pessoa liberou uma versão mais nova | Não abra PR nem faça deploy. Avise o usuário. |
+| fixVersion do Jira maior que o `versao.ini` do branch ou do master | A versão da tarefa mudou depois do build (por exemplo, a `POS 11.2` foi lançada e a tarefa passou para a `POS 11.2.1`) | Com a aprovação do usuário, ajuste o `versao.ini` com um commit `chore(versao)` antes do merge (passo 3.1 ou passo 4 da skill). |
+| `git push origin --delete <branch>` mostra `remote ref does not exist` | O repositório remove o branch do PR no merge | Nenhuma. O branch remoto já foi removido. |
+| `git branch -d <branch>` recusa remover o branch | O branch local tem commits que não foram para o master | Não use `-D`. Mostre os commits (`git log master..<branch>`) e pergunte ao usuário. |
