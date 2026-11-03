@@ -1,7 +1,6 @@
 import { cp, lstat, mkdir, mkdtemp, readFile, readlink, realpath, rm, symlink } from 'node:fs/promises';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { homedir, tmpdir } from 'node:os';
-import { createHash } from 'node:crypto';
 import { agents, canonicalPath, targetPath } from './agents.js';
 import type { Agent, Method, Scope } from './agents.js';
 import { backend, jsonArray } from './backend.js';
@@ -9,6 +8,7 @@ import { isMissing, skillName, yamlObject } from './catalog.js';
 import type { Catalog, Selection } from './catalog.js';
 import { Interrupted, directoryHash, exists, loadState, onForceExit, saveState, withScopeLock } from './storage.js';
 import type { State } from './storage.js';
+import { readManifest } from './manifest.js';
 import { requirementInfo } from './requirements.js';
 import type { RequirementInfo } from './requirements.js';
 
@@ -163,13 +163,8 @@ async function withInstallRollback<T>(paths: string[], action: () => Promise<T>)
 
 export async function executePlan(plan: Plan, force = false, onSuccess?: () => Promise<void>): Promise<Summary> {
   return withScopeLock(plan.scope, async interruption => {
-    if (plan.manifest) {
-      const content = await readFile(plan.manifest.path, 'utf8').catch(error => {
-        if (isMissing(error)) return null;
-        throw error;
-      });
-      const revision = content === null ? null : createHash('sha256').update(content).digest('hex');
-      if (revision !== plan.manifest.revision) throw new Error(`Manifest changed since preview: ${plan.manifest.path}. Prepare a new preview before applying changes.`);
+    if (plan.manifest && (await readManifest(plan.manifest.path)).revision !== plan.manifest.revision) {
+      throw new Error(`Manifest changed since preview: ${plan.manifest.path}. Prepare a new preview before applying changes.`);
     }
     const state = await loadState(plan.scope);
     await guard(plan, state, force);
