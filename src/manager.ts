@@ -1,4 +1,4 @@
-import { cp, lstat, mkdir, mkdtemp, readFile, realpath, rm } from 'node:fs/promises';
+import { cp, lstat, mkdir, mkdtemp, readFile, readlink, realpath, rm, symlink } from 'node:fs/promises';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { homedir, tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
@@ -129,21 +129,25 @@ export function preview(plan: Plan): string {
 // Restore only paths this backend group may change; earlier successful groups stay managed.
 async function withInstallRollback<T>(paths: string[], action: () => Promise<T>): Promise<T> {
   const directory = await mkdtemp(join(tmpdir(), 'colibri-rollback-'));
-  const snapshots: { path: string; backup?: string }[] = [];
+  const snapshots: { path: string; backup?: string; link?: string }[] = [];
   let keepBackup = false;
   try {
     for (const path of new Set(paths)) {
-      const backup = await exists(path) ? join(directory, String(snapshots.length)) : undefined;
-      if (backup) await cp(path, backup, { recursive: true, verbatimSymlinks: true });
-      snapshots.push({ path, ...(backup ? { backup } : {}) });
+      if (!await exists(path)) { snapshots.push({ path }); continue; }
+      // fs.cp recreates links without a type, and Windows then needs admin; keep only the target to restore it as the backend does.
+      if ((await lstat(path)).isSymbolicLink()) { snapshots.push({ path, link: await readlink(path) }); continue; }
+      const backup = join(directory, String(snapshots.length));
+      await cp(path, backup, { recursive: true, verbatimSymlinks: true });
+      snapshots.push({ path, backup });
     }
     try { return await action(); }
     catch (error) {
       const failures: unknown[] = [];
-      for (const { path, backup } of snapshots) {
+      for (const { path, backup, link } of snapshots) {
         try {
           if (await exists(path)) await rm(path, { recursive: true, force: true });
-          if (backup) await cp(backup, path, { recursive: true, verbatimSymlinks: true });
+          if (link !== undefined) await symlink(link, path, process.platform === 'win32' ? 'junction' : 'dir');
+          else if (backup) await cp(backup, path, { recursive: true, verbatimSymlinks: true });
         } catch (failure) { failures.push(failure); }
       }
       if (failures.length) {

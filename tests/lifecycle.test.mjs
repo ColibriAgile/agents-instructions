@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, writeFile, readFile, readdir, rm, lstat, access, symlink, rename, chmod } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, readdir, rm, lstat, access, symlink, rename, chmod, readlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
@@ -331,6 +331,7 @@ test('R2: a failed update restores existing copies and canonical symlinks before
   for (const method of ['copy', 'symlink']) {
     const { project, catalog, run } = await fixture(t);
     run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', method, '--yes']);
+    const targetsBefore = method === 'symlink' ? await Promise.all(['.claude', '.windsurf'].map(agent => readlink(join(project, agent, 'skills/demo')))) : [];
     await writeFile(join(catalog, 'SKILLS/demo/SKILL.md'), '---\nname: demo\ndescription: Demo\n---\nVersion two\n');
     const fifo = join(catalog, 'SKILLS/demo/unsupported-fifo');
     const created = spawnSync('mkfifo', [fifo], { encoding: 'utf8' });
@@ -340,6 +341,7 @@ test('R2: a failed update restores existing copies and canonical symlinks before
       assert.match(await readFile(join(project, agent, 'skills/demo/SKILL.md'), 'utf8'), /Version one/);
       assert.equal((await lstat(join(project, agent, 'skills/demo'))).isSymbolicLink(), method === 'symlink');
     }
+    for (const [i, agent] of ['.claude', '.windsurf'].entries()) if (method === 'symlink') assert.equal(await readlink(join(project, agent, 'skills/demo')), targetsBefore[i]);
     assert.deepEqual(JSON.parse(run(['list', '--json']).stdout)[0].targets.map(t => t.status), ['installed', 'installed']);
     await rm(fifo);
     run(['update', '-s', 'demo', '--yes']);
