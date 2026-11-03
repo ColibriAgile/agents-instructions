@@ -9,7 +9,7 @@ import type { Plan } from './manager.js';
 import { readManifest, saveManifest } from './manifest.js';
 import { directoryHash, exists, loadState } from './storage.js';
 import { targetPath } from './agents.js';
-import { requirementInfo } from './requirements.js';
+import { requirementInfo, summarizeDescription, unknownNotice } from './requirements.js';
 
 export interface Options {
   cwd?: string; catalog?: string; global?: boolean; agent?: string[]; skill?: string[]; bundle?: string[];
@@ -105,9 +105,10 @@ export async function runCommand(action: string, options: Options, loaded?: Cata
     if (options.json) console.log(JSON.stringify(rows, null, 2));
     else {
       for (const row of rows) {
-        console.log('targets' in row ? `${row.name} · ${row.targets.map(t => `${t.agent} (${t.status}, ${t.method})`).join(', ')}` : `${row.name} [${row.bundles.join(', ')}] · ${row.description}`);
-        console.log(`  ${row.runtime.summary} · ${row.runtime.notice}`);
+        console.log('targets' in row ? `${row.name} · ${row.targets.map(t => `${t.agent} (${t.status}, ${t.method})`).join(', ')}` : `${row.name} [${row.bundles.join(', ')}] · ${summarizeDescription(row.description)}`);
+        console.log(row.runtime.platformStatus === 'unknown' ? `  ${row.runtime.summary}` : `  ${row.runtime.summary} · ${row.runtime.notice}`);
       }
+      if (rows.some(row => row.runtime.platformStatus === 'unknown')) console.log(`\n${unknownNotice}`);
       if (!rows.length) console.log('No Colibri-managed skills in this scope. Use list --available to browse the catalog.');
     }
     return;

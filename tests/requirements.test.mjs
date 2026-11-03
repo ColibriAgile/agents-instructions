@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { loadCatalog, resolveSelection } from '../dist/catalog.js';
-import { requirementInfo, bundleRequirementHint } from '../dist/requirements.js';
+import { requirementInfo, bundleRequirementHint, summarizeDescription } from '../dist/requirements.js';
 import { installPlan, managedPlan, preview } from '../dist/manager.js';
 import { readManifest } from '../dist/manifest.js';
 import { saveState } from '../dist/storage.js';
@@ -128,4 +128,35 @@ test('R3/R4: JSON exposes requirements; restricted skills remain installable wit
   assert.match(run(['list']), /NonexistentTool123/);
   run(['remove', '-s', 'demo', '--yes']);
   await assert.rejects(() => access(join(project, '.claude/skills/demo')), { code: 'ENOENT' });
+});
+
+test('CR-11: summarizeDescription keeps the first sentence and caps long text', () => {
+  assert.equal(summarizeDescription('Short one. Second sentence.'), 'Short one.');
+  assert.equal(summarizeDescription('No period here'), 'No period here');
+  const long = summarizeDescription(`${'word '.repeat(60)}end. More.`);
+  assert.equal(long.length, 120);
+  assert.ok(long.endsWith('…'));
+  assert.equal(summarizeDescription('Multi\n  line\ttext. Next.'), 'Multi line text.');
+});
+
+test('CR-13: list --available and the install preview print the unknown-requirements notice once', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'colibri notice '));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const catalog = join(root, 'catalog');
+  for (const name of ['alpha', 'beta']) {
+    await mkdir(join(catalog, 'SKILLS', name), { recursive: true });
+    await writeFile(join(catalog, 'SKILLS', name, 'SKILL.md'), `---\nname: ${name}\ndescription: First sentence of ${name}. Second sentence that must not appear.\n---\n`);
+  }
+  await writeFile(join(catalog, 'bundles.yaml'), 'repo: test/catalog\nbundles:\n  core:\n    description: Core\n    skills: [alpha, beta]\n');
+  const run = args => spawnSync(process.execPath, [resolve('bin/colibri-skills.mjs'), ...args, '--cwd', root, '--catalog', catalog], { encoding: 'utf8', timeout: 30000, env: { ...process.env, HOME: root, USERPROFILE: root } });
+  const count = text => text.split('Ausência de requisitos catalogados').length - 1;
+  const list = run(['list', '--available']);
+  assert.equal(list.status, 0, list.stderr);
+  assert.equal(count(list.stdout), 1);
+  assert.doesNotMatch(list.stdout, /Second sentence/);
+  const dry = run(['install', '-s', 'alpha,beta', '-a', 'codex', '--dry-run']);
+  assert.equal(dry.status, 0, dry.stderr);
+  assert.equal(count(dry.stdout), 1);
+  const json = JSON.parse(run(['list', '--available', '--json']).stdout);
+  assert.match(json[0].description, /Second sentence/);
 });

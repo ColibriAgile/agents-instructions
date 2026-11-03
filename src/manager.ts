@@ -9,7 +9,7 @@ import type { Catalog, Selection } from './catalog.js';
 import { Interrupted, directoryHash, exists, loadState, onForceExit, saveState, withScopeLock } from './storage.js';
 import type { State } from './storage.js';
 import { readManifest } from './manifest.js';
-import { requirementInfo } from './requirements.js';
+import { requirementInfo, unknownNotice } from './requirements.js';
 import type { RequirementInfo } from './requirements.js';
 
 export interface PlanItem extends Selection { targets: { agent: Agent; method: Method }[]; runtime: RequirementInfo }
@@ -117,11 +117,12 @@ export function preview(plan: Plan): string {
     lines.push(`${item.name} ← ${item.source}`);
     lines.push(`  ${item.runtime.summary}`);
     if (plan.action !== 'remove') {
-      lines.push(`  ${item.runtime.notice}`);
+      if (item.runtime.platformStatus !== 'unknown') lines.push(`  ${item.runtime.notice}`);
       for (const note of item.runtime.notes) lines.push(`  · ${note}`);
     }
     for (const target of item.targets) lines.push(`  ${agents[target.agent].label} · ${target.method} → ${targetPath(plan.scope, target.agent, item.name)}`);
   }
+  if (plan.action !== 'remove' && plan.items.some(i => i.runtime.platformStatus === 'unknown')) lines.push(unknownNotice);
   lines.push('Agents using .agents/skills share the same directory. Symlink mode may fall back to copy.');
   return lines.join('\n');
 }

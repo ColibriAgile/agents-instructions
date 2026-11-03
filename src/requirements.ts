@@ -39,3 +39,13 @@ export function bundleRequirementHint(catalog: Catalog, bundle: string, platform
     skills.length > declared.length ? `${skills.length - declared.length} não catalogadas` : '',
   ].filter(Boolean).join(' · ');
 }
+
+/** First sentence of a description, capped so long skill descriptions stay readable in one line. */
+export function summarizeDescription(text: string, max = 120): string {
+  const flat = text.replace(/\s+/g, ' ').trim();
+  const sentence = /^.*?[.!?](?=\s|$)/.exec(flat)?.[0] ?? flat;
+  return sentence.length > max ? `${sentence.slice(0, max - 1).trimEnd()}…` : sentence;
+}
+
+/** The generic notice is shown once per output, not once per skill. */
+export const unknownNotice = requirementInfo(null).notice;
