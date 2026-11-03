@@ -95,3 +95,17 @@ test('R2: a signal after the action finished exits 0 with a warning, and one bef
   assert.doesNotMatch(failed.stderr, /after all changes were applied/);
   await assert.rejects(() => readFile(join(cwd, '.colibri-skills.json.lock')), { code: 'ENOENT' });
 });
+
+test('CR-05: directoryHash does not depend on the process locale', async t => {
+  const dir = await mkdtemp(join(tmpdir(), 'colibri-hash-locale-'));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  for (const name of ['aa.md', 'z.md', 'y.md', 'j.md', 'a_b.md', 'a-b.md', 'B.md']) await writeFile(join(dir, name), name);
+  const script = `import { directoryHash } from ${JSON.stringify(new URL('../dist/storage.js', import.meta.url).href)}; console.log(await directoryHash(process.argv[1]));`;
+  const hashes = new Set();
+  for (const lang of ['en_US.UTF-8', 'pt_BR.UTF-8', 'da_DK.UTF-8', 'lt_LT.UTF-8']) {
+    const result = spawnSync(process.execPath, ['--input-type=module', '-e', script, dir], { encoding: 'utf8', env: { ...process.env, LANG: lang, LC_ALL: lang } });
+    assert.equal(result.status, 0, result.stderr);
+    hashes.add(result.stdout.trim());
+  }
+  assert.equal(hashes.size, 1, [...hashes].join('\n'));
+});

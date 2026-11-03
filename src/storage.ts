@@ -112,7 +112,7 @@ export async function directoryHash(path: string): Promise<string | null> {
   try { root = await realpath(path); }
   catch (error) { if (isMissing(error)) return null; throw error; }
   const walk = async (dir: string): Promise<void> => {
-    for (const item of (await readdir(dir, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
+    for (const item of (await readdir(dir, { withFileTypes: true })).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) {
       const file = join(dir, item.name);
       const name = relative(root, file).split('\\').join('/');
       if (item.isSymbolicLink()) {
