@@ -32,7 +32,7 @@ test('AC8: npm tarball contains resources and installs a real skill outside the 
   const unsupported = spawnSync(process.execPath, ['--import', `data:text/javascript,${encodeURIComponent("Object.defineProperty(process.versions, 'node', { value: '20.19.6' });")}`, entry], { cwd: project, encoding: 'utf8' });
   assert.equal(unsupported.status, 1);
   assert.equal(unsupported.stdout, '');
-  assert.match(unsupported.stderr, /requires Node\.js >=22\.20\.0; detected v20\.19\.6/);
+  assert.match(unsupported.stderr, /requer Node\.js >=22\.20\.0; detectado v20\.19\.6/);
   const env = { ...process.env, HOME: root, USERPROFILE: root, DISABLE_TELEMETRY: '1' };
   delete env.CLAUDE_CONFIG_DIR;
   delete env.CODEX_HOME;

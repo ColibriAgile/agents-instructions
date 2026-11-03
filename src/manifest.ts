@@ -18,16 +18,16 @@ export async function readManifest(path: string): Promise<Manifest> {
   try { text = await readFile(path, 'utf8'); }
   catch (error) { if (!isMissing(error)) throw error; }
   const document = parseDocument(text ?? '', { uniqueKeys: true });
-  if (document.errors.length) throw new Error(`Invalid manifest ${path}: ${document.errors[0]!.message}`);
+  if (document.errors.length) throw new Error(`Manifesto inválido ${path}: ${document.errors[0]!.message}`);
   const data: unknown = document.toJS({ maxAliasCount: 50 }) ?? {};
-  if (!record(data)) throw new Error(`Manifest ${path} must be a YAML mapping`);
+  if (!record(data)) throw new Error(`O manifesto ${path} deve ser um mapeamento YAML`);
   const bundles = data.bundles === undefined ? [] : stringList(data.bundles, 'bundles');
   const skills = data.skills === undefined ? [] : stringList(data.skills, 'skills');
   skills.forEach(skillName);
-  if (data.sources !== undefined && !Array.isArray(data.sources)) throw new Error('sources must be a list');
+  if (data.sources !== undefined && !Array.isArray(data.sources)) throw new Error('sources deve ser uma lista');
   const sources = ((data.sources ?? []) as unknown[]).map(src => {
-    if (!record(src) || typeof src.repo !== 'string' || !src.repo.trim() || src.repo.startsWith('-')) throw new Error('Each source requires a valid repo');
-    const names = stringList(src.skills, 'source skills');
+    if (!record(src) || typeof src.repo !== 'string' || !src.repo.trim() || src.repo.startsWith('-')) throw new Error('Cada source exige um repo válido');
+    const names = stringList(src.skills, 'skills da source');
     names.forEach(skillName);
     return { repo: src.repo, skills: names };
   });

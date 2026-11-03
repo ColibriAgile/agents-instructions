@@ -13,9 +13,9 @@ test('AC2: bundled catalog is complete and every bundle resolves', async () => {
   const selection = resolveSelection(catalog, { bundles: Object.keys(catalog.bundles) });
   assert.equal(selection.length, 69);
   assert.equal(new Set(selection.map(s => s.name)).size, 69);
-  assert.throws(() => resolveSelection(catalog, { bundles: ['missing'] }), /Unknown bundle/);
-  assert.throws(() => resolveSelection(catalog, { skills: ['../escape'] }), /Invalid skill name/);
-  assert.throws(() => resolveSelection(catalog, { skills: ['missing'] }), /Unknown skill/);
+  assert.throws(() => resolveSelection(catalog, { bundles: ['missing'] }), /Bundle desconhecido/);
+  assert.throws(() => resolveSelection(catalog, { skills: ['../escape'] }), /Nome de skill inválido/);
+  assert.throws(() => resolveSelection(catalog, { skills: ['missing'] }), /Skill desconhecida/);
 });
 
 test('AC2: manifest round trip retains external sources and unknown settings, adds core only for managed bundles', async t => {
@@ -54,7 +54,7 @@ test('AC2: invalid manifests and invalid catalog references fail before writes',
 
 test('CR-09: readSkillMeta reads valid frontmatter and rejects missing or incomplete metadata', () => {
   assert.deepEqual(readSkillMeta('---\r\nname: demo\r\ndescription: Demo\r\n---\r\nBody', 'demo'), { name: 'demo', description: 'Demo' });
-  assert.throws(() => readSkillMeta('No frontmatter', 'demo/SKILL.md'), /Missing frontmatter: demo\/SKILL\.md/);
-  assert.throws(() => readSkillMeta('---\nname: demo\n---\n', 'demo/SKILL.md'), /Invalid metadata: demo\/SKILL\.md/);
-  assert.throws(() => readSkillMeta('---\nname: Bad Name\ndescription: x\n---\n', 'demo'), /Invalid skill name/);
+  assert.throws(() => readSkillMeta('No frontmatter', 'demo/SKILL.md'), /Frontmatter ausente: demo\/SKILL\.md/);
+  assert.throws(() => readSkillMeta('---\nname: demo\n---\n', 'demo/SKILL.md'), /Metadados inválidos: demo\/SKILL\.md/);
+  assert.throws(() => readSkillMeta('---\nname: Bad Name\ndescription: x\n---\n', 'demo'), /Nome de skill inválido/);
 });

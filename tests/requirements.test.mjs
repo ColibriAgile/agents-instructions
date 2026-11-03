@@ -65,7 +65,7 @@ test('R1: optional metadata is backward compatible; malformed or unknown require
     'version: 1\nskills:\n  demo: {}',
   ]) {
     await writeFile(path, text);
-    await assert.rejects(() => loadCatalog(root), /requirement/i);
+    await assert.rejects(() => loadCatalog(root), /requisito/i);
     assert.equal(await readFile(path, 'utf8'), text);
   }
 });

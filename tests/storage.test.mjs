@@ -30,7 +30,7 @@ test('AC7: state rejects corruption and mutation lock prevents concurrent writer
 test('AC4: backend failures propagate without executing shell substitutions', async t => {
   const cwd = await mkdtemp(join(tmpdir(), 'colibri backend '));
   t.after(() => rm(cwd, { recursive: true, force: true }));
-  await assert.rejects(() => backend(['add', join(cwd, 'missing $(touch sentinel)'), '--skill', 'demo', '--agent', 'claude-code', '--yes', '--json'], { cwd, global: false }), /skills backend failed/);
+  await assert.rejects(() => backend(['add', join(cwd, 'missing $(touch sentinel)'), '--skill', 'demo', '--agent', 'claude-code', '--yes', '--json'], { cwd, global: false }), /o backend skills falhou/);
   await assert.rejects(() => readFile(join(cwd, 'sentinel')), { code: 'ENOENT' });
 });
 

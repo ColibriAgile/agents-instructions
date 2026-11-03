@@ -17,11 +17,11 @@ test('unsupported Node is rejected before the wizard, commands or dependencies l
       const result = spawnSync(process.execPath, ['--import', versionOverride(version), entry, ...args],
         { cwd, encoding: 'utf8', env: { ...process.env, HOME: cwd, USERPROFILE: cwd } });
       assert.equal(result.status, 1);
-      assert.match(result.stderr, /requires Node\.js >=22\.20\.0/);
-      assert.ok(result.stderr.includes(`detected v${version}`));
-      assert.match(result.stderr, /Upgrade Node\.js/);
+      assert.match(result.stderr, /requer Node\.js >=22\.20\.0/);
+      assert.ok(result.stderr.includes(`detectado v${version}`));
+      assert.match(result.stderr, /Atualize o Node\.js/);
       assert.equal(result.stdout, '');
-      assert.doesNotMatch(result.stderr, /SyntaxError|skills backend failed|requires a terminal/);
+      assert.doesNotMatch(result.stderr, /SyntaxError|o backend skills falhou|requires a terminal/);
     }
   }
   assert.deepEqual(await readdir(cwd), []);

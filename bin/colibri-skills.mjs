@@ -11,7 +11,7 @@ const supported = !process.versions.node.includes('-')
   && (difference === -1 || current[difference] > minimum[difference]);
 
 if (!supported) {
-  console.error(`Error: ${pkg.name} requires Node.js ${required}; detected v${process.versions.node}. Upgrade Node.js and run the command again.`);
+  console.error(`Erro: ${pkg.name} requer Node.js ${required}; detectado v${process.versions.node}. Atualize o Node.js e execute o comando novamente.`);
   process.exitCode = 1;
 } else {
   await import('../dist/cli.js');

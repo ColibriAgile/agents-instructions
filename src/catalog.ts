@@ -16,36 +16,36 @@ export function record(value: unknown): value is Record<string, unknown> {
 }
 
 export function skillName(value: unknown): asserts value is string {
-  if (typeof value !== 'string' || !/^[a-z0-9][a-z0-9_-]*$/.test(value)) throw new Error(`Invalid skill name: ${String(value)}`);
+  if (typeof value !== 'string' || !/^[a-z0-9][a-z0-9_-]*$/.test(value)) throw new Error(`Nome de skill inválido: ${String(value)}`);
 }
 
 export function stringList(value: unknown, label: string): string[] {
-  if (!Array.isArray(value) || value.some(item => typeof item !== 'string' || !item.trim())) throw new Error(`${label} must be a list of nonempty strings`);
+  if (!Array.isArray(value) || value.some(item => typeof item !== 'string' || !item.trim())) throw new Error(`${label} deve ser uma lista de textos não vazios`);
   return [...new Set(value as string[])];
 }
 
 export function yamlObject(text: string, label: string): Record<string, unknown> {
   const doc = parseDocument(text, { uniqueKeys: true });
-  if (doc.errors.length) throw new Error(`Invalid ${label}: ${doc.errors[0]!.message}`);
+  if (doc.errors.length) throw new Error(`${label} inválido: ${doc.errors[0]!.message}`);
   const data: unknown = doc.toJS({ maxAliasCount: 50 });
-  if (!record(data)) throw new Error(`${label} must be a YAML mapping`);
+  if (!record(data)) throw new Error(`${label} deve ser um mapeamento YAML`);
   return data;
 }
 
 /** Reads the `SKILL.md` frontmatter; each caller adds its own rule (folder name, requested name). */
 export function readSkillMeta(text: string, label: string): { name: string; description: string } {
   const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text);
-  if (!frontmatter) throw new Error(`Missing frontmatter: ${label}`);
+  if (!frontmatter) throw new Error(`Frontmatter ausente: ${label}`);
   const meta = yamlObject(frontmatter[1]!, label);
   skillName(meta.name);
-  if (typeof meta.name !== 'string' || typeof meta.description !== 'string') throw new Error(`Invalid metadata: ${label}`);
+  if (typeof meta.name !== 'string' || typeof meta.description !== 'string') throw new Error(`Metadados inválidos: ${label}`);
   return { name: meta.name, description: meta.description };
 }
 
 export async function loadCatalog(root = packageRoot): Promise<Catalog> {
   root = resolve(root);
   const data = yamlObject(await readFile(join(root, 'bundles.yaml'), 'utf8'), 'bundles.yaml');
-  if (typeof data.repo !== 'string' || !record(data.bundles)) throw new Error('Catalog requires repo and bundles');
+  if (typeof data.repo !== 'string' || !record(data.bundles)) throw new Error('O catálogo exige repo e bundles');
   const source = join(root, 'SKILLS');
   const skills: Skill[] = [];
   for (const entry of await readdir(source, { withFileTypes: true })) {
@@ -55,17 +55,17 @@ export async function loadCatalog(root = packageRoot): Promise<Catalog> {
     try { text = await readFile(join(path, 'SKILL.md'), 'utf8'); }
     catch (error) { if (isMissing(error)) continue; throw error; }
     const meta = readSkillMeta(text, path);
-    if (meta.name !== entry.name) throw new Error(`Invalid metadata: ${path}`);
+    if (meta.name !== entry.name) throw new Error(`Metadados inválidos: ${path}`);
     skills.push({ name: meta.name, description: meta.description, path, bundles: [], requirements: null });
   }
   const bundles: Record<string, Bundle> = {};
   for (const [name, value] of Object.entries(data.bundles)) {
     skillName(name);
-    if (!record(value) || typeof value.description !== 'string') throw new Error(`Invalid bundle: ${name}`);
-    const names = stringList(value.skills, `Bundle ${name} skills`);
+    if (!record(value) || typeof value.description !== 'string') throw new Error(`Bundle inválido: ${name}`);
+    const names = stringList(value.skills, `skills do bundle ${name}`);
     for (const skill of names) {
       const found = skills.find(s => s.name === skill);
-      if (!found) throw new Error(`Bundle ${name} references missing skill: ${skill}`);
+      if (!found) throw new Error(`O bundle ${name} referencia uma skill inexistente: ${skill}`);
       found.bundles.push(name);
     }
     bundles[name] = { description: value.description, skills: names };
@@ -78,19 +78,19 @@ async function readRequirements(root: string, skills: Skill[]): Promise<void> {
   let text: string;
   try { text = await readFile(join(root, 'skill-requirements.yaml'), 'utf8'); }
   catch (error) { if (isMissing(error)) return; throw error; }
-  const data = yamlObject(text, 'skill requirements');
-  if (data.version !== 1 || !record(data.skills) || Object.keys(data).some(k => !['version', 'skills'].includes(k))) throw new Error('Invalid skill requirements: expected version 1 and skills mapping');
+  const data = yamlObject(text, 'requisitos de skill');
+  if (data.version !== 1 || !record(data.skills) || Object.keys(data).some(k => !['version', 'skills'].includes(k))) throw new Error('Requisitos de skill inválidos: esperado version 1 e um mapeamento skills');
   for (const [name, value] of Object.entries(data.skills)) {
     const skill = skills.find(s => s.name === name);
-    if (!skill) throw new Error(`Unknown skill in requirements: ${name}`);
-    if (!record(value) || !Object.keys(value).length || Object.keys(value).some(k => !['platforms', 'tools', 'notes'].includes(k))) throw new Error(`Invalid requirements for ${name}`);
+    if (!skill) throw new Error(`Skill desconhecida nos requisitos: ${name}`);
+    if (!record(value) || !Object.keys(value).length || Object.keys(value).some(k => !['platforms', 'tools', 'notes'].includes(k))) throw new Error(`Requisitos inválidos para ${name}`);
     const requirements: Requirements = {};
     for (const field of ['platforms', 'tools', 'notes'] as const) {
       if (value[field] === undefined) continue;
-      const entries = stringList(value[field], `requirements ${name}.${field}`);
-      if (!entries.length) throw new Error(`Empty requirements ${name}.${field}`);
+      const entries = stringList(value[field], `requisitos ${name}.${field}`);
+      if (!entries.length) throw new Error(`Requisitos vazios em ${name}.${field}`);
       if (field === 'platforms') {
-        if (entries.some(p => !['win32', 'darwin', 'linux'].includes(p))) throw new Error(`Invalid platform in requirements for ${name}`);
+        if (entries.some(p => !['win32', 'darwin', 'linux'].includes(p))) throw new Error(`Plataforma inválida nos requisitos de ${name}`);
         requirements.platforms = entries as Platform[];
       } else requirements[field] = entries;
     }
@@ -103,19 +103,19 @@ export function resolveSelection(catalog: Catalog, options: { bundles?: string[]
   const add = (name: string, source: string, origin: Selection['origin']) => {
     skillName(name);
     const existing = result.get(name);
-    if (existing && (existing.source !== source || existing.origin !== origin)) throw new Error(`Ambiguous skill ${name}: multiple source intents`);
+    if (existing && (existing.source !== source || existing.origin !== origin)) throw new Error(`Skill ambígua ${name}: há mais de uma origem declarada`);
     result.set(name, { name, source, origin, requirements: origin === 'catalog' ? catalog.skills.find(s => s.name === name)?.requirements ?? null : null });
   };
   const bundles = [...(options.manifest?.bundles ?? []), ...(options.bundles ?? [])];
   if (options.manifest && bundles.length && !bundles.includes('core')) bundles.unshift('core');
   const names = [...(options.manifest?.skills ?? []), ...(options.skills ?? [])];
   for (const bundle of bundles) {
-    if (!Object.hasOwn(catalog.bundles, bundle)) throw new Error(`Unknown bundle: ${bundle}`);
+    if (!Object.hasOwn(catalog.bundles, bundle)) throw new Error(`Bundle desconhecido: ${bundle}`);
     names.push(...catalog.bundles[bundle]!.skills);
   }
   for (const name of names) {
     skillName(name);
-    if (!catalog.skills.some(s => s.name === name)) throw new Error(`Unknown skill: ${name}`);
+    if (!catalog.skills.some(s => s.name === name)) throw new Error(`Skill desconhecida: ${name}`);
     add(name, catalog.source, 'catalog');
   }
   for (const src of options.manifest?.sources ?? []) {

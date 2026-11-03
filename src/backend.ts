@@ -35,7 +35,7 @@ export async function backend(args: string[], scope: Scope, interruption?: Abort
       interruption?.removeEventListener('abort', forward);
       stopForced();
       if (interruption?.aborted) reject(interruption.reason);
-      else if (code !== 0) reject(new Error(`skills backend failed (${signal ?? code}): ${[stderr.slice(-3000), stdout.slice(-3000)].filter(Boolean).join('\n')}`));
+      else if (code !== 0) reject(new Error(`o backend skills falhou (${signal ?? code}): ${[stderr.slice(-3000), stdout.slice(-3000)].filter(Boolean).join('\n')}`));
       else resolve(stdout);
     });
   });
@@ -44,8 +44,8 @@ export async function backend(args: string[], scope: Scope, interruption?: Abort
 export function jsonArray(text: string): Record<string, unknown>[] {
   let value: unknown;
   try { value = JSON.parse(text); }
-  catch { throw new Error('Invalid JSON from skills backend'); }
-  if (!Array.isArray(value) || value.some(v => !record(v))) throw new Error('Invalid result from skills backend');
+  catch { throw new Error('JSON inválido vindo do backend skills'); }
+  if (!Array.isArray(value) || value.some(v => !record(v))) throw new Error('Resultado inválido do backend skills');
   return value as Record<string, unknown>[];
 }
 

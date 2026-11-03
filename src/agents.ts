@@ -15,8 +15,8 @@ export type Method = 'copy' | 'symlink';
 export interface Scope { cwd: string; global: boolean }
 
 export function validateAgents(values: string[]): Agent[] {
-  if (!values.length) throw new Error('Select at least one agent (--agent)');
-  for (const value of values) if (!Object.hasOwn(agents, value)) throw new Error(`Unsupported agent: ${value}. Supported: ${Object.keys(agents).join(', ')}`);
+  if (!values.length) throw new Error('Selecione ao menos um agente (--agent)');
+  for (const value of values) if (!Object.hasOwn(agents, value)) throw new Error(`Agente não suportado: ${value}. Suportados: ${Object.keys(agents).join(', ')}`);
   return [...new Set(values)] as Agent[];
 }
 
