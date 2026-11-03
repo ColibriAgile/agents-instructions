@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { loadState, saveState, withScopeLock } from '../dist/storage.js';
 import { backend } from '../dist/backend.js';
@@ -108,4 +108,26 @@ test('CR-05: directoryHash does not depend on the process locale', async t => {
     hashes.add(result.stdout.trim());
   }
   assert.equal(hashes.size, 1, [...hashes].join('\n'));
+});
+
+test('CR-06: a second signal force-exits, releases the lock and reports the signal code', { skip: process.platform === 'win32' }, async t => {
+  const cwd = await mkdtemp(join(tmpdir(), 'colibri second signal '));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  const storage = pathToFileURL(resolve('dist/storage.js')).href;
+  const script = `import { withScopeLock } from ${JSON.stringify(storage)};
+    await withScopeLock({ cwd: process.argv[1], global: false }, async () => { console.log('ready'); await new Promise(() => setInterval(() => {}, 1000)); });`;
+  const child = spawn(process.execPath, ['--input-type=module', '-e', script, cwd], { stdio: ['ignore', 'pipe', 'pipe'] });
+  let stderr = '';
+  child.stderr.setEncoding('utf8').on('data', chunk => { stderr += chunk; });
+  await new Promise(done => child.stdout.once('data', done));
+  const closed = new Promise(done => child.on('close', (code, signal) => done({ code, signal })));
+  const killer = setTimeout(() => child.kill('SIGKILL'), 4000);
+  child.kill('SIGINT');
+  await new Promise(done => setTimeout(done, 300));
+  child.kill('SIGINT');
+  const result = await closed;
+  clearTimeout(killer);
+  assert.equal(result.code, 130, `${JSON.stringify(result)} ${stderr}`);
+  assert.match(stderr, /second SIGINT/);
+  await assert.rejects(() => readFile(join(cwd, '.colibri-skills.json.lock')), { code: 'ENOENT' });
 });

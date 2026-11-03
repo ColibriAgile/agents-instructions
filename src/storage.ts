@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { rmSync } from 'node:fs';
 import { mkdir, open, readFile, readdir, readlink, rename, rm, lstat, realpath } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { dirname, join, relative } from 'node:path';
@@ -63,12 +64,27 @@ export class Interrupted extends Error {
   }
 }
 
+// Work that must be stopped, and recovery locations reported, when a second signal forces the exit.
+const forceExitHooks = new Set<() => string | void>();
+export function onForceExit(hook: () => string | void): () => void {
+  forceExitHooks.add(hook);
+  return () => { forceExitHooks.delete(hook); };
+}
+
 export async function withScopeLock<T>(scope: Scope, action: (interruption: AbortSignal) => Promise<T>): Promise<T> {
   const path = `${statePath(scope)}.lock`;
   // Default signal termination would skip rollback and leave this lock behind; later signals must not skip them either.
   // Listening before the lock exists closes the window where a signal would orphan it.
   const interruption = new AbortController();
-  const listener = (signal: Interruption) => { if (!interruption.signal.aborted) interruption.abort(new Interrupted(signal)); };
+  const listener = (signal: Interruption) => {
+    if (!interruption.signal.aborted) { interruption.abort(new Interrupted(signal)); return; }
+    // A second signal means the cooperative rollback is stuck (for example a grandchild still holds the backend pipes).
+    const notes: string[] = [];
+    for (const hook of forceExitHooks) { try { const note = hook(); if (note) notes.push(note); } catch { /* keep exiting */ } }
+    rmSync(path, { force: true });
+    console.error(`Aborted by second ${signal} without a complete rollback; the lock was released.${notes.length ? ` ${notes.join(' ')}` : ''} Run list and update to check the installed skills.`);
+    process.exit(signalCodes[signal]);
+  };
   for (const signal of Object.keys(signalCodes) as Interruption[]) process.on(signal, listener);
   let completed = false;
   try {

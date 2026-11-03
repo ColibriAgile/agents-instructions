@@ -7,7 +7,7 @@ import type { Agent, Method, Scope } from './agents.js';
 import { backend, jsonArray } from './backend.js';
 import { isMissing, skillName, yamlObject } from './catalog.js';
 import type { Catalog, Selection } from './catalog.js';
-import { Interrupted, directoryHash, exists, loadState, saveState, withScopeLock } from './storage.js';
+import { Interrupted, directoryHash, exists, loadState, onForceExit, saveState, withScopeLock } from './storage.js';
 import type { State } from './storage.js';
 import { requirementInfo } from './requirements.js';
 import type { RequirementInfo } from './requirements.js';
@@ -131,6 +131,7 @@ async function withInstallRollback<T>(paths: string[], action: () => Promise<T>)
   const directory = await mkdtemp(join(tmpdir(), 'colibri-rollback-'));
   const snapshots: { path: string; backup?: string; link?: string }[] = [];
   let keepBackup = false;
+  const forgetForceExit = onForceExit(() => `Recovery copies: ${directory}.`);
   try {
     for (const path of new Set(paths)) {
       if (!await exists(path)) { snapshots.push({ path }); continue; }
@@ -157,7 +158,7 @@ async function withInstallRollback<T>(paths: string[], action: () => Promise<T>)
       if (error instanceof Interrupted) throw new Interrupted(error.signal, 'Changes in progress were rolled back; run the command again to finish.');
       throw error;
     }
-  } finally { if (!keepBackup) await rm(directory, { recursive: true, force: true }); }
+  } finally { forgetForceExit(); if (!keepBackup) await rm(directory, { recursive: true, force: true }); }
 }
 
 export async function executePlan(plan: Plan, force = false, onSuccess?: () => Promise<void>): Promise<Summary> {

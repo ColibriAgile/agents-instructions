@@ -1,8 +1,9 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { record } from './catalog.js';
 import type { Scope } from './agents.js';
+import { onForceExit } from './storage.js';
 import type { Interrupted } from './storage.js';
 
 // Resolve only the documented executable, never import the backend's internal modules.
@@ -19,14 +20,20 @@ export async function backend(args: string[], scope: Scope, interruption?: Abort
     });
     // Settle only after the child exits, so a rollback never races its writes.
     const forward = () => { child.kill((interruption!.reason as Interrupted).signal); };
+    // On a second signal the whole process tree must die: git or a credential helper may still hold the pipes.
+    const stopForced = onForceExit(() => {
+      if (process.platform === 'win32' && child.pid) spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true });
+      else child.kill('SIGKILL');
+    });
     interruption?.addEventListener('abort', forward, { once: true });
     let stdout = '';
     let stderr = '';
     child.stdout.setEncoding('utf8').on('data', (chunk: string) => { stdout += chunk; });
     child.stderr.setEncoding('utf8').on('data', (chunk: string) => { stderr += chunk; });
-    child.on('error', error => { interruption?.removeEventListener('abort', forward); reject(error); });
+    child.on('error', error => { interruption?.removeEventListener('abort', forward); stopForced(); reject(error); });
     child.on('close', (code, signal) => {
       interruption?.removeEventListener('abort', forward);
+      stopForced();
       if (interruption?.aborted) reject(interruption.reason);
       else if (code !== 0) reject(new Error(`skills backend failed (${signal ?? code}): ${[stderr.slice(-3000), stdout.slice(-3000)].filter(Boolean).join('\n')}`));
       else resolve(stdout);
