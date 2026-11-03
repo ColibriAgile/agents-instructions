@@ -221,7 +221,7 @@ export async function executePlan(plan: Plan, force = false, onSuccess?: () => P
       else summary.unchanged++;
     }
     const first = plan.items[0]?.targets[0];
-    if (first && plan.action !== 'remove') {
+    if (first && plan.action === 'install') {
       state.preferences = { agents: [...new Set(plan.items.flatMap(i => i.targets.map(t => t.agent)))], method: first.method };
       await saveState(plan.scope, state);
     }

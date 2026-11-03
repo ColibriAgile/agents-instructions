@@ -125,6 +125,19 @@ test('CR-03: install -b stays additive without replace mode', async t => {
   assert.match(await readFile(join(project, 'skills.yaml'), 'utf8'), /example/);
 });
 
+test('CR-04: update does not change the stored install preferences', async t => {
+  const { project, run } = await fixture(t);
+  const preferences = async () => JSON.parse(await readFile(join(project, '.colibri-skills.json'), 'utf8')).preferences;
+  run(['install', '-s', 'essential', '-a', 'codex', '--method', 'symlink', '--yes']);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'codex', 'windsurf', '--method', 'copy', '--yes']);
+  const before = await preferences();
+  assert.equal(before.method, 'copy');
+  run(['update', '-s', 'essential', '-a', 'codex', '--yes']);
+  assert.deepEqual(await preferences(), before);
+  run(['install', '-s', 'essential', '--yes']);
+  await access(join(project, '.windsurf/skills/essential/SKILL.md'));
+});
+
 test('AC6: unmanaged collisions, dry runs, unknown names and manual removals cause no writes', async t => {
   const { project, run } = await fixture(t);
   await mkdir(join(project, '.claude/skills/demo'), { recursive: true });
