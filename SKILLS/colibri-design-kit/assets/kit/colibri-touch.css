@@ -1060,11 +1060,11 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
 /* A camada fora de uso fica no DOM com `hidden`: o display do componente não pode vencê-lo. */
 .ct-keyboard[hidden],
 .ct-keypad[hidden] { display: none; }
-/* Dez teclas por linha com 7 px entre vizinhas: no totem de 800 px a tecla tem o alvo; as linhas mais curtas
- * centralizam. A larga (Maiúscula, apagar, ?123, acentos) vale uma tecla e meia; o espaço leva o resto. */
-.ct-keyboard__row { display: flex; gap: 7px; justify-content: center; }
-.ct-keyboard .ct-key { flex: 0 0 calc((100% - 63px) / 10); }
-.ct-keyboard .ct-key--larga { flex-basis: calc((100% - 63px) / 10 * 1.5 + 3.5px); }
+/* Dez teclas por linha com 8 px entre vizinhas (o mínimo entre alvos da seção 9): no totem de 800 px a tecla
+ * tem o alvo; as linhas mais curtas centralizam. A larga (Maiúscula, apagar, ?123, acentos) vale uma tecla e meia; o espaço leva o resto. */
+.ct-keyboard__row { display: flex; gap: 8px; justify-content: center; }
+.ct-keyboard .ct-key { flex: 0 0 calc((100% - 72px) / 10); }
+.ct-keyboard .ct-key--larga { flex-basis: calc((100% - 72px) / 10 * 1.5 + 4px); }
 .ct-keyboard .ct-key--espaco { flex: 1 1 auto; font-size: var(--ct-text); }
 /* Numérico em tamanho real: três colunas de 2,1 alvos no meio da bandeja, e não esticadas na largura toda. */
 .ct-keypad { display: grid; grid-template-columns: repeat(3, calc(var(--ct-target) * 2.1)); gap: 12px 14px; justify-content: center; }
