@@ -291,6 +291,37 @@
     </div>
 </div>
 
+<!-- Totem: teclado numérico na folha (CPF na nota). Regra do teclado na tela, seção 9. -->
+<div class="ct-app ct-app--totem ct-app--kiosk demo-surface" id="cpf">
+    <div class="demo-scroll"></div>
+    <div class="ct-backdrop"></div>
+    <section class="ct-sheet" role="dialog" aria-modal="true" aria-labelledby="cpf-titulo">
+        <div class="ct-sheet__head"><h2 class="ct-sheet__title" id="cpf-titulo">CPF na nota?</h2><button class="ct-icon-btn" type="button" aria-label="Fechar"><i class="bi bi-x-lg" aria-hidden="true"></i></button></div>
+        <div class="ct-sheet__body" style="display: flex; flex-direction: column; gap: 1.6vh">
+            <div class="ct-entry"><span class="ct-entry__label" id="cpf-rotulo">CPF</span><div class="ct-entry__valor ct-entry__valor--mono" aria-labelledby="cpf-rotulo" aria-live="polite">123.456.<span class="ct-entry__falta">___-__</span><span class="ct-entry__cursor" aria-hidden="true"></span></div></div>
+            <div class="ct-teclado"><div class="ct-keypad"><button class="ct-key" type="button">1</button><button class="ct-key" type="button">2</button><button class="ct-key" type="button">3</button><button class="ct-key" type="button">4</button><button class="ct-key" type="button">5</button><button class="ct-key" type="button">6</button><button class="ct-key" type="button">7</button><button class="ct-key" type="button">8</button><button class="ct-key" type="button">9</button><button class="ct-key ct-key--funcao" type="button" data-tecla="limpar">Limpar</button><button class="ct-key" type="button">0</button><button class="ct-key ct-key--funcao" type="button" aria-label="Apagar" data-tecla="apagar"><i class="bi bi-backspace" aria-hidden="true"></i></button></div></div>
+        </div>
+        <div class="ct-sheet__foot"><button class="ct-btn" type="button">Sem CPF</button><button class="ct-btn ct-btn--primary ct-btn--lg" type="button">Confirmar</button></div>
+    </section>
+</div>
+
+<!-- Totem: teclado alfanumérico na folha (nome para chamada), com as camadas de letras e de números e símbolos. -->
+<div class="ct-app ct-app--totem ct-app--kiosk demo-surface" id="teclado">
+    <div class="demo-scroll"></div>
+    <div class="ct-backdrop"></div>
+    <section class="ct-sheet" role="dialog" aria-modal="true" aria-labelledby="teclado-titulo">
+        <div class="ct-sheet__head"><h2 class="ct-sheet__title" id="teclado-titulo">Como devemos chamar você?</h2><button class="ct-icon-btn" type="button" aria-label="Fechar"><i class="bi bi-x-lg" aria-hidden="true"></i></button></div>
+        <div class="ct-sheet__body" style="display: flex; flex-direction: column; gap: 1.6vh">
+            <div class="ct-entry"><span class="ct-entry__label" id="teclado-rotulo">Nome para chamada</span><div class="ct-entry__valor" aria-labelledby="teclado-rotulo" aria-live="polite"><span id="teclado-valor">Maria</span><span class="ct-entry__cursor" aria-hidden="true"></span></div></div>
+            <div class="ct-teclado">
+                <div class="ct-keyboard" data-camada="letras"><div class="ct-keyboard__row"><button class="ct-key" type="button">Q</button><button class="ct-key" type="button">W</button><button class="ct-key" type="button">E</button><button class="ct-key" type="button">R</button><button class="ct-key" type="button">T</button><button class="ct-key" type="button">Y</button><button class="ct-key" type="button">U</button><button class="ct-key" type="button">I</button><button class="ct-key" type="button">O</button><button class="ct-key" type="button">P</button></div><div class="ct-keyboard__row"><button class="ct-key" type="button">A</button><button class="ct-key" type="button">S</button><button class="ct-key" type="button">D</button><button class="ct-key" type="button">F</button><button class="ct-key" type="button">G</button><button class="ct-key" type="button">H</button><button class="ct-key" type="button">J</button><button class="ct-key" type="button">K</button><button class="ct-key" type="button">L</button><button class="ct-key" type="button">Ç</button></div><div class="ct-keyboard__row"><button class="ct-key ct-key--funcao ct-key--larga" type="button" aria-pressed="true" aria-label="Maiúscula" data-tecla="maiuscula"><i class="bi bi-shift-fill" aria-hidden="true"></i></button><button class="ct-key" type="button">Z</button><button class="ct-key" type="button">X</button><button class="ct-key" type="button">C</button><button class="ct-key" type="button">V</button><button class="ct-key" type="button">B</button><button class="ct-key" type="button">N</button><button class="ct-key" type="button">M</button><button class="ct-key ct-key--funcao ct-key--larga" type="button" aria-label="Apagar" data-tecla="apagar"><i class="bi bi-backspace" aria-hidden="true"></i></button></div><div class="ct-keyboard__row"><button class="ct-key ct-key--funcao ct-key--larga" type="button" aria-label="Números e símbolos" data-tecla="camada">?123</button><button class="ct-key ct-key--funcao ct-key--larga" type="button" aria-pressed="false" data-tecla="acentos">áàã</button><button class="ct-key ct-key--espaco" type="button" data-tecla="espaco">espaço</button></div></div>
+                <div class="ct-keyboard" data-camada="numeros" hidden><div class="ct-keyboard__row"><button class="ct-key" type="button">1</button><button class="ct-key" type="button">2</button><button class="ct-key" type="button">3</button><button class="ct-key" type="button">4</button><button class="ct-key" type="button">5</button><button class="ct-key" type="button">6</button><button class="ct-key" type="button">7</button><button class="ct-key" type="button">8</button><button class="ct-key" type="button">9</button><button class="ct-key" type="button">0</button></div><div class="ct-keyboard__row"><button class="ct-key" type="button">-</button><button class="ct-key" type="button">/</button><button class="ct-key" type="button">:</button><button class="ct-key" type="button">;</button><button class="ct-key" type="button">(</button><button class="ct-key" type="button">)</button><button class="ct-key" type="button">&</button><button class="ct-key" type="button">@</button><button class="ct-key" type="button">&quot;</button><button class="ct-key" type="button">#</button></div><div class="ct-keyboard__row"><button class="ct-key" type="button">.</button><button class="ct-key" type="button">,</button><button class="ct-key" type="button">?</button><button class="ct-key" type="button">!</button><button class="ct-key" type="button">&#39;</button><button class="ct-key" type="button">+</button><button class="ct-key" type="button">=</button><button class="ct-key" type="button">%</button><button class="ct-key ct-key--funcao ct-key--larga" type="button" aria-label="Apagar" data-tecla="apagar"><i class="bi bi-backspace" aria-hidden="true"></i></button></div><div class="ct-keyboard__row"><button class="ct-key ct-key--funcao ct-key--larga" type="button" aria-label="Letras" data-tecla="camada">ABC</button><button class="ct-key ct-key--funcao ct-key--larga" type="button" aria-pressed="false" data-tecla="acentos">áàã</button><button class="ct-key ct-key--espaco" type="button" data-tecla="espaco">espaço</button></div></div>
+            </div>
+        </div>
+        <div class="ct-sheet__foot"><button class="ct-btn" type="button">Voltar</button><button class="ct-btn ct-btn--primary ct-btn--lg" type="button">Continuar</button></div>
+    </section>
+</div>
+
 <!-- KDS: telas de produção, tema Colibri (sem esquema) -->
 <div class="ct-app ct-app--kds demo-surface" id="kds">
     <!-- Barra da estação: ícone da lista curada sobre a cor da estação (paleta), contagens em selos de estado, ações à direita -->
@@ -620,7 +651,7 @@
 </div>
 
 <div class="demo-bar" id="demo-bar">
-    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>, <a href="#tablet-descanso">descanso</a>) · <a href="#totem">Totem</a> (<a href="#portas">portas</a>) · Vidro (<a href="#tablet-vidro">tablet</a>, <a href="#tablet-vidro-claro">claro</a>, <a href="#totem-vidro">totem</a>, <a href="#tablet-descanso-vidro">descanso</a>) · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>, <a href="#bump">bump</a>, <a href="#bump-claro">bump claro</a>, <a href="#consolidado">por produto</a>, <a href="#painel">painel</a>) · <a href="#chamados">Chamados</a> (<a href="#chamados-claro">claro</a>) · <a href="#pronto">Pronto</a>
+    <a href="#tablet">Tablet</a> (<a href="#tablet-folha">folha</a>, <a href="#tablet-carrinho">carrinho</a>, <a href="#tablet-passos">passos</a>, <a href="#tablet-leitor">leitor</a>, <a href="#tablet-descanso">descanso</a>) · <a href="#totem">Totem</a> (<a href="#portas">portas</a>, <a href="#cpf">numérico</a>, <a href="#teclado">alfanumérico</a>, <a href="#teclado-numeros">?123</a>) · Vidro (<a href="#tablet-vidro">tablet</a>, <a href="#tablet-vidro-claro">claro</a>, <a href="#totem-vidro">totem</a>, <a href="#cpf-vidro">numérico</a>, <a href="#teclado-vidro-claro">alfanumérico</a>, <a href="#tablet-descanso-vidro">descanso</a>) · <a href="#kds">KDS</a> (<a href="#kds-claro">claro</a>, <a href="#bump">bump</a>, <a href="#bump-claro">bump claro</a>, <a href="#consolidado">por produto</a>, <a href="#painel">painel</a>) · <a href="#chamados">Chamados</a> (<a href="#chamados-claro">claro</a>) · <a href="#pronto">Pronto</a>
     <span id="demo-esquema" hidden>
         | <label>Ambiente <input type="color" id="s-ambiente" value="#0b1120"></label>
         <label>Ação <input type="color" id="s-acao" value="#f59e0b"></label>
@@ -677,15 +708,47 @@
         document.getElementById('demo-bar').hidden = h.indexOf('limpo') >= 0;
         // Acabamento de vidro, escolha do canal: #...-vidro (escuro), #...-vidro-claro, mais -economico.
         var vidro = h.indexOf('vidro') >= 0, vidroClaro = h.indexOf('vidro-claro') >= 0;
-        document.querySelectorAll('#tablet, #totem, #portas').forEach(function (el) {
+        document.querySelectorAll('#tablet, #totem, #portas, #cpf, #teclado').forEach(function (el) {
             el.classList.toggle('ct-app--vidro', vidro);
             el.classList.toggle('ct-app--vidro-escuro', vidro && !vidroClaro);
             el.classList.toggle('ct-app--vidro-claro', vidroClaro);
             el.classList.toggle('ct-app--vidro-economico', vidro && h.indexOf('economico') >= 0);
         });
 
+        // Teclado alfanumérico: #teclado-numeros abre na camada de números e símbolos.
+        if (id === 'teclado') trocarCamada(h.indexOf('numeros') >= 0 ? 'numeros' : 'letras');
+
         document.dispatchEvent(new CustomEvent('demo:superficie', { detail: id }));
     }
+    // Teclado na tela: ?123 / ABC troca a camada; a Maiúscula liga e desliga (seta preenchida ou de contorno) e
+    // desliga sozinha depois de uma letra; as teclas de caractere escrevem no valor.
+    function trocarCamada(nome) {
+        document.querySelectorAll('#teclado .ct-keyboard').forEach(function (k) { k.hidden = k.dataset.camada !== nome; });
+    }
+    (function () {
+        var raiz = document.getElementById('teclado'), valor = document.getElementById('teclado-valor');
+        function maiuscula(ligada) {
+            var b = raiz.querySelector('[data-tecla="maiuscula"]');
+            b.setAttribute('aria-pressed', String(ligada));
+            b.querySelector('.bi').className = 'bi ' + (ligada ? 'bi-shift-fill' : 'bi-shift');
+            raiz.querySelectorAll('[data-camada="letras"] .ct-key:not([data-tecla])').forEach(function (t) {
+                t.textContent = ligada ? t.textContent.toUpperCase() : t.textContent.toLowerCase();
+            });
+        }
+        raiz.addEventListener('click', function (e) {
+            var t = e.target.closest('.ct-key');
+            if (!t) return;
+            var acao = t.dataset.tecla;
+            if (acao === 'camada') trocarCamada(t.closest('.ct-keyboard').dataset.camada === 'letras' ? 'numeros' : 'letras');
+            else if (acao === 'maiuscula') maiuscula(t.getAttribute('aria-pressed') !== 'true');
+            else if (acao === 'apagar') valor.textContent = valor.textContent.slice(0, -1);
+            else if (acao === 'espaco') valor.textContent += ' ';
+            else if (!acao) {
+                valor.textContent += t.textContent;
+                if (raiz.querySelector('[data-tecla="maiuscula"]').getAttribute('aria-pressed') === 'true') maiuscula(false);
+            }
+        });
+    })();
     window.addEventListener('hashchange', mostrar);
     mostrar();
     setTimeout(function () { if (!window.__esquemaCarregado) document.getElementById('demo-sem-modulo').hidden = false; }, 800);

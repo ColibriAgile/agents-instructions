@@ -80,6 +80,12 @@ for (const modoForcado of modos) for (const ambiente of ambientes) for (const ac
     for (const [a, b] of pares) {
         const c = contraste(t[a], t[b]);
         if (c < CONTRASTE.texto - 1e-9) falhar(`${id}: ${a} sobre ${b} = ${c.toFixed(2)}:1 (mínimo ${CONTRASTE.texto})`);
+    }    // Teclado na tela (colibri-touch.css, desde 03/11/2026): no modo escuro, a tecla de caractere é --ct-line
+    // (no claro, --ct-surface, já coberta acima), e todo texto de tecla é --ct-ink, também a Maiúscula ligada:
+    // --ct-action-ink sobre --ct-line não chega a 4,5:1 em vários esquemas (ex.: ambiente #777777).
+    if (e.modo === 'dark') for (const k of ['--ct-ink']) {
+        const c = contraste(t[k], t['--ct-line']);
+        if (c < CONTRASTE.texto - 1e-9) falhar(`${id}: ${k} sobre --ct-line (tecla do teclado) = ${c.toFixed(2)}:1 (mínimo ${CONTRASTE.texto})`);
     }
 }
 

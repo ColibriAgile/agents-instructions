@@ -57,6 +57,7 @@ Leia também as linhas `-`. Perder um sinal é regressão mesmo quando nenhuma l
 | `.cp-modo-toque` ou `.cp-modo-bump` na raiz da grade (leva o `--ct-col-min`), limite de colunas no cálculo do empilhamento | O11, R4 |
 | ícone ou rótulo da urgência na linha de origem do card de agrupamento, faixa de aviso do despacho | R6 |
 | `.ct-app--vidro-*` com os tokens de `derivarVidro`, a etiqueta de vidro do `.ct-secao__titulo`, `.ct-app--vidro-economico` | O13 |
+| `.ct-keyboard`, `.ct-keypad` ou `.ct-teclado` trocados por teclado próprio, `hidden` na camada fora de uso, `bi-shift-fill` na Maiúscula ligada | O14 |
 | `.ct-product__link` (o cartão inteiro tocável), o `.ct-product__add` de um cartão ou o `aria-label` dele | O12 |
 | `.cm-skip` ou o `id="conteudo"` da área de conteúdo | S1 |
 | informação da loja (`.ct-loja__info`), taxa ou total antes de finalizar | W2 |

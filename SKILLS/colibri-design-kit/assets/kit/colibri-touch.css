@@ -638,6 +638,9 @@
     border-top: 1px solid var(--ct-line);
 }
 .ct-sheet__foot .ct-btn { flex: 1; }
+/* O rodapé é surface-2, o fundo do botão secundário: ali ele sobe um degrau, para surface, e não vira texto solto
+ * (nem parece menos botão que o desligado, que leva a linha). Achado no totem em 03/11/2026. */
+.ct-sheet__foot .ct-btn:not(.ct-btn--primary, .ct-btn--ghost, .ct-btn--danger):enabled { background: var(--ct-surface); }
 .ct-sheet__foot .ct-btn--primary { flex: 2; }
 /* Painel lateral (paisagem): a mesma folha, presa à direita na altura toda, para o que
  * acompanha o cardápio sem escondê-lo (carrinho, sacola). Em retrato, use a folha que sobe. */
@@ -975,6 +978,98 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
     cursor: pointer;
 }
 .ct-check input { flex: 0 0 auto; width: 24px; height: 24px; margin: 0; accent-color: var(--ct-action); }
+
+/* ---------- Teclado na tela (tablet e totem: não há teclado físico) ----------
+ * .ct-entry, o valor digitado acima do teclado (rótulo, valor, o que falta da máscara e o cursor); .ct-teclado, a
+ * bandeja na largura da folha, colada ao rodapé; dentro dela, .ct-keypad (numérico: CPF, celular, PIN, comanda),
+ * em tamanho real e centralizado, ou .ct-keyboard (alfanumérico, com as camadas de letras e de números e símbolos,
+ * trocadas pela tecla ?123 / ABC). Regra do teclado na tela (DESIGN.md, seção 9): a tecla se destaca da bandeja só
+ * pelo tom (bandeja < função < caractere), com cantos de 10 px, mais alta que larga e com a quina de 1 px embaixo,
+ * as duas exceções nomeadas aos cantos e ao plano do perfil; a tecla de função não leva moldura; todo texto de
+ * tecla é --ct-ink (sobre a tecla do modo escuro, a cor de ação não chega a 4,5:1 em todo esquema: a Maiúscula
+ * ligada sobe ao tom da tecla de caractere e troca a seta de contorno pela preenchida); nenhuma tecla OK: a ação
+ * principal é a do rodapé da folha. */
+.ct-app {
+    --ct-teclado: var(--ct-line);
+    --ct-tecla: var(--ct-surface);
+    --ct-tecla-funcao: var(--ct-bg);
+    --ct-tecla-quina: rgba(20, 35, 50, .28);
+}
+[data-theme="dark"] .ct-app,
+.ct-app[data-theme="dark"] {
+    --ct-teclado: var(--ct-surface);
+    --ct-tecla: var(--ct-line);
+    --ct-tecla-funcao: var(--ct-surface-2);
+    --ct-tecla-quina: rgba(0, 0, 0, .55);
+}
+.ct-entry { display: flex; flex-direction: column; gap: 6px; }
+.ct-entry__label { color: var(--ct-ink-2); font-size: var(--ct-text); font-weight: var(--ct-w-control); }
+.ct-entry__valor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(var(--ct-target) * 1.25);
+    padding: 0 var(--ct-pad);
+    overflow-wrap: anywhere;
+    color: var(--ct-ink);
+    background: var(--ct-surface-2);
+    border: 1px solid var(--ct-line);
+    border-radius: var(--ct-radius-card);
+    font-size: var(--ct-text-2xl);
+    font-weight: var(--ct-w-strong);
+    text-align: center;
+}
+/* Número (CPF, celular, código): mono com algarismos tabulares; o que falta da máscara em ink-3. */
+.ct-entry__valor--mono { font-family: var(--cm-mono); font-variant-numeric: tabular-nums; letter-spacing: .06em; }
+.ct-entry__falta { color: var(--ct-ink-3); }
+.ct-entry__vazio { color: var(--ct-ink-3); font-size: var(--ct-text-lg); font-weight: var(--ct-w-control); letter-spacing: normal; }
+.ct-entry__cursor { flex: 0 0 auto; width: 3px; height: 1.05em; margin-left: 3px; background: var(--ct-action-ink); border-radius: 2px; }
+.ct-teclado {
+    margin: auto calc(-1 * var(--ct-pad)) calc(-1 * var(--ct-pad));
+    padding: 14px 10px 18px;
+    background: var(--ct-teclado);
+    border-top: 1px solid var(--ct-line);
+}
+.ct-key {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: calc(var(--ct-target) * 1.32);
+    padding: 0;
+    color: var(--ct-ink);
+    background: var(--ct-tecla);
+    border: 0;
+    border-radius: 10px;
+    box-shadow: 0 1px 0 var(--ct-tecla-quina);
+    font: inherit;
+    font-size: var(--ct-text-xl);
+    font-weight: var(--ct-w-control);
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 120ms var(--ct-ease), background-color 120ms var(--ct-ease);
+}
+.ct-key .bi { font-size: 1.25em; }
+.ct-key--funcao { background: var(--ct-tecla-funcao); font-size: var(--ct-text); }
+/* Ligada (Maiúscula, acentos): o tom da tecla de caractere; a Maiúscula troca bi-shift por bi-shift-fill. */
+.ct-key--funcao[aria-pressed="true"] { background: var(--ct-tecla); }
+.ct-key:active:not(:disabled) { background: var(--ct-action-soft); box-shadow: none; transform: translateY(1px); }
+.ct-key:focus-visible { outline-offset: -3px; }
+.ct-key:disabled { color: var(--ct-disabled-ink); cursor: not-allowed; }
+.ct-keyboard { display: flex; flex-direction: column; gap: 12px; }
+/* A camada fora de uso fica no DOM com `hidden`: o display do componente não pode vencê-lo. */
+.ct-keyboard[hidden],
+.ct-keypad[hidden] { display: none; }
+/* Dez teclas por linha com 7 px entre vizinhas: no totem de 800 px a tecla tem o alvo; as linhas mais curtas
+ * centralizam. A larga (Maiúscula, apagar, ?123, acentos) vale uma tecla e meia; o espaço leva o resto. */
+.ct-keyboard__row { display: flex; gap: 7px; justify-content: center; }
+.ct-keyboard .ct-key { flex: 0 0 calc((100% - 63px) / 10); }
+.ct-keyboard .ct-key--larga { flex-basis: calc((100% - 63px) / 10 * 1.5 + 3.5px); }
+.ct-keyboard .ct-key--espaco { flex: 1 1 auto; font-size: var(--ct-text); }
+/* Numérico em tamanho real: três colunas de 2,1 alvos no meio da bandeja, e não esticadas na largura toda. */
+.ct-keypad { display: grid; grid-template-columns: repeat(3, calc(var(--ct-target) * 2.1)); gap: 12px 14px; justify-content: center; }
+.ct-keypad .ct-key { height: calc(var(--ct-target) * 1.28); font-size: var(--ct-text-2xl); font-variant-numeric: tabular-nums; }
+.ct-keypad .ct-key--funcao { font-size: var(--ct-text-lg); }
 
 /* ---------- Avisos ---------- */
 .ct-notice {
@@ -1794,6 +1889,26 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
 /* No fundo claro, o colibri vai em branco: os tons dele somem no azul médio. */
 .ct-app--vidro-claro::after { filter: brightness(0) invert(1); }
 
+/* Teclado no vidro: a bandeja é um degrau do vidro da folha e a tecla, uma lâmina com o fio de luz no alto. O motor
+ * garante o texto sobre o vidro da folha (derivarVidro), não sobre uma camada a mais: por isso, sob o texto, a camada
+ * da tecla só aumenta o contraste. No vidro escuro (texto claro), a tecla de caractere é o próprio vidro e a função
+ * escurece; no claro (texto escuro), as duas clareiam. Mesmo peso do seletor do modo escuro, e depois dele. */
+.ct-app.ct-app--vidro-escuro {
+    --ct-teclado: rgba(0, 0, 0, .24);
+    --ct-tecla: transparent;
+    --ct-tecla-funcao: rgba(0, 0, 0, .12);
+    --ct-tecla-quina: rgba(0, 0, 0, .45);
+}
+.ct-app.ct-app--vidro-claro {
+    --ct-teclado: rgba(15, 30, 50, .06);
+    --ct-tecla: rgba(255, 255, 255, .55);
+    --ct-tecla-funcao: rgba(255, 255, 255, .25);
+    --ct-tecla-quina: rgba(15, 30, 50, .22);
+}
+.ct-app--vidro .ct-key { box-shadow: inset 0 1px 0 var(--ct-vidro-brilho), 0 1px 0 var(--ct-tecla-quina); }
+.ct-app--vidro .ct-key:active:not(:disabled) { box-shadow: none; }
+.ct-app--vidro .ct-entry__valor { box-shadow: inset 0 1px 0 var(--ct-vidro-brilho); }
+
 /* Peças de vidro. O mini card de destaque, que fora do vidro não tem moldura, ganha a do vidro. */
 .ct-app--vidro :is(.ct-header, .ct-rail, .ct-footer, .ct-product, .ct-sheet, .ct-loja, .ct-topo, .ct-item, .ct-destaque,
     .ct-sacola-barra, .ct-sacola, .ct-produto-modal, .ct-produto__corpo, .ct-grupo, .ct-produto__obs, .ct-produto__rodape) {
@@ -1889,7 +2004,9 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
     .ct-icon-btn:active:not(:disabled),
     .ct-qty__btn:active:not(:disabled),
     .ct-door:active:not(:disabled),
+    .ct-key:active:not(:disabled),
     .ct-product__add:active:not(:disabled) { transform: none; }
+    .ct-key { transition: none; }
     .ct-order--late::before { animation: none; }
     .ct-spin { animation: none; }
     /* Destaques: a aplicação não gira (fica no primeiro); sem aproximação nem esmaecimento. */
