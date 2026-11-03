@@ -43,7 +43,7 @@ test('E2: a confirmed older plan cannot overwrite a newer manifest or install st
   const newer = await prepareInstall(catalog, { ...options, bundle: ['b'] });
   await apply(newer);
   const saved = await readFile(manifest, 'utf8');
-  await assert.rejects(() => apply(older), /manifest changed.*preview/i);
+  await assert.rejects(() => apply(older), /manifesto mudou.*prévia/i);
   assert.equal(await readFile(manifest, 'utf8'), saved);
   await assert.rejects(() => access(join(project, '.claude/skills/alpha')), { code: 'ENOENT' });
   assert.deepEqual((await installedRows({ cwd: project, global: false })).map(s => s.name).sort(), ['beta', 'essential']);
@@ -60,7 +60,7 @@ test('E2: creating, deleting or editing a manifest invalidates its pending plan 
     if (change === 'create-empty') await writeFile(manifest, '');
     else if (change === 'delete') await rm(manifest);
     else await writeFile(manifest, edited);
-    await assert.rejects(() => apply(prepared), /manifest changed.*preview/i);
+    await assert.rejects(() => apply(prepared), /manifesto mudou.*prévia/i);
     if (change === 'delete') await assert.rejects(() => access(manifest), { code: 'ENOENT' });
     else assert.equal(await readFile(manifest, 'utf8'), change === 'create-empty' ? '' : edited);
     assert.deepEqual(await installedRows({ cwd: project, global: false }), []);
@@ -76,7 +76,7 @@ test('E2: edits made during installation are preserved when the prepared manifes
   await assert.rejects(() => executePlan(prepared.plan, false, async () => {
     await writeFile(manifest, edited);
     await prepared.save();
-  }), /manifest changed.*preview/i);
+  }), /manifesto mudou.*prévia/i);
   assert.equal(await readFile(manifest, 'utf8'), edited);
   assert.deepEqual((await installedRows({ cwd: project, global: false })).map(s => s.name).sort(), ['alpha', 'essential']);
 });
@@ -97,7 +97,7 @@ test('E2: a reconcile plan is refused when the manifest changed or was deleted a
       assert.deepEqual(await installed(), ['alpha', 'essential']);
       continue;
     }
-    await assert.rejects(() => executePlan(plan), /manifest changed.*preview/i);
+    await assert.rejects(() => executePlan(plan), /manifesto mudou.*prévia/i);
     await access(join(project, '.claude/skills/beta/SKILL.md'));
     assert.deepEqual(await installed(), ['alpha', 'beta', 'essential']);
     if (change === 'require-extra') assert.deepEqual((await prepareReconcile(catalog, { cwd: project })).extras, []);

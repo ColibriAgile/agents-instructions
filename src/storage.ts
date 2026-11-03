@@ -32,21 +32,21 @@ export async function loadState(scope: Scope): Promise<State> {
   catch (error) { if (isMissing(error)) return { version: 1, skills: {} }; throw error; }
   try {
     const state: unknown = JSON.parse(text);
-    if (!record(state) || state.version !== 1 || !record(state.skills)) throw new Error('expected version 1 and skills mapping');
+    if (!record(state) || state.version !== 1 || !record(state.skills)) throw new Error('esperado version 1 e o mapa skills');
     for (const [name, value] of Object.entries(state.skills)) {
       skillName(name);
-      if (!record(value) || !['catalog', 'external'].includes(String(value.origin)) || typeof value.source !== 'string' || !value.source || value.source.startsWith('-') || !record(value.targets)) throw new Error(`invalid skill ${name}`);
-      if (value.canonicalHash !== undefined && (typeof value.canonicalHash !== 'string' || !/^[a-f0-9]{64}$/.test(value.canonicalHash))) throw new Error(`invalid canonical ownership ${name}`);
+      if (!record(value) || !['catalog', 'external'].includes(String(value.origin)) || typeof value.source !== 'string' || !value.source || value.source.startsWith('-') || !record(value.targets)) throw new Error(`skill inválida ${name}`);
+      if (value.canonicalHash !== undefined && (typeof value.canonicalHash !== 'string' || !/^[a-f0-9]{64}$/.test(value.canonicalHash))) throw new Error(`posse canônica inválida ${name}`);
       for (const [agent, target] of Object.entries(value.targets)) {
-        if (!Object.hasOwn(agents, agent) || !record(target) || !['copy', 'symlink'].includes(String(target.method)) || typeof target.hash !== 'string' || !/^[a-f0-9]{64}$/.test(target.hash)) throw new Error(`invalid target ${name}/${agent}`);
+        if (!Object.hasOwn(agents, agent) || !record(target) || !['copy', 'symlink'].includes(String(target.method)) || typeof target.hash !== 'string' || !/^[a-f0-9]{64}$/.test(target.hash)) throw new Error(`destino inválido ${name}/${agent}`);
       }
     }
     if (state.preferences !== undefined) {
       const pref = state.preferences;
-      if (!record(pref) || !Array.isArray(pref.agents) || pref.agents.some(a => typeof a !== 'string' || !Object.hasOwn(agents, a)) || !['copy', 'symlink'].includes(String(pref.method))) throw new Error('invalid preferences');
+      if (!record(pref) || !Array.isArray(pref.agents) || pref.agents.some(a => typeof a !== 'string' || !Object.hasOwn(agents, a)) || !['copy', 'symlink'].includes(String(pref.method))) throw new Error('preferências inválidas');
     }
     return state as unknown as State;
-  } catch (error) { throw new Error(`Invalid Colibri state ${path}: ${(error as Error).message}`); }
+  } catch (error) { throw new Error(`Estado da Colibri inválido ${path}: ${(error as Error).message}`); }
 }
 
 export async function saveState(scope: Scope, state: State): Promise<void> {
@@ -58,8 +58,8 @@ export type Interruption = keyof typeof signalCodes;
 
 export class Interrupted extends Error {
   readonly signal: Interruption;
-  constructor(signal: Interruption, detail = 'Run the command again to finish.') {
-    super(`Operation interrupted by ${signal}. ${detail}`);
+  constructor(signal: Interruption, detail = 'Rode o comando de novo para concluir.') {
+    super(`Operação interrompida por ${signal}. ${detail}`);
     this.signal = signal;
   }
 }
@@ -82,7 +82,7 @@ export async function withScopeLock<T>(scope: Scope, action: (interruption: Abor
     const notes: string[] = [];
     for (const hook of forceExitHooks) { try { const note = hook(); if (note) notes.push(note); } catch { /* keep exiting */ } }
     rmSync(path, { force: true });
-    console.error(`Aborted by second ${signal} without a complete rollback; the lock was released.${notes.length ? ` ${notes.join(' ')}` : ''} Run list and update to check the installed skills.`);
+    console.error(`Abortado por um segundo ${signal} sem reversão completa; o bloqueio foi liberado.${notes.length ? ` ${notes.join(' ')}` : ''} Rode list e update para conferir as skills instaladas.`);
     process.exit(signalCodes[signal]);
   };
   for (const signal of Object.keys(signalCodes) as Interruption[]) process.on(signal, listener);
@@ -93,7 +93,7 @@ export async function withScopeLock<T>(scope: Scope, action: (interruption: Abor
     let lock;
     try { lock = await open(path, 'wx', 0o600); }
     catch (error) {
-      if (error instanceof Error && 'code' in error && error.code === 'EEXIST') throw new Error(`Another Colibri operation holds ${path}. If interrupted, verify no process is running before deleting this lock.`);
+      if (error instanceof Error && 'code' in error && error.code === 'EEXIST') throw new Error(`Outra operação da Colibri mantém ${path}. Se ela foi interrompida, confirme que nenhum processo está rodando antes de apagar este bloqueio.`);
       throw error;
     }
     try {
@@ -110,7 +110,7 @@ export async function withScopeLock<T>(scope: Scope, action: (interruption: Abor
     // The exit code reports what happened to the files: a signal that arrived after the last checkpoint changed nothing.
     if (interruption.signal.aborted) {
       const { signal } = interruption.signal.reason as Interrupted;
-      if (completed) console.error(`Received ${signal} after all changes were applied; the operation completed.`);
+      if (completed) console.error(`Recebido ${signal} depois de todas as alterações serem aplicadas; a operação foi concluída.`);
       else process.exitCode = signalCodes[signal];
     }
   }

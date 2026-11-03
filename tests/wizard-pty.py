@@ -69,45 +69,45 @@ def scenario(search, preferences=False, requirements=False):
             time.sleep(0.07)
 
         try:
-            expect("Choose action")
+            expect("Escolha a ação")
             if search:
                 send(b"\r")
-                expect("Scope")
+                expect("Escopo")
                 send(b"\r")
-                expect("Choose agents")
+                expect("Escolha os agentes")
                 if not preferences:
                     send(b"\t")
                 send(b"\r")
-                expect("Browse skills")
+                expect("Navegar pelas skills")
                 send(b"\x1b[B")
                 send(b"\r")
-                expect("Category filter")
+                expect("Filtro de categoria")
                 send(b"\r")
-                expect("Choose skills")
+                expect("Escolha as skills")
                 send(b"delphi-xe2-build" if requirements else b"commit")
                 send(b"\t")
                 send(b"\r")
-                expect("Installation method")
+                expect("Método de instalação")
                 send(b"\r")
-                expect("Apply these changes?")
+                expect("Aplicar estas alterações?")
                 if requirements:
                     output = ANSI.sub('', transcript)
                     assert 'Requer Windows e Delphi XE2' in output, output
                     assert 'Sistema atual:' in output, output
                     assert 'Instalação permitida; ferramentas não verificadas.' in output, output
-                    assert output.index('Sistema atual:') < output.index('Apply these changes?'), output
+                    assert output.index('Sistema atual:') < output.index('Aplicar estas alterações?'), output
                 send(b"n")
                 send(b"\r")
-                expect("Cancelled. No files changed.")
+                expect("Cancelado. Nenhum arquivo foi alterado.")
                 assert ("delphi-xe2-build" if requirements else "commit") in ANSI.sub("", transcript), transcript
-                assert "INSTALL" in ANSI.sub("", transcript), transcript
+                assert "INSTALAR" in ANSI.sub("", transcript), transcript
                 if preferences:
                     assert 'Claude Code · symlink' in ANSI.sub('', transcript), transcript
                     assert 'Windsurf · symlink' in ANSI.sub('', transcript), transcript
                     assert 'Codex · symlink' not in ANSI.sub('', transcript), transcript
             else:
                 send(b"\x03")
-                expect("Cancelled. No files changed.")
+                expect("Cancelado. Nenhum arquivo foi alterado.")
             assert process.wait(timeout=5) == 0
             if not preferences:
                 assert list(Path(project).iterdir()) == [], "Cancellation must not create project artifacts"

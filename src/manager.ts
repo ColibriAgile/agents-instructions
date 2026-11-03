@@ -17,8 +17,8 @@ export interface Plan { action: 'install' | 'update' | 'remove'; scope: Scope; i
 export interface Summary { added: number; updated: number; unchanged: number; removed: number }
 
 export function installPlan(scope: Scope, selection: Selection[], targetAgents: Agent[], method: Method): Plan {
-  if (!selection.length) throw new Error('No skills selected');
-  if (!targetAgents.length) throw new Error('Select at least one agent');
+  if (!selection.length) throw new Error('Nenhuma skill selecionada');
+  if (!targetAgents.length) throw new Error('Selecione ao menos um agente');
   return { action: 'install', scope, items: selection.map(s => ({ ...s, runtime: requirementInfo(s.requirements), targets: targetAgents.map(agent => ({ agent, method })) })) };
 }
 
@@ -28,14 +28,14 @@ export async function managedPlan(action: 'update' | 'remove', scope: Scope, cat
   const items = selected.map(name => {
     skillName(name);
     const skill = state.skills[name];
-    if (!skill) throw new Error(`Skill ${name} is not managed by Colibri in this scope`);
+    if (!skill) throw new Error(`A skill ${name} não é gerenciada pela Colibri neste escopo`);
     const targets = Object.entries(skill.targets)
       .filter(([agent]) => !targetAgents || targetAgents.includes(agent as Agent))
       .map(([agent, value]) => ({ agent: agent as Agent, method: value!.method }));
     const requirements = skill.origin === 'catalog' ? catalog.skills.find(s => s.name === name)?.requirements ?? null : null;
     return { name, source: skill.origin === 'catalog' ? catalog.source : skill.source, origin: skill.origin, requirements, runtime: requirementInfo(requirements), targets };
   }).filter(s => s.targets.length);
-  if (!items.length) throw new Error('No managed skills match the selected scope and agents');
+  if (!items.length) throw new Error('Nenhuma skill gerenciada corresponde ao escopo e aos agentes selecionados');
   return { action, scope, items };
 }
 
@@ -54,7 +54,7 @@ async function safeTarget(path: string, source: string, scope: Scope): Promise<v
   // Inside the selected root, redirected agent directories still require manual resolution.
   if (!fromBase.startsWith('..') && !isAbsolute(fromBase)) {
     const expected = resolve(await realpath(base), fromBase);
-    if (resolve(await realpath(parent)) !== expected) throw new Error(`Symlinked parent requires manual resolution: ${parent}`);
+    if (resolve(await realpath(parent)) !== expected) throw new Error(`O diretório pai é um symlink e exige resolução manual: ${parent}`);
   }
   if (isAbsolute(source)) {
     const realSource = await realpath(source).catch(error => {
@@ -68,7 +68,7 @@ async function safeTarget(path: string, source: string, scope: Scope): Promise<v
     const delta = relative(realSource, realDestination);
     const reverse = relative(realDestination, realSource);
     const inside = (p: string) => !p || (!p.startsWith(`..${sep}`) && p !== '..' && !isAbsolute(p));
-    if (inside(delta) || inside(reverse)) throw new Error(`Destination overlaps source: ${path}`);
+    if (inside(delta) || inside(reverse)) throw new Error(`O destino se sobrepõe à origem: ${path}`);
   }
 }
 
@@ -87,9 +87,9 @@ async function guard(plan: Plan, state: State, force: boolean): Promise<void> {
         targetPath(plan.scope, a as Agent, item.name) === path || (path === canonical && t!.method === 'symlink'));
       const ownedCanonical = path === canonical ? managed?.canonicalHash : undefined;
       if (await exists(path) && !force) {
-        if (!owners.length && !ownedCanonical) throw new Error(`Unmanaged destination: ${path}. Use --force to replace it explicitly.`);
+        if (!owners.length && !ownedCanonical) throw new Error(`Destino não gerenciado: ${path}. Use --force para substituí-lo explicitamente.`);
         const expected = ownedCanonical ?? owners[0]?.[1]?.hash;
-        if (await directoryHash(path) !== expected) throw new Error(`Installed skill was modified: ${path}. Use --force to overwrite/remove it.`);
+        if (await directoryHash(path) !== expected) throw new Error(`A skill instalada foi modificada: ${path}. Use --force para sobrescrever ou remover.`);
       }
       // Shared directories and canonical symlinks cannot be changed for one consumer only.
       for (const [agent, target] of Object.entries(managed?.targets ?? {})) {
@@ -98,21 +98,23 @@ async function guard(plan: Plan, state: State, force: boolean): Promise<void> {
         if (other === path || (path === canonical && target!.method === 'symlink')) {
           // Identical reinstallation may add another alias without changing existing content.
           if (plan.action === 'install' && isAbsolute(item.source) && await directoryHash(resolve(item.source, item.name)) === await directoryHash(path)) continue;
-          throw new Error(`Shared destination ${path} is also used by ${agents[agent as Agent].label}. Select all sharing agents.`);
+          throw new Error(`O destino compartilhado ${path} também é usado por ${agents[agent as Agent].label}. Selecione todos os agentes que o compartilham.`);
         }
       }
     }
     if (managed && (managed.origin !== item.origin || (item.origin === 'external' && managed.source !== effectiveSource(item.source, plan.scope)))) {
       if (Object.keys(managed.targets).some(agent => !selectedAgents.includes(agent as Agent))) {
-        throw new Error(`Changing source for ${item.name} requires selecting all managed agents, even with --force`);
+        throw new Error(`Trocar a origem de ${item.name} exige selecionar todos os agentes gerenciados, mesmo com --force`);
       }
-      if (!force) throw new Error(`Skill ${item.name} is managed from another source; use --force to replace it`);
+      if (!force) throw new Error(`A skill ${item.name} é gerenciada a partir de outra origem; use --force para substituí-la`);
     }
   }
 }
 
+const label: Record<Plan['action'], string> = { install: 'INSTALAR', update: 'ATUALIZAR', remove: 'REMOVER' };
+
 export function preview(plan: Plan): string {
-  const lines = [`${plan.action.toUpperCase()} · ${plan.scope.global ? 'global' : 'project'} · ${plan.scope.cwd}`];
+  const lines = [`${label[plan.action]} · ${plan.scope.global ? 'global' : 'projeto'} · ${plan.scope.cwd}`];
   for (const item of plan.items) {
     lines.push(`${item.name} ← ${item.source}`);
     lines.push(`  ${item.runtime.summary}`);
@@ -123,7 +125,7 @@ export function preview(plan: Plan): string {
     for (const target of item.targets) lines.push(`  ${agents[target.agent].label} · ${target.method} → ${targetPath(plan.scope, target.agent, item.name)}`);
   }
   if (plan.action !== 'remove' && plan.items.some(i => i.runtime.platformStatus === 'unknown')) lines.push(unknownNotice);
-  lines.push('Agents using .agents/skills share the same directory. Symlink mode may fall back to copy.');
+  lines.push('Agentes que usam .agents/skills compartilham o mesmo diretório. O modo symlink pode recorrer a copy.');
   return lines.join('\n');
 }
 
@@ -132,7 +134,7 @@ async function withInstallRollback<T>(paths: string[], action: () => Promise<T>)
   const directory = await mkdtemp(join(tmpdir(), 'colibri-rollback-'));
   const snapshots: { path: string; backup?: string; link?: string }[] = [];
   let keepBackup = false;
-  const forgetForceExit = onForceExit(() => `Recovery copies: ${directory}.`);
+  const forgetForceExit = onForceExit(() => `Cópias de recuperação: ${directory}.`);
   try {
     for (const path of new Set(paths)) {
       if (!await exists(path)) { snapshots.push({ path }); continue; }
@@ -154,9 +156,9 @@ async function withInstallRollback<T>(paths: string[], action: () => Promise<T>)
       }
       if (failures.length) {
         keepBackup = true;
-        throw new AggregateError([error, ...failures], `Installation failed and rollback was incomplete. Recovery copies: ${directory}. Original error: ${String(error)}`);
+        throw new AggregateError([error, ...failures], `A instalação falhou e a reversão ficou incompleta. Cópias de recuperação: ${directory}. Erro original: ${String(error)}`);
       }
-      if (error instanceof Interrupted) throw new Interrupted(error.signal, 'Changes in progress were rolled back; run the command again to finish.');
+      if (error instanceof Interrupted) throw new Interrupted(error.signal, 'As alterações em andamento foram revertidas; rode o comando de novo para concluir.');
       throw error;
     }
   } finally { forgetForceExit(); if (!keepBackup) await rm(directory, { recursive: true, force: true }); }
@@ -165,7 +167,7 @@ async function withInstallRollback<T>(paths: string[], action: () => Promise<T>)
 export async function executePlan(plan: Plan, force = false, onSuccess?: () => Promise<void>): Promise<Summary> {
   return withScopeLock(plan.scope, async interruption => {
     if (plan.manifest && (await readManifest(plan.manifest.path)).revision !== plan.manifest.revision) {
-      throw new Error(`Manifest changed since preview: ${plan.manifest.path}. Prepare a new preview before applying changes.`);
+      throw new Error(`O manifesto mudou desde a prévia: ${plan.manifest.path}. Prepare uma nova prévia antes de aplicar as alterações.`);
     }
     const state = await loadState(plan.scope);
     await guard(plan, state, force);
@@ -191,7 +193,7 @@ export async function executePlan(plan: Plan, force = false, onSuccess?: () => P
             'add', source, '--skill', item.name, '--agent', ...targets.map(t => t.agent), '--yes', '--json',
             ...(method === 'copy' ? ['--copy'] : []), ...(plan.scope.global ? ['--global'] : []),
           ], plan.scope, interruption));
-          if (!result.some(r => r.name === item.name && r.status === 'installed')) throw new Error(`Backend did not install ${item.name}`);
+          if (!result.some(r => r.name === item.name && r.status === 'installed')) throw new Error(`O backend não instalou ${item.name}`);
           const managed = state.skills[item.name] ?? { source, origin: item.origin, targets: {} };
           managed.source = source;
           managed.origin = item.origin;
@@ -201,9 +203,9 @@ export async function executePlan(plan: Plan, force = false, onSuccess?: () => P
             const text = await readFile(skillFile, 'utf8');
             let name: string | undefined;
             try { name = readSkillMeta(text, skillFile).name; } catch { /* reported below with the file path */ }
-            if (name !== item.name) throw new Error(`Invalid installed SKILL.md: ${skillFile}`);
+            if (name !== item.name) throw new Error(`SKILL.md instalado inválido: ${skillFile}`);
             const hash = await directoryHash(path);
-            if (!hash) throw new Error(`Backend did not create requested destination: ${path}`);
+            if (!hash) throw new Error(`O backend não criou o destino solicitado: ${path}`);
             const actualMethod = (await lstat(path)).isSymbolicLink() ||
               (path === canonicalPath(plan.scope, item.name) && result.some(r => r.name === item.name && r.mode === 'symlink')) ? 'symlink' : 'copy';
             managed.targets[t.agent] = { method: actualMethod, hash };
@@ -233,7 +235,7 @@ export async function executePlan(plan: Plan, force = false, onSuccess?: () => P
 
 async function removeItem(scope: Scope, item: PlanItem, state: State, interruption: AbortSignal): Promise<void> {
   const managed = state.skills[item.name];
-  if (!managed) throw new Error(`Skill ${item.name} is no longer managed`);
+  if (!managed) throw new Error(`A skill ${item.name} não é mais gerenciada`);
   const remaining = Object.keys(managed.targets).filter(a => !item.targets.some(t => t.agent === a));
   const canonical = canonicalPath(scope, item.name);
   // Partial removal is directory-local. The backend lock must remain while another target uses it.

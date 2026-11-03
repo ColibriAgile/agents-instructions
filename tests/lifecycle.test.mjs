@@ -44,13 +44,13 @@ test('AC4–6: copy lifecycle preserves another target, manual skills and local 
   assert.match(await readFile(claude, 'utf8'), /Version one/);
   assert.match(await readFile(codex, 'utf8'), /Version one/);
   assert.equal((await lstat(join(project, '.claude/skills/demo'))).isSymbolicLink(), false);
-  assert.match(run(['install', '-s', 'demo', '-a', 'claude-code', 'codex', '--yes']).stdout, /unchanged/i);
+  assert.match(run(['install', '-s', 'demo', '-a', 'claude-code', 'codex', '--yes']).stdout, /sem alteração/i);
   await writeFile(join(catalog, 'SKILLS/demo/SKILL.md'), '---\nname: demo\ndescription: Test demo\n---\nVersion two\n');
   run(['update', '-s', 'demo', '-a', 'claude-code', '--yes']);
   assert.match(await readFile(claude, 'utf8'), /Version two/);
   assert.match(await readFile(codex, 'utf8'), /Version one/);
   await writeFile(claude, 'Manual edit');
-  assert.match(run(['update', '-s', 'demo', '-a', 'claude-code', '--yes'], false).stderr, /modified/i);
+  assert.match(run(['update', '-s', 'demo', '-a', 'claude-code', '--yes'], false).stderr, /modificada/i);
   assert.equal(await readFile(claude, 'utf8'), 'Manual edit');
   run(['remove', '-s', 'demo', '-a', 'claude-code', '--force', '--yes']);
   await assert.rejects(() => access(claude), { code: 'ENOENT' });
@@ -67,7 +67,7 @@ test('AC4–5: symlinks survive partial removal; shared aliases cannot be remove
   run(['remove', '-s', 'demo', '-a', 'claude-code', '--yes']);
   assert.match(await readFile(join(project, '.agents/skills/demo/SKILL.md'), 'utf8'), /Version one/);
   run(['install', '-s', 'demo', '-a', 'cursor', '--yes']);
-  assert.match(run(['remove', '-s', 'demo', '-a', 'codex', '--yes'], false).stderr, /shared/i);
+  assert.match(run(['remove', '-s', 'demo', '-a', 'codex', '--yes'], false).stderr, /compartilhado/i);
   await access(join(project, '.agents/skills/demo/SKILL.md'));
   await writeFile(join(catalog, 'SKILLS/demo/resource.txt'), 'Bundled resource');
   run(['update', '-s', 'demo', '--yes']);
@@ -92,7 +92,7 @@ test('CR-02: a manually modified canonical copy blocks remove without --force', 
   run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
   const canonical = join(project, '.agents/skills/demo');
   await writeFile(join(canonical, 'notes.txt'), 'manual edit');
-  assert.match(run(['remove', '-s', 'demo', '--yes'], false).stderr, /modified/i);
+  assert.match(run(['remove', '-s', 'demo', '--yes'], false).stderr, /modificada/i);
   await access(join(canonical, 'notes.txt'));
   run(['remove', '-s', 'demo', '--force', '--yes']);
   await assert.rejects(() => access(canonical), { code: 'ENOENT' });
@@ -143,7 +143,7 @@ test('AC6: unmanaged collisions, dry runs, unknown names and manual removals cau
   await mkdir(join(project, '.claude/skills/demo'), { recursive: true });
   const path = join(project, '.claude/skills/demo/SKILL.md');
   await writeFile(path, 'Manual content');
-  assert.match(run(['install', '-s', 'demo', '-a', 'claude-code', '--yes'], false).stderr, /unmanaged/i);
+  assert.match(run(['install', '-s', 'demo', '-a', 'claude-code', '--yes'], false).stderr, /não gerenciado/i);
   assert.equal(await readFile(path, 'utf8'), 'Manual content');
   run(['install', '-s', 'demo', '-a', 'claude-code', '--dry-run']);
   await assert.rejects(() => access(join(project, '.colibri-skills.json')), { code: 'ENOENT' });
@@ -260,7 +260,7 @@ test('AC5–6: full removal clears canonical ownership, so reinstall works and e
   run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
   assert.equal((await lstat(join(project, '.claude/skills/demo'))).isSymbolicLink(), true);
   await writeFile(join(canonical, 'SKILL.md'), 'Manual canonical edit');
-  assert.match(run(['install', '-s', 'demo', '-a', 'codex', '--method', 'copy', '--yes'], false).stderr, /modified/i);
+  assert.match(run(['install', '-s', 'demo', '-a', 'codex', '--method', 'copy', '--yes'], false).stderr, /modificada/i);
   assert.equal(await readFile(join(canonical, 'SKILL.md'), 'utf8'), 'Manual canonical edit');
   await writeFile(join(canonical, 'SKILL.md'), await readFile(join(catalog, 'SKILLS/demo/SKILL.md')));
   run(['install', '-s', 'demo', '-a', 'codex', '--method', 'copy', '--yes']);
@@ -295,7 +295,7 @@ test('R1: force install refuses a source alias of the destination without deleti
   await symlink(destination, join(catalog, 'SKILLS'), process.platform === 'win32' ? 'junction' : 'dir');
   const original = await readFile(join(destination, 'demo/SKILL.md'), 'utf8');
   const result = run(['install', '-s', 'demo', '-a', 'claude-code', '--force', '--yes'], false);
-  assert.match(result.stderr, /overlaps source/i);
+  assert.match(result.stderr, /se sobrepõe à origem/i);
   assert.equal(await readFile(join(destination, 'demo/SKILL.md'), 'utf8'), original);
   assert.deepEqual(JSON.parse(run(['list', '--json']).stdout), []);
 });
@@ -394,7 +394,7 @@ test('R2: a signal during copy rolls back, releases the lock and allows retry wi
   for (const [signal, code, group] of [['SIGTERM', 143, false], ['SIGINT', 130, true], ['SIGHUP', 129, false]]) {
     const result = await interrupt(context, install, signal, total, group);
     assert.equal(result.code, code, result.stderr);
-    assert.match(result.stderr, new RegExp(`interrupted by ${signal}`, 'i'));
+    assert.match(result.stderr, new RegExp(`interrompida por ${signal}`, 'i'));
     await settled();
     await assert.rejects(() => access(destination), { code: 'ENOENT' });
     assert.deepEqual(JSON.parse(run(['list', '--json']).stdout), []);
@@ -422,7 +422,7 @@ test('E1: changing source for one target is refused and other targets keep their
   const manifest = join(project, 'external.yaml');
   await writeFile(manifest, `sources:\n  - repo: ${JSON.stringify(external)}\n    skills: [demo]\n`);
   const result = run(['install', '--manifest', manifest, '-a', 'claude-code', '--force', '--yes'], false);
-  assert.match(result.stderr, /source.*all|all.*source/i);
+  assert.match(result.stderr, /origem.*todos|todos.*origem/i);
   run(['update', '-s', 'demo', '-a', 'windsurf', '--yes']);
   assert.match(await readFile(join(project, '.windsurf/skills/demo/SKILL.md'), 'utf8'), /Version one/);
   assert.equal(JSON.parse(run(['list', '--json']).stdout)[0].origin, 'catalog');
@@ -444,7 +444,7 @@ test('R2: an interrupted remove releases the lock, leaves targets installed or m
   };
   const result = await interrupt(context, ['remove', '-s', 'demo', '--yes'], 'SIGTERM', total, false, removing);
   assert.equal(result.code, 143, result.stderr);
-  assert.match(result.stderr, /interrupted by SIGTERM/i);
+  assert.match(result.stderr, /interrompida por SIGTERM/i);
   await assert.rejects(() => access(join(project, '.colibri-skills.json.lock')), { code: 'ENOENT' });
   const rows = JSON.parse(run(['list', '--json']).stdout);
   assert.deepEqual(rows.map(row => row.name), ['demo']);

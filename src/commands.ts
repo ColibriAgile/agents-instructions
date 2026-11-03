@@ -28,8 +28,8 @@ export async function prepareInstall(catalog: Catalog, options: Options): Promis
   const bundles = values(options.bundle);
   const names = values(options.skill);
   const method = options.method ?? state.preferences?.method ?? 'copy';
-  if (!['copy', 'symlink'].includes(method)) throw new Error('Method must be copy or symlink');
-  if (scope.global && options.manifest) throw new Error('--manifest is project-only');
+  if (!['copy', 'symlink'].includes(method)) throw new Error('O método deve ser copy ou symlink');
+  if (scope.global && options.manifest) throw new Error('--manifest só vale para o projeto');
   const managed = !scope.global && (bundles.length > 0 || Boolean(options.manifest) || !names.length);
   let selection;
   let manifestVersion: Plan['manifest'];
@@ -45,7 +45,7 @@ export async function prepareInstall(catalog: Catalog, options: Options): Promis
     const selectedSkills = [...new Set([...manifest.skills, ...names])];
     selection = resolveSelection(catalog, { manifest: { ...manifest, bundles: selectedBundles, skills: selectedSkills } });
     if (bundles.length || names.length) save = () => saveManifest(path, manifest, selectedBundles, selectedSkills);
-    if (!selection.length) throw new Error(`No skills selected. Choose --skill/--bundle, or create ${path}`);
+    if (!selection.length) throw new Error(`Nenhuma skill selecionada. Escolha --skill/--bundle ou crie ${path}`);
   } else selection = resolveSelection(catalog, { bundles, skills: names });
   const plan = installPlan(scope, selection, targets, method);
   if (manifestVersion) plan.manifest = manifestVersion;
@@ -53,9 +53,9 @@ export async function prepareInstall(catalog: Catalog, options: Options): Promis
 }
 
 async function managedExtras(catalog: Catalog, scope: Scope, manifestPath?: string): Promise<{ names: string[]; manifest: NonNullable<Plan['manifest']> }> {
-  if (scope.global) throw new Error('Reconciliation is project-only');
+  if (scope.global) throw new Error('A reconciliação só vale para o projeto');
   const path = resolve(scope.cwd, manifestPath ?? 'skills.yaml');
-  if (!await exists(path)) throw new Error(`Manifest not found: ${path}`);
+  if (!await exists(path)) throw new Error(`Manifesto não encontrado: ${path}`);
   const manifest = await readManifest(path);
   const required = new Set(resolveSelection(catalog, { manifest }).map(s => s.name));
   const names = Object.entries((await loadState(scope)).skills).filter(([name, skill]) => Object.keys(skill.targets).length > 0 && !required.has(name)).map(([name]) => name);
@@ -71,7 +71,7 @@ export async function prepareReconcile(catalog: Catalog, options: Options): Prom
   const { names, manifest } = await managedExtras(catalog, scope, options.manifest);
   const selected = values(options.skill);
   if (!selected.length) return { extras: names };
-  for (const name of selected) if (!names.includes(name)) throw new Error(`${name} is not a managed extra outside the manifest`);
+  for (const name of selected) if (!names.includes(name)) throw new Error(`${name} não é um extra gerenciado fora do manifesto`);
   const plan = await managedPlan('remove', scope, catalog, selected, options.agent?.length ? validateAgents(values(options.agent)) : undefined);
   // The extras shown in the preview come from this revision; executePlan aborts under the lock if it changed.
   plan.manifest = manifest;
@@ -98,8 +98,8 @@ export async function runCommand(action: string, options: Options, loaded?: Cata
   const catalog = loaded ?? await loadCatalog(options.catalog);
   const scope = scopeFor(options);
   const targetAgents = options.agent?.length ? validateAgents(values(options.agent)) : undefined;
-  if (options.method && !['copy', 'symlink'].includes(options.method)) throw new Error('Method must be copy or symlink');
-  if (options.global && options.manifest) throw new Error('--manifest is project-only');
+  if (options.method && !['copy', 'symlink'].includes(options.method)) throw new Error('O método deve ser copy ou symlink');
+  if (options.global && options.manifest) throw new Error('--manifest só vale para o projeto');
   if (action === 'list') {
     const rows = options.available ? catalog.skills.map(s => ({ ...s, runtime: requirementInfo(s.requirements) })) : await installedRows(scope, targetAgents, catalog);
     if (options.json) console.log(JSON.stringify(rows, null, 2));
@@ -109,7 +109,7 @@ export async function runCommand(action: string, options: Options, loaded?: Cata
         console.log(row.runtime.platformStatus === 'unknown' ? `  ${row.runtime.summary}` : `  ${row.runtime.summary} · ${row.runtime.notice}`);
       }
       if (rows.some(row => row.runtime.platformStatus === 'unknown')) console.log(`\n${unknownNotice}`);
-      if (!rows.length) console.log('No Colibri-managed skills in this scope. Use list --available to browse the catalog.');
+      if (!rows.length) console.log('Nenhuma skill gerenciada pela Colibri neste escopo. Use list --available para ver o catálogo.');
     }
     return;
   }
@@ -121,24 +121,24 @@ export async function runCommand(action: string, options: Options, loaded?: Cata
     const reconcile = await prepareReconcile(catalog, options);
     if (!reconcile.plan) {
       if (options.json) console.log(JSON.stringify(reconcile.extras.map(name => ({ name })), null, 2));
-      else console.log(reconcile.extras.length ? `Managed extras: ${reconcile.extras.join(', ')}\nChoose --skill <names> to remove specific extras.` : 'No managed extras outside the manifest.');
+      else console.log(reconcile.extras.length ? `Extras gerenciados: ${reconcile.extras.join(', ')}\nEscolha --skill <nomes> para remover extras específicos.` : 'Nenhum extra gerenciado fora do manifesto.');
       return;
     }
     plan = reconcile.plan;
   } else if (action === 'update' || action === 'remove') plan = await managedPlan(action, scope, catalog, values(options.skill), targetAgents);
-  else throw new Error(`Unknown action: ${action}`);
+  else throw new Error(`Ação desconhecida: ${action}`);
   if (options.json && options.dryRun) { console.log(JSON.stringify(plan, null, 2)); return; }
   if (!options.json) console.log(preview(plan));
-  if (options.dryRun) { console.log('Dry run: no files changed.'); return; }
+  if (options.dryRun) { console.log('Simulação: nenhum arquivo foi alterado.'); return; }
   if (!options.yes) {
-    if (!process.stdin.isTTY || !process.stdout.isTTY) throw new Error('Confirmation requires a terminal. Review --dry-run, then pass --yes.');
-    const confirmed = await p.confirm({ message: options.force ? 'Apply these changes, replacing conflicts (--force)?' : 'Apply these changes?', initialValue: false });
-    if (p.isCancel(confirmed) || !confirmed) { p.cancel('Cancelled. No files changed.'); return; }
+    if (!process.stdin.isTTY || !process.stdout.isTTY) throw new Error('A confirmação exige um terminal. Revise com --dry-run e depois passe --yes.');
+    const confirmed = await p.confirm({ message: options.force ? 'Aplicar estas alterações, substituindo os conflitos (--force)?' : 'Aplicar estas alterações?', initialValue: false });
+    if (p.isCancel(confirmed) || !confirmed) { p.cancel('Cancelado. Nenhum arquivo foi alterado.'); return; }
   }
   const result = await executePlan(plan, options.force, save);
   if (options.json) console.log(JSON.stringify(result, null, 2));
   else {
-    console.log(`${result.added} added · ${result.updated} updated · ${result.unchanged} unchanged · ${result.removed} removed`);
-    if (droppedBundles.length) console.log(`Removed from the manifest: ${droppedBundles.join(', ')}. Their skills stay installed until you run reconcile.`);
+    console.log(`${result.added} adicionadas · ${result.updated} atualizadas · ${result.unchanged} sem alteração · ${result.removed} removidas`);
+    if (droppedBundles.length) console.log(`Removidos do manifesto: ${droppedBundles.join(', ')}. As skills deles continuam instaladas até você rodar reconcile.`);
   }
 }

@@ -7,36 +7,36 @@ import type { Options } from './commands.js';
 import { wizard } from './wizard.js';
 
 const pkg = JSON.parse(await readFile(join(packageRoot, 'package.json'), 'utf8')) as { version: string };
-const program = new Command().name('colibri-skills').description('Install and manage Colibri agent skills on Windows, macOS and Linux').version(pkg.version);
+const program = new Command().name('colibri-skills').description('Instala e gerencia as skills de agentes da Colibri no Windows, macOS e Linux').version(pkg.version);
 
 function common(command: Command): Command {
   return command
-    .option('--cwd <path>', 'Target project directory (defaults to current directory)')
-    .option('--catalog <path>', 'Use a local catalog root (bundles.yaml and SKILLS/)')
-    .option('-g, --global', 'Use user scope instead of the project')
-    .option('-a, --agent <names...>', 'Target agents: claude-code, codex, cursor, github-copilot, opencode, windsurf')
-    .option('--json', 'Output machine-readable JSON');
+    .option('--cwd <path>', 'Diretório do projeto de destino (padrão: diretório atual)')
+    .option('--catalog <path>', 'Usa uma raiz de catálogo local (bundles.yaml e SKILLS/)')
+    .option('-g, --global', 'Usa o escopo do usuário em vez do projeto')
+    .option('-a, --agent <names...>', 'Agentes de destino: claude-code, codex, cursor, github-copilot, opencode, windsurf')
+    .option('--json', 'Exibe a saída em JSON legível por máquina');
 }
 
 common(program).action(async (options: Options) => { await wizard(options); });
 
 for (const action of ['install', 'update', 'remove', 'reconcile'] as const) {
   const command = common(program.command(action).description({
-    install: 'Install catalog skills, bundles or the project manifest', update: 'Update selected Colibri-managed skills',
-    remove: 'Remove selected Colibri-managed skills', reconcile: 'List or remove managed extras outside skills.yaml',
+    install: 'Instala skills do catálogo, bundles ou o manifesto do projeto', update: 'Atualiza as skills selecionadas gerenciadas pela Colibri',
+    remove: 'Remove as skills selecionadas gerenciadas pela Colibri', reconcile: 'Lista ou remove extras gerenciados fora do skills.yaml',
   }[action]))
-    .option('-s, --skill <names...>', 'Select skill names (space-separated or comma-separated)')
-    .option('-y, --yes', 'Apply the preview without a confirmation prompt')
-    .option('-f, --force', 'Explicitly replace/remove conflicting or modified skill content')
-    .option('--dry-run', 'Show the plan without changing files');
-  if (action === 'install') command.option('-b, --bundle <names...>', 'Install bundles; local bundles are saved with core in skills.yaml').option('--method <method>', 'copy or symlink (default: copy or last used method)').option('--manifest <path>', 'Project manifest path (default: skills.yaml)');
-  if (action === 'reconcile') command.option('--manifest <path>', 'Project manifest path (default: skills.yaml)');
+    .option('-s, --skill <names...>', 'Seleciona skills pelo nome (separadas por espaço ou vírgula)')
+    .option('-y, --yes', 'Aplica a prévia sem pedir confirmação')
+    .option('-f, --force', 'Substitui ou remove explicitamente conteúdo de skill em conflito ou modificado')
+    .option('--dry-run', 'Mostra o plano sem alterar arquivos');
+  if (action === 'install') command.option('-b, --bundle <names...>', 'Instala bundles; os bundles locais são salvos com core no skills.yaml').option('--method <method>', 'copy ou symlink (padrão: copy ou o último método usado)').option('--manifest <path>', 'Caminho do manifesto do projeto (padrão: skills.yaml)');
+  if (action === 'reconcile') command.option('--manifest <path>', 'Caminho do manifesto do projeto (padrão: skills.yaml)');
   command.action(async (options: Options) => { await runCommand(action, { ...program.opts<Options>(), ...options }); });
 }
 
-common(program.command('list').alias('ls').description('List Colibri-managed installations, or browse the bundled catalog'))
-  .option('--available', 'List available catalog skills instead of managed installations')
+common(program.command('list').alias('ls').description('Lista as instalações gerenciadas pela Colibri ou navega pelo catálogo embutido'))
+  .option('--available', 'Lista as skills disponíveis no catálogo em vez das instalações gerenciadas')
   .action(async (options: Options) => { await runCommand('list', { ...program.opts<Options>(), ...options }); });
 
 try { await program.parseAsync(); }
-catch (error) { console.error(`Error: ${error instanceof Error ? error.message : String(error)}`); process.exitCode ||= 1; }
+catch (error) { console.error(`Erro: ${error instanceof Error ? error.message : String(error)}`); process.exitCode ||= 1; }

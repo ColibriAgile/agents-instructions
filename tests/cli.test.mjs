@@ -19,7 +19,7 @@ test('AC1: help/version work outside the clone and non-TTY wizard explains comma
   assert.equal(version.stdout.trim(), packageVersion);
   const wizard = run([]);
   assert.equal(wizard.status, 1);
-  assert.match(wizard.stderr, /requires a terminal/);
+  assert.match(wizard.stderr, /exige um terminal/);
   const unknown = run(['install', '--unknown']);
   assert.equal(unknown.status, 1);
   assert.match(unknown.stderr, /unknown option/);
@@ -41,7 +41,7 @@ test('AC1,4: JSON catalog and noninteractive confirmation checks create no insta
   assert.deepEqual(plan.items[0].targets, [{ agent: 'claude-code', method: 'copy' }]);
   const confirm = run(['install', '--skill', 'commit', '--agent', 'claude-code']);
   assert.equal(confirm.status, 1);
-  assert.match(confirm.stderr, /pass --yes/);
+  assert.match(confirm.stderr, /passe --yes/);
   assert.deepEqual(await readdir(cwd), []);
 });
 

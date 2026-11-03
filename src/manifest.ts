@@ -37,7 +37,7 @@ export async function readManifest(path: string): Promise<Manifest> {
 
 export async function saveManifest(path: string, manifest: Manifest, bundles: string[], skills: string[]): Promise<void> {
   if ((await readManifest(path)).revision !== manifest.revision) {
-    throw new Error(`Manifest changed since preview: ${path}. Prepare a new preview before applying changes.`);
+    throw new Error(`O manifesto mudou desde a prévia: ${path}. Prepare uma nova prévia antes de aplicar as alterações.`);
   }
   const document = manifest.document.clone();
   document.set('bundles', [...new Set(bundles.length ? ['core', ...bundles] : [])]);

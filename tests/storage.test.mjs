@@ -17,12 +17,12 @@ test('AC7: state rejects corruption and mutation lock prevents concurrent writer
   await saveState(scope, state);
   assert.equal(JSON.parse(await readFile(join(cwd, '.colibri-skills.json'), 'utf8')).version, 1);
   await withScopeLock(scope, async () => {
-    await assert.rejects(() => withScopeLock(scope, async () => {}), /Another Colibri operation/);
+    await assert.rejects(() => withScopeLock(scope, async () => {}), /Outra operação da Colibri/);
   });
   await withScopeLock(scope, async () => {});
   for (const text of ['{broken', '{"version":2,"skills":{}}', '{"version":1,"skills":{"../bad":{}}}']) {
     await writeFile(join(cwd, '.colibri-skills.json'), text);
-    await assert.rejects(() => loadState(scope), /Invalid Colibri state/);
+    await assert.rejects(() => loadState(scope), /Estado da Colibri inválido/);
     assert.equal(await readFile(join(cwd, '.colibri-skills.json'), 'utf8'), text);
   }
 });
@@ -45,7 +45,7 @@ test('R2: no lock path leaves signal listeners behind', async t => {
   await withScopeLock(scope, async () => {});
   await assert.rejects(() => withScopeLock(scope, async () => { throw new Error('action failed'); }), /action failed/);
   await writeFile(join(cwd, '.colibri-skills.json.lock'), 'pid=0\n');
-  await assert.rejects(() => withScopeLock(scope, async () => {}), /Another Colibri operation/);
+  await assert.rejects(() => withScopeLock(scope, async () => {}), /Outra operação da Colibri/);
   assert.deepEqual(listeners(), before);
 });
 
@@ -64,7 +64,7 @@ test('R2: a signal that arrives while the lock is created releases it and exits 
   const result = spawnSync(process.execPath, ['--input-type=module', '-e', script, cwd], { encoding: 'utf8', timeout: 30000 });
   assert.equal(result.status, 143, `${result.stdout}\n${result.stderr}`);
   assert.equal(result.stdout, '');
-  assert.match(result.stderr, /interrupted by SIGTERM/i);
+  assert.match(result.stderr, /interrompida por SIGTERM/i);
   await assert.rejects(() => readFile(join(cwd, '.colibri-skills.json.lock')), { code: 'ENOENT' });
 });
 
@@ -87,12 +87,12 @@ test('R2: a signal after the action finished exits 0 with a warning, and one bef
   const completed = run(false);
   assert.equal(completed.status, 0, `${completed.stdout}\n${completed.stderr}`);
   assert.equal(completed.stdout, 'completed\n');
-  assert.match(completed.stderr, /Received SIGTERM after all changes were applied; the operation completed\./);
+  assert.match(completed.stderr, /Recebido SIGTERM depois de todas as alterações serem aplicadas; a operação foi concluída\./);
   await assert.rejects(() => readFile(join(cwd, '.colibri-skills.json.lock')), { code: 'ENOENT' });
   const failed = run(true);
   assert.equal(failed.status, 143, `${failed.stdout}\n${failed.stderr}`);
-  assert.match(failed.stderr, /interrupted by SIGTERM/i);
-  assert.doesNotMatch(failed.stderr, /after all changes were applied/);
+  assert.match(failed.stderr, /interrompida por SIGTERM/i);
+  assert.doesNotMatch(failed.stderr, /depois de todas as alterações/);
   await assert.rejects(() => readFile(join(cwd, '.colibri-skills.json.lock')), { code: 'ENOENT' });
 });
 
@@ -128,6 +128,6 @@ test('CR-06: a second signal force-exits, releases the lock and reports the sign
   const result = await closed;
   clearTimeout(killer);
   assert.equal(result.code, 130, `${JSON.stringify(result)} ${stderr}`);
-  assert.match(stderr, /second SIGINT/);
+  assert.match(stderr, /segundo SIGINT/);
   await assert.rejects(() => readFile(join(cwd, '.colibri-skills.json.lock')), { code: 'ENOENT' });
 });
