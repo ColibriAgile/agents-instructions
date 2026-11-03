@@ -129,6 +129,7 @@ export async function runCommand(action: string, options: Options, loaded?: Cata
   else throw new Error(`Ação desconhecida: ${action}`);
   if (options.json && options.dryRun) { console.log(JSON.stringify(plan, null, 2)); return; }
   if (!options.json) console.log(preview(plan));
+  if (!options.json && droppedBundles.length) console.log(`Serão removidos do manifesto: ${droppedBundles.join(', ')}. As skills deles continuam instaladas até você rodar reconcile.`);
   if (options.dryRun) { console.log('Simulação: nenhum arquivo foi alterado.'); return; }
   if (!options.yes) {
     if (!process.stdin.isTTY || !process.stdout.isTTY) throw new Error('A confirmação exige um terminal. Revise com --dry-run e depois passe --yes.');

@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { loadCatalog } from '../dist/catalog.js';
-import { prepareInstall } from '../dist/commands.js';
+import { prepareInstall, runCommand } from '../dist/commands.js';
 
 const cli = resolve('bin/colibri-skills.mjs');
 
@@ -115,6 +115,26 @@ test('CR-03: replace mode makes the selected bundles the final manifest state', 
   assert.deepEqual(droppedBundles, ['example']);
   await save();
   assert.match(await readFile(join(project, 'skills.yaml'), 'utf8'), /bundles:\s*\n?\s*(\[core, extra\]|- core\s+- extra)/);
+});
+
+test('CR-03: the preview and --dry-run list the bundles removed from the manifest before applying', async t => {
+  const { project, catalog } = await extraBundleFixture(t);
+  const run = async options => {
+    const lines = [];
+    const original = console.log;
+    console.log = (...args) => lines.push(args.join(' '));
+    try { await runCommand('install', { cwd: project, catalog, agent: ['claude-code'], dryRun: true, ...options }); } finally { console.log = original; }
+    return lines.join('\n');
+  };
+  const before = await readFile(join(project, 'skills.yaml'), 'utf8');
+  const replaced = await run({ bundle: ['extra'], replaceBundles: true });
+  assert.match(replaced, /Serão removidos do manifesto: example\. As skills deles continuam instaladas/);
+  assert.ok(replaced.indexOf('Serão removidos do manifesto') < replaced.indexOf('Simulação'));
+  assert.doesNotMatch(await run({ bundle: ['extra'] }), /Serão removidos/);
+  assert.doesNotMatch(await run({ bundle: ['core', 'example', 'extra'], replaceBundles: true }), /Serão removidos/);
+  assert.doesNotMatch(await run({ bundle: ['extra'], replaceBundles: true, json: true }), /Serão removidos/);
+  assert.equal(await readFile(join(project, 'skills.yaml'), 'utf8'), before);
+  await assert.rejects(() => access(join(project, '.claude')));
 });
 
 test('CR-03: install -b stays additive without replace mode', async t => {
