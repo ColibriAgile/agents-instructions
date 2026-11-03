@@ -32,6 +32,16 @@ export function yamlObject(text: string, label: string): Record<string, unknown>
   return data;
 }
 
+/** Reads the `SKILL.md` frontmatter; each caller adds its own rule (folder name, requested name). */
+export function readSkillMeta(text: string, label: string): { name: string; description: string } {
+  const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text);
+  if (!frontmatter) throw new Error(`Missing frontmatter: ${label}`);
+  const meta = yamlObject(frontmatter[1]!, label);
+  skillName(meta.name);
+  if (typeof meta.name !== 'string' || typeof meta.description !== 'string') throw new Error(`Invalid metadata: ${label}`);
+  return { name: meta.name, description: meta.description };
+}
+
 export async function loadCatalog(root = packageRoot): Promise<Catalog> {
   root = resolve(root);
   const data = yamlObject(await readFile(join(root, 'bundles.yaml'), 'utf8'), 'bundles.yaml');
@@ -44,11 +54,8 @@ export async function loadCatalog(root = packageRoot): Promise<Catalog> {
     let text: string;
     try { text = await readFile(join(path, 'SKILL.md'), 'utf8'); }
     catch (error) { if (isMissing(error)) continue; throw error; }
-    const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text);
-    if (!frontmatter) throw new Error(`Missing frontmatter: ${path}`);
-    const meta = yamlObject(frontmatter[1]!, `${entry.name}/SKILL.md`);
-    skillName(meta.name);
-    if (meta.name !== entry.name || typeof meta.description !== 'string') throw new Error(`Invalid metadata: ${path}`);
+    const meta = readSkillMeta(text, path);
+    if (meta.name !== entry.name) throw new Error(`Invalid metadata: ${path}`);
     skills.push({ name: meta.name, description: meta.description, path, bundles: [], requirements: null });
   }
   const bundles: Record<string, Bundle> = {};

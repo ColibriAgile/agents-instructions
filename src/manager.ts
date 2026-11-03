@@ -4,7 +4,7 @@ import { homedir, tmpdir } from 'node:os';
 import { agents, canonicalPath, targetPath } from './agents.js';
 import type { Agent, Method, Scope } from './agents.js';
 import { backend, jsonArray } from './backend.js';
-import { isMissing, skillName, yamlObject } from './catalog.js';
+import { isMissing, readSkillMeta, skillName } from './catalog.js';
 import type { Catalog, Selection } from './catalog.js';
 import { Interrupted, directoryHash, exists, loadState, onForceExit, saveState, withScopeLock } from './storage.js';
 import type { State } from './storage.js';
@@ -198,9 +198,9 @@ export async function executePlan(plan: Plan, force = false, onSuccess?: () => P
             const path = targetPath(plan.scope, t.agent, item.name);
             const skillFile = join(path, 'SKILL.md');
             const text = await readFile(skillFile, 'utf8');
-            const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text);
-            const metadata = frontmatter ? yamlObject(frontmatter[1]!, skillFile) : undefined;
-            if (metadata?.name !== item.name || typeof metadata?.description !== 'string') throw new Error(`Invalid installed SKILL.md: ${skillFile}`);
+            let name: string | undefined;
+            try { name = readSkillMeta(text, skillFile).name; } catch { /* reported below with the file path */ }
+            if (name !== item.name) throw new Error(`Invalid installed SKILL.md: ${skillFile}`);
             const hash = await directoryHash(path);
             if (!hash) throw new Error(`Backend did not create requested destination: ${path}`);
             const actualMethod = (await lstat(path)).isSymbolicLink() ||

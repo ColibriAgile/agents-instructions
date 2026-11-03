@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { loadCatalog, resolveSelection } from '../dist/catalog.js';
+import { loadCatalog, readSkillMeta, resolveSelection } from '../dist/catalog.js';
 import { readManifest, saveManifest } from '../dist/manifest.js';
 
 test('AC2: bundled catalog is complete and every bundle resolves', async () => {
@@ -50,4 +50,11 @@ test('AC2: invalid manifests and invalid catalog references fail before writes',
   await mkdir(join(dir, 'SKILLS'), { recursive: true });
   await writeFile(join(dir, 'bundles.yaml'), 'repo: test/repo\nbundles:\n  core:\n    description: Core\n    skills: [missing]\n');
   await assert.rejects(() => loadCatalog(dir), /missing/);
+});
+
+test('CR-09: readSkillMeta reads valid frontmatter and rejects missing or incomplete metadata', () => {
+  assert.deepEqual(readSkillMeta('---\r\nname: demo\r\ndescription: Demo\r\n---\r\nBody', 'demo'), { name: 'demo', description: 'Demo' });
+  assert.throws(() => readSkillMeta('No frontmatter', 'demo/SKILL.md'), /Missing frontmatter: demo\/SKILL\.md/);
+  assert.throws(() => readSkillMeta('---\nname: demo\n---\n', 'demo/SKILL.md'), /Invalid metadata: demo\/SKILL\.md/);
+  assert.throws(() => readSkillMeta('---\nname: Bad Name\ndescription: x\n---\n', 'demo'), /Invalid skill name/);
 });
