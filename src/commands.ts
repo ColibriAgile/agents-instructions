@@ -80,24 +80,22 @@ export async function prepareReconcile(catalog: Catalog, options: Options): Prom
 
 export async function installedRows(scope: Scope, filter?: Agent[], catalog?: Catalog) {
   const state = await loadState(scope);
-  const rows = [];
-  for (const [name, skill] of Object.entries(state.skills)) {
-    const targets = [];
-    for (const [key, value] of Object.entries(skill.targets)) {
+  const rows = await Promise.all(Object.entries(state.skills).map(async ([name, skill]) => {
+    const entries = Object.entries(skill.targets).filter(([key]) => !filter || filter.includes(key as Agent));
+    const targets = await Promise.all(entries.map(async ([key, value]) => {
       const agent = key as Agent;
-      if (filter && !filter.includes(agent)) continue;
       const path = targetPath(scope, agent, name);
       const hash = await directoryHash(path);
-      targets.push({ agent, method: value!.method, path, status: hash === null ? 'missing' : hash === value!.hash ? 'installed' : 'modified' });
-    }
+      return { agent, method: value!.method, path, status: hash === null ? 'missing' : hash === value!.hash ? 'installed' : 'modified' };
+    }));
     const requirements = skill.origin === 'catalog' ? catalog?.skills.find(s => s.name === name)?.requirements ?? null : null;
-    if (targets.length) rows.push({ name, source: skill.source, origin: skill.origin, targets, requirements, runtime: requirementInfo(requirements) });
-  }
-  return rows;
+    return { name, source: skill.source, origin: skill.origin, targets, requirements, runtime: requirementInfo(requirements) };
+  }));
+  return rows.filter(row => row.targets.length);
 }
 
-export async function runCommand(action: string, options: Options): Promise<void> {
-  const catalog = await loadCatalog(options.catalog);
+export async function runCommand(action: string, options: Options, loaded?: Catalog): Promise<void> {
+  const catalog = loaded ?? await loadCatalog(options.catalog);
   const scope = scopeFor(options);
   const targetAgents = options.agent?.length ? validateAgents(values(options.agent)) : undefined;
   if (options.method && !['copy', 'symlink'].includes(options.method)) throw new Error('Method must be copy or symlink');

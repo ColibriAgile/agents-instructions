@@ -32,14 +32,16 @@ export async function wizard(initial: Options = {}, initialAction?: string): Pro
     const options: Options = { ...initial, global };
     const scope = scopeFor(options);
     const state = await loadState(scope);
-    const choices = action === 'install' ? Object.keys(agents) as Agent[] : [...new Set((await installedRows(scope)).flatMap(s => s.targets.map(t => t.agent)))];
+    // Read once: the later screens filter these rows in memory. executePlan still revalidates the state under the lock.
+    const rows = action === 'install' ? [] : await installedRows(scope, undefined, catalog);
+    const choices = action === 'install' ? Object.keys(agents) as Agent[] : [...new Set(rows.flatMap(s => s.targets.map(t => t.agent)))];
     if (!choices.length) { p.outro('No Colibri-managed skills in this scope.'); return; }
     options.agent = answer(await p.autocompleteMultiselect<Agent>({
       message: 'Choose agents', placeholder: 'Type to search agents...', required: true,
       options: choices.map(value => ({ value, label: agents[value].label, hint: agents[value].local })),
       initialValues: action === 'install' ? (state.preferences?.agents ?? []).filter(a => choices.includes(a)) : choices,
     }));
-    if (action === 'list') { await runCommand(action, options); p.outro('Done.'); return; }
+    if (action === 'list') { await runCommand(action, options, catalog); p.outro('Done.'); return; }
     if (action === 'install') {
       const mode = answer(await p.select({ message: 'Browse skills', options: [
         { value: 'bundles', label: 'Select bundles', hint: 'grouped by stack and topic' },
@@ -69,15 +71,16 @@ export async function wizard(initial: Options = {}, initialAction?: string): Pro
         { value: 'symlink', label: 'Symlink', hint: 'persistent canonical copy; may fall back to copy' },
       ] }));
     } else {
-      const rows = await installedRows(scope, options.agent as Agent[], catalog);
+      const chosen = new Set<Agent>(options.agent as Agent[]);
+      const visible = rows.map(r => ({ ...r, targets: r.targets.filter(t => chosen.has(t.agent)) })).filter(r => r.targets.length);
       const extraNames = action === 'reconcile' ? new Set(await extras(catalog, scope, options.manifest)) : undefined;
-      const available = rows.filter(s => !extraNames || extraNames.has(s.name));
+      const available = visible.filter(s => !extraNames || extraNames.has(s.name));
       if (!available.length) { p.outro('No matching managed skills.'); return; }
       options.skill = answer(await p.autocompleteMultiselect<string>({ message: action === 'update' ? 'Choose skills to update' : 'Choose skills to remove', required: true,
         options: available.map(s => ({ value: s.name, label: `${s.name} · ${s.runtime.summary}`, hint: s.targets.map(t => `${t.agent}: ${t.status}`).join(', ') })),
       }));
     }
-    await runCommand(action, options);
+    await runCommand(action, options, catalog);
     p.outro('Done.');
   } catch (error) {
     if (error instanceof Cancelled) { p.cancel('Cancelled. No files changed.'); return; }
