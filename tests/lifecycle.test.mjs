@@ -74,6 +74,28 @@ test('AC4–5: symlinks survive partial removal; shared aliases cannot be remove
   await assert.rejects(() => access(join(project, '.agents/skills/demo')), { code: 'ENOENT' });
 });
 
+test('CR-02: removing every target deletes the owned canonical copy and its state entry', async t => {
+  const { project, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  await access(join(project, '.agents/skills/demo/SKILL.md'));
+  run(['remove', '-s', 'demo', '--yes']);
+  await assert.rejects(() => access(join(project, '.agents/skills/demo')), { code: 'ENOENT' });
+  await assert.rejects(() => lstat(join(project, '.claude/skills/demo')), { code: 'ENOENT' });
+  const metadata = JSON.parse(await readFile(join(project, '.colibri-skills.json'), 'utf8'));
+  assert.equal(metadata.skills?.demo, undefined);
+});
+
+test('CR-02: a manually modified canonical copy blocks remove without --force', async t => {
+  const { project, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  const canonical = join(project, '.agents/skills/demo');
+  await writeFile(join(canonical, 'notes.txt'), 'manual edit');
+  assert.match(run(['remove', '-s', 'demo', '--yes'], false).stderr, /modified/i);
+  await access(join(canonical, 'notes.txt'));
+  run(['remove', '-s', 'demo', '--force', '--yes']);
+  await assert.rejects(() => access(canonical), { code: 'ENOENT' });
+});
+
 test('AC6: unmanaged collisions, dry runs, unknown names and manual removals cause no writes', async t => {
   const { project, run } = await fixture(t);
   await mkdir(join(project, '.claude/skills/demo'), { recursive: true });
@@ -186,22 +208,18 @@ test('AC7: a relative global Claude config resolves against the selected working
   await assert.rejects(() => access(join(root, 'relative-config')), { code: 'ENOENT' });
 });
 
-test('AC5–6: retained canonical ownership permits reinstall and still protects edits and unregistered consumers', async t => {
+test('AC5–6: full removal clears canonical ownership, so reinstall works and edits are still protected', async t => {
   const { project, catalog, run } = await fixture(t);
   const canonical = join(project, '.agents/skills/demo');
   run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
-  const unregistered = join(project, '.another-agent/skills/demo');
-  await mkdir(join(project, '.another-agent/skills'), { recursive: true });
-  await symlink(canonical, unregistered, process.platform === 'win32' ? 'junction' : 'dir');
   run(['remove', '-s', 'demo', '--yes']);
-  assert.match(await readFile(join(unregistered, 'SKILL.md'), 'utf8'), /Version one/);
+  await assert.rejects(() => access(canonical), { code: 'ENOENT' });
   assert.deepEqual(JSON.parse(run(['list', '--json']).stdout), []);
   run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
   assert.equal((await lstat(join(project, '.claude/skills/demo'))).isSymbolicLink(), true);
-  run(['remove', '-s', 'demo', '--yes']);
   await writeFile(join(canonical, 'SKILL.md'), 'Manual canonical edit');
   assert.match(run(['install', '-s', 'demo', '-a', 'codex', '--method', 'copy', '--yes'], false).stderr, /modified/i);
-  assert.equal(await readFile(join(unregistered, 'SKILL.md'), 'utf8'), 'Manual canonical edit');
+  assert.equal(await readFile(join(canonical, 'SKILL.md'), 'utf8'), 'Manual canonical edit');
   await writeFile(join(canonical, 'SKILL.md'), await readFile(join(catalog, 'SKILLS/demo/SKILL.md')));
   run(['install', '-s', 'demo', '-a', 'codex', '--method', 'copy', '--yes']);
   assert.match(await readFile(join(canonical, 'SKILL.md'), 'utf8'), /Version one/);

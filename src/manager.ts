@@ -79,6 +79,8 @@ async function guard(plan: Plan, state: State, force: boolean): Promise<void> {
     const canonical = canonicalPath(plan.scope, item.name);
     const paths = new Set(item.targets.map(t => targetPath(plan.scope, t.agent, item.name)));
     if (plan.action !== 'remove' && item.targets.some(t => t.method === 'symlink')) paths.add(canonical);
+    // Removing every target also removes the canonical copy the CLI owns, so a modified copy must block it.
+    if (plan.action === 'remove' && managed?.canonicalHash && Object.keys(managed.targets).every(a => selectedAgents.includes(a as Agent))) paths.add(canonical);
     for (const path of paths) {
       await safeTarget(path, effectiveSource(item.source, plan.scope), plan.scope);
       const owners = Object.entries(managed?.targets ?? {}).filter(([a, t]) =>
@@ -86,7 +88,7 @@ async function guard(plan: Plan, state: State, force: boolean): Promise<void> {
       const ownedCanonical = path === canonical ? managed?.canonicalHash : undefined;
       if (await exists(path) && !force) {
         if (!owners.length && !ownedCanonical) throw new Error(`Unmanaged destination: ${path}. Use --force to replace it explicitly.`);
-        const expected = owners[0]?.[1]?.hash ?? ownedCanonical;
+        const expected = ownedCanonical ?? owners[0]?.[1]?.hash;
         if (await directoryHash(path) !== expected) throw new Error(`Installed skill was modified: ${path}. Use --force to overwrite/remove it.`);
       }
       // Shared directories and canonical symlinks cannot be changed for one consumer only.
@@ -235,6 +237,8 @@ async function removeItem(scope: Scope, item: PlanItem, state: State, interrupti
   const canonical = canonicalPath(scope, item.name);
   // Partial removal is directory-local. The backend lock must remain while another target uses it.
   for (const path of new Set(item.targets.map(t => targetPath(scope, t.agent, item.name)))) await rm(path, { recursive: true, force: true });
+  // The canonical copy is deleted only when no target remains and the CLI recorded owning it.
+  if (!remaining.length && managed.canonicalHash) await rm(canonical, { recursive: true, force: true });
   if (!remaining.length && !await exists(canonical)) {
     // Let the backend maintain its own locks. Never let its cleanup touch an unrelated canonical skill.
     await backend(['remove', item.name, '--agent', ...item.targets.map(t => t.agent), '--yes', ...(scope.global ? ['--global'] : [])], scope, interruption);
