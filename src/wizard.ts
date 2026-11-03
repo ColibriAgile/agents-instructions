@@ -52,7 +52,10 @@ export async function wizard(initial: Options = {}, initialAction?: string): Pro
           options: Object.entries(catalog.bundles).filter(([name]) => global || name !== 'core').map(([value, b]) => ({ value, label: `${value} · ${bundleRequirementHint(catalog, value)}`, hint: `${b.skills.length} skills · ${b.description}` })),
           initialValues: (manifest?.bundles ?? []).filter(b => b !== 'core' && Object.hasOwn(catalog.bundles, b)),
         }));
-        if (!global) p.log.info('core is included in project manifests. Existing bundles and external sources are preserved.');
+        if (!global) {
+          options.replaceBundles = true;
+          p.log.info('core is included in project manifests. The selected bundles replace the manifest bundles; skills and external sources are preserved.');
+        }
       } else if (mode === 'search') {
         const bundle = answer(await p.select({ message: 'Category filter', options: [
           { value: '*', label: 'All skills' }, ...Object.entries(catalog.bundles).map(([value, b]) => ({ value, label: value, hint: b.description })),

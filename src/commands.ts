@@ -14,12 +14,14 @@ import { requirementInfo } from './requirements.js';
 export interface Options {
   cwd?: string; catalog?: string; global?: boolean; agent?: string[]; skill?: string[]; bundle?: string[];
   method?: Method; manifest?: string; yes?: boolean; force?: boolean; dryRun?: boolean; json?: boolean; available?: boolean;
+  /** Internal (wizard only): the selected bundles replace the manifest bundles instead of adding to them. */
+  replaceBundles?: boolean;
 }
 
 export const values = (items?: string[]): string[] => [...new Set((items ?? []).flatMap(i => i.split(',')).filter(Boolean))];
 export const scopeFor = (options: Options): Scope => ({ cwd: resolve(options.cwd ?? '.'), global: options.global ?? false });
 
-export async function prepareInstall(catalog: Catalog, options: Options): Promise<{ plan: Plan; save?: () => Promise<void> }> {
+export async function prepareInstall(catalog: Catalog, options: Options): Promise<{ plan: Plan; save?: () => Promise<void>; droppedBundles: string[] }> {
   const scope = scopeFor(options);
   const state = await loadState(scope);
   const targets = validateAgents(values(options.agent?.length ? options.agent : state.preferences?.agents));
@@ -32,12 +34,14 @@ export async function prepareInstall(catalog: Catalog, options: Options): Promis
   let selection;
   let manifestVersion: Plan['manifest'];
   let save: (() => Promise<void>) | undefined;
+  let droppedBundles: string[] = [];
   if (managed) {
     const path = resolve(scope.cwd, options.manifest ?? 'skills.yaml');
     const manifest = await readManifest(path);
     manifestVersion = { path, revision: manifest.revision };
-    const selectedBundles = [...new Set([...manifest.bundles, ...bundles])];
+    const selectedBundles = [...new Set(options.replaceBundles ? bundles : [...manifest.bundles, ...bundles])];
     if (selectedBundles.length && !selectedBundles.includes('core')) selectedBundles.unshift('core');
+    droppedBundles = manifest.bundles.filter(b => !selectedBundles.includes(b));
     const selectedSkills = [...new Set([...manifest.skills, ...names])];
     selection = resolveSelection(catalog, { manifest: { ...manifest, bundles: selectedBundles, skills: selectedSkills } });
     if (bundles.length || names.length) save = () => saveManifest(path, manifest, selectedBundles, selectedSkills);
@@ -45,7 +49,7 @@ export async function prepareInstall(catalog: Catalog, options: Options): Promis
   } else selection = resolveSelection(catalog, { bundles, skills: names });
   const plan = installPlan(scope, selection, targets, method);
   if (manifestVersion) plan.manifest = manifestVersion;
-  return { plan, save };
+  return { plan, save, droppedBundles };
 }
 
 async function managedExtras(catalog: Catalog, scope: Scope, manifestPath?: string): Promise<{ names: string[]; manifest: NonNullable<Plan['manifest']> }> {
@@ -112,7 +116,8 @@ export async function runCommand(action: string, options: Options): Promise<void
   }
   let plan: Plan;
   let save: (() => Promise<void>) | undefined;
-  if (action === 'install') ({ plan, save } = await prepareInstall(catalog, options));
+  let droppedBundles: string[] = [];
+  if (action === 'install') ({ plan, save, droppedBundles } = await prepareInstall(catalog, options));
   else if (action === 'reconcile') {
     const reconcile = await prepareReconcile(catalog, options);
     if (!reconcile.plan) {
@@ -133,5 +138,8 @@ export async function runCommand(action: string, options: Options): Promise<void
   }
   const result = await executePlan(plan, options.force, save);
   if (options.json) console.log(JSON.stringify(result, null, 2));
-  else console.log(`${result.added} added · ${result.updated} updated · ${result.unchanged} unchanged · ${result.removed} removed`);
+  else {
+    console.log(`${result.added} added · ${result.updated} updated · ${result.unchanged} unchanged · ${result.removed} removed`);
+    if (droppedBundles.length) console.log(`Removed from the manifest: ${droppedBundles.join(', ')}. Their skills stay installed until you run reconcile.`);
+  }
 }

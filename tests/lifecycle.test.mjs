@@ -4,6 +4,8 @@ import { mkdtemp, mkdir, writeFile, readFile, readdir, rm, lstat, access, symlin
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
+import { loadCatalog } from '../dist/catalog.js';
+import { prepareInstall } from '../dist/commands.js';
 
 const cli = resolve('bin/colibri-skills.mjs');
 
@@ -94,6 +96,33 @@ test('CR-02: a manually modified canonical copy blocks remove without --force', 
   await access(join(canonical, 'notes.txt'));
   run(['remove', '-s', 'demo', '--force', '--yes']);
   await assert.rejects(() => access(canonical), { code: 'ENOENT' });
+});
+
+async function extraBundleFixture(t) {
+  const f = await fixture(t);
+  await mkdir(join(f.catalog, 'SKILLS/extra-skill'), { recursive: true });
+  await writeFile(join(f.catalog, 'SKILLS/extra-skill/SKILL.md'), '---\nname: extra-skill\ndescription: Test extra\n---\nBody\n');
+  await writeFile(join(f.catalog, 'bundles.yaml'), 'repo: test/catalog\nbundles:\n  core:\n    description: Mandatory\n    skills: [essential]\n  example:\n    description: Example\n    skills: [demo]\n  extra:\n    description: Extra\n    skills: [extra-skill]\n');
+  await writeFile(join(f.project, 'skills.yaml'), 'bundles: [core, example, extra]\n');
+  return f;
+}
+
+test('CR-03: replace mode makes the selected bundles the final manifest state', async t => {
+  const { project, catalog } = await extraBundleFixture(t);
+  const loaded = await loadCatalog(catalog);
+  const { plan, save, droppedBundles } = await prepareInstall(loaded, { cwd: project, catalog, bundle: ['extra'], agent: ['claude-code'], replaceBundles: true });
+  assert.deepEqual(plan.items.map(i => i.name).sort(), ['essential', 'extra-skill']);
+  assert.deepEqual(droppedBundles, ['example']);
+  await save();
+  assert.match(await readFile(join(project, 'skills.yaml'), 'utf8'), /bundles:\s*\n?\s*(\[core, extra\]|- core\s+- extra)/);
+});
+
+test('CR-03: install -b stays additive without replace mode', async t => {
+  const { project, run } = await extraBundleFixture(t);
+  run(['install', '-b', 'extra', '-a', 'claude-code', '--yes']);
+  await access(join(project, '.claude/skills/demo/SKILL.md'));
+  await access(join(project, '.claude/skills/extra-skill/SKILL.md'));
+  assert.match(await readFile(join(project, 'skills.yaml'), 'utf8'), /example/);
 });
 
 test('AC6: unmanaged collisions, dry runs, unknown names and manual removals cause no writes', async t => {
