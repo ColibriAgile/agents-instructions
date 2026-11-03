@@ -18,7 +18,7 @@ export interface Options {
   replaceBundles?: boolean;
 }
 
-export const values = (items?: string[]): string[] => [...new Set((items ?? []).flatMap(i => i.split(',')).filter(Boolean))];
+export const values = (items?: string[]): string[] => [...new Set((items ?? []).flatMap(i => i.split(',')).map(i => i.trim()).filter(Boolean))];
 export const scopeFor = (options: Options): Scope => ({ cwd: resolve(options.cwd ?? '.'), global: options.global ?? false });
 
 export async function prepareInstall(catalog: Catalog, options: Options): Promise<{ plan: Plan; save?: () => Promise<void>; droppedBundles: string[] }> {

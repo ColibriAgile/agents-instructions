@@ -44,3 +44,8 @@ test('AC1,4: JSON catalog and noninteractive confirmation checks create no insta
   assert.match(confirm.stderr, /pass --yes/);
   assert.deepEqual(await readdir(cwd), []);
 });
+
+test('CR-07: comma separated lists accept spaces after the comma', async () => {
+  const { values } = await import('../dist/commands.js');
+  assert.deepEqual(values(['deep-review, kb', ' codex ,, cursor']), ['deep-review', 'kb', 'codex', 'cursor']);
+});
