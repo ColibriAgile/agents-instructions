@@ -365,6 +365,8 @@ O cursor do teclado é um só (tabindex que anda, `tabindex="0"` só no cartão 
 
 Bootstrap Icons em fonte local (`.bi`). Um ícone por item de menu e por ação; tamanho de 15–16 px em navegação e ações, 14 px dentro de botões. Nada de imagens PNG/GIF para ícones ou carregamento.
 
+**Figuras de comida e de alérgeno (exceção nomeada, perfil Operação).** O Bootstrap Icons não tem as figuras de que um cardápio precisa (pratos, bebidas, sobremesas, os alérgenos). Só nelas, o kit aceita dois conjuntos, sempre em SVG local (do pacote, nunca de CDN), no traço de linha e na cor do texto (`currentColor`): **Phosphor** (`@phosphor-icons/core`), peso light, nas figuras de categoria que o lojista escolhe para a classe (o mesmo conjunto, com as mesmas chaves, no cardápio do tablet e no totem); e **Tabler** outline (`@tabler/icons` ou `@tabler/icons-react`), nos pictogramas de alérgeno, com o Phosphor regular onde o Tabler não tem a figura (ex.: camarão). A figura nunca vem sozinha: a categoria leva o nome, e o alérgeno, o nome dele (no card de produção do perfil Produção, o alérgeno continua só com o nome, seção 10). Ações, navegação, estados e o ícone da estação do KDS continuam só com Bootstrap Icons; nenhum outro conjunto, e nenhuma figura desses dois fora de categoria e alérgeno.
+
 **Código QR** (`.cm-qr`): o SVG ou a imagem do código dentro de `.cm-qr`, que é branco fixo nos dois temas, com 8 px de respiro visual e cantos de 6 px; o código em preto e branco literais, gerado com a própria margem de módulos como zona de silêncio (seção 2, "Código QR na tela"). Ao lado dele, o texto do que o código abre (endereço, instrução), em `.cm-qr__text`.
 
 ## 8. Faça / Não faça
@@ -608,6 +610,7 @@ Vale a regra do movimento com motivo (seção 4). Folha sobe em 260 ms com `--cm
 - No acabamento de vidro, texto direto sobre o fundo, opacidade ou tons de texto escolhidos à mão, vidro abaixo de 22%, ponto claro sob vidro escuro (ou escuro sob vidro claro) no fundo da marca, ou vidro nas telas de produção, nos painéis do perfil Cards e no Admin.
 - Alvo de toque abaixo do mínimo da superfície, ou ação que só aparece no hover.
 - Classes de cor da paleta do Tailwind, propriedades `scale`/`translate` separadas, `:has()` ou `color-mix()` com variável.
+- Ícone de outra família fora das figuras de categoria (Phosphor light) e de alérgeno (Tabler outline), ou figura de comida sem o nome ao lado.
 - Emojis como ícone, inclusive o ícone da estação; `confirm()` e `alert()` do navegador no lugar de uma folha.
 - Quantidade, nome do item ou estado de preparo em cor de destaque ou de estado (quantidade amarela, nome azul) ou piscando: só o atraso pulsa. No perfil Produção, o ícone de estado leva a cor junto com uma forma própria de cada estado (seção 10).
 - Painel da produção com cartões de métrica, número fora da meta indicado só pela cor ou unidade que sai da coluna.
