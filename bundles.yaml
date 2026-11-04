@@ -31,6 +31,7 @@ bundles:
       - atualizar-pacotes-nuget
       - atualizar-testes-mtp
       - colibri-connection-string
+      - colibri-dotnet-aderencia
       - colibri-logging
       - colibri-ports
       - csharp-tests
