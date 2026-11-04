@@ -21,7 +21,7 @@ test('unsupported Node is rejected before the wizard, commands or dependencies l
       assert.ok(result.stderr.includes(`detectado v${version}`));
       assert.match(result.stderr, /Atualize o Node\.js/);
       assert.equal(result.stdout, '');
-      assert.doesNotMatch(result.stderr, /SyntaxError|o backend skills falhou|requires a terminal/);
+      assert.doesNotMatch(result.stderr, /SyntaxError|o backend skills falhou|A confirmação exige um terminal/);
     }
   }
   assert.deepEqual(await readdir(cwd), []);
