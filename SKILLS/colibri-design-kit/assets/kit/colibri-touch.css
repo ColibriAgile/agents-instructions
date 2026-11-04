@@ -1030,6 +1030,10 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
     background: var(--ct-teclado);
     border-top: 1px solid var(--ct-line);
 }
+/* Folha em que o corpo rola (avisos acima do campo): o valor, a bandeja e as ações ficam juntos no rodapé fixo,
+ * num bloco em coluna, para o teclado não rolar para fora da tela. Ali a bandeja vai de ponta a ponta pelo recuo do
+ * rodapé, sem a margem de baixo do corpo. Achado no totem em 03/11/2026. */
+.ct-sheet__foot .ct-teclado { margin: 0 calc(-1 * var(--ct-pad)); }
 .ct-key {
     display: flex;
     align-items: center;
