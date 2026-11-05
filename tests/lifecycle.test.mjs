@@ -147,6 +147,14 @@ test('CR-03: the preview and --dry-run list the bundles removed from the manifes
   await assert.rejects(() => access(join(project, '.claude')));
 });
 
+test('CR-03: replace mode with no selected bundle is refused and leaves the manifest untouched', async t => {
+  const { project, catalog } = await extraBundleFixture(t);
+  const loaded = await loadCatalog(catalog);
+  const before = await readFile(join(project, 'skills.yaml'), 'utf8');
+  await assert.rejects(() => prepareInstall(loaded, { cwd: project, catalog, bundle: [], agent: ['claude-code'], replaceBundles: true }), /ao menos um bundle/);
+  assert.equal(await readFile(join(project, 'skills.yaml'), 'utf8'), before);
+});
+
 test('CR-03: install -b stays additive without replace mode', async t => {
   const { project, run } = await extraBundleFixture(t);
   run(['install', '-b', 'extra', '-a', 'claude-code', '--yes']);

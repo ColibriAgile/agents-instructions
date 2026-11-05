@@ -30,6 +30,8 @@ export async function prepareInstall(catalog: Catalog, options: Options): Promis
   const method = options.method ?? state.preferences?.method ?? 'copy';
   if (!['copy', 'symlink'].includes(method)) throw new Error('O método deve ser copy ou symlink');
   if (scope.global && options.manifest) throw new Error('--manifest só vale para o projeto');
+  // Replacing with nothing would drop every bundle without saving the manifest, and still report them as removed.
+  if (options.replaceBundles && !bundles.length) throw new Error('Substituir os bundles do manifesto exige selecionar ao menos um bundle');
   const managed = !scope.global && (bundles.length > 0 || Boolean(options.manifest) || !names.length);
   let selection;
   let manifestVersion: Plan['manifest'];
