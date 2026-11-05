@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, readFile, readdir, rm, lstat, access, symlink, rename, chmod, readlink, realpath } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { hostname, tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { loadCatalog } from '../dist/catalog.js';
@@ -126,6 +126,29 @@ test('CR-02: the canonical warning names the agents that read the directory and 
   const global = run(['remove', '-g', '-s', 'demo', '--dry-run']).stdout;
   assert.ok(global.includes(`Apaga a cópia canônica ${join(home, '.agents', 'skills', 'demo')}.`), global);
   assert.match(global, /Codex, Cursor, GitHub Copilot e OpenCode/);
+});
+
+test('CR-08: an existing lock reports whether its owner is still running, without ever deleting it', async t => {
+  const { project, run } = await fixture(t);
+  const lock = join(project, '.colibri-skills.json.lock');
+  const finished = spawnSync(process.execPath, ['-e', '']).pid;
+  const install = ['install', '-s', 'demo', '-a', 'claude-code', '--yes'];
+  const cases = [
+    [`pid=${finished}\nhost=${hostname()}\n`, new RegExp(`bloqueio .*\\.colibri-skills\\.json\\.lock é órfão: o processo ${finished} não está mais em execução nesta máquina\\. Apague-o com: ${process.platform === 'win32' ? 'Remove-Item -LiteralPath' : 'rm'} '`)],
+    [`pid=${process.pid}\nhost=${hostname()}\n`, new RegExp(`Outra operação da Colibri \\(PID ${process.pid}\\) está em andamento`)],
+    [`pid=${finished}\nhost=another-machine\n`, /Outra operação da Colibri mantém .*confirme que nenhum processo está rodando/],
+    [`pid=${finished}\n`, /Outra operação da Colibri mantém .*confirme que nenhum processo está rodando/],
+  ];
+  for (const [content, message] of cases) {
+    await writeFile(lock, content);
+    const result = run(install, false);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, message, content);
+    assert.equal(await readFile(lock, 'utf8'), content);
+  }
+  await rm(lock);
+  run(install);
+  await assert.rejects(() => access(lock), { code: 'ENOENT' });
 });
 
 async function extraBundleFixture(t) {

@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { rmSync } from 'node:fs';
 import { mkdir, open, readFile, readdir, readlink, rename, rm, lstat, realpath } from 'node:fs/promises';
-import { homedir } from 'node:os';
+import { homedir, hostname } from 'node:os';
 import { dirname, join, relative } from 'node:path';
 import { agents } from './agents.js';
 import type { Agent, Method, Scope } from './agents.js';
@@ -96,11 +96,12 @@ export async function withScopeLock<T>(scope: Scope, action: (interruption: Abor
     let lock;
     try { lock = await open(path, 'wx', 0o600); acquired = true; }
     catch (error) {
-      if (error instanceof Error && 'code' in error && error.code === 'EEXIST') throw new Error(`Outra operação da Colibri mantém ${path}. Se ela foi interrompida, confirme que nenhum processo está rodando antes de apagar este bloqueio.`);
+      if (error instanceof Error && 'code' in error && error.code === 'EEXIST') throw new Error(await lockOwnerMessage(path));
       throw error;
     }
     try {
-      await lock.writeFile(`pid=${process.pid}\n`);
+      // The host lets a later run tell an orphaned lock from one held on another machine sharing this folder.
+      await lock.writeFile(`pid=${process.pid}\nhost=${hostname()}\n`);
       interruption.signal.throwIfAborted();
       const result = await action(interruption.signal);
       completed = true;
@@ -118,6 +119,27 @@ export async function withScopeLock<T>(scope: Scope, action: (interruption: Abor
       else process.exitCode = signalCodes[signal];
     }
   }
+}
+
+function isRunning(pid: number): boolean {
+  try { process.kill(pid, 0); return true; }
+  // EPERM: the process exists but belongs to another user.
+  catch (error) { return error instanceof Error && 'code' in error && error.code === 'EPERM'; }
+}
+
+/**
+ * Explains an existing lock without ever deleting it: removing an orphan automatically would race with another run
+ * that found the same orphan. Only a lock from this host can be judged; a reused PID errs on the side of "running".
+ */
+async function lockOwnerMessage(path: string): Promise<string> {
+  const generic = `Outra operação da Colibri mantém ${path}. Se ela foi interrompida, confirme que nenhum processo está rodando antes de apagar este bloqueio.`;
+  let text: string;
+  try { text = await readFile(path, 'utf8'); } catch { return generic; }
+  const pid = Number(/^pid=(\d+)$/m.exec(text)?.[1]);
+  if (!pid || /^host=(.*)$/m.exec(text)?.[1] !== hostname()) return generic;
+  if (isRunning(pid)) return `Outra operação da Colibri (PID ${pid}) está em andamento e mantém ${path}. Aguarde ela terminar e rode o comando de novo.`;
+  const command = process.platform === 'win32' ? `Remove-Item -LiteralPath '${path.replaceAll("'", "''")}'` : `rm '${path.replaceAll("'", "'\\''")}'`;
+  return `O bloqueio ${path} é órfão: o processo ${pid} não está mais em execução nesta máquina. Apague-o com: ${command}`;
 }
 
 export async function exists(path: string): Promise<boolean> {
