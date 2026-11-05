@@ -134,10 +134,10 @@ Regras completas: skills `atualizar-testes-mtp` e `csharp-tests`.
 | TST-02 | O `global.json` tem `"test": {"runner": "Microsoft.Testing.Platform"}`. | `raiz.global_json` | comum | 🔴 | — |
 | TST-03 | A cobertura usa `Microsoft.Testing.Extensions.CodeCoverage`. Não há `coverlet.collector`. | `csproj[].packages` | comum | 🟡 | — |
 | TST-04 | Não há resíduo de VSTest (`Microsoft.NET.Test.Sdk`, `xunit.runner.visualstudio`). | `csproj[].packages` | regra da `atualizar-testes-mtp` (as 3 referências ainda têm o resíduo) | ⚪ | — |
-| TST-05 | As asserções usam Shouldly. Quando a suíte tem dublês, eles usam NSubstitute. A referência a NSubstitute só existe quando algum teste a usa: referência sem uso é ❌. | `csproj[].packages`, `sinais.assert_classico`, busca de `Substitute.For` nos testes | comum | 🟡 | NSubstitute: a suíte não tem dublês (nem feitos à mão). |
+| TST-05 | As asserções usam Shouldly. A referência a NSubstitute só existe quando algum teste a usa (`Substitute.For`): referência sem uso é ❌. Dublês feitos à mão são aceitos; a rubrica não exige trocá-los por NSubstitute. | `csproj[].packages`, `sinais.assert_classico`, busca de `Substitute.For` nos testes | comum | 🟡 | NSubstitute: nenhum teste usa `Substitute.For`. |
 | TST-06 | O nome dos projetos de teste tem um sufixo único, igual ao `project-suffix` do `testes.yml`. | `csproj[]` com `is_test`, `workflows[]` | parcial (`.Testes` em DConnect e PIS; `.Tests` no BOC) | ⚪ | — |
 | TST-07 | Os testes de banco leem `DbServer`, `DbName`, `DbUser`, `DbPassword` de variável de ambiente (padrão `DbFixture`). Nenhuma credencial fica no repositório. | leitura das fixtures | regra da `colibri-connection-string` | 🟡 | Não há teste de banco. |
-| TST-08 | Quando a suíte testa log, os testes usam `CoLib.Logging.Fake`. A referência só existe quando algum teste a usa: referência sem uso é ❌. Os utilitários de teste vêm de `CoLib.xUnit` e `CoLib.Shouldly` por `.projitems`. | `csproj[].project_references`, `csproj[].imports`, busca de uso do `CoLib.Logging.Fake` nos testes | parcial (PIS, DConnect) | ⚪ | `CoLib.Logging.Fake`: a suíte não testa log. |
+| TST-08 | A referência a `CoLib.Logging.Fake` só existe quando algum teste a usa: referência sem uso é ❌. Testes de log com captura própria são aceitos. Os utilitários de teste vêm de `CoLib.xUnit` e `CoLib.Shouldly` por `.projitems`. | `csproj[].project_references`, `csproj[].imports`, busca de uso do `CoLib.Logging.Fake` nos testes | parcial (PIS, DConnect) | ⚪ | `CoLib.Logging.Fake`: nenhum teste o usa. |
 
 ## SRV — Serviço do Windows
 
