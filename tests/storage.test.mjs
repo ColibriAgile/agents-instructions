@@ -110,6 +110,29 @@ test('CR-05: directoryHash does not depend on the process locale', async t => {
   assert.equal(hashes.size, 1, [...hashes].join('\n'));
 });
 
+// Two different signals: identical pending POSIX signals may be coalesced into one delivery.
+test('CR-06: a second signal before the lock is acquired never deletes the lock of another operation', { skip: process.platform === 'win32' }, async t => {
+  const cwd = await mkdtemp(join(tmpdir(), 'colibri foreign lock '));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  const lock = join(cwd, '.colibri-skills.json.lock');
+  await writeFile(lock, 'pid=999999\n');
+  const storage = pathToFileURL(resolve('dist/storage.js')).href;
+  const script = `
+    import { withScopeLock } from ${JSON.stringify(storage)};
+    process.on('SIGTERM', () => {});
+    process.on('SIGINT', () => {});
+    process.kill(process.pid, 'SIGTERM');
+    process.kill(process.pid, 'SIGINT');
+    try { await withScopeLock({ cwd: process.argv[1], global: false }, async () => { console.log('action ran'); }); }
+    catch (error) { console.error(error.message); process.exitCode ||= 1; }
+  `;
+  const result = spawnSync(process.execPath, ['--input-type=module', '-e', script, cwd], { encoding: 'utf8', timeout: 30000 });
+  assert.equal(result.status, 130, `${result.stdout}\n${result.stderr}`);
+  assert.equal(result.stdout, '');
+  assert.doesNotMatch(result.stderr, /bloqueio foi liberado/);
+  assert.equal(await readFile(lock, 'utf8'), 'pid=999999\n');
+});
+
 test('CR-06: a second signal force-exits, releases the lock and reports the signal code', { skip: process.platform === 'win32' }, async t => {
   const cwd = await mkdtemp(join(tmpdir(), 'colibri second signal '));
   t.after(() => rm(cwd, { recursive: true, force: true }));
@@ -129,5 +152,6 @@ test('CR-06: a second signal force-exits, releases the lock and reports the sign
   clearTimeout(killer);
   assert.equal(result.code, 130, `${JSON.stringify(result)} ${stderr}`);
   assert.match(stderr, /segundo SIGINT/);
+  assert.match(stderr, /O bloqueio foi liberado/);
   await assert.rejects(() => readFile(join(cwd, '.colibri-skills.json.lock')), { code: 'ENOENT' });
 });

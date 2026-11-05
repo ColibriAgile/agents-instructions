@@ -76,13 +76,16 @@ export async function withScopeLock<T>(scope: Scope, action: (interruption: Abor
   // Default signal termination would skip rollback and leave this lock behind; later signals must not skip them either.
   // Listening before the lock exists closes the window where a signal would orphan it.
   const interruption = new AbortController();
+  let acquired = false;
   const listener = (signal: Interruption) => {
     if (!interruption.signal.aborted) { interruption.abort(new Interrupted(signal)); return; }
     // A second signal means the cooperative rollback is stuck (for example a grandchild still holds the backend pipes).
     const notes: string[] = [];
     for (const hook of forceExitHooks) { try { const note = hook(); if (note) notes.push(note); } catch { /* keep exiting */ } }
-    rmSync(path, { force: true });
-    console.error(`Abortado por um segundo ${signal} sem reversão completa; o bloqueio foi liberado.${notes.length ? ` ${notes.join(' ')}` : ''} Rode list e update para conferir as skills instaladas.`);
+    // Before the exclusive open succeeds, the lock file (if any) belongs to another operation.
+    if (acquired) rmSync(path, { force: true });
+    const released = acquired ? ' O bloqueio foi liberado.' : '';
+    console.error(`Abortado por um segundo ${signal} sem reversão completa.${released}${notes.length ? ` ${notes.join(' ')}` : ''} Rode list e update para conferir as skills instaladas.`);
     process.exit(signalCodes[signal]);
   };
   for (const signal of Object.keys(signalCodes) as Interruption[]) process.on(signal, listener);
@@ -91,7 +94,7 @@ export async function withScopeLock<T>(scope: Scope, action: (interruption: Abor
     await mkdir(dirname(path), { recursive: true });
     interruption.signal.throwIfAborted();
     let lock;
-    try { lock = await open(path, 'wx', 0o600); }
+    try { lock = await open(path, 'wx', 0o600); acquired = true; }
     catch (error) {
       if (error instanceof Error && 'code' in error && error.code === 'EEXIST') throw new Error(`Outra operação da Colibri mantém ${path}. Se ela foi interrompida, confirme que nenhum processo está rodando antes de apagar este bloqueio.`);
       throw error;
@@ -103,7 +106,8 @@ export async function withScopeLock<T>(scope: Scope, action: (interruption: Abor
       completed = true;
       return result;
     }
-    finally { await lock.close(); await rm(path, { force: true }); }
+    // Clear the flag in the same continuation as the removal: afterwards the path may belong to another operation.
+    finally { await lock.close(); await rm(path, { force: true }); acquired = false; }
   }
   finally {
     for (const signal of Object.keys(signalCodes) as Interruption[]) process.off(signal, listener);
