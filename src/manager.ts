@@ -12,7 +12,11 @@ import { readManifest } from './manifest.js';
 import { requirementInfo, unknownNotice } from './requirements.js';
 import type { RequirementInfo } from './requirements.js';
 
-export interface PlanItem extends Selection { targets: { agent: Agent; method: Method }[]; runtime: RequirementInfo }
+export interface PlanItem extends Selection {
+  targets: { agent: Agent; method: Method }[]; runtime: RequirementInfo;
+  /** remove only: the owned canonical copy this item deletes because no managed target remains. */
+  removesCanonical?: string;
+}
 export interface Plan { action: 'install' | 'update' | 'remove'; scope: Scope; items: PlanItem[]; manifest?: { path: string; revision: string | null } }
 export interface Summary { added: number; updated: number; unchanged: number; removed: number }
 
@@ -33,7 +37,10 @@ export async function managedPlan(action: 'update' | 'remove', scope: Scope, cat
       .filter(([agent]) => !targetAgents || targetAgents.includes(agent as Agent))
       .map(([agent, value]) => ({ agent: agent as Agent, method: value!.method }));
     const requirements = skill.origin === 'catalog' ? catalog.skills.find(s => s.name === name)?.requirements ?? null : null;
-    return { name, source: skill.origin === 'catalog' ? catalog.source : skill.source, origin: skill.origin, requirements, runtime: requirementInfo(requirements), targets };
+    // Same rule removeItem applies: the canonical copy goes only with the last target and only when the CLI owns it.
+    const removesAll = Object.keys(skill.targets).every(agent => targets.some(t => t.agent === agent));
+    const removesCanonical = action === 'remove' && removesAll && skill.canonicalHash ? canonicalPath(scope, name) : undefined;
+    return { name, source: skill.origin === 'catalog' ? catalog.source : skill.source, origin: skill.origin, requirements, runtime: requirementInfo(requirements), targets, ...(removesCanonical ? { removesCanonical } : {}) };
   }).filter(s => s.targets.length);
   if (!items.length) throw new Error('Nenhuma skill gerenciada corresponde ao escopo e aos agentes selecionados');
   return { action, scope, items };
@@ -123,6 +130,7 @@ export function preview(plan: Plan): string {
       for (const note of item.runtime.notes) lines.push(`  · ${note}`);
     }
     for (const target of item.targets) lines.push(`  ${agents[target.agent].label} · ${target.method} → ${targetPath(plan.scope, target.agent, item.name)}`);
+    if (item.removesCanonical) lines.push(`  ⚠ Apaga a cópia canônica ${item.removesCanonical}; links criados fora da Colibri que apontam para ela deixam de funcionar.`);
   }
   if (plan.action !== 'remove' && plan.items.some(i => i.runtime.platformStatus === 'unknown')) lines.push(unknownNotice);
   lines.push('Agentes que usam .agents/skills compartilham o mesmo diretório. O modo symlink pode recorrer a copy.');

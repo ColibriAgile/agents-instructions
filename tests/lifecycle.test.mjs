@@ -98,6 +98,16 @@ test('CR-02: a manually modified canonical copy blocks remove without --force', 
   await assert.rejects(() => access(canonical), { code: 'ENOENT' });
 });
 
+test('CR-02: a partial remove keeps the canonical copy and does not warn about it', async t => {
+  const { project, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  assert.doesNotMatch(run(['remove', '-s', 'demo', '-a', 'claude-code', '--dry-run']).stdout, /cópia canônica/);
+  const [planned] = JSON.parse(run(['remove', '-s', 'demo', '-a', 'claude-code', '--dry-run', '--json']).stdout).items;
+  assert.equal(planned.removesCanonical, undefined);
+  run(['remove', '-s', 'demo', '-a', 'claude-code', '--yes']);
+  await access(join(project, '.agents/skills/demo/SKILL.md'));
+});
+
 async function extraBundleFixture(t) {
   const f = await fixture(t);
   await mkdir(join(f.catalog, 'SKILLS/extra-skill'), { recursive: true });
@@ -270,12 +280,23 @@ test('AC7: a relative global Claude config resolves against the selected working
   await assert.rejects(() => access(join(root, 'relative-config')), { code: 'ENOENT' });
 });
 
-test('AC5–6: full removal clears canonical ownership, so reinstall works and edits are still protected', async t => {
+test('AC5–6: full removal warns unregistered consumers, clears canonical ownership, so reinstall works and edits are still protected', async t => {
   const { project, catalog, run } = await fixture(t);
   const canonical = join(project, '.agents/skills/demo');
   run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
-  run(['remove', '-s', 'demo', '--yes']);
+  // A consumer the CLI does not know about: the preview must warn before the canonical copy goes away.
+  const unregistered = join(project, '.another-agent/skills/demo');
+  await mkdir(join(project, '.another-agent/skills'), { recursive: true });
+  await symlink(canonical, unregistered, process.platform === 'win32' ? 'junction' : 'dir');
+  const warning = /Apaga a cópia canônica .*\.agents.skills.demo.*links criados fora da Colibri/;
+  assert.match(run(['remove', '-s', 'demo', '--dry-run']).stdout, warning);
+  const [planned] = JSON.parse(run(['remove', '-s', 'demo', '--dry-run', '--json']).stdout).items;
+  assert.equal(planned.removesCanonical, canonical);
+  assert.match(run(['remove', '-s', 'demo', '--yes']).stdout, warning);
   await assert.rejects(() => access(canonical), { code: 'ENOENT' });
+  // The documented consequence: the unregistered link is left dangling.
+  await lstat(unregistered);
+  await assert.rejects(() => access(join(unregistered, 'SKILL.md')), { code: 'ENOENT' });
   assert.deepEqual(JSON.parse(run(['list', '--json']).stdout), []);
   run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
   assert.equal((await lstat(join(project, '.claude/skills/demo'))).isSymbolicLink(), true);
