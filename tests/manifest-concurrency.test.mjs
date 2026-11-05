@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { loadCatalog } from '../dist/catalog.js';
 import { prepareInstall, prepareReconcile, installedRows } from '../dist/commands.js';
-import { executePlan } from '../dist/manager.js';
+import { executePlan, managedPlan } from '../dist/manager.js';
 import { readManifest } from '../dist/manifest.js';
 
 async function fixture(t) {
@@ -102,4 +102,32 @@ test('E2: a reconcile plan is refused when the manifest changed or was deleted a
     assert.deepEqual(await installed(), ['alpha', 'beta', 'essential']);
     if (change === 'require-extra') assert.deepEqual((await prepareReconcile(catalog, { cwd: project })).extras, []);
   }
+});
+
+test('CR-02: a remove plan is refused when the canonical-copy decision changed after its preview', async t => {
+  const { project, catalog } = await fixture(t);
+  const scope = { cwd: project, global: false };
+  const canonical = join(project, '.agents/skills/alpha');
+  const install = agents => prepareInstall(catalog, { cwd: project, agent: agents, skill: ['alpha'], method: 'symlink' }).then(p => executePlan(p.plan));
+  const remove = agents => managedPlan('remove', scope, catalog, ['alpha'], agents);
+  await install(['claude-code', 'windsurf']);
+
+  // The preview did not warn, but another operation removed the other agent: applying it would delete the canonical copy unannounced.
+  const silent = await remove(['claude-code']);
+  assert.equal(silent.items[0].removesCanonical, undefined);
+  await executePlan(await remove(['windsurf']));
+  await assert.rejects(() => executePlan(silent), /cópia canônica.*mudou desde a prévia/i);
+  await access(join(canonical, 'SKILL.md'));
+  await access(join(project, '.claude/skills/alpha/SKILL.md'));
+
+  // The preview warned, but another agent was added since: the canonical copy would now stay, contradicting the preview.
+  const warned = await remove(['claude-code']);
+  assert.equal(warned.items[0].removesCanonical, canonical);
+  await install(['windsurf']);
+  await assert.rejects(() => executePlan(warned), /cópia canônica.*mudou desde a prévia/i);
+  await access(join(project, '.claude/skills/alpha/SKILL.md'));
+
+  // A preview that still holds applies normally.
+  assert.equal((await executePlan(await remove(['claude-code', 'windsurf']))).removed, 1);
+  await assert.rejects(() => access(canonical), { code: 'ENOENT' });
 });

@@ -199,6 +199,13 @@ export async function executePlan(plan: Plan, force = false, onSuccess?: () => P
       throw new Error(`O manifesto mudou desde a prévia: ${plan.manifest.path}. Prepare uma nova prévia antes de aplicar as alterações.`);
     }
     const state = await loadState(plan.scope);
+    // The preview promised whether each remove deletes the canonical copy; another operation may have changed that since.
+    if (plan.action === 'remove') {
+      for (const item of plan.items) {
+        const now = canonicalRemoval(plan.scope, item.name, state.skills[item.name], item.targets.map(t => t.agent))?.path;
+        if (now !== item.removesCanonical) throw new Error(`A remoção da cópia canônica de ${item.name} mudou desde a prévia: ${canonicalPath(plan.scope, item.name)}. Prepare uma nova prévia antes de aplicar as alterações.`);
+      }
+    }
     await guard(plan, state, force);
     const summary: Summary = { added: 0, updated: 0, unchanged: 0, removed: 0 };
     for (const item of plan.items) {
