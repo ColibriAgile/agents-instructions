@@ -49,7 +49,14 @@ test('CR-UX: commander help and usage errors are in pt-BR with unchanged exit co
   const command = run(['instal']);
   assert.equal(command.status, 1);
   assert.match(command.stderr, /Erro: argumentos demais\. Esperados 0, recebidos 1: instal\./);
-  for (const result of [missing, command]) assert.doesNotMatch(result.stderr, english);
+  const typo = run(['install', '--dry-rn']);
+  assert.equal(typo.status, 1);
+  assert.match(typo.stderr, /Erro: opção desconhecida '--dry-rn'\n\(Você quis dizer --dry-run\?\)/);
+  const extra = run(['list', 'extra']);
+  assert.equal(extra.status, 1);
+  assert.match(extra.stderr, /Erro: argumentos demais para 'list'\. Esperados 0, recebidos 1: extra\./);
+  // Every rule in the translation table is exercised above; commander is pinned, so a changed message fails here.
+  for (const result of [missing, command, typo, extra]) assert.doesNotMatch(result.stderr, english);
   assert.deepEqual(await readdir(cwd), []);
 });
 

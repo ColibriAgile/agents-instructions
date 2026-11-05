@@ -9,15 +9,14 @@ import { wizard } from './wizard.js';
 const pkg = JSON.parse(await readFile(join(packageRoot, 'package.json'), 'utf8')) as { version: string };
 // Commander only ships English texts. Subcommands inherit these settings, so they must be set before program.command().
 const titles: Record<string, string> = { 'Usage:': 'Uso:', 'Options:': 'Opções:', 'Commands:': 'Comandos:', 'Arguments:': 'Argumentos:', 'Global Options:': 'Opções globais:' };
-// Only the usage errors this CLI can produce are rewritten; anything else is shown untouched rather than hidden.
+// Only the usage errors this CLI can produce are rewritten, each covered by a CLI test; anything else is shown untouched.
+// Not reachable today: unknown command (the root has its own action, so commander reports excess arguments), missing
+// required argument (no command declares one) and several suggestions at once (no two options are equally close).
 const usageErrors: [RegExp, string | ((...groups: string[]) => string)][] = [
   [/^error: unknown option '([^']+)'/, "Erro: opção desconhecida '$1'"],
-  [/^error: unknown command '([^']+)'/, "Erro: comando desconhecido '$1'"],
   [/^error: option '([^']+)' argument missing/, "Erro: falta o valor da opção '$1'"],
-  [/^error: missing required argument '([^']+)'/, "Erro: falta o argumento obrigatório '$1'"],
   [/^error: too many arguments(?: for '([^']+)')?\. Expected (\d+) arguments? but got (\d+): (.*)\./,
     (_, command, expected, received, details) => `Erro: argumentos demais${command ? ` para '${command}'` : ''}. Esperados ${expected}, recebidos ${received}: ${details}.`],
-  [/\(Did you mean one of (.+)\?\)/, '(Você quis dizer um destes: $1?)'],
   [/\(Did you mean (.+)\?\)/, '(Você quis dizer $1?)'],
 ];
 function translateUsageError(text: string): string {
