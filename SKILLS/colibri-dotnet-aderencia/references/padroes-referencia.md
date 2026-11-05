@@ -103,7 +103,9 @@ Todos usam `runs-on: [self-hosted, colibri]` e `ColibriAgile/build-tools/...@mas
 
 - `AGENTS.md` nas 3. O `CLAUDE.md` contém `AGENTS.md` (DConnect, BOC) ou é symlink (PIS).
 - `.editorconfig`: DConnect (`charset = utf-8-bom`, `indent_size = 4`, `:42-44`, mais severidades CA, IDE e RCS). O do PIS só tem supressões de regras (RCS, IDE, S, CA), sem `charset` nem `indent_size`.
-- `renovate.json`: DConnect (`config:recommended`, submódulos ligados, `automerge false`).
+- `renovate.json` (coleta de 05/11/2026, no GitHub): as 3 referências têm a mesma base. Os commits deste item e do próximo são o último commit que mudou o `renovate.json` no `master`, não os commits da tabela do início. As linhas valem para estes commits. DConnect `c44bc0fe`, PIS `adf01a1e` e BOC `c7397694`: `git-submodules` na linha 6, categoria `dotnet` na 12, grupo `Microsoft packages` na 17, grupo `System packages` na 26, NuGet com versão exata desligado (DConnect e BOC `:42`, PIS `:35`), `automerge false` e `prConcurrentLimit 15` no fim do arquivo. O DConnect tem 1 regra a mais do produto (TypeScript do `gerar-api`). O BOC desliga o grupo `DevExpress packages`.
+- `renovate.json`, padrão mais novo (REP-08): o Tablet (`1e0d1e6c`), o KDS (`c4932cf2`) e o Menu (`1b42923`, commit «padroniza renovate» do Pitty, 05/11/2026) declaram o `$schema` na linha 2. Nenhuma das 3 referências declara o `$schema`.
+- Janela do `schedule`: ela varia e não é regra. DConnect, PIS e BOC usam `after 2am and before 5am every weekday` nos 2 grupos. Tablet e Menu usam `after 1am and before 8am` no grupo Microsoft e `after 2am and before 5am` no grupo System. O KDS usa `after 1am and before 8am` nos 2 grupos. Fora do conjunto: o `kiosk` usa `after 1am and before 10am`, e a `dotnet-lib` usa `after 2am and before 7am every day`.
 - csproj: `net10.0`, `Nullable enable`, `ImplicitUsings enable`, `LangVersion preview`.
 - `Directory.Build.props`, `Directory.Packages.props` e `TreatWarningsAsErrors`: não existem nas 3.
 - `.gitattributes`: `*.verified.txt eol=lf` (DConnect, PIS).

@@ -15,7 +15,7 @@ Os padrões vêm de 3 repositórios de referência (DConnect, pos-integration-se
 - A única gravação é o arquivo do relatório. Não edite código, csproj, workflow, `.gitmodules` nem configuração do alvo.
 - Não execute `dotnet build`, `dotnet test`, `dotnet publish`, `dotnet restore`, `git submodule update` nem instaladores. A auditoria lê arquivos. Um build mudaria `bin/` e `obj/` e não muda a nota.
 - Não copie o valor de um segredo para o relatório, para o chat nem para a saída de um comando. Indique só o arquivo, a linha e o tipo. Quando você ler um arquivo com segredo, leia só as linhas necessárias e não repita o literal.
-- Uma regra que só 1 ou 2 referências seguem não reprova o alvo. O campo "Força" de cada item diz isto.
+- Uma regra que só 1 ou 2 referências seguem (`parcial`) não reprova o alvo. Uma regra que só os repositórios padronizados por último seguem (`nova`) também não reprova. O campo "Força" de cada item diz isto.
 
 ## Steps
 

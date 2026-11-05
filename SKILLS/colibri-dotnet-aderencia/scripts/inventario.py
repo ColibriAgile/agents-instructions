@@ -299,6 +299,37 @@ def sem_comentarios(texto: str) -> str:
     return re.sub(r"(?m)^[ \t]*//.*$", branco, texto)
 
 
+def resumo_renovate(texto: str, avisos: List[str]) -> Optional[Dict]:
+    """Resume os campos do renovate.json que REP-03 e REP-08 conferem. O arquivo inteiro pode passar de 1500 caracteres."""
+    try:
+        dados = json.loads(texto)
+    except ValueError as erro:
+        avisos.append(f"renovate.json: JSON inválido ({erro}).")
+        return None
+    if not isinstance(dados, dict):
+        avisos.append("renovate.json: a raiz não é um objeto JSON.")
+        return None
+    regras = [r for r in dados.get("packageRules") or [] if isinstance(r, dict)]
+    submodulos = dados.get("git-submodules")
+    return {
+        "schema": dados.get("$schema"),
+        "extends": dados.get("extends"),
+        "dependency_dashboard": dados.get("dependencyDashboard"),
+        "git_submodules": submodulos.get("enabled") if isinstance(submodulos, dict) else None,
+        "categoria_dotnet_ligada": any("dotnet" in (r.get("matchCategories") or []) and r.get("enabled") is True
+                                       for r in regras),
+        "grupos": [{"nome": r["groupName"], "pacotes": r.get("matchPackageNames"), "schedule": r.get("schedule"),
+                    "enabled": r.get("enabled", True)} for r in regras if r.get("groupName")],
+        "nuget_exato_desligado": any("nuget" in (r.get("matchManagers") or []) and r.get("matchCurrentValue")
+                                     and r.get("enabled") is False for r in regras),
+        "automerge": dados.get("automerge"),
+        "pr_hourly_limit": dados.get("prHourlyLimit"),
+        "pr_concurrent_limit": dados.get("prConcurrentLimit"),
+        "schedule_global": dados.get("schedule"),
+        "regras": len(regras),
+    }
+
+
 def inventariar(raiz: Path, limite: int) -> Dict:
     avisos: List[str] = []
     saida: Dict = {
@@ -337,6 +368,8 @@ def inventariar(raiz: Path, limite: int) -> Dict:
             info["linhas"] = texto.count("\n") + 1
         if chave == "directory_build_props" and texto is not None:
             info["props"] = inventario_csproj(raiz, caminho, avisos)["props"]
+        if chave == "renovate" and texto is not None:
+            info["resumo"] = resumo_renovate(texto, avisos)
         saida["raiz_arquivos"][chave] = info
 
     rx = {nome: re.compile(padrao, re.M) for nome, padrao in SINAIS_CS.items()}

@@ -25,7 +25,7 @@ Cada item tem estes campos:
 
 - **Regra**: o que o padrão pede.
 - **Verificar**: o campo do inventário (`inventario.py`) ou a leitura que comprova o status.
-- **Força**: `comum` quando as 3 referências seguem a regra; `parcial` quando só 1 ou 2 seguem. Um item `parcial` não reprova o alvo: ele recebe ⚠️ e vira convenção a escolher.
+- **Força**: `comum` quando as 3 referências seguem a regra; `parcial` quando só 1 ou 2 seguem. Um item `parcial` não reprova o alvo: ele recebe ⚠️ e vira convenção a escolher. `nova` quando nenhuma das 3 referências segue a regra ainda, mas os repositórios padronizados por último seguem. O campo cita esses repositórios. Um item `nova` também não reprova o alvo: ele recebe ⚠️ e vira sugestão.
 - **Sev.**: a severidade padrão quando o status é ❌. Ajuste a severidade só com motivo escrito no relatório.
 - **N/A quando**: a condição em que o item não se aplica ao alvo.
 
@@ -174,11 +174,12 @@ Aplique esta seção só a hosts ASP.NET. Para console, worker e WinForms, marqu
 | --- | --- | --- | --- | --- |
 | REP-01 | Existe `AGENTS.md` com as regras do projeto, e `CLAUDE.md` aponta para ele (conteúdo `AGENTS.md` ou symlink). | `raiz.agents_md`, `raiz.claude_md` | comum | 🟠 |
 | REP-02 | Existe `.editorconfig` com as severidades de análise (CA, IDE, RCS). O DConnect também fixa `charset = utf-8-bom` e `indent_size = 4`. | `raiz.editorconfig` | parcial (existe em DConnect e PIS; só o DConnect fixa charset e indentação) | 🟡 |
-| REP-03 | Existe `renovate.json` com atualização de submódulos. | `raiz.renovate` | parcial (DConnect) | ⚪ |
+| REP-03 | Existe `renovate.json` com a base Colibri: `extends` = `config:recommended`; `dependencyDashboard` = `true`; `git-submodules.enabled` = `true`; 1 regra que liga a categoria `dotnet`; os grupos `Microsoft packages` (`/^Microsoft\\./`) e `System packages` (`/^System\\./`), cada um com `schedule` em dias úteis (`every weekday`); 1 regra que desliga o NuGet com versão exata (`matchManagers` = `nuget`, `matchCurrentValue` = `/^\\[[^,]+\\]$/`, `enabled` = `false`); `automerge` = `false`; `prHourlyLimit` = `15` e `prConcurrentLimit` = `15`. O horário da janela varia entre os repositórios e não reprova o alvo. Uma regra a mais do produto (por exemplo, `DevExpress packages` desligado) não é divergência. | `raiz.renovate.resumo` | comum | ⚪ |
 | REP-04 | Os projetos usam o `TargetFramework` atual da Colibri (`net10.0`; plugin `net10.0-windows`), `Nullable enable` e `ImplicitUsings enable`. | `csproj[].props` | comum | 🟠 (framework antigo); ⚪ (Nullable, ImplicitUsings) |
 | REP-05 | `LangVersion` igual às referências (`preview`). | `csproj[].props`, `raiz.directory_build_props` | comum | ⚪ |
 | REP-06 | Existe `skills.yaml` com os bundles `core` e `dotnet`. | `raiz.skills_yaml` | comum | ⚪ |
 | REP-07 | Se há Verify, o `.gitattributes` tem `*.verified.txt text eol=lf`. | `raiz.gitattributes`, `csproj[].packages` | comum | ⚪ |
+| REP-08 | O `renovate.json` declara `"$schema": "https://docs.renovatebot.com/renovate-schema.json"`. Nos repositórios padronizados, ele é a 1ª chave; a posição não reprova. Com o schema, o editor valida as chaves e completa os nomes. | `raiz.renovate.resumo.schema` | nova (Tablet, KDS e Menu; o Pitty padronizou o Menu em 05/11/2026, commit `1b42923`) | ⚪ |
 
 `Directory.Build.props`, `Directory.Packages.props` e `TreatWarningsAsErrors` não existem nas referências. A presença deles no alvo não é divergência. A `dotnet-lib` tem o próprio `Directory.Build.props`, então as regras do alvo não chegam aos projetos `CoLib.*`.
 

@@ -121,6 +121,44 @@ log.LogError(
         self.assertTrue(wf["publish_args"])
         self.assertEqual(saida["config_json"][0]["linhas"], ['2: "Port": 5002'])
 
+    def test_renovate_resume_a_base_colibri_mesmo_com_arquivo_longo(self) -> None:
+        regras_do_produto = [{"description": f"regra {i} do produto " + "x" * 80, "enabled": False} for i in range(10)]
+        texto = json.dumps({
+            "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+            "extends": ["config:recommended"],
+            "dependencyDashboard": True,
+            "git-submodules": {"enabled": True},
+            "packageRules": [
+                {"matchCategories": ["dotnet"], "enabled": True},
+                {"groupName": "Microsoft packages", "schedule": ["after 1am and before 8am every weekday"],
+                 "matchPackageNames": ["/^Microsoft\\./"]},
+                {"description": "Ignore NuGet packages pinned to an exact version", "matchManagers": ["nuget"],
+                 "matchCurrentValue": "/^\\[[^,]+\\]$/", "enabled": False},
+                *regras_do_produto,
+            ],
+            "automerge": False,
+            "prHourlyLimit": 15,
+            "prConcurrentLimit": 15,
+        }, indent=2)
+        self.assertGreater(len(texto), 1500)
+        escrever(self.raiz, "renovate.json", texto)
+        info = self.rodar()["raiz_arquivos"]["renovate"]
+        self.assertLess(len(info["conteudo"]), 1501)
+        resumo = info["resumo"]
+        self.assertEqual(resumo["schema"], "https://docs.renovatebot.com/renovate-schema.json")
+        self.assertTrue(resumo["git_submodules"])
+        self.assertTrue(resumo["categoria_dotnet_ligada"])
+        self.assertTrue(resumo["nuget_exato_desligado"])
+        self.assertEqual(resumo["grupos"][0]["schedule"], ["after 1am and before 8am every weekday"])
+        self.assertEqual((resumo["automerge"], resumo["pr_hourly_limit"], resumo["pr_concurrent_limit"]), (False, 15, 15))
+        self.assertEqual(resumo["regras"], 13)
+
+    def test_renovate_invalido_vira_aviso(self) -> None:
+        escrever(self.raiz, "renovate.json", "{ isto não é json")
+        saida = self.rodar()
+        self.assertIsNone(saida["raiz_arquivos"]["renovate"]["resumo"])
+        self.assertTrue(any(a.startswith("renovate.json:") for a in saida["avisos"]))
+
     def test_cli_rejeita_pasta_inexistente(self) -> None:
         r = subprocess.run([sys.executable, "-I", str(Path(inventario.__file__)), str(self.raiz / "nao-existe")],
                            capture_output=True, text=True)
