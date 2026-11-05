@@ -25,7 +25,11 @@ export async function backend(args: string[], scope: Scope, interruption?: Abort
     const killTree = () => {
       if (treeKilled || !child.pid || child.exitCode !== null || child.signalCode !== null) return;
       treeKilled = true;
-      spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true });
+      // The system copy, not whatever "taskkill" a restricted or hostile PATH resolves to.
+      const taskkill = process.env.SystemRoot ? join(process.env.SystemRoot, 'System32', 'taskkill.exe') : 'taskkill';
+      const result = spawnSync(taskkill, ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true });
+      // Without the tree kill, at least stop the direct child, as child.kill did before.
+      if (result.error || result.status !== 0) child.kill();
     };
     // Settle only after the child exits, so a rollback never races its writes.
     const forward = () => {
