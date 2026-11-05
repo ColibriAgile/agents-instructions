@@ -13,11 +13,14 @@
 | E7 | Arquivos obrigatórios falham explicitamente; falhas do cache antes da atribuição de `Portas` preservam os defaults, mas não há rollback se uma exceção ocorrer depois dessa atribuição | `_lib/CoLib.Ambiente/Source/ConfiguracoesDeAmbiente.cs:344-359,415-482,484-524,571-573` | observado |
 | E8 | Não há teste direto do parsing real das configurações de ambiente | `DConnect.Testes/Source/InicializadorDoDConnectTestes.cs:28-48,61-106`; `DConnect.Testes/DConnect.Testes.csproj:61-66` | observado como lacuna |
 | E9 | As bibliotecas Colibri são código local, sem versão NuGet comprovada | `DConnect/DConnect.csproj:3,81,106`; `_lib/CoLib.Ambiente/CoLib.Ambiente.csproj:4-19`; `_lib/CoLib.Colibri/Colibri.projitems:12-16` | observado |
+| E10 | `ObterPorta(identificador, valorDefault)` lê `[Portas] <identificador>` do `ncrmaster.cfg` sem argumentos da linha de comando; devolve o padrão sem arquivo, sem chave ou sem inteiro; lança `InvalidOperationException` fora de 1 a 65535 | `dotnet-lib` `a995c682`: `CoLib.Ambiente/Source/ConfiguracoesDeAmbiente.cs:368-392` | observado |
+| E11 | Produtos novos leem a porta própria por nome: KDS `ObterPorta("kds", 6500)`; Tablet e Totem fazem igual | `kds/Kds/Program.cs:27` | observado (KDS); informado pelo time (Tablet, Totem) |
+| E12 | Decisão do time: a porta própria de um produto novo não entra na lib. O PR dotnet-lib#28 (`Portas.Menu`) foi revertido por isso | `dotnet-lib` `a995c682` (revert de `a41ca38d`) | decisão |
 
 ## Lacunas que o alvo deve resolver
 
 - componente que grava ou atualiza `launcher.conexao`;
-- propriedade solicitada que não esteja exposta no contrato Colibri;
+- propriedade solicitada que não esteja exposta no contrato Colibri, quando ela não é a porta própria do alvo (a porta própria usa `ObterPorta`, E10 e E11);
 - necessidade de reproduzir ou substituir a precedência dos argumentos de linha de comando no modo Master;
 - compatibilidade de versão e forma de inclusão das bibliotecas Colibri;
 - cobertura de testes de parsing, propriedade selecionada e ciclo de vida.

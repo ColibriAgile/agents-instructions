@@ -35,7 +35,7 @@ Esta skill orienta a criação de código C# que lê um valor de porta a partir 
 
 **Step 4: Implementar o fluxo**
 
-1. O agente deve usar `CoLib.Ambiente.ConfiguracoesDeAmbiente` como fonte de leitura e selecionar a propriedade de porta comprovada para o requisito.
+1. O agente deve usar `CoLib.Ambiente.ConfiguracoesDeAmbiente` como fonte de leitura. Para a porta em que o próprio alvo escuta, o agente deve usar `ConfiguracoesDeAmbiente.ObterPorta("<nome no manifesto>", <padrão>)` e não deve acrescentar propriedade de porta na `dotnet-lib` (`references/rules.md`, "Porta própria do alvo"). Para a porta de um serviço consumido, o agente deve selecionar a propriedade de porta comprovada para o requisito.
 2. O agente deve usar `IProvedorDeConfiguracoesDoAmbiente` ou `ProvedorDeConfiguracoesDoAmbiente` somente quando a propriedade solicitada existir nesse contrato; para propriedades fora dele, deve usar a adaptação comprovada ou escalar a lacuna.
 3. O agente deve preservar a distinção entre `Portas.<propriedade>` e `Master.Porta`, sem inferir a propriedade pela finalidade do serviço.
 4. O agente deve centralizar o parsing na lib Colibri e manter o código-alvo responsável apenas por obter e expor o valor necessário.
@@ -63,5 +63,5 @@ Esta skill orienta a criação de código C# que lê um valor de porta a partir 
 - Se `ncrmaster.cfg` ou `launcher.boot` forem obrigatórios e estiverem ausentes, o agente deve preservar a falha explícita observada.
 - Se `launcher.conexao` tiver formato ou produtor desconhecido, o agente deve preservar a leitura somente após confirmar o contrato; caso contrário, deve registrar uma lacuna. Trate a atribuição de `Portas` como não transacional: uma falha posterior não implica restauração automática dos defaults.
 - Se o alvo reproduzir a leitura do Master, preserve a precedência de argumentos de linha de comando válidos sobre os valores do INI; registre uma decisão quando essa precedência não fizer parte do requisito.
-- Se a propriedade solicitada não existir no contrato Colibri comprovado, o agente deve registrar a lacuna e escalar a adaptação antes de criar uma nova abstração.
+- Se a propriedade solicitada não existir no contrato Colibri comprovado, o agente deve registrar a lacuna e escalar a adaptação antes de criar uma nova abstração. Exceção: a porta própria do alvo usa `ObterPorta` e não precisa de propriedade na lib.
 - Se o alvo exigir reload, validação de faixa, probe de disponibilidade, retry ou consumo de endpoint, o agente deve tratar isso como decisão fora da evidência extraída.

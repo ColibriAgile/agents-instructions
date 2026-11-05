@@ -24,9 +24,23 @@
 5. A implementação deve selecionar a propriedade exigida pelo alvo; `Portas.DConnect` é apenas o caso concreto observado no DConnect.
 6. `Master.Porta`, com default observado `4000`, é uma propriedade distinta das portas agrupadas em `Portas`.
 
+## Porta própria do alvo
+
+A porta em que o próprio alvo escuta é lida pelo nome cadastrado no Master (E10, E11, E12):
+
+```csharp
+var porta = ConfiguracoesDeAmbiente.ObterPorta("<nome no manifesto>", <padrão do manifesto>);
+```
+
+- O nome e o padrão são os mesmos de `portas[]` do `manifesto.server`.
+- Não acrescente propriedade `Portas.<Produto>` nem constante `PORTA_<PRODUTO>_DEFAULT` na `dotnet-lib` para o alvo. A lib não conhece cada aplicação, e cada produto novo pediria uma linha nova na lib.
+- `ObterPorta` não lê argumentos da linha de comando. A leitura tipada usa `LerComCommandLineArgs`, e com ela um `--<chave> N` muda a porta.
+- `ObterPorta` lança `InvalidOperationException` para valor fora de 1 a 65535. Sem arquivo, sem chave ou sem inteiro, ela devolve o padrão. `PastasDoSistema.Base` pode lançar outra exceção quando a pasta do Colibri não existe. O alvo decide se uma falha para o boot ou usa o padrão com aviso.
+- Produtos que já tinham a propriedade tipada antes desta regra (DConnect, PIS, BOC, D-Mock) podem continuar a usá-la.
+
 ## Propriedades e contratos
 
-- Use `ConfiguracoesDeAmbiente.Portas.<propriedade>` quando o valor estiver no agrupamento `Ports`.
+- Use `ConfiguracoesDeAmbiente.Portas.<propriedade>` para a porta de um serviço consumido que já está no agrupamento `Ports` (por exemplo, `Portas.Cis` e `Portas.Pis`). Para a porta própria do alvo, use `ObterPorta` (seção anterior).
 - Use `ConfiguracoesDeAmbiente.Master.Porta` somente quando o requisito pedir explicitamente a porta do serviço Master.
 - Use `IProvedorDeConfiguracoesDoAmbiente` ou `ProvedorDeConfiguracoesDoAmbiente` quando a propriedade desejada estiver exposta pelo contrato.
 - Para uma propriedade ausente no contrato, confirme a API da revisão Colibri antes de criar uma adaptação.
