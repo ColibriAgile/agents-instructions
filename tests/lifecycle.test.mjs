@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, writeFile, readFile, readdir, rm, lstat, access, symlink, rename, chmod, readlink } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, readdir, rm, lstat, access, symlink, rename, chmod, readlink, realpath } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { loadCatalog } from '../dist/catalog.js';
 import { prepareInstall, runCommand } from '../dist/commands.js';
@@ -429,6 +429,7 @@ async function largeSkill(catalog) {
 const entries = path => readdir(path).then(names => names.length, () => 0);
 
 // Signals the CLI while the backend is filling the destination, or once ready() holds; group mimics Ctrl+C in a terminal.
+// signal may be a list, sent back to back: use different signals, since identical pending POSIX signals may merge into one.
 async function interrupt({ project, catalog, env }, args, signal, total, group = false, ready = async () => {
   const count = await entries(join(project, '.claude/skills/demo'));
   return count > 0 && count < total;
@@ -442,10 +443,35 @@ async function interrupt({ project, catalog, env }, args, signal, total, group =
     if (child.exitCode !== null) assert.fail(`CLI finished before the interruption: ${stderr}`);
     await new Promise(resolve => setTimeout(resolve, 5));
   }
-  if (group) process.kill(-child.pid, signal);
-  else child.kill(signal);
+  for (const each of [signal].flat()) {
+    if (group) process.kill(-child.pid, each);
+    else child.kill(each);
+  }
   return { code: await closed, stderr };
 }
+
+test('CR-06: a second signal during update force-exits, keeps the recovery copy of the previous version and releases the lock', { skip: process.platform === 'win32' }, async t => {
+  const context = await fixture(t);
+  const { root, project, catalog, env, run } = context;
+  const temporary = join(root, 'temporary');
+  await mkdir(temporary);
+  env.TMPDIR = temporary;
+  const total = await largeSkill(catalog);
+  run(['install', '-s', 'demo', '-a', 'claude-code', '--method', 'copy', '--yes']);
+  await writeFile(join(catalog, 'SKILLS/demo/SKILL.md'), '---\nname: demo\ndescription: Test demo\n---\nVersion two\n');
+  const result = await interrupt(context, ['update', '-s', 'demo', '--yes'], ['SIGINT', 'SIGTERM'], total);
+  assert.equal(result.code, 143, result.stderr);
+  assert.match(result.stderr, /segundo SIGTERM sem reversão completa\. O bloqueio foi liberado\./);
+  const recovery = /Cópias de recuperação: (.+?)\. Rode list e update/.exec(result.stderr)?.[1];
+  assert.ok(recovery, result.stderr);
+  assert.equal(await realpath(dirname(recovery)), await realpath(temporary));
+  // The snapshot of the destination holds the complete previous version, ready for a manual restore.
+  const [snapshot, ...others] = await readdir(recovery);
+  assert.deepEqual(others, []);
+  assert.match(await readFile(join(recovery, snapshot, 'SKILL.md'), 'utf8'), /Version one/);
+  assert.equal(await entries(join(recovery, snapshot)), total);
+  await assert.rejects(() => access(join(project, '.colibri-skills.json.lock')), { code: 'ENOENT' });
+});
 
 test('R2: a signal during copy rolls back, releases the lock and allows retry without force', { skip: process.platform === 'win32' }, async t => {
   const context = await fixture(t);
