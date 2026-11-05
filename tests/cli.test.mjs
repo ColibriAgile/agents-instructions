@@ -22,7 +22,34 @@ test('AC1: help/version work outside the clone and non-TTY wizard explains comma
   assert.match(wizard.stderr, /exige um terminal/);
   const unknown = run(['install', '--unknown']);
   assert.equal(unknown.status, 1);
-  assert.match(unknown.stderr, /unknown option/);
+  assert.match(unknown.stderr, /Erro: opção desconhecida '--unknown'/);
+  assert.deepEqual(await readdir(cwd), []);
+});
+
+test('CR-UX: commander help and usage errors are in pt-BR with unchanged exit codes', async t => {
+  const cwd = await mkdtemp(join(tmpdir(), 'colibri CLI pt-BR '));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  const run = args => spawnSync(process.execPath, [entry, ...args], { cwd, encoding: 'utf8' });
+  const english = /Usage:|Options:|Commands:|Arguments:|display help for command|output the version number|Did you mean|error:/;
+  for (const args of [['--help'], ['install', '--help'], ['help', 'remove']]) {
+    const help = run(args);
+    assert.equal(help.status, 0, args.join(' '));
+    assert.doesNotMatch(help.stdout, english, args.join(' '));
+    assert.match(help.stdout, /Uso:/, args.join(' '));
+    assert.match(help.stdout, /Opções:/, args.join(' '));
+  }
+  assert.match(run(['--help']).stdout, /Comandos:[\s\S]*Exibe a ajuda de um comando/);
+  assert.match(run(['install', '--help']).stdout, /-h, --help\s+Exibe a ajuda do comando/);
+  assert.match(run(['--help']).stdout, /-V, --version\s+Exibe o número da versão/);
+  assert.equal(run(['--version']).stdout.trim(), packageVersion);
+  const missing = run(['install', '--method']);
+  assert.equal(missing.status, 1);
+  assert.match(missing.stderr, /Erro: falta o valor da opção '--method <method>'/);
+  // The root has its own action (the wizard), so commander reports a mistyped command as an excess argument.
+  const command = run(['instal']);
+  assert.equal(command.status, 1);
+  assert.match(command.stderr, /Erro: argumentos demais\. Esperados 0, recebidos 1: instal\./);
+  for (const result of [missing, command]) assert.doesNotMatch(result.stderr, english);
   assert.deepEqual(await readdir(cwd), []);
 });
 
