@@ -71,10 +71,10 @@ Regras completas: skill `colibri-ports`.
 
 | ID | Regra | Verificar | Força | Sev. | N/A quando |
 | --- | --- | --- | --- | --- | --- |
-| POR-01 | A porta HTTP do próprio serviço vem de `ConfiguracoesDeAmbiente` (`Portas.<Produto>` ou `ObterPorta("<chave>", <padrão>)`). | `sinais.configuracoes_de_ambiente`, `sinais.obter_porta`, `sinais.kestrel` | comum | 🟠 | O alvo não abre porta HTTP (console, worker, plugin). |
+| POR-01 | A porta HTTP do próprio serviço vem de `ConfiguracoesDeAmbiente.ObterPorta("<nome no Master>", <padrão>)`, como no Tablet, no KDS e no Totem. Um produto que já tinha a propriedade tipada `Portas.<Produto>` na lib antes desta regra (DConnect, PIS, BOC, D-Mock) pode continuar a usá-la. | `sinais.configuracoes_de_ambiente`, `sinais.obter_porta`, `sinais.kestrel` | comum | 🟠 | O alvo não abre porta HTTP (console, worker, plugin). |
 | POR-02 | Não existe porta fixa no código nem em `appsettings*.json`. O `launchSettings.json` pode ter porta de desenvolvimento. | `config_json[]`, `sinais.porta_literal` | comum | 🟠 (código ou `appsettings.json`); ⚪ (`appsettings.Development.json`) | Igual a POR-01. |
 | POR-03 | O `manifesto.server` declara `portas[]` com `nome`, `porta_default` e `servico`. O `nome` é a chave lida no código e o `porta_default` é o padrão do código. | `build.manifestos[].portas` contra o código | comum | 🟠 | Igual a POR-01. |
-| POR-04 | A `dotnet-lib` tem a propriedade tipada `Portas.<Produto>` e a constante `PORTA_<PRODUTO>_DEFAULT`. O alvo usa a propriedade. | leitura de `_lib/CoLib.Ambiente/Source/ConfiguracoesDeAmbiente.cs` | comum | 🟡 | Igual a POR-01. Se o alvo usa `ObterPorta`, marque ⚠️: a correção é um PR na `dotnet-lib`. |
+| POR-04 | Um produto novo não acrescenta a própria porta na `dotnet-lib`: nem propriedade tipada `Portas.<Produto>`, nem constante `PORTA_<PRODUTO>_DEFAULT`. Ele lê a porta pelo nome cadastrado no Master (POR-01). Motivo: a lib não conhece cada aplicação, e uma porta tipada pede uma linha nova na lib para cada produto. A leitura tipada também usa `LerComCommandLineArgs`, e assim um argumento `--<chave>` da linha de comando passa a mudar a porta. | busca no alvo por `Portas.<Produto>`, `PORTA_<PRODUTO>_DEFAULT` e `LerComCommandLineArgs` para a porta própria | comum | 🟡 | Igual a POR-01. O produto já tinha a propriedade tipada antes desta regra (ver POR-01): marque ✅. Se o alvo acrescentou a própria porta na lib, marque ❌: a correção é voltar a `ObterPorta`. Reverter a lib é opcional e pede autorização. |
 | POR-05 | As portas e os hosts de serviços consumidos (CIS, PIS, Master) vêm de `ConfiguracoesDeAmbiente` (`Portas.Cis`, `Portas.Pis`, `UrlPis`, `Master.Servidor`). O alvo não guarda estes valores em configuração própria. | `sinais.porta_literal`, leitura dos clientes HTTP | comum | 🟠 | O alvo não consome serviços Colibri. |
 | POR-06 | A precedência é argumento → variável de ambiente → `config["Port"]` → `ConfiguracoesDeAmbiente`. | leitura do bootstrap | parcial (DConnect, PIS; o BOC usa só `ConfiguracoesDeAmbiente`) | ⚪ | Igual a POR-01. |
 
@@ -198,7 +198,7 @@ O relatório indica, para cada achado, quem executa a correção. Esta skill nã
 | Itens | Executor |
 | --- | --- |
 | LOG-* | skill `colibri-logging` |
-| POR-01 a POR-05 | skill `colibri-ports` (POR-04 também pede PR na `dotnet-lib`) |
+| POR-01 a POR-05 | skill `colibri-ports` |
 | DB-01 a DB-03, DB-07, TST-07 | skill `colibri-connection-string` |
 | TST-01 a TST-04 | skill `atualizar-testes-mtp` |
 | TST-05, TST-06, TST-08 | skills `csharp-tests` e `csharp-tests-refactor` |

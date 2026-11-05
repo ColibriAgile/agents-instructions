@@ -38,9 +38,10 @@ Os caminhos são relativos à raiz de cada repositório. Os números de linha va
 
 ## Portas
 
-- A lib: `_lib/CoLib.Ambiente/Source/ConfiguracoesDeAmbiente.cs`.
-  - `ObterPorta(identificador, valorDefault)`: `:368`. Lança `InvalidOperationException` quando o valor está fora de 1 a 65535.
-  - Master: `master\config\ncrmaster.cfg`, seção `[Portas]`, com `LerComCommandLineArgs` (`:498-505`).
+- A lib: `_lib/CoLib.Ambiente/Source/ConfiguracoesDeAmbiente.cs` (linhas no commit `a995c682` da `dotnet-lib`).
+  - `ObterPorta(identificador, valorDefault)`: `:368`. Lê `[Portas] <identificador>` do `ncrmaster.cfg`, sem argumentos da linha de comando. Lança `InvalidOperationException` quando o valor está fora de 1 a 65535. É a leitura da porta própria de um produto novo (POR-01, POR-04).
+  - Master: `master\config\ncrmaster.cfg`, seção `[Portas]`, com `LerComCommandLineArgs` (`:497-506`) para as propriedades tipadas. Por isso, `--<chave> N` na linha de comando muda essas portas.
+- Leitura por nome: KDS `Kds/Program.cs:27`: `var porta = ConfiguracoesDeAmbiente.ObterPorta("kds", 6500);`. O Tablet e o Totem fazem igual. O Colibri Menu acrescentou `Portas.Menu` na lib (PR dotnet-lib#28) e reverteu (`a995c682`): a porta própria de um produto novo não entra na lib.
   - Cliente: `client\config\launcher.conexao`, objeto `portas` (`:523-599`).
   - `Portas.Cis` (chave `colibri_server`, padrão 4300), `Portas.Pis` (chave `pis`, padrão 5001), `UrlPis` (`:333`), classe `Ports` (`:658-668`).
 - BOC `CboConnect.Sales/Program.cs:75-77`: `var porta = configuracoesDeAmbiente.Portas.CboConnect;` e `ConfigureKestrel(o => o.ListenAnyIP(porta))`.

@@ -92,7 +92,7 @@ O inventário mostra sinais, não prova conformidade. Um sinal com contagem zero
 
 - Se o alvo não tem nenhum `.csproj`, diga que a skill não se aplica e pare.
 - Se o Python não está disponível, faça o inventário com buscas dirigidas (os padrões de busca estão em `SINAIS_CS` de `scripts/inventario.py`) e marque a avaliação como provisória em "Limitações".
-- Se o `_lib` não existe no alvo, os itens que dependem de ler a lib (por exemplo, POR-04) ficam 🔍. Use um clone local da `dotnet-lib` só para leitura, se existir, e registre o commit.
+- Se o `_lib` não existe no alvo, os itens que dependem de ler a lib (por exemplo, a lista de portas tipadas que já existiam, em POR-01 e POR-04) ficam 🔍. Use um clone local da `dotnet-lib` só para leitura, se existir, e registre o commit.
 - Se o alvo tem vários produtos (por exemplo, serviço, plugin e mock), avalie cada executável nos itens POR, PUB e SRV e indique o produto na coluna "Evidência no alvo".
 - Se a rubrica não cobre um padrão que você vê nas 3 referências, registre o padrão em "Limitações" como candidato a item novo da rubrica. Não invente um ID.
 
