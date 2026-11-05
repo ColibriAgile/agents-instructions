@@ -18,11 +18,23 @@ export async function backend(args: string[], scope: Scope, interruption?: Abort
       env: { ...process.env, DISABLE_TELEMETRY: '1', DO_NOT_TRACK: '1', NO_COLOR: '1' },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
+    // Windows has no signals to forward: child.kill only terminates the direct child, and git or a credential
+    // helper started by it would keep running and holding the pipes. Kill the tree once, while the child is
+    // still alive, so the PID cannot have been reused by an unrelated process.
+    let treeKilled = false;
+    const killTree = () => {
+      if (treeKilled || !child.pid || child.exitCode !== null || child.signalCode !== null) return;
+      treeKilled = true;
+      spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true });
+    };
     // Settle only after the child exits, so a rollback never races its writes.
-    const forward = () => { child.kill((interruption!.reason as Interrupted).signal); };
+    const forward = () => {
+      if (process.platform === 'win32') killTree();
+      else child.kill((interruption!.reason as Interrupted).signal);
+    };
     // On a second signal the whole process tree must die: git or a credential helper may still hold the pipes.
     const stopForced = onForceExit(() => {
-      if (process.platform === 'win32' && child.pid) spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true });
+      if (process.platform === 'win32') killTree();
       else child.kill('SIGKILL');
     });
     interruption?.addEventListener('abort', forward, { once: true });
