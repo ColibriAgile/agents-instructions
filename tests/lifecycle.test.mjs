@@ -108,6 +108,26 @@ test('CR-02: a partial remove keeps the canonical copy and does not warn about i
   await access(join(project, '.agents/skills/demo/SKILL.md'));
 });
 
+test('CR-02: the canonical warning names the agents that read the directory and are not being removed', async t => {
+  const { home, project, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'codex', '--method', 'copy', '--yes']);
+  const solo = run(['remove', '-s', 'demo', '--dry-run']).stdout;
+  assert.match(solo, /Apaga a cópia canônica .*Também deixam de ver a skill: Cursor, GitHub Copilot e OpenCode/);
+  assert.doesNotMatch(solo.split('\n').find(line => line.includes('Apaga')), /Codex/);
+  const [planned] = JSON.parse(run(['remove', '-s', 'demo', '--dry-run', '--json']).stdout).items;
+  assert.equal(planned.removesCanonical, join(project, '.agents/skills/demo'));
+  assert.deepEqual(planned.canonicalReaders, ['cursor', 'github-copilot', 'opencode']);
+  run(['remove', '-s', 'demo', '--yes']);
+  run(['install', '-s', 'demo', '-a', 'codex', 'cursor', 'github-copilot', 'opencode', '--method', 'copy', '--yes']);
+  const all = run(['remove', '-s', 'demo', '--dry-run']).stdout;
+  assert.match(all, /Apaga a cópia canônica .*Também deixam de ver a skill os links criados fora da Colibri/);
+  run(['remove', '-s', 'demo', '--yes']);
+  run(['install', '-g', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  const global = run(['remove', '-g', '-s', 'demo', '--dry-run']).stdout;
+  assert.ok(global.includes(`Apaga a cópia canônica ${join(home, '.agents', 'skills', 'demo')}.`), global);
+  assert.match(global, /Codex, Cursor, GitHub Copilot e OpenCode/);
+});
+
 async function extraBundleFixture(t) {
   const f = await fixture(t);
   await mkdir(join(f.catalog, 'SKILLS/extra-skill'), { recursive: true });

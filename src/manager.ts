@@ -7,7 +7,7 @@ import { backend, jsonArray } from './backend.js';
 import { isMissing, readSkillMeta, skillName } from './catalog.js';
 import type { Catalog, Selection } from './catalog.js';
 import { Interrupted, directoryHash, exists, loadState, onForceExit, saveState, withScopeLock } from './storage.js';
-import type { State } from './storage.js';
+import type { ManagedSkill, State } from './storage.js';
 import { readManifest } from './manifest.js';
 import { requirementInfo, unknownNotice } from './requirements.js';
 import type { RequirementInfo } from './requirements.js';
@@ -16,7 +16,22 @@ export interface PlanItem extends Selection {
   targets: { agent: Agent; method: Method }[]; runtime: RequirementInfo;
   /** remove only: the owned canonical copy this item deletes because no managed target remains. */
   removesCanonical?: string;
+  /** remove only: agents not being removed whose skills directory is that canonical copy, so they lose the skill too. */
+  canonicalReaders?: Agent[];
 }
+
+/**
+ * The single rule for deleting the canonical copy on remove: only with the last managed target, and only when the CLI
+ * owns it. The plan, the check under the lock and the removal itself all use it, so the preview cannot disagree.
+ */
+export function canonicalRemoval(scope: Scope, name: string, skill: ManagedSkill | undefined, removed: Agent[]): { path: string; readers: Agent[] } | undefined {
+  if (!skill?.canonicalHash || !Object.keys(skill.targets).every(agent => removed.includes(agent as Agent))) return undefined;
+  const path = canonicalPath(scope, name);
+  const readers = (Object.keys(agents) as Agent[]).filter(agent => !removed.includes(agent) && targetPath(scope, agent, name) === path);
+  return { path, readers };
+}
+
+const listLabels = (names: string[]): string => names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} e ${names.at(-1)}`;
 export interface Plan { action: 'install' | 'update' | 'remove'; scope: Scope; items: PlanItem[]; manifest?: { path: string; revision: string | null } }
 export interface Summary { added: number; updated: number; unchanged: number; removed: number }
 
@@ -37,10 +52,11 @@ export async function managedPlan(action: 'update' | 'remove', scope: Scope, cat
       .filter(([agent]) => !targetAgents || targetAgents.includes(agent as Agent))
       .map(([agent, value]) => ({ agent: agent as Agent, method: value!.method }));
     const requirements = skill.origin === 'catalog' ? catalog.skills.find(s => s.name === name)?.requirements ?? null : null;
-    // Same rule removeItem applies: the canonical copy goes only with the last target and only when the CLI owns it.
-    const removesAll = Object.keys(skill.targets).every(agent => targets.some(t => t.agent === agent));
-    const removesCanonical = action === 'remove' && removesAll && skill.canonicalHash ? canonicalPath(scope, name) : undefined;
-    return { name, source: skill.origin === 'catalog' ? catalog.source : skill.source, origin: skill.origin, requirements, runtime: requirementInfo(requirements), targets, ...(removesCanonical ? { removesCanonical } : {}) };
+    const canonical = action === 'remove' ? canonicalRemoval(scope, name, skill, targets.map(t => t.agent)) : undefined;
+    return {
+      name, source: skill.origin === 'catalog' ? catalog.source : skill.source, origin: skill.origin, requirements, runtime: requirementInfo(requirements), targets,
+      ...(canonical ? { removesCanonical: canonical.path, canonicalReaders: canonical.readers } : {}),
+    };
   }).filter(s => s.targets.length);
   if (!items.length) throw new Error('Nenhuma skill gerenciada corresponde ao escopo e aos agentes selecionados');
   return { action, scope, items };
@@ -87,7 +103,7 @@ async function guard(plan: Plan, state: State, force: boolean): Promise<void> {
     const paths = new Set(item.targets.map(t => targetPath(plan.scope, t.agent, item.name)));
     if (plan.action !== 'remove' && item.targets.some(t => t.method === 'symlink')) paths.add(canonical);
     // Removing every target also removes the canonical copy the CLI owns, so a modified copy must block it.
-    if (plan.action === 'remove' && managed?.canonicalHash && Object.keys(managed.targets).every(a => selectedAgents.includes(a as Agent))) paths.add(canonical);
+    if (plan.action === 'remove' && canonicalRemoval(plan.scope, item.name, managed, selectedAgents)) paths.add(canonical);
     for (const path of paths) {
       await safeTarget(path, effectiveSource(item.source, plan.scope), plan.scope);
       const owners = Object.entries(managed?.targets ?? {}).filter(([a, t]) =>
@@ -130,7 +146,12 @@ export function preview(plan: Plan): string {
       for (const note of item.runtime.notes) lines.push(`  · ${note}`);
     }
     for (const target of item.targets) lines.push(`  ${agents[target.agent].label} · ${target.method} → ${targetPath(plan.scope, target.agent, item.name)}`);
-    if (item.removesCanonical) lines.push(`  ⚠ Apaga a cópia canônica ${item.removesCanonical}; links criados fora da Colibri que apontam para ela deixam de funcionar.`);
+    if (item.removesCanonical) {
+      const readers = (item.canonicalReaders ?? []).map(agent => agents[agent].label);
+      lines.push(`  ⚠ Apaga a cópia canônica ${item.removesCanonical}. Também deixam de ver a skill${readers.length
+        ? `: ${listLabels(readers)}, que leem esse diretório, e os links criados fora da Colibri que apontam para ele.`
+        : ' os links criados fora da Colibri que apontam para ele.'}`);
+    }
   }
   if (plan.action !== 'remove' && plan.items.some(i => i.runtime.platformStatus === 'unknown')) lines.push(unknownNotice);
   lines.push('Agentes que usam .agents/skills compartilham o mesmo diretório. O modo symlink pode recorrer a copy.');
@@ -248,8 +269,7 @@ async function removeItem(scope: Scope, item: PlanItem, state: State, interrupti
   const canonical = canonicalPath(scope, item.name);
   // Partial removal is directory-local. The backend lock must remain while another target uses it.
   for (const path of new Set(item.targets.map(t => targetPath(scope, t.agent, item.name)))) await rm(path, { recursive: true, force: true });
-  // The canonical copy is deleted only when no target remains and the CLI recorded owning it.
-  if (!remaining.length && managed.canonicalHash) await rm(canonical, { recursive: true, force: true });
+  if (canonicalRemoval(scope, item.name, managed, item.targets.map(t => t.agent))) await rm(canonical, { recursive: true, force: true });
   if (!remaining.length && !await exists(canonical)) {
     // Let the backend maintain its own locks. Never let its cleanup touch an unrelated canonical skill.
     await backend(['remove', item.name, '--agent', ...item.targets.map(t => t.agent), '--yes', ...(scope.global ? ['--global'] : [])], scope, interruption);
