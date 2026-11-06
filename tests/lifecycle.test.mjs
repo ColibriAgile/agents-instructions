@@ -60,6 +60,24 @@ test('AC4–6: copy lifecycle preserves another target, manual skills and local 
   assert.deepEqual(Object.keys(metadata.skills.demo.targets), ['codex']);
 });
 
+test('PR23-V3.6: list shows each installed status in pt-BR while --json keeps the contract values', async t => {
+  const { project, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', '--yes']);
+  const skill = join(project, '.claude/skills/demo');
+  const check = (label, value) => {
+    const text = run(['list']).stdout;
+    assert.match(text, new RegExp(`demo · claude-code \\(${label}, copy\\)`), text);
+    assert.doesNotMatch(text, /\b(installed|modified|missing)\b/, text);
+    const [row] = JSON.parse(run(['list', '--json']).stdout);
+    assert.equal(row.targets[0].status, value);
+  };
+  check('instalada', 'installed');
+  await writeFile(join(skill, 'SKILL.md'), 'Manual edit');
+  check('modificada', 'modified');
+  await rm(skill, { recursive: true, force: true });
+  check('ausente', 'missing');
+});
+
 test('AC4–5: symlinks survive partial removal; shared aliases cannot be removed independently', async t => {
   const { project, catalog, run } = await fixture(t);
   run(['install', '-s', 'demo', '-a', 'claude-code', 'codex', '--method', 'symlink', '--yes']);

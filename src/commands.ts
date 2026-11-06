@@ -80,6 +80,11 @@ export async function prepareReconcile(catalog: Catalog, options: Options): Prom
   return { extras: names, plan };
 }
 
+export type InstalledStatus = 'installed' | 'modified' | 'missing';
+
+// The status value is the --json contract; only the text shown on screen is translated.
+export const statusLabel: Record<InstalledStatus, string> = { installed: 'instalada', modified: 'modificada', missing: 'ausente' };
+
 export async function installedRows(scope: Scope, filter?: Agent[], catalog?: Catalog) {
   const state = await loadState(scope);
   const rows = await Promise.all(Object.entries(state.skills).map(async ([name, skill]) => {
@@ -88,7 +93,7 @@ export async function installedRows(scope: Scope, filter?: Agent[], catalog?: Ca
       const agent = key as Agent;
       const path = targetPath(scope, agent, name);
       const hash = await directoryHash(path);
-      return { agent, method: value!.method, path, status: hash === null ? 'missing' : hash === value!.hash ? 'installed' : 'modified' };
+      return { agent, method: value!.method, path, status: (hash === null ? 'missing' : hash === value!.hash ? 'installed' : 'modified') as InstalledStatus };
     }));
     const requirements = skill.origin === 'catalog' ? catalog?.skills.find(s => s.name === name)?.requirements ?? null : null;
     return { name, source: skill.source, origin: skill.origin, targets, requirements, runtime: requirementInfo(requirements) };
@@ -107,7 +112,7 @@ export async function runCommand(action: string, options: Options, loaded?: Cata
     if (options.json) console.log(JSON.stringify(rows, null, 2));
     else {
       for (const row of rows) {
-        console.log('targets' in row ? `${row.name} · ${row.targets.map(t => `${t.agent} (${t.status}, ${t.method})`).join(', ')}` : `${row.name} [${row.bundles.join(', ')}] · ${summarizeDescription(row.description)}`);
+        console.log('targets' in row ? `${row.name} · ${row.targets.map(t => `${t.agent} (${statusLabel[t.status]}, ${t.method})`).join(', ')}` : `${row.name} [${row.bundles.join(', ')}] · ${summarizeDescription(row.description)}`);
         console.log(row.runtime.platformStatus === 'unknown' ? `  ${row.runtime.summary}` : `  ${row.runtime.summary} · ${row.runtime.notice}`);
       }
       if (rows.some(row => row.runtime.platformStatus === 'unknown')) console.log(`\n${unknownNotice}`);
@@ -135,7 +140,7 @@ export async function runCommand(action: string, options: Options, loaded?: Cata
   if (options.dryRun) { console.log('Simulação: nenhum arquivo foi alterado.'); return; }
   if (!options.yes) {
     if (!process.stdin.isTTY || !process.stdout.isTTY) throw new Error('A confirmação exige um terminal. Revise com --dry-run e depois passe --yes.');
-    const confirmed = await p.confirm({ message: options.force ? 'Aplicar estas alterações, substituindo os conflitos (--force)?' : 'Aplicar estas alterações?', initialValue: false });
+    const confirmed = await p.confirm({ message: options.force ? 'Aplicar estas alterações, substituindo os conflitos (--force)?' : 'Aplicar estas alterações?', active: 'Sim', inactive: 'Não', initialValue: false });
     if (p.isCancel(confirmed) || !confirmed) { p.cancel('Cancelado. Nenhum arquivo foi alterado.'); return; }
   }
   const result = await executePlan(plan, options.force, save);

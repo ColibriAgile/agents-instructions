@@ -31,7 +31,7 @@ def snapshot(project):
     return result
 
 
-def scenario(search, preferences=False, requirements=False):
+def scenario(search, preferences=False, requirements=False, update=False):
     with tempfile.TemporaryDirectory(prefix="colibri wizard ") as project:
         if preferences:
             setup = subprocess.run([NODE, str(ENTRY), 'install', '--cwd', project, '--skill', 'commit', '--agent', 'claude-code', 'windsurf', '--method', 'symlink', '--yes'],
@@ -70,7 +70,20 @@ def scenario(search, preferences=False, requirements=False):
 
         try:
             expect("Escolha a ação")
-            if search:
+            if update:
+                send(b"\x1b[B")
+                send(b"\r")
+                expect("Escopo")
+                send(b"\r")
+                expect("Escolha os agentes")
+                send(b"\r")
+                expect("(claude-code: instalada, windsurf: instalada)")
+                assert "Escolha as skills a atualizar" in ANSI.sub('', transcript), transcript
+                output = ANSI.sub('', transcript)
+                assert not re.search(r'\b(installed|modified|missing)\b', output), output
+                send(b"\x03")
+                expect("Cancelado. Nenhum arquivo foi alterado.")
+            elif search:
                 send(b"\r")
                 expect("Escopo")
                 send(b"\r")
@@ -89,7 +102,9 @@ def scenario(search, preferences=False, requirements=False):
                 send(b"\r")
                 expect("Método de instalação")
                 send(b"\r")
-                expect("Aplicar estas alterações?")
+                expect("○ Sim / ● Não")
+                confirm = ANSI.sub('', transcript).split("Aplicar estas alterações?")[-1]
+                assert not re.search(r'\b(Yes|No)\b', confirm), confirm
                 if requirements:
                     output = ANSI.sub('', transcript)
                     assert 'Requer Windows e Delphi XE2' in output, output
@@ -125,5 +140,7 @@ scenario(True)
 print("PASS: agent selection, category, searchable skills, method and declined preview without writes")
 scenario(True, preferences=True)
 print('PASS: stored agents/method are offered on the next run and declining preserves state')
+scenario(False, preferences=True, update=True)
+print('PASS: update screen shows the installed status in pt-BR and Ctrl+C keeps state')
 scenario(True, requirements=True)
 print('PASS: declared Windows/Delphi requirements and host restriction appear before confirmation without writes')

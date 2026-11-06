@@ -2,7 +2,7 @@ import * as p from '@clack/prompts';
 import { agents } from './agents.js';
 import type { Agent, Method } from './agents.js';
 import { loadCatalog } from './catalog.js';
-import { extras, installedRows, runCommand, scopeFor } from './commands.js';
+import { extras, installedRows, runCommand, scopeFor, statusLabel } from './commands.js';
 import type { Options } from './commands.js';
 import { loadState } from './storage.js';
 import { readManifest } from './manifest.js';
@@ -77,7 +77,7 @@ export async function wizard(initial: Options = {}, initialAction?: string): Pro
       const available = visible.filter(s => !extraNames || extraNames.has(s.name));
       if (!available.length) { p.outro('Nenhuma skill gerenciada correspondente.'); return; }
       options.skill = answer(await p.autocompleteMultiselect<string>({ message: action === 'update' ? 'Escolha as skills a atualizar' : 'Escolha as skills a remover', required: true,
-        options: available.map(s => ({ value: s.name, label: `${s.name} · ${s.runtime.summary}`, hint: s.targets.map(t => `${t.agent}: ${t.status}`).join(', ') })),
+        options: available.map(s => ({ value: s.name, label: `${s.name} · ${s.runtime.summary}`, hint: s.targets.map(t => `${t.agent}: ${statusLabel[t.status]}`).join(', ') })),
       }));
     }
     await runCommand(action, options, catalog);
