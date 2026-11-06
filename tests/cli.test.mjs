@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtemp, rm, readdir, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { skillFolderCount } from './skill-folders.mjs';
 
 const entry = resolve('bin/colibri-skills.mjs');
 const { version: packageVersion } = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
@@ -66,7 +67,7 @@ test('AC1,4: JSON catalog and noninteractive confirmation checks create no insta
   const run = args => spawnSync(process.execPath, [entry, ...args], { cwd, encoding: 'utf8' });
   const list = run(['list', '--available', '--json']);
   assert.equal(list.status, 0);
-  assert.equal(JSON.parse(list.stdout).length, 69);
+  assert.equal(JSON.parse(list.stdout).length, skillFolderCount());
   const preview = run(['install', '--skill', 'commit', '--agent', 'claude-code', '--dry-run', '--json']);
   assert.equal(preview.status, 0);
   const plan = JSON.parse(preview.stdout);

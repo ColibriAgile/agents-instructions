@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtemp, mkdir, readFile, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
+import { skillFolderCount } from './skill-folders.mjs';
 
 test('AC8: npm tarball contains resources and installs a real skill outside the clone', async t => {
   const root = await mkdtemp(join(tmpdir(), 'colibri package '));
@@ -41,7 +42,8 @@ test('AC8: npm tarball contains resources and installs a real skill outside the 
     assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
     return result.stdout;
   };
-  assert.equal(JSON.parse(run(['list', '--available', '--json'])).length, 69);
+  // Counted in the source checkout: the installed tarball must carry every skill folder.
+  assert.equal(JSON.parse(run(['list', '--available', '--json'])).length, skillFolderCount());
   const delphi = JSON.parse(run(['list', '--available', '--json'])).find(s => s.name === 'delphi-xe2-build');
   assert.equal(delphi.runtime.summary, 'Requer Windows e Delphi XE2');
   assert.deepEqual(delphi.requirements.platforms, ['win32']);

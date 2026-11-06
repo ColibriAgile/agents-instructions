@@ -5,14 +5,16 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { loadCatalog, readSkillMeta, resolveSelection } from '../dist/catalog.js';
 import { readManifest, saveManifest } from '../dist/manifest.js';
+import { skillFolderCount } from './skill-folders.mjs';
 
 test('AC2: bundled catalog is complete and every bundle resolves', async () => {
   const catalog = await loadCatalog();
-  assert.equal(catalog.skills.length, 69);
+  const expected = skillFolderCount();
+  assert.equal(catalog.skills.length, expected);
   assert.equal(Object.keys(catalog.bundles).length, 12);
   const selection = resolveSelection(catalog, { bundles: Object.keys(catalog.bundles) });
-  assert.equal(selection.length, 69);
-  assert.equal(new Set(selection.map(s => s.name)).size, 69);
+  assert.equal(selection.length, expected);
+  assert.equal(new Set(selection.map(s => s.name)).size, expected);
   assert.throws(() => resolveSelection(catalog, { bundles: ['missing'] }), /Bundle desconhecido/);
   assert.throws(() => resolveSelection(catalog, { skills: ['../escape'] }), /Nome de skill inválido/);
   assert.throws(() => resolveSelection(catalog, { skills: ['missing'] }), /Skill desconhecida/);
