@@ -31,8 +31,16 @@ def snapshot(project):
     return result
 
 
-def scenario(search, preferences=False, requirements=False, update=False):
+def scenario(search, preferences=False, requirements=False, update=False, remove=False, force=False):
     with tempfile.TemporaryDirectory(prefix="colibri wizard ") as project:
+        prepared = preferences or remove or force
+        if remove or force:
+            setup = subprocess.run([NODE, str(ENTRY), 'install', '--cwd', project, '--skill', 'commit', '--agent', 'claude-code', 'windsurf', '--method', 'copy', '--yes'],
+                                   capture_output=True, text=True, env={**os.environ, 'DISABLE_TELEMETRY': '1'})
+            assert setup.returncode == 0, setup.stdout + setup.stderr
+        if remove:
+            (Path(project) / '.claude/skills/commit/SKILL.md').write_text('Manual edit')
+            shutil.rmtree(Path(project) / '.windsurf/skills/commit')
         if preferences:
             setup = subprocess.run([NODE, str(ENTRY), 'install', '--cwd', project, '--skill', 'commit', '--agent', 'claude-code', 'windsurf', '--method', 'symlink', '--yes'],
                                    capture_output=True, text=True, env={**os.environ, 'DISABLE_TELEMETRY': '1'})
@@ -40,7 +48,8 @@ def scenario(search, preferences=False, requirements=False, update=False):
         before = snapshot(project)
         master, slave = pty.openpty()
         fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack('HHHH', 32, 120, 0, 0))
-        process = subprocess.Popen([NODE, str(ENTRY), "--cwd", project], stdin=slave, stdout=slave, stderr=slave,
+        command = ['remove', '-s', 'commit', '--force'] if force else []
+        process = subprocess.Popen([NODE, str(ENTRY), *command, "--cwd", project], stdin=slave, stdout=slave, stderr=slave,
                                    cwd=project, env={**os.environ, "TERM": "xterm-256color", "NO_COLOR": "1"})
         os.close(slave)
         transcript = ""
@@ -69,8 +78,33 @@ def scenario(search, preferences=False, requirements=False, update=False):
             time.sleep(0.07)
 
         try:
-            expect("Escolha a ação")
-            if update:
+            if force:
+                expect("○ Sim / ● Não")
+                confirm = ANSI.sub('', transcript).split("REMOVER")[-1]
+                assert "Aplicar estas alterações, substituindo os conflitos (--force)?" in confirm, confirm
+                assert not re.search(r'\b(Yes|No)\b', confirm), confirm
+                send(b"n")
+                send(b"\r")
+                expect("Cancelado. Nenhum arquivo foi alterado.")
+            else:
+                expect("Escolha a ação")
+            if remove:
+                send(b"\x1b[B")
+                send(b"\x1b[B")
+                send(b"\r")
+                expect("Escopo")
+                send(b"\r")
+                expect("Escolha os agentes")
+                send(b"\r")
+                expect("(claude-code: modificada, windsurf: ausente)")
+                output = ANSI.sub('', transcript)
+                assert "Escolha as skills a remover" in output, output
+                assert not re.search(r'\b(installed|modified|missing)\b', output), output
+                send(b"\x03")
+                expect("Cancelado. Nenhum arquivo foi alterado.")
+            elif force:
+                pass
+            elif update:
                 send(b"\x1b[B")
                 send(b"\r")
                 expect("Escopo")
@@ -124,7 +158,7 @@ def scenario(search, preferences=False, requirements=False, update=False):
                 send(b"\x03")
                 expect("Cancelado. Nenhum arquivo foi alterado.")
             assert process.wait(timeout=5) == 0
-            if not preferences:
+            if not prepared:
                 assert list(Path(project).iterdir()) == [], "Cancellation must not create project artifacts"
             assert snapshot(project) == before, "Declining must leave existing content and preferences unchanged"
         finally:
@@ -142,5 +176,9 @@ scenario(True, preferences=True)
 print('PASS: stored agents/method are offered on the next run and declining preserves state')
 scenario(False, preferences=True, update=True)
 print('PASS: update screen shows the installed status in pt-BR and Ctrl+C keeps state')
+scenario(False, remove=True)
+print('PASS: remove screen shows modificada/ausente in pt-BR and Ctrl+C keeps state')
+scenario(False, force=True)
+print('PASS: remove --force asks Sim / Não with Não selected and declining keeps state')
 scenario(True, requirements=True)
 print('PASS: declared Windows/Delphi requirements and host restriction appear before confirmation without writes')
