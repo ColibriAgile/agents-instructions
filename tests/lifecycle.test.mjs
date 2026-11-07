@@ -1,0 +1,591 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtemp, mkdir, writeFile, readFile, readdir, rm, lstat, access, symlink, rename, chmod, readlink, realpath } from 'node:fs/promises';
+import { hostname, tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
+import { spawn, spawnSync } from 'node:child_process';
+import { loadCatalog } from '../dist/catalog.js';
+import { prepareInstall, runCommand } from '../dist/commands.js';
+
+const cli = resolve('bin/colibri-skills.mjs');
+
+async function fixture(t) {
+  const root = await mkdtemp(join(tmpdir(), 'colibri lifecycle '));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const home = join(root, 'isolated home');
+  const project = join(root, 'project with spaces');
+  const catalog = join(root, 'local catalog');
+  await mkdir(home, { recursive: true });
+  await mkdir(project);
+  for (const name of ['demo', 'essential']) {
+    await mkdir(join(catalog, 'SKILLS', name), { recursive: true });
+    await writeFile(join(catalog, 'SKILLS', name, 'SKILL.md'), `---\nname: ${name}\ndescription: Test ${name}\n---\nVersion one\n`);
+  }
+  await writeFile(join(catalog, 'bundles.yaml'), 'repo: test/catalog\nbundles:\n  core:\n    description: Mandatory\n    skills: [essential]\n  example:\n    description: Example\n    skills: [demo]\n');
+  const env = { ...process.env, HOME: home, USERPROFILE: home, XDG_CONFIG_HOME: join(home, '.config'), NO_COLOR: '1', DISABLE_TELEMETRY: '1' };
+  for (const key of ['CODEX_HOME', 'CLAUDE_CONFIG_DIR', 'SKILLS_CDN_REF', 'APPDATA']) delete env[key];
+  function run(args, success = true) {
+    const result = spawnSync(process.execPath, [cli, ...args, '--catalog', catalog, '--cwd', project], { env, encoding: 'utf8', timeout: 30000 });
+    assert.equal(result.error, undefined);
+    if (success) assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+    else assert.notEqual(result.status, 0, `${result.stdout}\n${result.stderr}`);
+    return result;
+  }
+  return { root, home, project, catalog, env, run };
+}
+
+test('AC4–6: copy lifecycle preserves another target, manual skills and local edits', async t => {
+  const { project, catalog, run } = await fixture(t);
+  await mkdir(join(project, '.claude/skills/manual'), { recursive: true });
+  await writeFile(join(project, '.claude/skills/manual/SKILL.md'), 'User authored');
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'codex', '--yes']);
+  const claude = join(project, '.claude/skills/demo/SKILL.md');
+  const codex = join(project, '.agents/skills/demo/SKILL.md');
+  assert.match(await readFile(claude, 'utf8'), /Version one/);
+  assert.match(await readFile(codex, 'utf8'), /Version one/);
+  assert.equal((await lstat(join(project, '.claude/skills/demo'))).isSymbolicLink(), false);
+  assert.match(run(['install', '-s', 'demo', '-a', 'claude-code', 'codex', '--yes']).stdout, /sem alteração/i);
+  await writeFile(join(catalog, 'SKILLS/demo/SKILL.md'), '---\nname: demo\ndescription: Test demo\n---\nVersion two\n');
+  run(['update', '-s', 'demo', '-a', 'claude-code', '--yes']);
+  assert.match(await readFile(claude, 'utf8'), /Version two/);
+  assert.match(await readFile(codex, 'utf8'), /Version one/);
+  await writeFile(claude, 'Manual edit');
+  assert.match(run(['update', '-s', 'demo', '-a', 'claude-code', '--yes'], false).stderr, /modificada/i);
+  assert.equal(await readFile(claude, 'utf8'), 'Manual edit');
+  run(['remove', '-s', 'demo', '-a', 'claude-code', '--force', '--yes']);
+  await assert.rejects(() => access(claude), { code: 'ENOENT' });
+  assert.match(await readFile(codex, 'utf8'), /Version one/);
+  assert.equal(await readFile(join(project, '.claude/skills/manual/SKILL.md'), 'utf8'), 'User authored');
+  const metadata = JSON.parse(await readFile(join(project, '.colibri-skills.json'), 'utf8'));
+  assert.deepEqual(Object.keys(metadata.skills.demo.targets), ['codex']);
+});
+
+test('PR23-V3.6: list shows each installed status in pt-BR while --json keeps the contract values', async t => {
+  const { project, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', '--yes']);
+  const skill = join(project, '.claude/skills/demo');
+  const check = (label, value) => {
+    const text = run(['list']).stdout;
+    assert.match(text, new RegExp(`demo · claude-code \\(${label}, copy\\)`), text);
+    assert.doesNotMatch(text, /\b(installed|modified|missing)\b/, text);
+    const [row] = JSON.parse(run(['list', '--json']).stdout);
+    assert.equal(row.targets[0].status, value);
+  };
+  check('instalada', 'installed');
+  await writeFile(join(skill, 'SKILL.md'), 'Manual edit');
+  check('modificada', 'modified');
+  await rm(skill, { recursive: true, force: true });
+  check('ausente', 'missing');
+});
+
+test('AC4–5: symlinks survive partial removal; shared aliases cannot be removed independently', async t => {
+  const { project, catalog, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'codex', '--method', 'symlink', '--yes']);
+  assert.equal((await lstat(join(project, '.claude/skills/demo'))).isSymbolicLink(), true);
+  run(['remove', '-s', 'demo', '-a', 'claude-code', '--yes']);
+  assert.match(await readFile(join(project, '.agents/skills/demo/SKILL.md'), 'utf8'), /Version one/);
+  run(['install', '-s', 'demo', '-a', 'cursor', '--yes']);
+  assert.match(run(['remove', '-s', 'demo', '-a', 'codex', '--yes'], false).stderr, /compartilhado/i);
+  await access(join(project, '.agents/skills/demo/SKILL.md'));
+  await writeFile(join(catalog, 'SKILLS/demo/resource.txt'), 'Bundled resource');
+  run(['update', '-s', 'demo', '--yes']);
+  assert.equal(await readFile(join(project, '.agents/skills/demo/resource.txt'), 'utf8'), 'Bundled resource');
+  run(['remove', '-s', 'demo', '--yes']);
+  await assert.rejects(() => access(join(project, '.agents/skills/demo')), { code: 'ENOENT' });
+});
+
+test('CR-02: removing every target deletes the owned canonical copy and its state entry', async t => {
+  const { project, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  await access(join(project, '.agents/skills/demo/SKILL.md'));
+  run(['remove', '-s', 'demo', '--yes']);
+  await assert.rejects(() => access(join(project, '.agents/skills/demo')), { code: 'ENOENT' });
+  await assert.rejects(() => lstat(join(project, '.claude/skills/demo')), { code: 'ENOENT' });
+  const metadata = JSON.parse(await readFile(join(project, '.colibri-skills.json'), 'utf8'));
+  assert.equal(metadata.skills?.demo, undefined);
+});
+
+test('CR-02: a manually modified canonical copy blocks remove without --force', async t => {
+  const { project, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  const canonical = join(project, '.agents/skills/demo');
+  await writeFile(join(canonical, 'notes.txt'), 'manual edit');
+  assert.match(run(['remove', '-s', 'demo', '--yes'], false).stderr, /modificada/i);
+  await access(join(canonical, 'notes.txt'));
+  run(['remove', '-s', 'demo', '--force', '--yes']);
+  await assert.rejects(() => access(canonical), { code: 'ENOENT' });
+});
+
+test('CR-02: a partial remove keeps the canonical copy and does not warn about it', async t => {
+  const { project, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  assert.doesNotMatch(run(['remove', '-s', 'demo', '-a', 'claude-code', '--dry-run']).stdout, /cópia canônica/);
+  const [planned] = JSON.parse(run(['remove', '-s', 'demo', '-a', 'claude-code', '--dry-run', '--json']).stdout).items;
+  assert.equal(planned.removesCanonical, undefined);
+  run(['remove', '-s', 'demo', '-a', 'claude-code', '--yes']);
+  await access(join(project, '.agents/skills/demo/SKILL.md'));
+});
+
+test('CR-02: the canonical warning names the agents that read the directory and are not being removed', async t => {
+  const { home, project, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'codex', '--method', 'copy', '--yes']);
+  const solo = run(['remove', '-s', 'demo', '--dry-run']).stdout;
+  assert.match(solo, /Apaga a cópia canônica .*Também deixam de ver a skill: Cursor, GitHub Copilot e OpenCode/);
+  assert.doesNotMatch(solo.split('\n').find(line => line.includes('Apaga')), /Codex/);
+  const [planned] = JSON.parse(run(['remove', '-s', 'demo', '--dry-run', '--json']).stdout).items;
+  assert.equal(planned.removesCanonical, join(project, '.agents/skills/demo'));
+  assert.deepEqual(planned.canonicalReaders, ['cursor', 'github-copilot', 'opencode']);
+  run(['remove', '-s', 'demo', '--yes']);
+  run(['install', '-s', 'demo', '-a', 'codex', 'cursor', 'github-copilot', 'opencode', '--method', 'copy', '--yes']);
+  const all = run(['remove', '-s', 'demo', '--dry-run']).stdout;
+  assert.match(all, /Apaga a cópia canônica .*Também deixam de ver a skill os links criados fora da Colibri/);
+  run(['remove', '-s', 'demo', '--yes']);
+  run(['install', '-g', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  const global = run(['remove', '-g', '-s', 'demo', '--dry-run']).stdout;
+  assert.ok(global.includes(`Apaga a cópia canônica ${join(home, '.agents', 'skills', 'demo')}.`), global);
+  assert.match(global, /Codex, Cursor, GitHub Copilot e OpenCode/);
+});
+
+test('CR-08: an existing lock reports whether its owner is still running, without ever deleting it', async t => {
+  const { project, run } = await fixture(t);
+  const lock = join(project, '.colibri-skills.json.lock');
+  const finished = spawnSync(process.execPath, ['-e', '']).pid;
+  const install = ['install', '-s', 'demo', '-a', 'claude-code', '--yes'];
+  const cases = [
+    [`pid=${finished}\nhost=${hostname()}\n`, new RegExp(`bloqueio .*\\.colibri-skills\\.json\\.lock é órfão: o processo ${finished} não está mais em execução nesta máquina\\. Apague-o com: ${process.platform === 'win32' ? 'Remove-Item -LiteralPath' : 'rm'} '`)],
+    [`pid=${process.pid}\nhost=${hostname()}\n`, new RegExp(`Outra operação da Colibri \\(PID ${process.pid}\\) está em andamento`)],
+    [`pid=${finished}\nhost=another-machine\n`, /Outra operação da Colibri mantém .*confirme que nenhum processo está rodando/],
+    [`pid=${finished}\n`, /Outra operação da Colibri mantém .*confirme que nenhum processo está rodando/],
+  ];
+  for (const [content, message] of cases) {
+    await writeFile(lock, content);
+    const result = run(install, false);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, message, content);
+    assert.equal(await readFile(lock, 'utf8'), content);
+  }
+  await rm(lock);
+  run(install);
+  await assert.rejects(() => access(lock), { code: 'ENOENT' });
+});
+
+async function extraBundleFixture(t) {
+  const f = await fixture(t);
+  await mkdir(join(f.catalog, 'SKILLS/extra-skill'), { recursive: true });
+  await writeFile(join(f.catalog, 'SKILLS/extra-skill/SKILL.md'), '---\nname: extra-skill\ndescription: Test extra\n---\nBody\n');
+  await writeFile(join(f.catalog, 'bundles.yaml'), 'repo: test/catalog\nbundles:\n  core:\n    description: Mandatory\n    skills: [essential]\n  example:\n    description: Example\n    skills: [demo]\n  extra:\n    description: Extra\n    skills: [extra-skill]\n');
+  await writeFile(join(f.project, 'skills.yaml'), 'bundles: [core, example, extra]\n');
+  return f;
+}
+
+test('CR-03: replace mode makes the selected bundles the final manifest state', async t => {
+  const { project, catalog } = await extraBundleFixture(t);
+  const loaded = await loadCatalog(catalog);
+  const { plan, save, droppedBundles } = await prepareInstall(loaded, { cwd: project, catalog, bundle: ['extra'], agent: ['claude-code'], replaceBundles: true });
+  assert.deepEqual(plan.items.map(i => i.name).sort(), ['essential', 'extra-skill']);
+  assert.deepEqual(droppedBundles, ['example']);
+  await save();
+  assert.match(await readFile(join(project, 'skills.yaml'), 'utf8'), /bundles:\s*\n?\s*(\[core, extra\]|- core\s+- extra)/);
+});
+
+test('CR-03: the preview and --dry-run list the bundles removed from the manifest before applying', async t => {
+  const { project, catalog } = await extraBundleFixture(t);
+  const run = async options => {
+    const lines = [];
+    const original = console.log;
+    console.log = (...args) => lines.push(args.join(' '));
+    try { await runCommand('install', { cwd: project, catalog, agent: ['claude-code'], dryRun: true, ...options }); } finally { console.log = original; }
+    return lines.join('\n');
+  };
+  const before = await readFile(join(project, 'skills.yaml'), 'utf8');
+  const replaced = await run({ bundle: ['extra'], replaceBundles: true });
+  assert.match(replaced, /Serão removidos do manifesto: example\. As skills deles continuam instaladas/);
+  assert.ok(replaced.indexOf('Serão removidos do manifesto') < replaced.indexOf('Simulação'));
+  assert.doesNotMatch(await run({ bundle: ['extra'] }), /Serão removidos/);
+  assert.doesNotMatch(await run({ bundle: ['core', 'example', 'extra'], replaceBundles: true }), /Serão removidos/);
+  assert.doesNotMatch(await run({ bundle: ['extra'], replaceBundles: true, json: true }), /Serão removidos/);
+  assert.equal(await readFile(join(project, 'skills.yaml'), 'utf8'), before);
+  await assert.rejects(() => access(join(project, '.claude')));
+});
+
+test('CR-03: replace mode with no selected bundle is refused and leaves the manifest untouched', async t => {
+  const { project, catalog } = await extraBundleFixture(t);
+  const loaded = await loadCatalog(catalog);
+  const before = await readFile(join(project, 'skills.yaml'), 'utf8');
+  await assert.rejects(() => prepareInstall(loaded, { cwd: project, catalog, bundle: [], agent: ['claude-code'], replaceBundles: true }), /ao menos um bundle/);
+  assert.equal(await readFile(join(project, 'skills.yaml'), 'utf8'), before);
+});
+
+test('CR-03: install -b stays additive without replace mode', async t => {
+  const { project, run } = await extraBundleFixture(t);
+  run(['install', '-b', 'extra', '-a', 'claude-code', '--yes']);
+  await access(join(project, '.claude/skills/demo/SKILL.md'));
+  await access(join(project, '.claude/skills/extra-skill/SKILL.md'));
+  assert.match(await readFile(join(project, 'skills.yaml'), 'utf8'), /example/);
+});
+
+test('CR-04: update does not change the stored install preferences', async t => {
+  const { project, run } = await fixture(t);
+  const preferences = async () => JSON.parse(await readFile(join(project, '.colibri-skills.json'), 'utf8')).preferences;
+  run(['install', '-s', 'essential', '-a', 'codex', '--method', 'symlink', '--yes']);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'codex', 'windsurf', '--method', 'copy', '--yes']);
+  const before = await preferences();
+  assert.equal(before.method, 'copy');
+  run(['update', '-s', 'essential', '-a', 'codex', '--yes']);
+  assert.deepEqual(await preferences(), before);
+  run(['install', '-s', 'essential', '--yes']);
+  await access(join(project, '.windsurf/skills/essential/SKILL.md'));
+});
+
+test('AC6: unmanaged collisions, dry runs, unknown names and manual removals cause no writes', async t => {
+  const { project, run } = await fixture(t);
+  await mkdir(join(project, '.claude/skills/demo'), { recursive: true });
+  const path = join(project, '.claude/skills/demo/SKILL.md');
+  await writeFile(path, 'Manual content');
+  assert.match(run(['install', '-s', 'demo', '-a', 'claude-code', '--yes'], false).stderr, /não gerenciado/i);
+  assert.equal(await readFile(path, 'utf8'), 'Manual content');
+  run(['install', '-s', 'demo', '-a', 'claude-code', '--dry-run']);
+  await assert.rejects(() => access(join(project, '.colibri-skills.json')), { code: 'ENOENT' });
+  run(['install', '-s', '../escape', '-a', 'claude-code', '--yes'], false);
+  run(['remove', '-s', 'demo', '--yes'], false);
+  assert.equal(await readFile(path, 'utf8'), 'Manual content');
+  run(['install', '-s', 'demo', '-a', 'claude-code', '--force', '--yes']);
+  assert.match(await readFile(path, 'utf8'), /Version one/);
+});
+
+test('AC2,6: manifest installation adds core, preserves sources and reconciles only managed extras', async t => {
+  const { project, run } = await fixture(t);
+  await writeFile(join(project, 'skills.yaml'), '# existing\nbundles: [example]\nteam: keep\n');
+  run(['install', '-a', 'claude-code', '--yes']);
+  await access(join(project, '.claude/skills/essential/SKILL.md'));
+  await access(join(project, '.claude/skills/demo/SKILL.md'));
+  await mkdir(join(project, '.claude/skills/manual'), { recursive: true });
+  await writeFile(join(project, '.claude/skills/manual/SKILL.md'), 'Unrelated');
+  await writeFile(join(project, 'skills.yaml'), 'bundles: [core]\nteam: keep\n');
+  const result = run(['reconcile', '--json']);
+  assert.deepEqual(JSON.parse(result.stdout).map(s => s.name), ['demo']);
+  run(['reconcile', '-s', 'demo', '--yes']);
+  await assert.rejects(() => access(join(project, '.claude/skills/demo')), { code: 'ENOENT' });
+  assert.equal(await readFile(join(project, '.claude/skills/manual/SKILL.md'), 'utf8'), 'Unrelated');
+  assert.match(await readFile(join(project, 'skills.yaml'), 'utf8'), /team: keep/);
+});
+
+test('AC7: global operations use isolated home and never write project manifests or metadata', async t => {
+  const { project, home, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', '--global', '--yes']);
+  assert.match(await readFile(join(home, '.claude/skills/demo/SKILL.md'), 'utf8'), /Version one/);
+  await access(join(home, '.colibri-agents/skills.json'));
+  for (const name of ['skills.yaml', '.colibri-skills.json', 'skills-lock.json']) await assert.rejects(() => access(join(project, name)), { code: 'ENOENT' });
+  run(['remove', '-s', 'demo', '--global', '--yes']);
+  await assert.rejects(() => access(join(home, '.claude/skills/demo')), { code: 'ENOENT' });
+});
+
+test('AC4: failed external source is not recorded as installed', async t => {
+  const { project, root, run } = await fixture(t);
+  await writeFile(join(project, 'skills.yaml'), `sources:\n  - repo: ${JSON.stringify(join(root, 'missing source'))}\n    skills: [absent]\n`);
+  run(['install', '-a', 'claude-code', '--yes'], false);
+  let state;
+  try { state = JSON.parse(await readFile(join(project, '.colibri-skills.json'), 'utf8')); }
+  catch (error) { assert.equal(error.code, 'ENOENT'); }
+  assert.equal(state?.skills.absent, undefined);
+});
+
+test('AC5: updating linked targets keeps the chosen method and partial removal leaves the other link working', async t => {
+  const { project, catalog, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'codex', '--method', 'symlink', '--yes']);
+  await writeFile(join(catalog, 'SKILLS/demo/extra.txt'), 'New resource');
+  run(['update', '-s', 'demo', '--yes']);
+  assert.equal((await lstat(join(project, '.claude/skills/demo'))).isSymbolicLink(), true);
+  assert.equal(await readFile(join(project, '.claude/skills/demo/extra.txt'), 'utf8'), 'New resource');
+  run(['install', '-s', 'essential', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  run(['remove', '-s', 'essential', '-a', 'claude-code', '--yes']);
+  assert.match(await readFile(join(project, '.windsurf/skills/essential/SKILL.md'), 'utf8'), /Version one/);
+});
+
+test('AC4,6: local bundle selection saves core without losing external source fields', async t => {
+  const { project, catalog, run } = await fixture(t);
+  await writeFile(join(project, 'skills.yaml'), `# preserve\nsources:\n  - repo: ${JSON.stringify(join(catalog, 'SKILLS'))}\n    skills: [essential]\n    note: retained\nteam: keep\n`);
+  run(['install', '-b', 'example', '-a', 'claude-code', '--yes'], false);
+  // The same skill from two different source intents must be rejected before writes.
+  await assert.rejects(() => access(join(project, '.claude')), { code: 'ENOENT' });
+});
+
+test('AC2,4: saving bundle selection installs external skills and retains source metadata', async t => {
+  const { project, root, run } = await fixture(t);
+  const external = join(root, 'external source');
+  await mkdir(join(external, 'outside'), { recursive: true });
+  await writeFile(join(external, 'outside/SKILL.md'), '---\nname: outside\ndescription: External skill\n---\nExternal content\n');
+  await writeFile(join(project, 'skills.yaml'), `# keep comment\nsources:\n  - repo: ${JSON.stringify(external)}\n    skills: [outside]\n    note: retained\nteam: keep\n`);
+  run(['install', '-b', 'example', '-a', 'claude-code', '--yes']);
+  const manifest = await readFile(join(project, 'skills.yaml'), 'utf8');
+  assert.match(manifest, /- core/);
+  assert.match(manifest, /- example/);
+  assert.match(manifest, /keep comment/);
+  assert.match(manifest, /note: retained/);
+  assert.match(manifest, /team: keep/);
+  assert.match(await readFile(join(project, '.claude/skills/outside/SKILL.md'), 'utf8'), /External content/);
+});
+
+test('AC7: global Claude config override is honored', async t => {
+  const { project, catalog, root, env } = await fixture(t);
+  const config = join(root, 'custom Claude config');
+  const result = spawnSync(process.execPath, [cli, 'install', '-s', 'demo', '-a', 'claude-code', '--global', '--yes', '--catalog', catalog, '--cwd', project], {
+    env: { ...env, CLAUDE_CONFIG_DIR: config }, encoding: 'utf8', timeout: 30000,
+  });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  assert.match(await readFile(join(config, 'skills/demo/SKILL.md'), 'utf8'), /Version one/);
+  await assert.rejects(() => access(join(project, '.claude')), { code: 'ENOENT' });
+});
+
+test('AC7: a relative global Claude config resolves against the selected working directory', async t => {
+  const { root, home, project, catalog, env } = await fixture(t);
+  const result = spawnSync(process.execPath, [cli, 'install', '-s', 'demo', '-a', 'claude-code', '--global', '--yes', '--catalog', catalog, '--cwd', project], {
+    cwd: root, env: { ...env, CLAUDE_CONFIG_DIR: 'relative-config' }, encoding: 'utf8', timeout: 30000,
+  });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  assert.match(await readFile(join(project, 'relative-config/skills/demo/SKILL.md'), 'utf8'), /Version one/);
+  assert.ok(result.stdout.includes(join(project, 'relative-config/skills/demo')));
+  assert.equal(JSON.parse(await readFile(join(home, '.colibri-agents/skills.json'), 'utf8')).skills.demo.targets['claude-code'].method, 'copy');
+  await assert.rejects(() => access(join(root, 'relative-config')), { code: 'ENOENT' });
+});
+
+test('AC5–6: full removal warns unregistered consumers, clears canonical ownership, so reinstall works and edits are still protected', async t => {
+  const { project, catalog, run } = await fixture(t);
+  const canonical = join(project, '.agents/skills/demo');
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  // A consumer the CLI does not know about: the preview must warn before the canonical copy goes away.
+  const unregistered = join(project, '.another-agent/skills/demo');
+  await mkdir(join(project, '.another-agent/skills'), { recursive: true });
+  await symlink(canonical, unregistered, process.platform === 'win32' ? 'junction' : 'dir');
+  const warning = /Apaga a cópia canônica .*\.agents.skills.demo.*links criados fora da Colibri/;
+  assert.match(run(['remove', '-s', 'demo', '--dry-run']).stdout, warning);
+  const [planned] = JSON.parse(run(['remove', '-s', 'demo', '--dry-run', '--json']).stdout).items;
+  assert.equal(planned.removesCanonical, canonical);
+  assert.match(run(['remove', '-s', 'demo', '--yes']).stdout, warning);
+  await assert.rejects(() => access(canonical), { code: 'ENOENT' });
+  // The documented consequence: the unregistered link is left dangling.
+  await lstat(unregistered);
+  await assert.rejects(() => access(join(unregistered, 'SKILL.md')), { code: 'ENOENT' });
+  assert.deepEqual(JSON.parse(run(['list', '--json']).stdout), []);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  assert.equal((await lstat(join(project, '.claude/skills/demo'))).isSymbolicLink(), true);
+  await writeFile(join(canonical, 'SKILL.md'), 'Manual canonical edit');
+  assert.match(run(['install', '-s', 'demo', '-a', 'codex', '--method', 'copy', '--yes'], false).stderr, /modificada/i);
+  assert.equal(await readFile(join(canonical, 'SKILL.md'), 'utf8'), 'Manual canonical edit');
+  await writeFile(join(canonical, 'SKILL.md'), await readFile(join(catalog, 'SKILLS/demo/SKILL.md')));
+  run(['install', '-s', 'demo', '-a', 'codex', '--method', 'copy', '--yes']);
+  assert.match(await readFile(join(canonical, 'SKILL.md'), 'utf8'), /Version one/);
+});
+
+test('AC5: external source updates use the recorded source and keep the installation method', async t => {
+  const { root, project, run } = await fixture(t);
+  const external = join(root, 'external versioned');
+  await mkdir(join(external, 'outside'), { recursive: true });
+  const skill = join(external, 'outside/SKILL.md');
+  await writeFile(skill, '---\nname: outside\ndescription: External source\n---\nExternal version one\n');
+  await writeFile(join(project, 'skills.yaml'), `sources:\n  - repo: ${JSON.stringify(external)}\n    skills: [outside]\n`);
+  run(['install', '-a', 'claude-code', 'windsurf', '--method', 'symlink', '--yes']);
+  await writeFile(skill, '---\nname: outside\ndescription: External source\n---\nExternal version two\n');
+  run(['update', '-s', 'outside', '--yes']);
+  assert.match(await readFile(join(project, '.claude/skills/outside/SKILL.md'), 'utf8'), /External version two/);
+  assert.match(await readFile(join(project, '.windsurf/skills/outside/SKILL.md'), 'utf8'), /External version two/);
+  assert.equal((await lstat(join(project, '.claude/skills/outside'))).isSymbolicLink(), true);
+  const state = JSON.parse(await readFile(join(project, '.colibri-skills.json'), 'utf8'));
+  assert.equal(state.skills.outside.source, external);
+  assert.equal(state.skills.outside.origin, 'external');
+  assert.equal(state.skills.outside.targets['claude-code'].method, 'symlink');
+});
+
+
+test('R1: force install refuses a source alias of the destination without deleting its files', async t => {
+  const { project, catalog, run } = await fixture(t);
+  const destination = join(project, '.claude/skills');
+  await mkdir(join(project, '.claude'));
+  await rename(join(catalog, 'SKILLS'), destination);
+  await symlink(destination, join(catalog, 'SKILLS'), process.platform === 'win32' ? 'junction' : 'dir');
+  const original = await readFile(join(destination, 'demo/SKILL.md'), 'utf8');
+  const result = run(['install', '-s', 'demo', '-a', 'claude-code', '--force', '--yes'], false);
+  assert.match(result.stderr, /se sobrepõe à origem/i);
+  assert.equal(await readFile(join(destination, 'demo/SKILL.md'), 'utf8'), original);
+  assert.deepEqual(JSON.parse(run(['list', '--json']).stdout), []);
+});
+
+
+test('R3: copy failure reports its real cause when the backend also writes presentation logs', { skip: process.platform === 'win32' || process.getuid?.() === 0 }, async t => {
+  const { project, run } = await fixture(t);
+  const blocked = join(project, '.windsurf/skills');
+  await mkdir(blocked, { recursive: true });
+  await chmod(blocked, 0o555);
+  try {
+    const result = run(['install', '-s', 'demo', '-a', 'windsurf', '--yes'], false);
+    assert.match(result.stderr, /EACCES|permission denied/i);
+  } finally { await chmod(blocked, 0o755); }
+});
+
+test('R2: failed second target rolls back a fresh installation and can be retried without force', { skip: process.platform === 'win32' || process.getuid?.() === 0 }, async t => {
+  const { project, run } = await fixture(t);
+  const blocked = join(project, '.windsurf/skills');
+  await mkdir(blocked, { recursive: true });
+  await chmod(blocked, 0o555);
+  try {
+    run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--yes'], false);
+    assert.deepEqual(JSON.parse(run(['list', '--json']).stdout), []);
+    await assert.rejects(() => access(join(project, '.claude/skills/demo')), { code: 'ENOENT' });
+  } finally { await chmod(blocked, 0o755); }
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--yes']);
+  const rows = JSON.parse(run(['list', '--json']).stdout);
+  assert.deepEqual(rows[0].targets.map(t => t.status), ['installed', 'installed']);
+});
+
+test('R2: a failed update restores existing copies and canonical symlinks before retry', { skip: process.platform === 'win32' }, async t => {
+  for (const method of ['copy', 'symlink']) {
+    const { project, catalog, run } = await fixture(t);
+    run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', method, '--yes']);
+    const targetsBefore = method === 'symlink' ? await Promise.all(['.claude', '.windsurf'].map(agent => readlink(join(project, agent, 'skills/demo')))) : [];
+    await writeFile(join(catalog, 'SKILLS/demo/SKILL.md'), '---\nname: demo\ndescription: Demo\n---\nVersion two\n');
+    const fifo = join(catalog, 'SKILLS/demo/unsupported-fifo');
+    const created = spawnSync('mkfifo', [fifo], { encoding: 'utf8' });
+    assert.equal(created.status, 0, created.stderr);
+    run(['update', '-s', 'demo', '--yes'], false);
+    for (const agent of ['.claude', '.windsurf']) {
+      assert.match(await readFile(join(project, agent, 'skills/demo/SKILL.md'), 'utf8'), /Version one/);
+      assert.equal((await lstat(join(project, agent, 'skills/demo'))).isSymbolicLink(), method === 'symlink');
+    }
+    for (const [i, agent] of ['.claude', '.windsurf'].entries()) if (method === 'symlink') assert.equal(await readlink(join(project, agent, 'skills/demo')), targetsBefore[i]);
+    assert.deepEqual(JSON.parse(run(['list', '--json']).stdout)[0].targets.map(t => t.status), ['installed', 'installed']);
+    await rm(fifo);
+    run(['update', '-s', 'demo', '--yes']);
+    for (const agent of ['.claude', '.windsurf']) assert.match(await readFile(join(project, agent, 'skills/demo/SKILL.md'), 'utf8'), /Version two/);
+  }
+});
+
+async function largeSkill(catalog) {
+  const files = 5000;
+  for (let start = 0; start < files; start += 1000) {
+    await Promise.all(Array.from({ length: 1000 }, (_, i) => writeFile(join(catalog, 'SKILLS/demo', `file-${start + i}.txt`), `${start + i}\n`)));
+  }
+  return files + 1;
+}
+
+const entries = path => readdir(path).then(names => names.length, () => 0);
+
+// Signals the CLI while the backend is filling the destination, or once ready() holds; group mimics Ctrl+C in a terminal.
+// signal may be a list, sent back to back: use different signals, since identical pending POSIX signals may merge into one.
+async function interrupt({ project, catalog, env }, args, signal, total, group = false, ready = async () => {
+  const count = await entries(join(project, '.claude/skills/demo'));
+  return count > 0 && count < total;
+}) {
+  const child = spawn(process.execPath, [cli, ...args, '--catalog', catalog, '--cwd', project], { env, detached: group, stdio: ['ignore', 'pipe', 'pipe'] });
+  let stderr = '';
+  child.stderr.setEncoding('utf8').on('data', chunk => { stderr += chunk; });
+  const closed = new Promise(resolve => child.on('close', code => resolve(code)));
+  for (;;) {
+    if (await ready()) break;
+    if (child.exitCode !== null) assert.fail(`CLI finished before the interruption: ${stderr}`);
+    await new Promise(resolve => setTimeout(resolve, 5));
+  }
+  for (const each of [signal].flat()) {
+    if (group) process.kill(-child.pid, each);
+    else child.kill(each);
+  }
+  return { code: await closed, stderr };
+}
+
+test('CR-06: a second signal during update force-exits, keeps the recovery copy of the previous version and releases the lock', { skip: process.platform === 'win32' }, async t => {
+  const context = await fixture(t);
+  const { root, project, catalog, env, run } = context;
+  const temporary = join(root, 'temporary');
+  await mkdir(temporary);
+  env.TMPDIR = temporary;
+  const total = await largeSkill(catalog);
+  run(['install', '-s', 'demo', '-a', 'claude-code', '--method', 'copy', '--yes']);
+  await writeFile(join(catalog, 'SKILLS/demo/SKILL.md'), '---\nname: demo\ndescription: Test demo\n---\nVersion two\n');
+  const result = await interrupt(context, ['update', '-s', 'demo', '--yes'], ['SIGINT', 'SIGTERM'], total);
+  assert.equal(result.code, 143, result.stderr);
+  assert.match(result.stderr, /segundo SIGTERM sem reversão completa\. O bloqueio foi liberado\./);
+  const recovery = /Cópias de recuperação: (.+?)\. Rode list e update/.exec(result.stderr)?.[1];
+  assert.ok(recovery, result.stderr);
+  assert.equal(await realpath(dirname(recovery)), await realpath(temporary));
+  // The snapshot of the destination holds the complete previous version, ready for a manual restore.
+  const [snapshot, ...others] = await readdir(recovery);
+  assert.deepEqual(others, []);
+  assert.match(await readFile(join(recovery, snapshot, 'SKILL.md'), 'utf8'), /Version one/);
+  assert.equal(await entries(join(recovery, snapshot)), total);
+  await assert.rejects(() => access(join(project, '.colibri-skills.json.lock')), { code: 'ENOENT' });
+});
+
+test('R2: a signal during copy rolls back, releases the lock and allows retry without force', { skip: process.platform === 'win32' }, async t => {
+  const context = await fixture(t);
+  const { root, project, catalog, env, run } = context;
+  const temporary = join(root, 'temporary');
+  await mkdir(temporary);
+  env.TMPDIR = temporary;
+  const total = await largeSkill(catalog);
+  const destination = join(project, '.claude/skills/demo');
+  const install = ['install', '-s', 'demo', '-a', 'claude-code', '--method', 'copy', '--yes'];
+  const settled = async () => {
+    await assert.rejects(() => access(join(project, '.colibri-skills.json.lock')), { code: 'ENOENT' });
+    assert.deepEqual((await readdir(temporary)).filter(name => name.startsWith('colibri-rollback-')), []);
+  };
+  for (const [signal, code, group] of [['SIGTERM', 143, false], ['SIGINT', 130, true], ['SIGHUP', 129, false]]) {
+    const result = await interrupt(context, install, signal, total, group);
+    assert.equal(result.code, code, result.stderr);
+    assert.match(result.stderr, new RegExp(`interrompida por ${signal}`, 'i'));
+    await settled();
+    await assert.rejects(() => access(destination), { code: 'ENOENT' });
+    assert.deepEqual(JSON.parse(run(['list', '--json']).stdout), []);
+  }
+  run(install);
+  const state = await readFile(join(project, '.colibri-skills.json'), 'utf8');
+  await writeFile(join(catalog, 'SKILLS/demo/SKILL.md'), '---\nname: demo\ndescription: Test demo\n---\nVersion two\n');
+  const update = await interrupt(context, ['update', '-s', 'demo', '--yes'], 'SIGINT', total);
+  assert.equal(update.code, 130, update.stderr);
+  await settled();
+  assert.equal(await readFile(join(project, '.colibri-skills.json'), 'utf8'), state);
+  // Recorded hashes cover names and bytes, so "installed" proves the previous copy came back intact.
+  assert.deepEqual(JSON.parse(run(['list', '--json']).stdout)[0].targets.map(t => t.status), ['installed']);
+  assert.match(await readFile(join(destination, 'SKILL.md'), 'utf8'), /Version one/);
+  run(['update', '-s', 'demo', '--yes']);
+  assert.match(await readFile(join(destination, 'SKILL.md'), 'utf8'), /Version two/);
+});
+
+test('E1: changing source for one target is refused and other targets keep their original source', async t => {
+  const { root, project, run } = await fixture(t);
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--yes']);
+  const external = join(root, 'external demo');
+  await mkdir(join(external, 'demo'), { recursive: true });
+  await writeFile(join(external, 'demo/SKILL.md'), '---\nname: demo\ndescription: External demo\n---\nExternal content\n');
+  const manifest = join(project, 'external.yaml');
+  await writeFile(manifest, `sources:\n  - repo: ${JSON.stringify(external)}\n    skills: [demo]\n`);
+  const result = run(['install', '--manifest', manifest, '-a', 'claude-code', '--force', '--yes'], false);
+  assert.match(result.stderr, /origem.*todos|todos.*origem/i);
+  run(['update', '-s', 'demo', '-a', 'windsurf', '--yes']);
+  assert.match(await readFile(join(project, '.windsurf/skills/demo/SKILL.md'), 'utf8'), /Version one/);
+  assert.equal(JSON.parse(run(['list', '--json']).stdout)[0].origin, 'catalog');
+  run(['install', '--manifest', manifest, '-a', 'claude-code', 'windsurf', '--force', '--yes']);
+  for (const agent of ['.claude', '.windsurf']) assert.match(await readFile(join(project, agent, 'skills/demo/SKILL.md'), 'utf8'), /External content/);
+  assert.equal(JSON.parse(run(['list', '--json']).stdout)[0].origin, 'external');
+});
+
+test('R2: an interrupted remove releases the lock, leaves targets installed or missing and finishes on retry without force', { skip: process.platform === 'win32' }, async t => {
+  const context = await fixture(t);
+  const { project, catalog, run } = context;
+  const total = await largeSkill(catalog);
+  const [first, second] = ['.claude', '.windsurf'].map(agent => join(project, agent, 'skills/demo'));
+  run(['install', '-s', 'demo', '-a', 'claude-code', 'windsurf', '--method', 'copy', '--yes']);
+  // Targets are deleted one after another; signal while the first is going away or right after it is gone.
+  const removing = async () => {
+    const count = await entries(first);
+    return (count > 0 && count < total) || (count === 0 && await entries(second) > 0);
+  };
+  const result = await interrupt(context, ['remove', '-s', 'demo', '--yes'], 'SIGTERM', total, false, removing);
+  assert.equal(result.code, 143, result.stderr);
+  assert.match(result.stderr, /interrompida por SIGTERM/i);
+  await assert.rejects(() => access(join(project, '.colibri-skills.json.lock')), { code: 'ENOENT' });
+  const rows = JSON.parse(run(['list', '--json']).stdout);
+  assert.deepEqual(rows.map(row => row.name), ['demo']);
+  for (const target of rows[0].targets) assert.ok(['installed', 'missing'].includes(target.status), JSON.stringify(rows[0].targets));
+  run(['remove', '-s', 'demo', '--yes']);
+  assert.deepEqual(JSON.parse(run(['list', '--json']).stdout), []);
+  for (const destination of [first, second]) await assert.rejects(() => access(destination), { code: 'ENOENT' });
+});

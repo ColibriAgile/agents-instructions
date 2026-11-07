@@ -1,0 +1,157 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
+import { join, resolve } from 'node:path';
+import { tmpdir } from 'node:os';
+import { spawn, spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
+import { loadState, saveState, withScopeLock } from '../dist/storage.js';
+import { backend } from '../dist/backend.js';
+
+test('AC7: state rejects corruption and mutation lock prevents concurrent writers', async t => {
+  const cwd = await mkdtemp(join(tmpdir(), 'colibri storage '));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  const scope = { cwd, global: false };
+  const state = await loadState(scope);
+  assert.deepEqual(state.skills, {});
+  await saveState(scope, state);
+  assert.equal(JSON.parse(await readFile(join(cwd, '.colibri-skills.json'), 'utf8')).version, 1);
+  await withScopeLock(scope, async () => {
+    await assert.rejects(() => withScopeLock(scope, async () => {}), /Outra operação da Colibri/);
+  });
+  await withScopeLock(scope, async () => {});
+  for (const text of ['{broken', '{"version":2,"skills":{}}', '{"version":1,"skills":{"../bad":{}}}']) {
+    await writeFile(join(cwd, '.colibri-skills.json'), text);
+    await assert.rejects(() => loadState(scope), /Estado da Colibri inválido/);
+    assert.equal(await readFile(join(cwd, '.colibri-skills.json'), 'utf8'), text);
+  }
+});
+
+test('AC4: backend failures propagate without executing shell substitutions', async t => {
+  const cwd = await mkdtemp(join(tmpdir(), 'colibri backend '));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  await assert.rejects(() => backend(['add', join(cwd, 'missing $(touch sentinel)'), '--skill', 'demo', '--agent', 'claude-code', '--yes', '--json'], { cwd, global: false }), /o backend skills falhou/);
+  await assert.rejects(() => readFile(join(cwd, 'sentinel')), { code: 'ENOENT' });
+});
+
+const interruptions = ['SIGINT', 'SIGTERM', 'SIGHUP'];
+const listeners = () => interruptions.map(signal => process.listenerCount(signal));
+
+test('R2: no lock path leaves signal listeners behind', async t => {
+  const cwd = await mkdtemp(join(tmpdir(), 'colibri listeners '));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  const scope = { cwd, global: false };
+  const before = listeners();
+  await withScopeLock(scope, async () => {});
+  await assert.rejects(() => withScopeLock(scope, async () => { throw new Error('action failed'); }), /action failed/);
+  await writeFile(join(cwd, '.colibri-skills.json.lock'), 'pid=0\n');
+  await assert.rejects(() => withScopeLock(scope, async () => {}), /Outra operação da Colibri/);
+  assert.deepEqual(listeners(), before);
+});
+
+// The pending signal is dispatched while the lock is still being created, before the action can observe it.
+test('R2: a signal that arrives while the lock is created releases it and exits with the signal code', { skip: process.platform === 'win32' }, async t => {
+  const cwd = await mkdtemp(join(tmpdir(), 'colibri early signal '));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  const storage = pathToFileURL(resolve('dist/storage.js')).href;
+  const script = `
+    import { withScopeLock } from ${JSON.stringify(storage)};
+    process.on('SIGTERM', () => {});
+    process.kill(process.pid, 'SIGTERM');
+    try { await withScopeLock({ cwd: process.argv[1], global: false }, async () => { console.log('action ran'); }); }
+    catch (error) { console.error(error.message); process.exitCode ||= 1; }
+  `;
+  const result = spawnSync(process.execPath, ['--input-type=module', '-e', script, cwd], { encoding: 'utf8', timeout: 30000 });
+  assert.equal(result.status, 143, `${result.stdout}\n${result.stderr}`);
+  assert.equal(result.stdout, '');
+  assert.match(result.stderr, /interrompida por SIGTERM/i);
+  await assert.rejects(() => readFile(join(cwd, '.colibri-skills.json.lock')), { code: 'ENOENT' });
+});
+
+// The child signals itself inside the action, after which no checkpoint remains: only the outcome decides the exit code.
+test('R2: a signal after the action finished exits 0 with a warning, and one before a failure keeps the signal code', { skip: process.platform === 'win32' }, async t => {
+  const cwd = await mkdtemp(join(tmpdir(), 'colibri late signal '));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  const storage = pathToFileURL(resolve('dist/storage.js')).href;
+  const run = fail => spawnSync(process.execPath, ['--input-type=module', '-e', `
+    import { withScopeLock } from ${JSON.stringify(storage)};
+    try {
+      await withScopeLock({ cwd: process.argv[1], global: false }, async interruption => {
+        process.kill(process.pid, 'SIGTERM');
+        await new Promise(resolve => { const poll = setInterval(() => { if (interruption.aborted) { clearInterval(poll); resolve(); } }, 1); });
+        if (${fail}) throw interruption.reason;
+        console.log('completed');
+      });
+    } catch (error) { console.error(error.message); process.exitCode ||= 1; }
+  `, cwd], { encoding: 'utf8', timeout: 30000 });
+  const completed = run(false);
+  assert.equal(completed.status, 0, `${completed.stdout}\n${completed.stderr}`);
+  assert.equal(completed.stdout, 'completed\n');
+  assert.match(completed.stderr, /Recebido SIGTERM depois de todas as alterações serem aplicadas; a operação foi concluída\./);
+  await assert.rejects(() => readFile(join(cwd, '.colibri-skills.json.lock')), { code: 'ENOENT' });
+  const failed = run(true);
+  assert.equal(failed.status, 143, `${failed.stdout}\n${failed.stderr}`);
+  assert.match(failed.stderr, /interrompida por SIGTERM/i);
+  assert.doesNotMatch(failed.stderr, /depois de todas as alterações/);
+  await assert.rejects(() => readFile(join(cwd, '.colibri-skills.json.lock')), { code: 'ENOENT' });
+});
+
+test('CR-05: directoryHash does not depend on the process locale', async t => {
+  const dir = await mkdtemp(join(tmpdir(), 'colibri-hash-locale-'));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  for (const name of ['aa.md', 'z.md', 'y.md', 'j.md', 'a_b.md', 'a-b.md', 'B.md']) await writeFile(join(dir, name), name);
+  const script = `import { directoryHash } from ${JSON.stringify(new URL('../dist/storage.js', import.meta.url).href)}; console.log(await directoryHash(process.argv[1]));`;
+  const hashes = new Set();
+  for (const lang of ['en_US.UTF-8', 'pt_BR.UTF-8', 'da_DK.UTF-8', 'lt_LT.UTF-8']) {
+    const result = spawnSync(process.execPath, ['--input-type=module', '-e', script, dir], { encoding: 'utf8', env: { ...process.env, LANG: lang, LC_ALL: lang } });
+    assert.equal(result.status, 0, result.stderr);
+    hashes.add(result.stdout.trim());
+  }
+  assert.equal(hashes.size, 1, [...hashes].join('\n'));
+});
+
+// Two different signals: identical pending POSIX signals may be coalesced into one delivery.
+test('CR-06: a second signal before the lock is acquired never deletes the lock of another operation', { skip: process.platform === 'win32' }, async t => {
+  const cwd = await mkdtemp(join(tmpdir(), 'colibri foreign lock '));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  const lock = join(cwd, '.colibri-skills.json.lock');
+  await writeFile(lock, 'pid=999999\n');
+  const storage = pathToFileURL(resolve('dist/storage.js')).href;
+  const script = `
+    import { withScopeLock } from ${JSON.stringify(storage)};
+    process.on('SIGTERM', () => {});
+    process.on('SIGINT', () => {});
+    process.kill(process.pid, 'SIGTERM');
+    process.kill(process.pid, 'SIGINT');
+    try { await withScopeLock({ cwd: process.argv[1], global: false }, async () => { console.log('action ran'); }); }
+    catch (error) { console.error(error.message); process.exitCode ||= 1; }
+  `;
+  const result = spawnSync(process.execPath, ['--input-type=module', '-e', script, cwd], { encoding: 'utf8', timeout: 30000 });
+  assert.equal(result.status, 130, `${result.stdout}\n${result.stderr}`);
+  assert.equal(result.stdout, '');
+  assert.doesNotMatch(result.stderr, /bloqueio foi liberado/);
+  assert.equal(await readFile(lock, 'utf8'), 'pid=999999\n');
+});
+
+test('CR-06: a second signal force-exits, releases the lock and reports the signal code', { skip: process.platform === 'win32' }, async t => {
+  const cwd = await mkdtemp(join(tmpdir(), 'colibri second signal '));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  const storage = pathToFileURL(resolve('dist/storage.js')).href;
+  const script = `import { withScopeLock } from ${JSON.stringify(storage)};
+    await withScopeLock({ cwd: process.argv[1], global: false }, async () => { console.log('ready'); await new Promise(() => setInterval(() => {}, 1000)); });`;
+  const child = spawn(process.execPath, ['--input-type=module', '-e', script, cwd], { stdio: ['ignore', 'pipe', 'pipe'] });
+  let stderr = '';
+  child.stderr.setEncoding('utf8').on('data', chunk => { stderr += chunk; });
+  await new Promise(done => child.stdout.once('data', done));
+  const closed = new Promise(done => child.on('close', (code, signal) => done({ code, signal })));
+  const killer = setTimeout(() => child.kill('SIGKILL'), 4000);
+  child.kill('SIGINT');
+  await new Promise(done => setTimeout(done, 300));
+  child.kill('SIGINT');
+  const result = await closed;
+  clearTimeout(killer);
+  assert.equal(result.code, 130, `${JSON.stringify(result)} ${stderr}`);
+  assert.match(stderr, /segundo SIGINT/);
+  assert.match(stderr, /O bloqueio foi liberado/);
+  await assert.rejects(() => readFile(join(cwd, '.colibri-skills.json.lock')), { code: 'ENOENT' });
+});
