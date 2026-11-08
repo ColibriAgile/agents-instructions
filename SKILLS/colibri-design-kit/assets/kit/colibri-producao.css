@@ -101,7 +101,9 @@
 .cp-card--atraso { --cp-cor: var(--cp-atraso); --cp-tinta: var(--cp-urgencia-ink); }
 .cp-card--pausa { --cp-cor: var(--cp-pausa); --cp-tinta: var(--cp-pausa-ink); }
 
-/* Cabeçalho na cor do tempo. Linha 1: índice (bump), tipo, senha e tempo; linha 2: pessoa e local. */
+/* Cabeçalho na cor do tempo. Linha 1: índice (bump), título (o rótulo do ticket, que já traz o tipo, com o
+ * apelido entre parênteses; quebra a linha quando não cabe) e tempo, no alto à direita; linha 2: local à
+ * esquerda e garçom à direita. */
 .cp-card__head {
     position: relative;
     isolation: isolate;
@@ -133,7 +135,7 @@
 }
 .cp-card__linha {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
     min-width: 0;
     font-size: var(--cp-text-sm);
@@ -150,7 +152,11 @@
     font-family: var(--cm-mono);
     font-weight: 700;
 }
-/* Tipo do pedido: selo branco com a cor da paleta no texto (o preenchimento é do tempo). */
+/* No alto da linha, o índice e a marca ficam centrados na primeira linha do título. */
+.cp-card__indice,
+.cp-card__marca { margin-top: calc((var(--cp-lh-cabecalho) - var(--cp-lh-selo)) / 2); }
+/* Tipo do pedido na origem do card de agrupamento: selo branco com a cor da paleta no texto (o
+ * preenchimento é do tempo). No cabeçalho do card de produção, o tipo vem no título. */
 .cp-card__tipo {
     --cp-tipo: var(--ct-palette-grafite);
     display: inline-flex;
@@ -183,6 +189,8 @@
     white-space: nowrap;
 }
 .cp-card__tempo .bi { font-size: .9em; }
+/* Título: o rótulo do ticket ocupa o espaço da linha e quebra quando não cabe. */
+.cp-card__titulo { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 /* Marca no lugar do tempo: "Em espera" e "Cancelado". */
 .cp-card__marca {
     display: inline-flex;
@@ -206,8 +214,17 @@
     line-height: var(--cp-lh-apoio);
 }
 .cp-card__apoio .bi { margin-right: 4px; font-size: .9em; line-height: 1; }
-/* Garçom do envio: linha própria sob o tempo, à direita, no tamanho da linha de apoio; nome longo
- * termina em reticências sem mudar a altura do cabeçalho. */
+/* Linha 2: local à esquerda e garçom à direita, na mesma linha; sem nenhum dos dois, a linha não existe. */
+.cp-card__sublinha {
+    display: flex;
+    align-items: baseline;
+    gap: 0 12px;
+    min-width: 0;
+}
+.cp-card__sublinha > .cp-card__apoio { flex: 1 1 auto; }
+.cp-card__sublinha > .cp-card__garcom { flex: 0 1 auto; margin-left: auto; }
+/* Garçom do envio, à direita, no tamanho da linha de apoio; nome longo termina em reticências sem mudar
+ * a altura do cabeçalho. */
 .cp-card__garcom {
     min-width: 0;
     overflow: hidden;
@@ -377,6 +394,15 @@
 }
 .cp-card__obs .bi,
 .cp-card__alt .bi { font-size: .9em; line-height: 1; }
+/* A observação fica 2 px abaixo do nome a que se refere: 15 px sob o item e 13 px sob o item do combo. */
+.cp-card__obs {
+    font-size: calc(var(--cp-text-lg) - 2px);
+    line-height: var(--cp-lh-apoio);
+}
+.cp-card__sub .cp-card__obs {
+    font-size: calc(var(--cp-text) - 2px);
+    line-height: var(--cp-lh-obs);
+}
 /* Alérgeno: tag em pílula, ícone de alerta e só o nome. */
 .cp-card__alergenos {
     display: flex;
