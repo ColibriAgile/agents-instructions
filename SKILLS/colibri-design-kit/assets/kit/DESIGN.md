@@ -628,7 +628,7 @@ Vale a regra do movimento com motivo (seção 4). Folha sobe em 260 ms com `--cm
 
 Card de produção do KDS (`.cp-card`), lido de longe na tela da estação, sobre o perfil Operação. É um perfil específico do KDS: os cards genéricos dos painéis de chamado (garçom, entregadores, senhas) ficam no perfil Cards, seção 11. Implementação em `colibri-producao.css` (prefixo `cp-`), carregado depois do `colibri-touch.css`; demonstração em `exemplo-toque.html#kds` (modo toque) e `#bump` (modo bump). O perfil Operação continua valendo no que esta seção não muda: barra da estação, tema Colibri por `data-theme`, paleta curada, piso Chrome 101, caixa de frase e nenhum texto em caixa alta.
 
-**Norte criativo: "Leitura de longe".** O cozinheiro lê o card de relance, de onde está e com as mãos ocupadas. O que produzir aparece primeiro e limpo; o que é de apoio (tipo, senha, pessoa, local) fica menor, no cabeçalho. A altura do card é economizada sem custar legibilidade.
+**Norte criativo: "Leitura de longe".** O cozinheiro lê o card de relance, de onde está e com as mãos ocupadas. O que produzir aparece primeiro e limpo; o que é de apoio (título, local, garçom) fica menor, no cabeçalho. A altura do card é economizada sem custar legibilidade.
 
 **Características:**
 
@@ -638,7 +638,7 @@ Card de produção do KDS (`.cp-card`), lido de longe na tela da estação, sobr
 
 ### Cores
 
-**Regra do tempo no preenchimento.** O cabeçalho do card leva a cor do tempo, e só dele: neutro no prazo (`--cp-neutro`), âmbar em atenção (`#875800`, com `bi-hourglass-split` antes do tempo) e vermelho em atraso (`#b02637`, com `bi-exclamation-octagon-fill`; o fundo respira até `#6a1720` a cada 1,2 s e fica parado com movimento reduzido). O tipo do pedido vai num selo branco com a cor da paleta no texto (`.cp-card__tipo--mesa` etc.), nunca no preenchimento: o laranja da retirada e o vinho colidiriam com atenção e atraso. A urgência nunca é só cor: o ícone antes do tempo diz o estado. Em espera, listras diagonais no cabeçalho e a marca "Em espera" no lugar do tempo; cancelado, a marca "Cancelado" em vermelho.
+**Regra do tempo no preenchimento.** O cabeçalho do card leva a cor do tempo, e só dele: neutro no prazo (`--cp-neutro`), âmbar em atenção (`#875800`, com `bi-hourglass-split` antes do tempo) e vermelho em atraso (`#b02637`, com `bi-exclamation-octagon-fill`; o fundo respira até `#6a1720` a cada 1,2 s e fica parado com movimento reduzido). O tipo do pedido vai no título, pelo rótulo do ticket ("MESA 12"), nunca no preenchimento: o laranja da retirada e o vinho colidiriam com atenção e atraso. Na origem do card de agrupamento, que não tem o rótulo inteiro, ele vai num selo branco com a cor da paleta no texto (`.cp-card__tipo--mesa` etc.). A urgência nunca é só cor: o ícone antes do tempo diz o estado. Em espera, listras diagonais no cabeçalho e a marca "Em espera" no lugar do tempo; cancelado, a marca "Cancelado" em vermelho.
 
 Os tokens ficam em `colibri-producao.css`, não na base, porque só o card os usa:
 
@@ -663,10 +663,11 @@ Os tokens ficam em `colibri-producao.css`, não na base, porque só o card os us
 |---|---|---|---|
 | Nome do item e quantidade (mono, tabulares) | 17 px | nome 400 no modo toque e 500 no bump; quantidade 500 | 24 px |
 | Item do combo (quantidade em mono) | 15 px | 400; quantidade 500 | 23 px |
-| Senha e tempo (mono, tabulares) | 15 px | 700 | 26 px |
-| Observação, alteração e ritmo de preparo | 12 px | 600 | 18 px |
+| Título e tempo (mono, tabulares) | 15 px | 700 | 26 px |
+| Observação (2 px abaixo do nome a que se refere) | 15 px sob o item; 13 px sob o item do combo | 600 | 20 px; 18 px no combo |
+| Alteração e ritmo de preparo | 12 px | 600 | 18 px |
 | Garçom, pessoa e local | 12 px | 500 | 20 px |
-| Selo do tipo, índice e marcas do cabeçalho | 12 px | 600 | 21 px |
+| Índice, marcas do cabeçalho e selo do tipo na origem | 12 px | 600 | 21 px |
 | Alérgeno | 12 px | 600 | 20 px |
 
 - As alturas de linha são fixas e maiores que o texto: o respiro entre as linhas tira a densidade sem crescer o card. Ícones dentro da observação e da linha de apoio levam `line-height: 1`, para não esticar a linha.
@@ -675,7 +676,7 @@ Os tokens ficam em `colibri-producao.css`, não na base, porque só o card os us
 
 ### Anatomia do card
 
-- **Cabeçalho**: (1) índice (só no modo bump), selo do tipo, senha e, à direita, o tempo; logo abaixo do tempo, à direita, o garçom que fez o envio (`.cp-card__garcom`, `bi-person-badge`), numa linha só com reticências e só quando a aplicação o conhece; (2) menor, pessoa (`bi-person`) e local (`bi-geo-alt`). Sem faixa de urgência nem faixa de dados.
+- **Cabeçalho**: (1) índice (só no modo bump), o título e, à direita e no alto, o tempo. O título (`.cp-card__titulo`) é o rótulo do ticket, que já traz o tipo ("MESA 12", "FICHA 51", "ENTREGA 479"), com o apelido ou o cliente da mesa entre parênteses ("MESA 12 (Ana)"); sem selo do tipo, que repetiria o nome; quebra a linha quando não cabe. (2) Menor, numa linha só (`.cp-card__sublinha`): local de entrega (`bi-geo-alt`) e de produção à esquerda e, à direita, o garçom que fez o envio (`.cp-card__garcom`, `bi-person-badge`), com reticências e só quando a aplicação o conhece; sem nenhum dos dois, a linha não existe. Sem faixa de urgência nem faixa de dados.
 - **Itens:** grade `estado | quantidade | nome`, numa linha só; a coluna de estado é fixa e sempre ocupada. Um traço de 1 px (`--cp-divisor`) separa os itens, sem espaço entre eles.
 - **Cinco estados, cinco formas** (a cor acompanha a forma, nunca sozinha): aguardando `bi-clock` em `ink-3`, em preparo `bi-fire` em `action-ink`, pronto `bi-check-circle-fill` em sucesso, pausado `bi-pause-circle-fill` em `ink-2`, cancelado `bi-x-circle-fill` em erro.
 - **Observação:** `bi-arrow-right` e o texto, na cor de aviso. **Alteração:** `bi-pencil-square`, na mesma cor; a linha alterada acende em `warning-soft` pelo tempo que a aplicação definir, sem bloco extra que empurre o card.
@@ -728,7 +729,7 @@ O modo é configurado por estação (todos os monitores de uma estação no mesm
 
 **Faça**
 
-- Cabeçalho na cor do tempo, com o ícone de urgência antes do tempo, e o tipo do pedido no selo.
+- Cabeçalho na cor do tempo, com o ícone de urgência antes do tempo, e o tipo do pedido no título (o rótulo do ticket).
 - Estado, quantidade e nome numa linha, primeiro e limpos.
 - Conferir o card nos dois temas e nos dois modos, com um pedido grande (combo, observações, alérgenos e item alterado).
 
@@ -736,6 +737,7 @@ O modo é configurado por estação (todos os monitores de uma estação no mesm
 
 - Borda ou contorno para separar o card do piso, ou faixa de urgência que empurra os itens.
 - Tipo do pedido no preenchimento do cabeçalho.
+- Selo do tipo ao lado de um título que já diz o tipo ("Mesa" e "MESA 12").
 - Negrito no nome do item ou selo invertido na quantidade.
 - Tinta esmaecida em item que ainda pede ação.
 - Relógio para outra coisa que não o aguardando (ex.: ritmo de preparo).
