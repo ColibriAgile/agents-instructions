@@ -65,6 +65,59 @@
     --cc-tinta-espera: var(--ct-on-brand);
 }
 
+/* ---------- Cabeçalho do painel ----------
+ * Título, contagem, relógio e ações, numa faixa discreta: nada nele é maior que as peças do card. O título
+ * e a contagem vão no corpo do rótulo do card (--cc-t), a data também, e a hora no corpo do tempo do card
+ * (--cc-t-xl). Texto alinhado pela base da linha (a contagem na mesma linha da data); os botões, ao centro. */
+.cc-cabecalho {
+    display: flex;
+    flex: none;
+    align-items: baseline;
+    gap: var(--cc-gap);
+    padding: calc(var(--cc-gap) * .6) var(--cc-pad);
+    color: var(--ct-ink);
+    background: var(--ct-surface);
+    border-bottom: 1px solid var(--ct-line);
+    font-family: var(--cm-font);
+    font-size: var(--cc-t);
+    line-height: 1.2;
+}
+.cc-cabecalho__titulo {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: var(--cc-t);
+    font-weight: 600;
+    line-height: inherit;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+/* Contagem ("5 chamados") e data: apoio, em ink-2. */
+.cc-cabecalho__apoio {
+    flex: none;
+    color: var(--ct-ink-2);
+    font-variant-numeric: tabular-nums;
+}
+/* Data e hora, encostadas à direita. */
+.cc-cabecalho__relogio {
+    display: flex;
+    flex: none;
+    align-items: baseline;
+    gap: var(--cc-gap);
+    margin-left: auto;
+}
+.cc-cabecalho__hora {
+    font-family: var(--cm-mono);
+    font-size: var(--cc-t-xl);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+}
+.cc-cabecalho__acao {
+    flex: none;
+    align-self: center;
+}
+
 /* Grade: colunas que cabem na largura, cards alinhados ao topo (não esticam até o vizinho). */
 .cc-grade {
     display: grid;
@@ -72,6 +125,11 @@
     align-items: start;
     gap: var(--cc-gap);
     padding: var(--cc-pad);
+}
+/* Colunas escolhidas pelo painel (--cc-cols, de 3 a 6), no lugar das que cabem: a aplicação grava o número
+ * na grade e garante o intervalo. Com 6 na TV em 1366 px, o card fica com cerca de 210 px. */
+.cc-grade--cols {
+    grid-template-columns: repeat(var(--cc-cols, 4), minmax(0, 1fr));
 }
 
 /* ---------- Card de sinal ----------
