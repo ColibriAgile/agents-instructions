@@ -63,7 +63,7 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 ### Perfil Cards (painéis de chamado)
 
 1. Copie também `colibri-cards.css` para a mesma pasta e carregue-o depois do `colibri-touch.css` nas telas de chamado (garçom, entregadores, senhas); com cor livre do lojista ou cor própria de fundo, também o `colibri-esquema.js`.
-2. Marque a raiz do painel com `cc-painel` (na TV, também `cc-painel--tv`; no painel voltado ao cliente, `cc-painel--cliente`) e a grade com `cc-grade`; monte o card com a marcação de `exemplo-toque.html#chamados` e `#chamados-claro`.
+2. Marque a raiz do painel com `cc-painel` (na TV, também `cc-painel--tv`; no painel voltado ao cliente, `cc-painel--cliente`), o topo com `cc-cabecalho` e a grade com `cc-grade` (com colunas escolhidas, de 3 a 6, também `cc-grade--cols` e `--cc-cols`); monte o card com a marcação de `exemplo-toque.html#chamados` e `#chamados-claro`.
 3. Escolha a cor de cada estado do painel (padrões do kit, paleta curada pelo nome ou hex livre do lojista; com hex livre, grave junto `--cc-tinta-<estado>` e `--cc-veu-<estado>` de `tintaSobre` e `veuSobre` e, no atraso, `--cc-atraso-respiro` de `respiroDe`) e o ícone de cada um, troque a classe do card (`cc-sinal--atencao`, `cc-sinal--atraso`) pelos limites de tempo configurados e transforme o que não cabe em `cc-mais` (seção 11 do `DESIGN.md`).
 4. Confira o painel nos dois temas (e com a cor própria, se houver), na TV em 1920 px, em 4K e em 1366×768, com mais chamados do que cabem e com uma cor clara e uma média em algum estado.
 
@@ -77,6 +77,12 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 ## Versões
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
+
+- **08/11/2026 (cabeçalho e colunas do painel de chamados):** no painel de chamados do ColibriTablet, o título do cabeçalho ficava maior que tudo no card, a contagem não alinhava com a data, e o kit não tinha controle de colunas (`.cc-grade` só em `auto-fill`): o projeto mantinha um cabeçalho e uma grade próprios. Pedido do usuário, depois da imagem da TV.
+  - **Regra:** `DESIGN.md`, seção 11. Em "Escolhas do painel", as colunas: as que cabem ou de 3 a 6, escolhidas pelo lojista para cada painel. Em "Peças", o cabeçalho do painel, menor que o card (título e contagem no corpo do rótulo, hora no corpo do tempo) e alinhado pela base, com a contagem na mesma linha da data. Atualizados os exemplos, o "Não faça" e a tabela de nomes.
+  - **Implementação:** `colibri-cards.css`: `.cc-cabecalho` (com `__titulo`, `__apoio`, `__relogio`, `__hora` e `__acao`) e `.cc-grade--cols` com `--cc-cols`. `exemplo-toque.html`: os quatro painéis de `#chamados` com o cabeçalho do kit no lugar da barra de demonstração, e o do garçom com 5 colunas e o botão de tela cheia.
+  - **Skill:** rubrica v23 (H4); `adocao-por-framework.md` e o checklist do `mapeamento-impeccable.md`.
+  - **Na aplicação que já tem o painel:** troque o cabeçalho próprio pelo `.cc-cabecalho` e a grade de colunas própria pela `.cc-grade--cols`, e ofereça de 3 a 6 colunas (no ColibriTablet, `.pc-header` e `.pc-grade` em `painel.css`).
 
 - **08/11/2026 (cabeçalho do card sem o selo do tipo e observação maior):** no KDS, o selo do tipo repetia o nome do rótulo do ticket, que já traz o tipo em todos os modos ("Mesa" e "MESA 12"); a pessoa e o garçom ocupavam duas linhas e deixavam um vão no cabeçalho; e a observação de 12 px ficou pequena para a cozinha. Pedido do usuário na WIN-3272, depois das imagens da tela.
   - **Regra:** `DESIGN.md`, seção 10. O título do cabeçalho é o rótulo do ticket, com o apelido entre parênteses ("MESA 12 (Ana)"), e quebra a linha quando não cabe; sem selo do tipo no cabeçalho (o selo fica na origem do card de agrupamento). Local à esquerda e garçom à direita, numa linha só. A observação fica 2 px abaixo do nome a que se refere (15 px sob o item, 13 px no combo). Atualizados o norte, a regra do tempo no preenchimento, a tabela de tipografia, a anatomia e os "Faça" e "Não faça".

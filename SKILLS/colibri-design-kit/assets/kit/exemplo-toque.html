@@ -39,10 +39,6 @@
         .demo-lines .ct-price { font-size: var(--ct-text-lg); }
         .demo-pilha { display: grid; gap: var(--ct-gap); align-content: start; }
         /* Barra dos painéis de chamado: título, contagem e hora (como na proposta aprovada do perfil Cards). */
-        .demo-cc-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-height: var(--ct-target); padding: 8px var(--cc-pad); background: var(--ct-surface); }
-        .demo-cc-barra__titulo { margin-right: auto; font-size: var(--cc-t-xl); font-weight: 700; letter-spacing: -.01em; }
-        .demo-cc-barra__apoio { color: var(--ct-ink-2); font-size: var(--cc-t); }
-        .demo-cc-barra__hora { font-family: var(--cm-mono); font-size: var(--cc-t-xl); font-weight: 700; font-variant-numeric: tabular-nums; }
     </style>
 </head>
 <body>
@@ -585,10 +581,11 @@
 <!-- Painéis de chamado (perfil Cards): três painéis empilhados só para a demonstração; na aplicação, cada um é uma tela -->
 <div class="ct-app ct-app--kds demo-surface" id="chamados">
     <div class="demo-scroll">
-        <!-- Garçom: cor de espera padrão (azul da paleta); a faixa vazia reserva a altura da urgência -->
+        <!-- Garçom: cor de espera padrão (azul da paleta); a faixa vazia reserva a altura da urgência; 5 colunas
+             escolhidas pelo painel (.cc-grade--cols com --cc-cols, de 3 a 6); botão de tela cheia no cabeçalho -->
         <section class="cc-painel" aria-label="Chamados de garçom">
-            <div class="demo-cc-barra"><span class="demo-cc-barra__titulo">Garçom</span><span class="demo-cc-barra__apoio">5 chamados</span><span class="demo-cc-barra__hora">19:42</span></div>
-            <div class="cc-grade">
+            <header class="cc-cabecalho"><h2 class="cc-cabecalho__titulo">Garçom</h2><span class="cc-cabecalho__apoio">5 chamados</span><div class="cc-cabecalho__relogio"><span class="cc-cabecalho__apoio">Domingo, 8 de novembro</span><span class="cc-cabecalho__hora">19:42</span></div><button type="button" class="ct-icon-btn cc-cabecalho__acao" aria-label="Tela cheia" title="Tela cheia"><i class="bi bi-fullscreen" aria-hidden="true"></i></button></header>
+            <div class="cc-grade cc-grade--cols" style="--cc-cols: 5">
                 <article class="cc-sinal">
                     <div class="cc-sinal__topo"><span class="cc-sinal__rotulo">Mesa</span><span class="cc-sinal__timer">01:12</span></div>
                     <div class="cc-sinal__valor">12</div>
@@ -623,7 +620,7 @@
         </section>
         <!-- Entregadores: o painel troca a cor de espera por outra da paleta (petróleo); o que não cabe vira "+N" -->
         <section class="cc-painel" style="--cc-espera: var(--cm-palette-petroleo)" aria-label="Chamados de entregadores">
-            <div class="demo-cc-barra"><span class="demo-cc-barra__titulo">Entregadores</span><span class="demo-cc-barra__apoio">3 chamados</span><span class="demo-cc-barra__hora">19:42</span></div>
+            <header class="cc-cabecalho"><h2 class="cc-cabecalho__titulo">Entregadores</h2><span class="cc-cabecalho__apoio">5 chamados</span><div class="cc-cabecalho__relogio"><span class="cc-cabecalho__apoio">Domingo, 8 de novembro</span><span class="cc-cabecalho__hora">19:42</span></div></header>
             <div class="cc-grade">
                 <article class="cc-sinal">
                     <div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-bicycle" aria-hidden="true"></i>Entregador</span><span class="cc-sinal__timer">00:48</span></div>
@@ -649,7 +646,7 @@
         <!-- Cor livre do lojista: espera num amarelo claro (#f5d76e); a tinta e o véu não são escolha dele, vêm do
              motor (tintaSobre('#f5d76e') = #1d2733, veuSobre('#f5d76e') = rgba(255, 255, 255, .45)), gravados no painel -->
         <section class="cc-painel" style="--cc-espera: #f5d76e; --cc-tinta-espera: #1d2733; --cc-veu-espera: rgba(255, 255, 255, .45)" aria-label="Chamados de retirada, com cor do lojista">
-            <div class="demo-cc-barra"><span class="demo-cc-barra__titulo">Retirada (cor do lojista)</span><span class="demo-cc-barra__apoio">2 chamados</span><span class="demo-cc-barra__hora">19:42</span></div>
+            <header class="cc-cabecalho"><h2 class="cc-cabecalho__titulo">Retirada (cor do lojista)</h2><span class="cc-cabecalho__apoio">2 chamados</span><div class="cc-cabecalho__relogio"><span class="cc-cabecalho__apoio">Domingo, 8 de novembro</span><span class="cc-cabecalho__hora">19:42</span></div></header>
             <div class="cc-grade">
                 <article class="cc-sinal">
                     <div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-bag" aria-hidden="true"></i>Retirada</span><span class="cc-sinal__timer">01:05</span></div>
@@ -667,7 +664,7 @@
         </section>
         <!-- Senhas prontas: voltado ao cliente, piso e preenchimento do esquema do canal; sem tempo e sem urgência -->
         <section class="cc-painel cc-painel--cliente" aria-label="Senhas prontas">
-            <div class="demo-cc-barra"><span class="demo-cc-barra__titulo">Senhas prontas</span><span class="demo-cc-barra__hora">19:42</span></div>
+            <header class="cc-cabecalho"><h2 class="cc-cabecalho__titulo">Senhas prontas</h2><div class="cc-cabecalho__relogio"><span class="cc-cabecalho__hora">19:42</span></div></header>
             <div class="cc-grade">
                 <article class="cc-sinal"><div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-shop" aria-hidden="true"></i>Balcão</span></div><div class="cc-sinal__valor">A47</div><div class="cc-sinal__rodape"><span>Retire no balcão 2</span></div></article>
                 <article class="cc-sinal"><div class="cc-sinal__topo"><span class="cc-sinal__rotulo"><i class="bi bi-bag" aria-hidden="true"></i>Retirada</span></div><div class="cc-sinal__valor">#486</div><div class="cc-sinal__rodape"><span>Carlos</span></div></article>

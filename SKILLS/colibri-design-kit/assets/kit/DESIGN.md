@@ -435,7 +435,7 @@ Telas cheias de toque: cardápio do tablet (Mesa, Comanda e Autoficha), totem de
 | Kanban colunado | Quadro com uma coluna por etapa; o card anda de uma coluna para a outra | Na mesa, operado com mouse e teclado: perfil Admin, `.cm-board` (painel de operação, seção 7; ex.: DConnect). Na TV, lido de longe: perfil Cards, seção 11 |
 | Card de produção | O pedido na estação, com os itens a preparar (`.cp-card`) | Perfil Produção, seção 10 |
 | Card de sinal | Um chamado lido de longe: quem, há quanto tempo, em que estado (`.cc-sinal`) | Perfil Cards, seção 11 |
-| Painel de chamados | Quadro de cards de sinal (garçom, entregadores, senhas) | Perfil Cards, seção 11 |
+| Painel de chamados | Quadro de cards de sinal (garçom, entregadores, senhas), com o cabeçalho do painel (`.cc-cabecalho`) | Perfil Cards, seção 11 |
 | Carrossel de destaques | Destaques do cardápio que se revezam sozinhos (`.ct-destaques`) | Tablet e totem |
 | Tela de descanso | O carrossel em tela cheia depois de um tempo sem uso (`.ct-destaques--descanso`) | Tablet e totem |
 | Vitrine web | A loja do Colibri Delivery no navegador do cliente (`.ct-app--web`) | Celular, computador e tablet |
@@ -770,6 +770,7 @@ Cada painel escolhe, dentro das regras fixas:
 - **Ícone de cada estado**, de Bootstrap Icons. O atraso padrão usa `bi-exclamation-octagon-fill`; a atenção, o do painel (`bi-exclamation-triangle-fill` no garçom, `bi-hourglass-split` nos entregadores).
 - **Ordem, posição e presença das peças.** Topo, valor, faixa, rodapé e selos são peças, não molde obrigatório: o painel ordena, junta ou omite o que o cenário pede (o painel de senhas não tem tempo nem faixa), desde que a informação principal continue a maior e a altura continue estável.
 - **Fundo do painel.** Claro ou escuro pelo tema Colibri (`data-theme`: só o piso muda), ou cor própria do lojista como semente `ambiente` de `derivarEsquema`, que deriva piso, superfícies e textos com o contraste garantido e decide claro ou escuro. O painel voltado ao cliente usa `.cc-painel--cliente`: piso, preenchimento e tinta da espera vêm do esquema do canal (`--ct-bg`, `--ct-brand` e `--ct-on-brand`), os mesmos do preço preenchido do cardápio.
+- **Colunas:** as que cabem na largura (`.cc-grade`, em `auto-fill`) ou de 3 a 6, escolhidas pelo lojista para cada painel (`.cc-grade--cols` com `--cc-cols` na grade; a aplicação oferece só esse intervalo). Com 6 colunas na TV em 1366 px, o card fica com cerca de 210 px e ainda cabe o número, o tempo e a faixa.
 - **Escala:** fixa (prévia no admin, tablet) ou da TV (`.cc-painel--tv`, abaixo).
 
 Os tokens ficam em `colibri-cards.css`, não na base, porque só o card os usa:
@@ -808,13 +809,14 @@ Peças que o painel ordena e escolhe (escolha do painel, acima); a marcação de
 - **Rodapé** (`.cc-sinal__rodape`): o motivo do chamado (ex.: "Conta", "Cardápio"), com a altura de um selo reservada.
 - **Selos** (`.cc-veu`): sobre o preenchimento, no véu do estado (ex.: "A caminho", "2 sacolas").
 - **Transbordo** (`.cc-mais`): o que não cabe no painel vira um bloco neutro "+N chamados", em `surface-2`, com texto `ink-2` e o número em `ink` mono, sem borda tracejada.
-- **Grade** (`.cc-grade`): colunas `auto-fill` que cabem na largura; os cards alinham ao topo e não esticam até a altura do vizinho.
+- **Grade** (`.cc-grade`): colunas `auto-fill` que cabem na largura ou, com `.cc-grade--cols`, as `--cc-cols` (3 a 6) escolhidas para o painel; os cards alinham ao topo e não esticam até a altura do vizinho.
+- **Cabeçalho do painel** (`.cc-cabecalho`): faixa discreta no topo, em `surface`, com o título (`.cc-cabecalho__titulo`), a contagem (`.cc-cabecalho__apoio`, "5 chamados"), a data e a hora à direita (`.cc-cabecalho__relogio`, com a data em `.cc-cabecalho__apoio` e a hora em `.cc-cabecalho__hora`) e as ações (`.cc-cabecalho__acao`, ex.: tela cheia, ativar som). Nada nele é maior que as peças do card: título e contagem no corpo do rótulo (`--cc-t`, o título em 600 e `ink`, a contagem em `ink-2`), a data igual à contagem e a hora no corpo do tempo (`--cc-t-xl`, mono). O texto alinha pela base da linha, e a contagem fica na mesma linha da data; os botões ficam ao centro.
 
 ### Exemplos
 
 Os painéis de `exemplo-toque.html#chamados` são exemplos do perfil, não modelos: mostram escolhas possíveis dentro das regras fixas.
 
-- **Garçom:** cor de espera padrão (azul), topo com "Mesa" e o tempo, número em display mono e o motivo no rodapé; atenção com `bi-exclamation-triangle-fill`.
+- **Garçom:** cor de espera padrão (azul), topo com "Mesa" e o tempo, número em display mono e o motivo no rodapé; atenção com `bi-exclamation-triangle-fill`; 5 colunas escolhidas (`.cc-grade--cols`) e o botão de tela cheia no cabeçalho.
 - **Entregadores:** espera petróleo (`--cc-espera: var(--cm-palette-petroleo)` no painel), rótulo com `bi-bicycle`, nome em `.cc-sinal__valor--texto`, selos no véu e `.cc-mais` para o que não cabe; atenção com `bi-hourglass-split`.
 - **Senhas** (voltado ao cliente): `.cc-painel--cliente`, com o esquema do canal; sem tempo e sem faixa de urgência, porque não há prazo voltado ao cliente.
 - **Cor livre do lojista:** um card de espera num amarelo claro escolhido pelo lojista, com a tinta escura e o véu claro calculados por `tintaSobre` e `veuSobre`.
@@ -835,6 +837,7 @@ Os painéis de `exemplo-toque.html#chamados` são exemplos do perfil, não model
 - Tinta escolhida pelo lojista, ou cor livre sem a tinta e o véu calculados.
 - Estado só pela cor, ou faixa que aparece e empurra o conteúdo.
 - Corpo de itens no card de sinal (isso é o `.cp-card` do perfil Produção), ou tempo e urgência no painel de senhas.
+- Cabeçalho maior que o card (título acima de `--cc-t` ou hora acima de `--cc-t-xl`), contagem e data em linhas de base diferentes, ou mais de 6 colunas na grade.
 - Mais de um estado respirando, respiro que anima cor ou fundo em vez de opacidade, ou que continua com movimento reduzido.
 
 ## 12. Implementação neste projeto
