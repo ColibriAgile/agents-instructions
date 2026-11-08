@@ -665,7 +665,7 @@ Os tokens ficam em `colibri-producao.css`, não na base, porque só o card os us
 | Item do combo (quantidade em mono) | 15 px | 400; quantidade 500 | 23 px |
 | Senha e tempo (mono, tabulares) | 15 px | 700 | 26 px |
 | Observação, alteração e ritmo de preparo | 12 px | 600 | 18 px |
-| Pessoa e local | 12 px | 500 | 20 px |
+| Garçom, pessoa e local | 12 px | 500 | 20 px |
 | Selo do tipo, índice e marcas do cabeçalho | 12 px | 600 | 21 px |
 | Alérgeno | 12 px | 600 | 20 px |
 
@@ -675,7 +675,7 @@ Os tokens ficam em `colibri-producao.css`, não na base, porque só o card os us
 
 ### Anatomia do card
 
-- **Cabeçalho**, em duas linhas: (1) índice (só no modo bump), selo do tipo, senha e, à direita, o tempo; (2) menor, pessoa (`bi-person`) e local (`bi-geo-alt`). Sem faixa de urgência nem faixa de dados.
+- **Cabeçalho**: (1) índice (só no modo bump), selo do tipo, senha e, à direita, o tempo; logo abaixo do tempo, à direita, o garçom que fez o envio (`.cp-card__garcom`, `bi-person-badge`), numa linha só com reticências e só quando a aplicação o conhece; (2) menor, pessoa (`bi-person`) e local (`bi-geo-alt`). Sem faixa de urgência nem faixa de dados.
 - **Itens:** grade `estado | quantidade | nome`, numa linha só; a coluna de estado é fixa e sempre ocupada. Um traço de 1 px (`--cp-divisor`) separa os itens, sem espaço entre eles.
 - **Cinco estados, cinco formas** (a cor acompanha a forma, nunca sozinha): aguardando `bi-clock` em `ink-3`, em preparo `bi-fire` em `action-ink`, pronto `bi-check-circle-fill` em sucesso, pausado `bi-pause-circle-fill` em `ink-2`, cancelado `bi-x-circle-fill` em erro.
 - **Observação:** `bi-arrow-right` e o texto, na cor de aviso. **Alteração:** `bi-pencil-square`, na mesma cor; a linha alterada acende em `warning-soft` pelo tempo que a aplicação definir, sem bloco extra que empurre o card.
@@ -698,7 +698,7 @@ A visão por produto (consolidado) usa o mesmo card, com o produto no lugar do p
 O modo é configurado por estação (todos os monitores de uma estação no mesmo modo) e marcado na raiz da grade: `.cp-modo-toque` ou `.cp-modo-bump`.
 
 - **Toque** (tablet ao alcance do cozinheiro): rodapé com botões só de texto, de 40 px (`.cp-card__acao`): Espera ou Iniciar e Concluir (`--principal`, com o dobro da largura); Remover (`--perigo`) no cancelado. O ícone de estado é o botão do item (`.cp-card__estado-btn`, 30 px visíveis): o toque avança de aguardando para em preparo e para pronto, o toque no pronto volta para em preparo (é o desfazer), e o toque longo põe ou tira o item da espera. O nome continua abrindo a ficha técnica. Num combo, a ação vale para a linha toda.
-- **Bump** (TV operada pela bump bar): sem rodapé. O card selecionado (`.is-selecionado`) tem contorno de 4 px na cor de seleção, afastado 3 px, e o índice aceso. O cursor (`.is-cursor`) fica no cabeçalho, com contorno interno na tinta do cabeçalho, ou num item, com contorno interno de 2 px e `action-soft`. Ao chegar num card, o cursor para no primeiro item pendente (nem pronto nem em espera); quando um item fica pronto, ele pula para o próximo pendente. No card cancelado, o cabeçalho é a única linha do cursor.
+- **Bump** (TV operada pela bump bar): sem rodapé. O card selecionado (`.is-selecionado`) tem um anel de 5 px na cor de seleção, separado do card por um anel de 3 px na cor do corpo, uma sombra que o tira do piso e o índice aceso. O anel do corpo é obrigatório: sem ele, o azul encosta no cabeçalho vermelho do atraso, de luminância parecida, e a seleção some. O cursor (`.is-cursor`) fica no cabeçalho, com contorno interno na tinta do cabeçalho, ou num item, com contorno interno de 2 px e `action-soft`. Ao chegar num card, o cursor para no primeiro item pendente (nem pronto nem em espera); quando um item fica pronto, ele pula para o próximo pendente. No card cancelado, o cabeçalho é a única linha do cursor.
 - **Faixas do card** (`.cp-card__faixa`): "Enter de novo para concluir", só no card selecionado e enquanto espera o segundo Enter; "Tudo pronto · Enter conclui" (`--pronto`), quando todos os itens estão prontos. O card nunca conclui sozinho: o item pronto fica no card, esmaecido, até o card ser concluído.
 
 **Regra da bump bar em dois níveis.** O cursor fica no cabeçalho (o card inteiro) ou num item, e a mesma tecla age no nível dele: 8 e 2 andam entre os itens, e acima do primeiro está o cabeçalho; 4 e 6 vão ao card anterior e ao próximo na ordem da fila, que o índice mostra; 0 avança o item ou inicia o card; `.` põe na espera o item ou o card; Enter sempre conclui o card, com a confirmação do segundo Enter; 5 vai ao primeiro card e Esc limpa a seleção. As teclas continuam configuráveis.
