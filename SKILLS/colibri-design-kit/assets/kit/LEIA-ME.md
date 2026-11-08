@@ -78,6 +78,12 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **08/11/2026 (seleção do card em atraso e garçom do envio):** no KDS, o contorno azul do card selecionado pela bump bar sumia ao lado do cabeçalho vermelho do atraso, porque as duas cores têm luminância parecida (relato da revenda Maqvale, WIN-3272). Além disso, o card por envio passou a mostrar o garçom que fez o envio. As duas mudanças vieram do KDS, onde eram complementos do projeto.
+  - **Regra:** `DESIGN.md`, seção 10. Em "Modos", o selecionado ganha anel de 5 px na cor de seleção, separado do card por um anel de 3 px na cor do corpo, e sombra. Em "Anatomia do card", o cabeçalho ganha a linha do garçom sob o tempo, à direita. A tabela de tipografia junta o garçom à linha de apoio.
+  - **Implementação:** `colibri-producao.css`: `.cp-card.is-selecionado` passa de `outline` para `box-shadow` em dois anéis, e entra o `.cp-card__garcom`. `exemplo-toque.html`: o selecionado do `#bump` é um card em atraso, e um card do `#kds` mostra o garçom.
+  - **Skill:** sem mudança na rubrica (o R4 cita o `.is-selecionado`, não a forma do contorno).
+  - **Na aplicação que já tem a peça:** tire o complemento local do selecionado e do garçom (no KDS, em `src/styles/producao.css`).
+
 - **04/11/2026 (tela de entrada do operador):** o tablet liga o vidro também na vinculação e na configuração do servidor, telas cheias de formulário antes do cardápio. O kit não tinha peça para elas: a folha (`.ct-sheet`) é camada fixa, com animação, e o formulário ficaria direto sobre o fundo, o que o O13 proíbe. O ColibriTablet resolveu com classes próprias e um desvio O13. Vira peça do perfil Operação:
   - **Regra:** `DESIGN.md`, seção 9, componente "Tela de entrada", com a linha nova em "Nomes" e o painel e a ação de canto em "O que vira vidro".
   - **Implementação:** `colibri-touch.css`: `.ct-entrada`, `.ct-entrada__painel` (coluna de até 448 px, sem superfície fora do vidro), `.ct-entrada__marca`, `.ct-entrada__titulo`, `.ct-entrada__texto` e `.ct-entrada__canto`; no vidro, o painel com o respiro e o canto da folha e a ação de canto com o fio de luz. `exemplo-toque.html`: `#entrada`, `#entrada-vidro` e `#entrada-vidro-claro`.

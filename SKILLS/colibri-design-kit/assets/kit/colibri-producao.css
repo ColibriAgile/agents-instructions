@@ -206,6 +206,19 @@
     line-height: var(--cp-lh-apoio);
 }
 .cp-card__apoio .bi { margin-right: 4px; font-size: .9em; line-height: 1; }
+/* Garçom do envio: linha própria sob o tempo, à direita, no tamanho da linha de apoio; nome longo
+ * termina em reticências sem mudar a altura do cabeçalho. */
+.cp-card__garcom {
+    min-width: 0;
+    overflow: hidden;
+    font-size: var(--cp-text-sm);
+    font-weight: 500;
+    line-height: var(--cp-lh-apoio);
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.cp-card__garcom .bi { margin-right: 4px; font-size: .9em; line-height: 1; }
 
 /* ---------- Card de agrupamento (visão por produto, consolidado) ----------
  * O mesmo card, com o produto no lugar do pedido: cabeçalho na cor do tempo do pior pedido, o produto e o
@@ -501,11 +514,19 @@
 .cp-card__acao:focus-visible { outline: 2px solid var(--cp-selecao); outline-offset: 2px; }
 
 /* ---------- Modo bump ----------
- * Sem rodapé. Card selecionado: contorno de 4 px afastado e o índice aceso. O cursor fica no
- * cabeçalho (card inteiro) ou num item (contorno interno de 2 px e fundo suave da ação). */
+ * Sem rodapé. Card selecionado: anel de 5 px na cor de seleção, afastado do card por um anel de 3 px
+ * na cor do corpo, e o índice aceso; o anel do corpo separa o azul do cabeçalho vermelho do atraso, de
+ * luminância parecida. O cursor fica no cabeçalho (card inteiro) ou num item (contorno interno de 2 px
+ * e fundo suave da ação). */
 .cp-modo-bump .cp-card { padding-bottom: 4px; }
 .cp-modo-bump .cp-card__foot { display: none; }
-.cp-card.is-selecionado { outline: 4px solid var(--cp-selecao); outline-offset: 3px; }
+.cp-card.is-selecionado {
+    z-index: 1;
+    box-shadow:
+        0 0 0 3px var(--cp-corpo),
+        0 0 0 8px var(--cp-selecao),
+        0 6px 18px rgba(0, 0, 0, .35);
+}
 .cp-card.is-selecionado .cp-card__indice { color: #fff; background: var(--ct-action); }
 .cp-card__head.is-cursor { box-shadow: inset 0 0 0 2px var(--cp-tinta); }
 .cp-card__item.is-cursor {
