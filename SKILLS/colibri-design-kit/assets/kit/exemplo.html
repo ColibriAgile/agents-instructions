@@ -228,6 +228,46 @@
                         </div>
                     </section>
 
+                    <!-- Página de configurações: um título por grupo, um painel e o Salvar do grupo no fim
+                         (regra das configurações por grupo); ajustes com unidade em linhas .cm-setting -->
+                    <section id="tempos" aria-labelledby="tempos-titulo">
+                        <div class="cm-section__head"><h2 class="cm-section__title" id="tempos-titulo">Tempos de tela</h2></div>
+                        <p class="cm-section__hint">Quanto a tela espera antes de seguir sozinha.</p>
+                        <form class="cm-panel cm-form" onsubmit="return false">
+                            <div class="cm-settings">
+                                <div class="cm-setting">
+                                    <div>
+                                        <label class="cm-setting__title" for="t-inatividade">Inatividade no cardápio</label>
+                                        <p class="cm-setting__hint" id="t-inatividade-dica">Sem toque nesse tempo, a tela pergunta "Ainda está aí?". De 15 a 600; padrão 90.</p>
+                                    </div>
+                                    <div class="cm-input-group cm-setting__control">
+                                        <input id="t-inatividade" type="number" min="15" max="600" class="cm-input cm-mono" value="90" aria-describedby="t-inatividade-dica">
+                                        <span class="cm-input-addon">segundos</span>
+                                    </div>
+                                </div>
+                                <div class="cm-setting">
+                                    <div>
+                                        <label class="cm-setting__title" for="t-comprovante">Comprovante do cartão</label>
+                                        <p class="cm-setting__hint" id="t-comprovante-dica">Sem resposta, segue sem imprimir a via. De 15 a 120; padrão 60.</p>
+                                    </div>
+                                    <div class="cm-input-group cm-setting__control">
+                                        <input id="t-comprovante" type="number" min="15" max="120" class="cm-input cm-mono" value="45" aria-describedby="t-comprovante-dica">
+                                        <span class="cm-input-addon">segundos</span>
+                                    </div>
+                                    <div class="cm-setting__extra">
+                                        <div class="cm-notice cm-notice--warning"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i><span>Abaixo de 60 s fica fora do mínimo da homologação.</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cm-form__actions">
+                                <div class="cm-btn-group" role="group">
+                                    <button type="button" class="cm-btn">Cancelar</button>
+                                    <button type="submit" class="cm-btn cm-btn--primary">Salvar tempos</button>
+                                </div>
+                            </div>
+                        </form>
+                    </section>
+
                     <div class="demo-row">
                         <!-- Formulário -->
                         <form class="cm-panel cm-form" onsubmit="return false">

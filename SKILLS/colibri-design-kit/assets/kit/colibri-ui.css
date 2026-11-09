@@ -1427,6 +1427,39 @@ label.cm-field__label {
     font-size: 12px;
     white-space: nowrap;
 }
+/* Lista de ajustes com unidade (seção 6, "Lista de ajustes com unidade"): um ajuste por linha,
+ * título e explicação à esquerda, o campo à direita com a unidade unida a ele; o aviso da linha
+ * embaixo, na largura toda. Abaixo de 760 px o campo desce para baixo do texto. O campo tem
+ * 184 px porque, abaixo de 480 px, o campo unido garante 104 px ao campo e a unidade fica com o resto. */
+.cm-settings { display: flex; flex-direction: column; }
+.cm-setting {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px 24px;
+    padding: 14px 0;
+}
+.cm-setting:first-child { padding-top: 0; }
+.cm-setting:last-child { padding-bottom: 0; }
+.cm-setting + .cm-setting { border-top: 1px solid var(--cm-line); }
+.cm-setting__title {
+    margin: 0;
+    color: var(--cm-ink);
+    font-size: 13px;
+    font-weight: 600;
+}
+.cm-setting__hint {
+    margin: 2px 0 0;
+    color: var(--cm-ink-3);
+    font-size: 12px;
+    line-height: 1.4;
+}
+.cm-setting__control { width: 184px; }
+.cm-setting__control > .cm-input { text-align: right; }
+.cm-setting__extra { grid-column: 1 / -1; }
+@media (max-width: 760px) {
+    .cm-setting { grid-template-columns: minmax(0, 1fr); }
+}
 .cm-check {
     display: inline-flex;
     align-items: center;
