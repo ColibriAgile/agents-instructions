@@ -173,9 +173,12 @@
     --ct-text-2xl: 64px;
     --ct-text-display: 96px;
 }
-/* Na TV, a folha (ajustes da tela) é operada de perto: volta à escala do KDS. O cabeçalho é apoio e segue
- * a regra da barra no tamanho do card: a altura, o nome em 17 px e os selos em 13 px da .ct-bar. */
-.ct-app--tv .ct-sheet {
+/* Na TV, a folha (ajustes da tela) é operada de perto: volta à escala do KDS, inclusive o texto solto dela.
+ * Com :where(), a regra pesa como uma classe só, e a aplicação ainda ajusta a sua folha como na .ct-app--kds.
+ * O cabeçalho é apoio e segue a regra da barra no tamanho do card: a altura, o nome em 17 px e os selos em
+ * 13 px da .ct-bar. */
+.ct-app--tv :where(.ct-sheet) {
+    font-size: var(--ct-text);
     --ct-gap: 12px;
     --ct-pad: 14px;
     --ct-text-sm: 14px;
