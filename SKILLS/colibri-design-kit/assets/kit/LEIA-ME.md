@@ -78,6 +78,12 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **08/11/2026 (TV com controles do KDS e colunas de 3 a 6):** no painel de pedidos prontos do KDS, o nome da loja no cabeçalho saía em 44 px e a folha "Ajustes da tela" tinha chips de 56 px com texto de 32 px, maiores que os da cozinha e que os próprios cards; e o painel não tinha controle de colunas. Pedido do usuário, depois da imagem da tela.
+  - **Regra:** `DESIGN.md`, seção 9. A `.ct-app--tv` passa a 40 px de alvo com controles em 15 px, como a `.ct-app--kds` (tabela de superfícies e a regra nova "TV, controles e folhas de perto"): a folha volta à escala do KDS, e o cabeçalho segue a regra da barra no tamanho do card. A regra das colunas pela largura do card passa a 3, 4, 5 ou 6 e vale também para as outras grades de pedidos do KDS e para a grade de pedidos prontos.
+  - **Implementação:** `colibri-touch.css`: tokens da `.ct-app--tv`, `.ct-app--tv .ct-sheet`, `.ct-app--tv .ct-header` e `.ct-header__name`, e `.ct-ready-grid--cols` com `--ct-cols`, limitada pela largura mínima do card. `exemplo-toque.html#pronto` com 5 colunas.
+  - **Skill:** rubrica v24 (O2, O8 e O11).
+  - **Na aplicação que já tem o painel:** tire o que encolhia a folha e o cabeçalho na TV, ofereça de 3 a 6 colunas nas estações, na expedição de entrega e nos pedidos prontos (no KDS, `COL_OPTIONS`, o `COLUNAS_MAX` do Delivery e a grade do `PedidoPronto.jsx`).
+
 - **08/11/2026 (cabeçalho e colunas do painel de chamados):** no painel de chamados do ColibriTablet, o título do cabeçalho ficava maior que tudo no card, a contagem não alinhava com a data, e o kit não tinha controle de colunas (`.cc-grade` só em `auto-fill`): o projeto mantinha um cabeçalho e uma grade próprios. Pedido do usuário, depois da imagem da TV.
   - **Regra:** `DESIGN.md`, seção 11. Em "Escolhas do painel", as colunas: as que cabem ou de 3 a 6, escolhidas pelo lojista para cada painel. Em "Peças", o cabeçalho do painel, menor que o card (título e contagem no corpo do rótulo, hora no corpo do tempo) e alinhado pela base, com a contagem na mesma linha da data. Atualizados os exemplos, o "Não faça" e a tabela de nomes.
   - **Implementação:** `colibri-cards.css`: `.cc-cabecalho` (com `__titulo`, `__apoio`, `__relogio`, `__hora` e `__acao`) e `.cc-grade--cols` com `--cc-cols`. `exemplo-toque.html`: os quatro painéis de `#chamados` com o cabeçalho do kit no lugar da barra de demonstração, e o do garçom com 5 colunas e o botão de tela cheia.
