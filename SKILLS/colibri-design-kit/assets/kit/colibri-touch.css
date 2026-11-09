@@ -158,9 +158,12 @@
     --ct-text-2xl: 32px;
     --ct-text-display: 48px;
 }
-/* Painel de pedidos prontos (TV): só leitura, de 2 a 5 m. */
+/* Painel de pedidos prontos (TV): só leitura, de 2 a 5 m. Quem se lê de longe são os cards e os números;
+ * os controles (botões, chips, quantidade) ficam no tamanho dos do KDS (40 px e texto de 15 px), como na
+ * .ct-app--kds: são usados de perto, por quem instala a TV. */
 .ct-app--tv {
-    --ct-target: 56px;
+    --ct-target: 40px;
+    --ct-control-text: 15px;
     --ct-gap: 20px;
     --ct-pad: 24px;
     --ct-text-sm: 18px;
@@ -170,6 +173,26 @@
     --ct-text-2xl: 64px;
     --ct-text-display: 96px;
 }
+/* Na TV, a folha (ajustes da tela) é operada de perto: volta à escala do KDS. O cabeçalho é apoio e segue
+ * a regra da barra no tamanho do card: a altura, o nome em 17 px e os selos em 13 px da .ct-bar. */
+.ct-app--tv .ct-sheet {
+    --ct-gap: 12px;
+    --ct-pad: 14px;
+    --ct-text-sm: 14px;
+    --ct-text: 18px;
+    --ct-text-lg: 20px;
+    --ct-text-xl: 24px;
+    --ct-text-2xl: 32px;
+    --ct-text-display: 48px;
+}
+.ct-app--tv .ct-header {
+    --ct-tag-h: 26px;
+    --ct-tag-pad: 8px;
+    --ct-tag-text: 13px;
+    min-height: 48px;
+    padding: 4px var(--ct-pad);
+}
+.ct-app--tv .ct-header__name { font-size: 17px; }
 
 /* ---------- Aplicação ---------- */
 .ct-app {
@@ -1391,6 +1414,12 @@ textarea.ct-input { min-height: calc(var(--ct-target) * 2); resize: none; }
     grid-template-columns: repeat(auto-fill, minmax(calc(var(--ct-text-display) * 2.6), 1fr));
     gap: var(--ct-gap);
     padding: var(--ct-pad);
+}
+/* Colunas escolhidas pelo lojista (--ct-cols, de 3 a 6), mas nenhuma abaixo da largura mínima do card (a do
+ * auto-fill acima): sem espaço, a TV mostra menos colunas, nunca um número cortado (regra das colunas pela
+ * largura do card). Em 1920 px cabem as seis; em 1366 px, quatro. */
+.ct-ready-grid--cols {
+    grid-template-columns: repeat(auto-fill, minmax(max(calc(var(--ct-text-display) * 2.6), calc((100% - (var(--ct-cols, 4) - 1) * var(--ct-gap)) / var(--ct-cols, 4) - .5px)), 1fr));
 }
 .ct-ready {
     display: flex;
