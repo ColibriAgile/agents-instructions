@@ -19,10 +19,8 @@ bundles:
       - grill-me
       - grill-with-docs
       - grilling
-      - lesson-learned
       - no-workarounds
       - repository-cli-efficiency
-      - show-me
       - investigar-logs
 
   dotnet:
@@ -38,7 +36,6 @@ bundles:
       - csharp-tests-refactor
       - dotnet-efficient-validation
       - extrair-requisitos-csharp
-      - http-client-resilience
       - pgsql-test-runner
 
   delphi:
@@ -83,25 +80,10 @@ bundles:
       - deep-review
       - refactoring-analysis
 
-  jira-pm:
-    description: Gestão de tarefas no Jira e migração de tarefas do ClickUp.
-    skills:
-      - jira-aashari-mcp
-      - jira-issue-description-generator
-      - jira-mcp-issue-management
-      - jira-task-refinement
-
   authoring:
     description: Autoria de skills/agents/rules/hooks — instalação pontual (ad hoc), remover ao final da tarefa.
     skills:
-      - agent-customization
       - assign-bundles
-      - create-agent
-      - create-hook
-      - create-instructions
-      - create-prompt
-      - create-skill
-      - to-prompt
       - writing-agents-md
       - writing-skills
 
@@ -121,7 +103,3 @@ bundles:
       - kb
       - kb-yt-channel
 
-  orchestration:
-    description: Skills especializadas em orquestração
-    skills:
-      - herdr-orchestration

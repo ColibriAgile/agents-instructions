@@ -113,7 +113,7 @@ O CLI compara somente a restrição de sistema operacional declarada com o siste
 ## Bundles de skills
 
 `bundles.yaml` é o catálogo central de bundles por stack (`dotnet`, `delphi`, `frontend`) e por
-temática (`sdd`, `code-review`, `jira-pm`, `authoring`), além do bundle `core`
+temática (`sdd`, `code-review`, `authoring`), além do bundle `core`
 (obrigatório em todo projeto).
 
 Cada projeto declara os bundles que usa em um `skills.yaml` próprio (veja `skills.yaml.sample`),
@@ -180,7 +180,7 @@ para imprimir só o resumo.
 Bundle extra pontual (ex: mexer no CLAUDE.md do projeto), sem alterar o `skills.yaml` commitado:
 
 ```powershell
-npx skills add ColibriAgile/agents-instructions -s create-agent create-instructions writing-agents-md -y
+npx skills add ColibriAgile/agents-instructions -s writing-agents-md writing-skills -y
 ```
 
 Remova manualmente quando terminar, ou deixe para a próxima execução do `Install-Skills.ps1`

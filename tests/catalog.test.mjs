@@ -11,7 +11,7 @@ test('AC2: bundled catalog is complete and every bundle resolves', async () => {
   const catalog = await loadCatalog();
   const expected = skillFolderCount();
   assert.equal(catalog.skills.length, expected);
-  assert.equal(Object.keys(catalog.bundles).length, 12);
+  assert.equal(Object.keys(catalog.bundles).length, 10);
   const selection = resolveSelection(catalog, { bundles: Object.keys(catalog.bundles) });
   assert.equal(selection.length, expected);
   assert.equal(new Set(selection.map(s => s.name)).size, expected);

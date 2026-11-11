@@ -203,8 +203,7 @@ O relatório indica, para cada achado, quem executa a correção. Esta skill nã
 | DB-01 a DB-03, DB-07, TST-07 | skill `colibri-connection-string` |
 | TST-01 a TST-04 | skill `atualizar-testes-mtp` |
 | TST-05, TST-06, TST-08 | skills `csharp-tests` e `csharp-tests-refactor` |
-| LIB-03 | skill `http-client-resilience` |
 | LIB-05, atualização de pacotes | skill `atualizar-pacotes-nuget` |
 | DB-04 (EF Core para Dapper), LIB-01, LIB-02 | `sdd-planejar-refatoracao` (mudança estrutural com plano próprio) |
-| SUB-*, PUB-*, CI-*, SRV-*, API-*, REP-*, SEC-* | manual, ou um plano com `sdd-planejar-correcoes` a partir do relatório |
+| LIB-03, SUB-*, PUB-*, CI-*, SRV-*, API-*, REP-*, SEC-* | manual, ou um plano com `sdd-planejar-correcoes` a partir do relatório |
 | Build e testes depois de cada correção | skill `dotnet-efficient-validation` |
