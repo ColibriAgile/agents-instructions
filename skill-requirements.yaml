@@ -29,3 +29,9 @@ skills:
     notes:
       - Os exemplos usam PowerShell; para os scripts Python, use py -3 no Windows ou python3 em macOS/Linux.
       - Revisão de PR exige gh autenticado; runtimes não nativos exigem compozy e suas configurações.
+  # SKILLS/colibri-notas-release/SKILL.md, seção Ferramentas.
+  colibri-notas-release:
+    tools: [MCP Atlassian, MCP Slack]
+    notes:
+      - O MCP do Atlassian precisa do conector v2 (discover e execute*), com acesso de escrita ao Confluence.
+      - O MCP do Slack precisa estar autenticado no workspace Sistema Colibri e permitir envio de arquivo; sem ele, a skill publica só no Confluence. O envio usa curl.

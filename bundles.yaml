@@ -88,9 +88,10 @@ bundles:
       - writing-skills
 
   release:
-    description: Liberação de pacotes Colibri para produção a partir de tarefas do Jira.
+    description: Liberação de pacotes Colibri para produção e notas de release a partir do Jira.
     skills:
       - colibri-deploy-producao
+      - colibri-notas-release
 
   api-docs:
     description: Documentação de APIs a partir de collections e specs — geração de Markdown para wiki/RAG.
