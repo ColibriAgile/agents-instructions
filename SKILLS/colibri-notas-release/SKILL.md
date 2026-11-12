@@ -33,6 +33,19 @@ Grupos, na ordem de exibição:
 
 Um tipo fora da tabela forma um grupo com o nome do próprio tipo, depois de Technical, em ordem alfabética.
 
+## Título da página
+
+O título da página é o nome da versão sem o número do build. O número da versão fica com as 3 primeiras partes, e a 3ª parte sai quando é zero. O nome do produto fica igual.
+
+| Nome da versão no Jira | Título da página |
+|---|---|
+| `PIS 1.6.4.87` | `PIS 1.6.4` |
+| `Tablet 2.2.0.141` | `Tablet 2.2` |
+| `Tablet 2.2.0` | `Tablet 2.2` |
+| `POS 11.2` | `POS 11.2` |
+
+A busca no Jira usa o nome da versão. A página do Confluence e o arquivo do Slack usam o título da página.
+
 ## Ferramentas
 
 - MCP do Atlassian com `discover` e `executeRead`/`executeWrite` (conector v2). Operações diretas: `searchJiraIssuesUsingJql`, `getJiraIssue`, `searchConfluence`, `getConfluenceContent`, `createConfluenceContent`, `updateConfluenceContent`. Operações pelo `execute*`: `getConfluenceContentAncestors`, `downloadJiraIssueAttachment`, `createConfluenceAttachment`.
@@ -96,15 +109,16 @@ Monte 1 documento em markdown com esta estrutura:
 
 ## Passo 4: Revisão e aprovação
 
-1. Confira se a página já existe: `searchConfluence` com `cql: space = "<chave do espaço>" AND type = page AND title = "<versão>"`. Se existe, guarde o id dela.
+1. Confira se a página já existe: `searchConfluence` com `cql: space = "<chave do espaço>" AND type = page AND title = "<título da página>"`. Se existe, guarde o id dela.
 2. Proponha a página-mãe. A árvore real é Releases → produto (→ subproduto) → versão, e o nome da página de produto nem sempre é igual ao nome do produto na versão.
-   - O produto é o nome da versão sem o número final (`CBO Connect 1.9.5` → `CBO Connect`).
+   - O produto é o título da página sem o número (`CBO Connect 1.9.5` → `CBO Connect`).
    - Chame `searchConfluence` com `cql: ancestor = <id da página Releases> AND type = page AND title ~ "<produto>" ORDER BY created DESC`.
-   - Escolha a página mais recente com título `<produto> <número>` e número diferente do número desta versão. Chame `getConfluenceContentAncestors` com o id dela: o último item da lista é a página-mãe proposta.
+   - Escolha a página mais recente com título `<produto> <número>` e número diferente do número do título da página. Chame `getConfluenceContentAncestors` com o id dela: o último item da lista é a página-mãe proposta.
    - Se nenhuma página tem esse título, a página-mãe proposta é a página Releases.
 3. Confira que as 2 ferramentas de envio de arquivo do Slack estão disponíveis nesta sessão.
 4. Mostre ao usuário, numa só mensagem:
    - as notas do passo 3;
+   - o título da página;
    - a página-mãe proposta (título e caminho desde Releases);
    - o canal do Slack que recebe o arquivo;
    - as chaves dos chamados descartados;
@@ -130,7 +144,7 @@ Monte 1 documento em markdown com esta estrutura:
 
    Tire os marcadores de imagem do passo 3: nesta primeira gravação, o corpo tem só texto.
 2. Grave a página:
-   - **Página nova:** `createConfluenceContent` com `contentType: "page"`, `title` igual ao nome da versão, `parent: {"parentContentId": "<id da página-mãe>"}` e `body: {"format": "html", "value": "<html>"}`.
+   - **Página nova:** `createConfluenceContent` com `contentType: "page"`, `title` igual ao título da página, `parent: {"parentContentId": "<id da página-mãe>"}` e `body: {"format": "html", "value": "<html>"}`.
    - **Página que já existe:** leia a página com `getConfluenceContent` (`draft: true`, `detail: "full"`, `content_format: "html"`). Chame `updateConfluenceContent` com o `snapshotToken` da leitura e o mesmo `body`.
 3. Guarde o id, a URL e o `snapshot.token` da resposta.
 4. Para cada imagem copiável, numa pasta temporária:
@@ -145,14 +159,14 @@ Monte 1 documento em markdown com esta estrutura:
 6. Se o download ou o envio de uma imagem falha, continue com as outras. A página fica sem essa imagem, e a imagem entra na lista de não copiadas do relatório.
 7. Se `updateConfluenceContent` responde `snapshot_stale`, leia a página de novo e repita a chamada com o token novo.
 
-*Pronto quando:* a página existe com o título da versão, e cada imagem está na página ou na lista de não copiadas.
+*Pronto quando:* a página existe com o título da página, e cada imagem está na página ou na lista de não copiadas.
 
 ## Passo 6: Enviar ao Slack
 
 Faça este passo logo depois do passo 5, sem outra pergunta, se o usuário aprovou o Slack.
 
-1. Grave as notas do passo 3 num arquivo `.md`, numa pasta temporária, em UTF-8. O nome do arquivo é o nome da versão com `-` no lugar dos espaços (`Tablet 2.2` → `Tablet-2.2.md`).
-   - A primeira linha é o título `# <versão>`.
+1. Grave as notas do passo 3 num arquivo `.md`, numa pasta temporária, em UTF-8. O nome do arquivo é o título da página com `-` no lugar dos espaços (`Tablet 2.2` → `Tablet-2.2.md`).
+   - A primeira linha é o título `# <título da página>`.
    - Tire os marcadores de imagem. Se as notas têm imagens, escreva no fim: `As imagens estão na página do Confluence.`
    - A última linha é a URL da página do Confluence.
 2. Leia o tamanho exato do arquivo em bytes (`wc -c < <arquivo>`).
@@ -163,7 +177,7 @@ Faça este passo logo depois do passo 5, sem outra pergunta, se o usuário aprov
    URL='<URL de envio>' && curl -sS -X POST "$URL" -H 'Content-Type: text/markdown' -H 'Content-Length: <tamanho>' --data-binary @<arquivo>
    ```
 
-5. Chame `slack_complete_file_upload` com o `file_id`, `channel_id` igual ao id do canal do Slack das constantes, `title` igual a `Notas de release: <versão>` e `initial_comment` com 2 linhas: `Notas de release: <versão>` e a URL da página do Confluence.
+5. Chame `slack_complete_file_upload` com o `file_id`, `channel_id` igual ao id do canal do Slack das constantes, `title` igual a `Notas de release: <título da página>` e `initial_comment` com 2 linhas: `Notas de release: <título da página>` e a URL da página do Confluence.
 6. Trate as falhas:
    - `curl` responde `401`: a URL de envio está errada ou expirou. Volte ao item 3.
    - Outra falha: mostre o erro e o caminho do arquivo ao usuário. A página do Confluence fica como está.
