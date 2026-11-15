@@ -1,6 +1,7 @@
 import * as p from '@clack/prompts';
 import { spawnSync } from 'node:child_process';
-import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { parseDocument } from 'yaml';
 import { isMissing, loadCatalog, packageRoot, readSkillMeta, skillName } from './catalog.js';
@@ -254,14 +255,14 @@ async function update(options: Options, ctx: Context): Promise<void> {
   const results: { repo: string; status: 'updated' | 'current' | 'skipped' | 'failed'; detail?: string }[] = [];
   const last = (text: string) => text.trim().split('\n').pop() ?? '';
   const dirty = git(ctx.clone, ['status', '--porcelain', '--untracked-files=no']).stdout.trim();
-  if (git(ctx.clone, ['rev-parse', '--git-dir']).status !== 0) results.push({ repo: 'catálogo', status: 'skipped', detail: 'a pasta do catálogo não é um clone Git' });
-  else if (dirty) results.push({ repo: 'catálogo', status: 'skipped', detail: 'o clone tem mudanças sem commit' });
-  else if (options.dryRun) results.push({ repo: 'catálogo', status: 'skipped', detail: 'simulação: git pull --ff-only' });
+  if (git(ctx.clone, ['rev-parse', '--git-dir']).status !== 0) results.push({ repo: 'catalog', status: 'skipped', detail: 'a pasta do catálogo não é um clone Git' });
+  else if (dirty) results.push({ repo: 'catalog', status: 'skipped', detail: 'o clone tem mudanças sem commit' });
+  else if (options.dryRun) results.push({ repo: 'catalog', status: 'skipped', detail: 'simulação: git pull --ff-only' });
   else {
     const before = git(ctx.clone, ['rev-parse', 'HEAD']).stdout.trim();
     const pull = git(ctx.clone, ['pull', '--ff-only', '--quiet']);
-    if (pull.status !== 0) results.push({ repo: 'catálogo', status: 'failed', detail: last(pull.stderr) });
-    else results.push({ repo: 'catálogo', status: git(ctx.clone, ['rev-parse', 'HEAD']).stdout.trim() === before ? 'current' : 'updated' });
+    if (pull.status !== 0) results.push({ repo: 'catalog', status: 'failed', detail: last(pull.stderr) });
+    else results.push({ repo: 'catalog', status: git(ctx.clone, ['rev-parse', 'HEAD']).stdout.trim() === before ? 'current' : 'updated' });
   }
   // The clones of the sources cache: <owner>/<name>, or one folder for a URL.
   const root = ctx.base.sourcesRoot;
@@ -287,7 +288,8 @@ async function update(options: Options, ctx: Context): Promise<void> {
   if (options.json) console.log(JSON.stringify(results, null, 2));
   else {
     const label = { updated: 'atualizado', current: 'em dia', skipped: 'não atualizado', failed: 'falhou' } as const;
-    for (const r of results) console.log(`${r.repo} · ${label[r.status]}${r.detail ? ` (${r.detail})` : ''}`);
+    // 'catalog' is the value of the --json contract; the screen says it in pt-BR.
+    for (const r of results) console.log(`${r.repo === 'catalog' ? 'catálogo' : r.repo} · ${label[r.status]}${r.detail ? ` (${r.detail})` : ''}`);
     console.log('Os projetos veem a versão nova na hora: os links apontam para estes clones.');
   }
   if (results.some(r => r.status === 'failed')) process.exitCode = 1;
@@ -379,26 +381,27 @@ async function importSkills(repo: string, options: Options, ctx: Context): Promi
   if (!options.json) console.log(`Trazer de ${repo} para ${slashed(join(ctx.clone, 'SKILLS'))}: ${names.join(', ')}${exist.length ? `\nSubstituir: ${exist.join(', ')}` : ''}`);
   if (options.dryRun) { console.log('Simulação: nenhum arquivo foi alterado.'); return; }
   if (!await confirmed(options)) return;
-  const errors = await cloneSources(ctx, [repo]);
-  if (errors.length) throw new Error(errors[0]!);
+  // The engine validates the text and gives the URL. The clone goes to a temp folder: the clones of the sources
+  // cache are what the linked projects see, and they change only with `update`.
   const source = await engine<SourceClone>({ op: 'source', sourcesRoot: ctx.base.sourcesRoot, repo });
-  // A clone that was there already: bring it to its remote first.
-  git(source.dir!, ['fetch', '--quiet', '--prune', 'origin']);
-  git(source.dir!, ['remote', 'set-head', 'origin', '--auto']);
-  git(source.dir!, ['reset', '--hard', '--quiet', 'origin/HEAD']);
-  const found = await engine<{ skills: { name: string; dir?: string }[] }>({ op: 'list', dir: source.dir });
-  const missing = names.filter(n => !found.skills.some(s => s.name === n));
-  if (missing.length) throw new Error(`${repo} não tem a(s) skill(s): ${missing.join(', ')}. Disponíveis: ${found.skills.map(s => s.name).join(', ') || '(nenhuma)'}`);
-  const folders = await skillFolders(source.dir!);
+  if (!source.url) throw new Error(`${repo}: não é um repositório de skills (use owner/nome ou uma URL Git).`);
+  const temporary = await mkdtemp(join(tmpdir(), 'colibri-import-'));
   const imported: string[] = [];
-  for (const name of names) {
-    const from = folders.get(name)!;
-    readSkillMeta(await readFile(join(from, 'SKILL.md'), 'utf8'), `${repo}/${name}`);
-    const target = join(ctx.clone, 'SKILLS', name);
-    await rm(target, { recursive: true, force: true });
-    await cp(from, target, { recursive: true, filter: path => !/[\\/]\.git([\\/]|$)/.test(path) });
-    imported.push(name);
-  }
+  try {
+    const cloned = spawnSync('git', ['clone', '--quiet', '--depth', '1', '--', source.url, join(temporary, 'repo')], { encoding: 'utf8', windowsHide: true });
+    if (cloned.status !== 0) throw new Error(`${repo}: não foi possível clonar (${(cloned.stderr || '').trim().split('\n').pop() ?? 'git clone falhou'}).`);
+    const folders = await skillFolders(join(temporary, 'repo'));
+    const missing = names.filter(n => !folders.has(n));
+    if (missing.length) throw new Error(`${repo} não tem a(s) skill(s): ${missing.join(', ')}. Disponíveis: ${[...folders.keys()].sort().join(', ') || '(nenhuma)'}`);
+    for (const name of names) {
+      const from = folders.get(name)!;
+      readSkillMeta(await readFile(join(from, 'SKILL.md'), 'utf8'), `${repo}/${name}`);
+      const target = join(ctx.clone, 'SKILLS', name);
+      await rm(target, { recursive: true, force: true });
+      await cp(from, target, { recursive: true, filter: path => !/[\\/]\.git([\\/]|$)/.test(path) });
+      imported.push(name);
+    }
+  } finally { await rm(temporary, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); }
   if (options.json) console.log(JSON.stringify(imported.map(name => ({ name })), null, 2));
   else {
     console.log(`${imported.length} skill(s) trazidas para SKILLS/: ${imported.join(', ')}`);

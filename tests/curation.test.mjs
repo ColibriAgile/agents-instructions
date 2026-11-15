@@ -120,6 +120,8 @@ test('P11: import traz uma skill de outro repositório para SKILLS/', async t =>
   assert.match(again.stderr, /Erro: Já existe em SKILLS\/: externa\. Passe --force para substituir\./);
   assert.equal(run('import', url, '-s', 'externa', '--force', '--yes').status, 0);
   assert.equal(run('import', '--upload-pack=x', '-s', 'externa', '--yes').status, 1);
+  // The import uses a temp clone: the sources cache (what linked projects see) is not touched.
+  assert.ok(!existsSync(join(base, 'sources')));
 });
 
 test('P12: model-invocation cria agents/openai.yaml só nas skills com a flag', async t => {
