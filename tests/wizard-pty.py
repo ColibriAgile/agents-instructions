@@ -100,10 +100,10 @@ def scenario(name):
                     send(DOWN)
                 send(b"\r")  # Ver o estado das skills do projeto
                 expect("faltando")
+                expect("Concluído.")
                 output = ANSI.sub('', transcript)
                 assert 'commit · faltando [core]' in output, output
                 assert not re.search(r'\b(missing|linked|stale)\b', output), output
-                expect("Concluído.")
             elif name == 'add':
                 send(DOWN)
                 send(DOWN)

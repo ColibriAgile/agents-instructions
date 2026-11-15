@@ -58,7 +58,7 @@ async function cloneSources(ctx: Context, repos: string[]): Promise<string[]> {
     if (!source.dir || !source.url) { errors.push(`${repo}: não é um repositório de skills (use owner/nome ou uma URL Git).`); continue; }
     if (source.exists) continue;
     await mkdir(dirname(source.dir), { recursive: true });
-    const result = spawnSync('git', ['-c', 'core.autocrlf=false', 'clone', '--quiet', '--', source.url, source.dir], { encoding: 'utf8', windowsHide: true });
+    const result = spawnSync('git', ['clone', '--quiet', '--', source.url, source.dir], { encoding: 'utf8', windowsHide: true });
     if (result.status !== 0) errors.push(`${repo}: não foi possível clonar (${(result.stderr || '').trim().split('\n').pop() ?? 'git clone falhou'}).`);
   }
   return errors;
@@ -388,7 +388,7 @@ async function importSkills(repo: string, options: Options, ctx: Context): Promi
   const temporary = await mkdtemp(join(tmpdir(), 'colibri-import-'));
   const imported: string[] = [];
   try {
-    const cloned = spawnSync('git', ['clone', '--quiet', '--depth', '1', '--', source.url, join(temporary, 'repo')], { encoding: 'utf8', windowsHide: true });
+    const cloned = spawnSync('git', ['-c', 'core.autocrlf=false', 'clone', '--quiet', '--depth', '1', '--', source.url, join(temporary, 'repo')], { encoding: 'utf8', windowsHide: true });
     if (cloned.status !== 0) throw new Error(`${repo}: não foi possível clonar (${(cloned.stderr || '').trim().split('\n').pop() ?? 'git clone falhou'}).`);
     const folders = await skillFolders(join(temporary, 'repo'));
     const missing = names.filter(n => !folders.has(n));
