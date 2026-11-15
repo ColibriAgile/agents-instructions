@@ -56,8 +56,10 @@ def scenario(name):
             nonlocal transcript, pending
             deadline = time.monotonic() + 20
             while time.monotonic() < deadline:
-                if needle in ANSI.sub("", pending):
-                    pending = ""
+                clean = ANSI.sub("", pending)
+                if needle in clean:
+                    # Keep the text after the needle: the next expected text can come in the same read.
+                    pending = clean[clean.index(needle) + len(needle):]
                     return
                 if select.select([master], [], [], 0.1)[0]:
                     try:

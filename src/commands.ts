@@ -58,7 +58,7 @@ async function cloneSources(ctx: Context, repos: string[]): Promise<string[]> {
     if (!source.dir || !source.url) { errors.push(`${repo}: não é um repositório de skills (use owner/nome ou uma URL Git).`); continue; }
     if (source.exists) continue;
     await mkdir(dirname(source.dir), { recursive: true });
-    const result = spawnSync('git', ['clone', '--quiet', '--', source.url, source.dir], { encoding: 'utf8', windowsHide: true });
+    const result = spawnSync('git', ['-c', 'core.autocrlf=false', 'clone', '--quiet', '--', source.url, source.dir], { encoding: 'utf8', windowsHide: true });
     if (result.status !== 0) errors.push(`${repo}: não foi possível clonar (${(result.stderr || '').trim().split('\n').pop() ?? 'git clone falhou'}).`);
   }
   return errors;

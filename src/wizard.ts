@@ -97,6 +97,13 @@ export async function wizard(initial: Options = {}): Promise<void> {
       if (!candidates.length) { p.outro('O projeto já tem todas as skills deste filtro.'); return; }
       options.skill = answer(await p.autocompleteMultiselect<string>({ message: 'Escolha as skills', placeholder: 'Digite o nome de uma skill...', required: true,
         options: candidates.map(s => ({ value: s.name, label: `${s.name} · ${requirementInfo(s.requirements).summary}`, hint: s.description })),
+        // A text that is part of a skill name shows only the skills with that name; other texts also search the descriptions.
+        filter: (search, option) => {
+          const text = search.trim().toLowerCase();
+          return candidates.some(s => s.name.includes(text))
+            ? String(option.value).includes(text)
+            : `${option.label ?? ''} ${option.hint ?? ''}`.toLowerCase().includes(text);
+        },
       }));
       options.keep = answer(await p.select({ message: 'Guardar no skills.yaml?', options: [
         { value: true, label: 'Sim', hint: 'a equipe recebe as mesmas skills' }, { value: false, label: 'Não', hint: 'só neste computador, como extra' },
