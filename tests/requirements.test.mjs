@@ -4,12 +4,8 @@ import { mkdtemp, mkdir, writeFile, readFile, rm, access } from 'node:fs/promise
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { loadCatalog, resolveSelection } from '../dist/catalog.js';
+import { loadCatalog } from '../dist/catalog.js';
 import { requirementInfo, bundleRequirementHint, summarizeDescription } from '../dist/requirements.js';
-import { installPlan, managedPlan, preview } from '../dist/manager.js';
-import { readManifest } from '../dist/manifest.js';
-import { saveState } from '../dist/storage.js';
-import { installedRows } from '../dist/commands.js';
 
 test('R1/R2: curated requirements and host statuses are descriptive, not tool detection', async () => {
   const catalog = await loadCatalog();
@@ -28,20 +24,8 @@ test('R1/R2: curated requirements and host statuses are descriptive, not tool de
   assert.match(unknown.notice, /não implica compatibilidade/i);
 });
 
-test('R3: explicit, bundle and manifest previews carry requirements and bundle restrictions', async t => {
+test('R3: bundle hints carry the restrictions of the skills of the bundle', async () => {
   const catalog = await loadCatalog();
-  const scope = { cwd: '/project', global: false };
-  for (const selection of [resolveSelection(catalog, { skills: ['delphi-xe2-build'] }), resolveSelection(catalog, { bundles: ['delphi'] })]) {
-    const plan = installPlan(scope, selection, ['claude-code'], 'copy');
-    assert.match(preview(plan), /Requer Windows e Delphi XE2/);
-    assert.equal(plan.items.find(s => s.name === 'delphi-xe2-build').requirements.platforms[0], 'win32');
-    assert.ok(plan.items.find(s => s.name === 'delphi-xe2-build').runtime.notice);
-  }
-  const dir = await mkdtemp(join(tmpdir(), 'colibri requirements '));
-  t.after(() => rm(dir, { recursive: true, force: true }));
-  await writeFile(join(dir, 'skills.yaml'), 'bundles: [delphi]\n');
-  const selected = resolveSelection(catalog, { manifest: await readManifest(join(dir, 'skills.yaml')) });
-  assert.match(preview(installPlan(scope, selected, ['claude-code'], 'copy')), /Requer Windows e Delphi XE2/);
   assert.match(bundleRequirementHint(catalog, 'delphi', 'darwin'), /Windows/);
   assert.match(bundleRequirementHint(catalog, 'delphi', 'darwin'), /restrição/);
 });
@@ -57,7 +41,6 @@ test('R1: optional metadata is backward compatible; malformed or unknown require
   for (const text of [
     'version: 1\nskills: [',
     'version: 2\nskills: {}',
-    'version: 1\nskills:\n  missing:\n    tools: [PowerShell]',
     'version: 1\nskills:\n  demo:\n    platforms: [windows]',
     'version: 1\nskills:\n  demo:\n    tools: PowerShell',
     'version: 1\nskills:\n  demo:\n    tools: [""]',
@@ -68,24 +51,11 @@ test('R1: optional metadata is backward compatible; malformed or unknown require
     await assert.rejects(() => loadCatalog(root), /requisito/i);
     assert.equal(await readFile(path, 'utf8'), text);
   }
-});
-
-test('R4: managed update uses current catalog requirements; external same-name skills remain unknown', async t => {
-  const cwd = await mkdtemp(join(tmpdir(), 'colibri managed requirements '));
-  t.after(() => rm(cwd, { recursive: true, force: true }));
-  const scope = { cwd, global: false };
-  const catalog = await loadCatalog();
-  const skill = { source: catalog.source, origin: 'catalog', targets: { 'claude-code': { method: 'copy', hash: 'a'.repeat(64) } } };
-  await saveState(scope, { version: 1, skills: { 'delphi-xe2-build': skill } });
-  const updated = await managedPlan('update', scope, catalog);
-  assert.equal(updated.items[0].runtime.summary, 'Requer Windows e Delphi XE2');
-  await saveState(scope, { version: 1, skills: { 'delphi-xe2-build': { ...skill, origin: 'external', source: 'other/repo' } } });
-  const external = await managedPlan('update', scope, catalog);
-  assert.equal(external.items[0].requirements, null);
-  assert.equal(external.items[0].runtime.summary, 'Requisitos não catalogados');
-  const installed = await installedRows(scope, undefined, catalog);
-  assert.equal(installed[0].requirements, null);
-  assert.equal(installed[0].runtime.platformStatus, 'unknown');
+  // The mod of the Herdr app can delete a skill folder: its entry here only warns (in pt-BR), it does not stop the CLI.
+  await writeFile(path, 'version: 1\nskills:\n  missing:\n    tools: [PowerShell]');
+  const catalog = await loadCatalog(root);
+  assert.equal(catalog.skills[0].requirements, null);
+  assert.match(catalog.warnings[0], /skill-requirements\.yaml cita uma skill que o catálogo não tem: missing/);
 });
 
 test('R1/R4: tool-only and multi-platform declarations distinguish unspecified from listed systems', () => {
@@ -100,27 +70,29 @@ test('R1/R4: tool-only and multi-platform declarations distinguish unspecified f
   }
 });
 
-test('R3/R4: JSON exposes requirements; restricted skills remain installable without tools', async t => {
+test('R3/R4: JSON exposes requirements; restricted skills remain linkable without tools', async t => {
   const root = await mkdtemp(join(tmpdir(), 'colibri requirement install '));
   t.after(() => rm(root, { recursive: true, force: true }));
   const catalog = join(root, 'catalog');
   const project = join(root, 'project');
   await mkdir(project);
+  spawnSync('git', ['-C', project, 'init', '-q']);
   await mkdir(join(catalog, 'SKILLS/demo'), { recursive: true });
   await writeFile(join(catalog, 'SKILLS/demo/SKILL.md'), '---\nname: demo\ndescription: Demo\n---\nNo tools executed\n');
   await writeFile(join(catalog, 'bundles.yaml'), 'repo: test/repo\nbundles:\n  core:\n    description: Core\n    skills: [demo]\n');
   const platform = process.platform === 'win32' ? 'linux' : 'win32';
   await writeFile(join(catalog, 'skill-requirements.yaml'), `version: 1\nskills:\n  demo:\n    platforms: [${platform}]\n    tools: [NonexistentTool123]\n    notes: [Declared requirement only]\n`);
   const run = args => {
-    const result = spawnSync(process.execPath, [resolve('bin/colibri-skills.mjs'), ...args, '--cwd', project, '--catalog', catalog], { encoding: 'utf8', timeout: 30000, env: { ...process.env, HOME: root, USERPROFILE: root } });
+    const result = spawnSync(process.execPath, [resolve('bin/colibri-skills.mjs'), ...args, '--cwd', project, '--catalog', catalog], { encoding: 'utf8', timeout: 30000, env: { ...process.env, HOME: root, USERPROFILE: root, COLIBRI_SKILLS_SOURCES: join(root, 'sources') } });
     assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
     return result.stdout;
   };
-  const plan = JSON.parse(run(['install', '-s', 'demo', '-a', 'claude-code', '--dry-run', '--json']));
-  assert.equal(plan.items[0].runtime.platformStatus, 'mismatch');
-  assert.deepEqual(plan.items[0].requirements.tools, ['NonexistentTool123']);
+  const plan = JSON.parse(run(['install', '-s', 'demo', '--dry-run', '--json']));
+  assert.deepEqual(plan.link, ['demo']);
+  // The preview on screen carries the declared requirements of the skill.
+  assert.match(run(['install', '-s', 'demo', '--dry-run']), /demo · Requer .* e NonexistentTool123 · Sistema atual: /);
   await assert.rejects(() => access(join(project, '.claude')), { code: 'ENOENT' });
-  run(['install', '-s', 'demo', '-a', 'claude-code', '--yes']);
+  run(['install', '-s', 'demo', '--yes']);
   assert.match(await readFile(join(project, '.claude/skills/demo/SKILL.md'), 'utf8'), /No tools executed/);
   const installed = JSON.parse(run(['list', '--json']));
   assert.equal(installed[0].runtime.platformStatus, 'mismatch');
@@ -148,13 +120,14 @@ test('CR-13: list --available and the install preview print the unknown-requirem
     await writeFile(join(catalog, 'SKILLS', name, 'SKILL.md'), `---\nname: ${name}\ndescription: First sentence of ${name}. Second sentence that must not appear.\n---\n`);
   }
   await writeFile(join(catalog, 'bundles.yaml'), 'repo: test/catalog\nbundles:\n  core:\n    description: Core\n    skills: [alpha, beta]\n');
-  const run = args => spawnSync(process.execPath, [resolve('bin/colibri-skills.mjs'), ...args, '--cwd', root, '--catalog', catalog], { encoding: 'utf8', timeout: 30000, env: { ...process.env, HOME: root, USERPROFILE: root } });
+  spawnSync('git', ['-C', root, 'init', '-q']);
+  const run = args => spawnSync(process.execPath, [resolve('bin/colibri-skills.mjs'), ...args, '--cwd', root, '--catalog', catalog], { encoding: 'utf8', timeout: 30000, env: { ...process.env, HOME: root, USERPROFILE: root, COLIBRI_SKILLS_SOURCES: join(root, 'sources') } });
   const count = text => text.split('Ausência de requisitos catalogados').length - 1;
   const list = run(['list', '--available']);
   assert.equal(list.status, 0, list.stderr);
   assert.equal(count(list.stdout), 1);
   assert.doesNotMatch(list.stdout, /Second sentence/);
-  const dry = run(['install', '-s', 'alpha,beta', '-a', 'codex', '--dry-run']);
+  const dry = run(['install', '-s', 'alpha,beta', '--dry-run']);
   assert.equal(dry.status, 0, dry.stderr);
   assert.equal(count(dry.stdout), 1);
   const json = JSON.parse(run(['list', '--available', '--json']).stdout);

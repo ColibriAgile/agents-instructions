@@ -2,14 +2,13 @@ import { readdir, readFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseDocument } from 'yaml';
-import type { Manifest } from './manifest.js';
 import type { Requirements, Platform } from './requirements.js';
 
 export const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export interface Skill { name: string; description: string; path: string; bundles: string[]; requirements: Requirements | null }
 export interface Bundle { description: string; skills: string[] }
-export interface Catalog { root: string; source: string; repo: string; skills: Skill[]; bundles: Record<string, Bundle> }
-export interface Selection { name: string; source: string; origin: 'catalog' | 'external'; requirements?: Requirements | null }
+/** `warnings`: problems of the catalog that do not stop the CLI (pt-BR, shown on stderr). */
+export interface Catalog { root: string; source: string; repo: string; skills: Skill[]; bundles: Record<string, Bundle>; warnings: string[] }
 
 export function record(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -70,11 +69,12 @@ export async function loadCatalog(root = packageRoot): Promise<Catalog> {
     }
     bundles[name] = { description: value.description, skills: names };
   }
-  await readRequirements(root, skills);
-  return { root, source, repo: data.repo, skills: skills.sort((a, b) => a.name.localeCompare(b.name)), bundles };
+  const warnings: string[] = [];
+  await readRequirements(root, skills, warnings);
+  return { root, source, repo: data.repo, skills: skills.sort((a, b) => a.name.localeCompare(b.name)), bundles, warnings };
 }
 
-async function readRequirements(root: string, skills: Skill[]): Promise<void> {
+async function readRequirements(root: string, skills: Skill[], warnings: string[]): Promise<void> {
   let text: string;
   try { text = await readFile(join(root, 'skill-requirements.yaml'), 'utf8'); }
   catch (error) { if (isMissing(error)) return; throw error; }
@@ -82,7 +82,8 @@ async function readRequirements(root: string, skills: Skill[]): Promise<void> {
   if (data.version !== 1 || !record(data.skills) || Object.keys(data).some(k => !['version', 'skills'].includes(k))) throw new Error('Requisitos de skill inválidos: esperado version 1 e um mapeamento skills');
   for (const [name, value] of Object.entries(data.skills)) {
     const skill = skills.find(s => s.name === name);
-    if (!skill) throw new Error(`Skill desconhecida nos requisitos: ${name}`);
+    // The mod of the Herdr app can delete a skill folder without this file: an entry without a folder only warns.
+    if (!skill) { warnings.push(`skill-requirements.yaml cita uma skill que o catálogo não tem: ${name}. Remova a entrada.`); continue; }
     if (!record(value) || !Object.keys(value).length || Object.keys(value).some(k => !['platforms', 'tools', 'notes'].includes(k))) throw new Error(`Requisitos inválidos para ${name}`);
     const requirements: Requirements = {};
     for (const field of ['platforms', 'tools', 'notes'] as const) {
@@ -96,32 +97,6 @@ async function readRequirements(root: string, skills: Skill[]): Promise<void> {
     }
     skill.requirements = requirements;
   }
-}
-
-export function resolveSelection(catalog: Catalog, options: { bundles?: string[]; skills?: string[]; manifest?: Manifest }): Selection[] {
-  const result = new Map<string, Selection>();
-  const add = (name: string, source: string, origin: Selection['origin']) => {
-    skillName(name);
-    const existing = result.get(name);
-    if (existing && (existing.source !== source || existing.origin !== origin)) throw new Error(`Skill ambígua ${name}: há mais de uma origem declarada`);
-    result.set(name, { name, source, origin, requirements: origin === 'catalog' ? catalog.skills.find(s => s.name === name)?.requirements ?? null : null });
-  };
-  const bundles = [...(options.manifest?.bundles ?? []), ...(options.bundles ?? [])];
-  if (options.manifest && bundles.length && !bundles.includes('core')) bundles.unshift('core');
-  const names = [...(options.manifest?.skills ?? []), ...(options.skills ?? [])];
-  for (const bundle of bundles) {
-    if (!Object.hasOwn(catalog.bundles, bundle)) throw new Error(`Bundle desconhecido: ${bundle}`);
-    names.push(...catalog.bundles[bundle]!.skills);
-  }
-  for (const name of names) {
-    skillName(name);
-    if (!catalog.skills.some(s => s.name === name)) throw new Error(`Skill desconhecida: ${name}`);
-    add(name, catalog.source, 'catalog');
-  }
-  for (const src of options.manifest?.sources ?? []) {
-    for (const name of src.skills) add(name, src.repo, 'external');
-  }
-  return [...result.values()];
 }
 
 export function isMissing(error: unknown): boolean {

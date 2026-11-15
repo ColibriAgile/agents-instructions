@@ -13,7 +13,7 @@ test('unsupported Node is rejected before the wizard, commands or dependencies l
   const cwd = await mkdtemp(join(tmpdir(), 'colibri runtime '));
   t.after(() => rm(cwd, { recursive: true, force: true }));
   for (const version of ['20.19.6', '22.19.0', '22.20.0-rc.1']) {
-    for (const args of [[], ['install', '--global', '--skill', 'commit', '--agent', 'codex', '--yes'], ['update', '--yes'], ['remove', '--yes']]) {
+    for (const args of [[], ['install', '--skill', 'commit', '--yes'], ['update', '--yes'], ['remove', '--yes']]) {
       const result = spawnSync(process.execPath, ['--import', versionOverride(version), entry, ...args],
         { cwd, encoding: 'utf8', env: { ...process.env, HOME: cwd, USERPROFILE: cwd } });
       assert.equal(result.status, 1);
@@ -21,7 +21,7 @@ test('unsupported Node is rejected before the wizard, commands or dependencies l
       assert.ok(result.stderr.includes(`detectado v${version}`));
       assert.match(result.stderr, /Atualize o Node\.js/);
       assert.equal(result.stdout, '');
-      assert.doesNotMatch(result.stderr, /SyntaxError|o backend skills falhou|A confirmação exige um terminal/);
+      assert.doesNotMatch(result.stderr, /SyntaxError|O motor de links falhou|A confirmação exige um terminal/);
     }
   }
   assert.deepEqual(await readdir(cwd), []);

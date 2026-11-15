@@ -3,21 +3,17 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { loadCatalog, readSkillMeta, resolveSelection } from '../dist/catalog.js';
-import { readManifest, saveManifest } from '../dist/manifest.js';
+import { loadCatalog, readSkillMeta } from '../dist/catalog.js';
+import { manifestText, readManifest, saveManifest } from '../dist/manifest.js';
 import { skillFolderCount } from './skill-folders.mjs';
 
-test('AC2: bundled catalog is complete and every bundle resolves', async () => {
+test('AC2: bundled catalog is complete, every bundle skill has a folder and no skill is without a bundle', async () => {
   const catalog = await loadCatalog();
   const expected = skillFolderCount();
   assert.equal(catalog.skills.length, expected);
-  assert.equal(Object.keys(catalog.bundles).length, 10);
-  const selection = resolveSelection(catalog, { bundles: Object.keys(catalog.bundles) });
-  assert.equal(selection.length, expected);
-  assert.equal(new Set(selection.map(s => s.name)).size, expected);
-  assert.throws(() => resolveSelection(catalog, { bundles: ['missing'] }), /Bundle desconhecido/);
-  assert.throws(() => resolveSelection(catalog, { skills: ['../escape'] }), /Nome de skill inválido/);
-  assert.throws(() => resolveSelection(catalog, { skills: ['missing'] }), /Skill desconhecida/);
+  assert.ok(Object.keys(catalog.bundles).includes('core'));
+  assert.deepEqual(catalog.skills.filter(s => !s.bundles.length).map(s => s.name), []);
+  assert.deepEqual(catalog.warnings, []);
 });
 
 test('AC2: manifest round trip retains external sources and unknown settings, adds core only for managed bundles', async t => {
@@ -25,26 +21,28 @@ test('AC2: manifest round trip retains external sources and unknown settings, ad
   t.after(() => rm(dir, { recursive: true, force: true }));
   const path = join(dir, 'skills.yaml');
   await writeFile(path, '# keep this comment\nbundles: [frontend]\nsources:\n  - repo: example/skills\n    skills: [external-skill]\nteam: colibri\n');
-  const catalog = await loadCatalog();
   const manifest = await readManifest(path);
-  await saveManifest(path, manifest, ['frontend'], ['commit']);
+  await saveManifest(path, manifest, manifestText(manifest, { bundles: ['frontend'], skills: ['commit', 'commit'], sources: manifest.sources }));
   const next = await readManifest(path);
   assert.deepEqual(next.bundles, ['core', 'frontend']);
+  assert.deepEqual(next.skills, ['commit']);
   assert.deepEqual(next.sources, [{ repo: 'example/skills', skills: ['external-skill'] }]);
   assert.equal(next.document.get('team'), 'colibri');
-  assert.match(await readFile(path, 'utf8'), /keep this comment/);
-  const resolved = resolveSelection(catalog, { manifest: next });
-  assert.equal(resolved.filter(s => s.name === 'commit').length, 1);
-  assert.equal(resolved.find(s => s.name === 'external-skill').source, 'example/skills');
-  assert.deepEqual(resolveSelection(catalog, { skills: ['commit', 'commit'] }).map(s => s.name), ['commit']);
-  assert.equal(resolveSelection(catalog, { bundles: ['frontend'] }).some(s => s.name === 'commit'), false);
+  const text = await readFile(path, 'utf8');
+  assert.match(text, /keep this comment/);
+  // Block style: the engine and the mod read skills.yaml line by line.
+  assert.match(text, /bundles:\n  - core\n  - frontend\n/);
+  assert.match(text, /sources:\n  - repo: example\/skills\n    skills:\n      - external-skill\n/);
+  // A manifest that changed after the preview is not overwritten.
+  await writeFile(path, 'bundles: [core]\n');
+  await assert.rejects(() => saveManifest(path, next, 'bundles: []\n'), /O manifesto mudou desde a prévia/);
 });
 
 test('AC2: invalid manifests and invalid catalog references fail before writes', async t => {
   const dir = await mkdtemp(join(tmpdir(), 'colibri invalid '));
   t.after(() => rm(dir, { recursive: true, force: true }));
   const path = join(dir, 'skills.yaml');
-  for (const text of ['bundles: [', 'bundles: dotnet', 'sources: [{repo: example/skills}]', 'skills: [../bad]']) {
+  for (const text of ['bundles: [', 'bundles: dotnet', 'sources: [{repo: example/skills}]', 'skills: [../bad]', 'sources: [{repo: --upload-pack=x, skills: [a]}]', 'sources: [{repo: ../x, skills: [a]}]']) {
     await writeFile(path, text);
     await assert.rejects(() => readManifest(path));
     assert.equal(await readFile(path, 'utf8'), text);

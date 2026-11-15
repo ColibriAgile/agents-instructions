@@ -14,7 +14,7 @@ test('AC1: help/version work outside the clone and non-TTY wizard explains comma
   const run = args => spawnSync(process.execPath, [entry, ...args], { cwd, encoding: 'utf8' });
   const help = run(['--help']);
   assert.equal(help.status, 0);
-  for (const command of ['install', 'update', 'remove', 'reconcile', 'list']) assert.match(help.stdout, new RegExp(command));
+  for (const command of ['install', 'update', 'remove', 'list', 'catalog', 'import', 'model-invocation']) assert.match(help.stdout, new RegExp(command));
   const version = run(['--version']);
   assert.equal(version.status, 0);
   assert.equal(version.stdout.trim(), packageVersion);
@@ -43,9 +43,12 @@ test('CR-UX: commander help and usage errors are in pt-BR with unchanged exit co
   assert.match(run(['install', '--help']).stdout, /-h, --help\s+Exibe a ajuda do comando/);
   assert.match(run(['--help']).stdout, /-V, --version\s+Exibe o número da versão/);
   assert.equal(run(['--version']).stdout.trim(), packageVersion);
-  const missing = run(['install', '--method']);
+  const missing = run(['install', '--repo']);
   assert.equal(missing.status, 1);
-  assert.match(missing.stderr, /Erro: falta o valor da opção '--method <method>'/);
+  assert.match(missing.stderr, /Erro: falta o valor da opção '--repo <repo>'/);
+  const argument = run(['import']);
+  assert.equal(argument.status, 1);
+  assert.match(argument.stderr, /Erro: falta o argumento 'repo'/);
   // The root has its own action (the wizard), so commander reports a mistyped command as an excess argument.
   const command = run(['instal']);
   assert.equal(command.status, 1);
@@ -57,26 +60,29 @@ test('CR-UX: commander help and usage errors are in pt-BR with unchanged exit co
   assert.equal(extra.status, 1);
   assert.match(extra.stderr, /Erro: argumentos demais para 'list'\. Esperados 0, recebidos 1: extra\./);
   // Every rule in the translation table is exercised above; commander is pinned, so a changed message fails here.
-  for (const result of [missing, command, typo, extra]) assert.doesNotMatch(result.stderr, english);
+  for (const result of [missing, argument, command, typo, extra]) assert.doesNotMatch(result.stderr, english);
+  for (const args of [['catalog', '--help'], ['catalog', 'assign', '--help'], ['import', '--help']]) {
+    const help = run(args);
+    assert.equal(help.status, 0, args.join(' '));
+    assert.doesNotMatch(help.stdout, english, args.join(' '));
+  }
   assert.deepEqual(await readdir(cwd), []);
 });
 
-test('AC1,4: JSON catalog and noninteractive confirmation checks create no installation', async t => {
+test('AC1,4: JSON catalog works outside a project; a project command without Git changes nothing', async t => {
   const cwd = await mkdtemp(join(tmpdir(), 'colibri CLI preview '));
   t.after(() => rm(cwd, { recursive: true, force: true }));
   const run = args => spawnSync(process.execPath, [entry, ...args], { cwd, encoding: 'utf8' });
   const list = run(['list', '--available', '--json']);
   assert.equal(list.status, 0);
   assert.equal(JSON.parse(list.stdout).length, skillFolderCount());
-  const preview = run(['install', '--skill', 'commit', '--agent', 'claude-code', '--dry-run', '--json']);
-  assert.equal(preview.status, 0);
-  const plan = JSON.parse(preview.stdout);
-  assert.equal(plan.action, 'install');
-  assert.deepEqual(plan.items.map(s => s.name), ['commit']);
-  assert.deepEqual(plan.items[0].targets, [{ agent: 'claude-code', method: 'copy' }]);
-  const confirm = run(['install', '--skill', 'commit', '--agent', 'claude-code']);
-  assert.equal(confirm.status, 1);
-  assert.match(confirm.stderr, /passe --yes/);
+  const orphans = run(['catalog', 'orphans', '--json']);
+  assert.equal(orphans.status, 0, orphans.stderr);
+  assert.ok(Array.isArray(JSON.parse(orphans.stdout)));
+  // The temp folder is not a Git repository: a project command stops before any write.
+  const install = spawnSync(process.execPath, [entry, 'install', '--skill', 'commit', '--yes'], { cwd, encoding: 'utf8', env: { ...process.env, GIT_CEILING_DIRECTORIES: tmpdir() } });
+  assert.equal(install.status, 1);
+  assert.match(install.stderr, /não está num repositório Git/);
   assert.deepEqual(await readdir(cwd), []);
 });
 
