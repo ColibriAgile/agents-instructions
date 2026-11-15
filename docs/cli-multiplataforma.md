@@ -1,5 +1,9 @@
 # CLI multiplataforma de skills
 
+> **Histórico.** Este documento descreve a primeira versão da CLI (ADR-001), que instalava cópias pelo pacote
+> `skills`. A CLI atual cria links para o clone: veja o [ADR-002](adr/002-skills-como-links-para-o-clone.md), a
+> [spec](specs/links-para-o-clone.md) e o README.
+
 Resumo do que foi feito, do problema que motivou e do caminho até a solução. A decisão formal está no
 [ADR-001](adr/001-cli-node-multiplataforma-para-instalar-skills.md). O uso está no README.
 

@@ -11,7 +11,7 @@ Atribui cada skill órfã (sem bundle) a um bundle em `bundles.yaml`, uma pergun
 ## Steps
 
 **Step 1: Levantar as órfãs**
-1. Execute `pwsh SKILLS/assign-bundles/scripts/Find-OrphanSkills.ps1` a partir da raiz do repositório (read-only).
+1. Execute `node bin/colibri-skills.mjs catalog orphans` a partir da raiz do repositório (read-only). Se o comando disser que falta o build, rode `npm ci --ignore-scripts` e `npm run build` antes.
 2. Se a saída for "Todas as skills pertencem a pelo menos 1 bundle.", pare e informe ao usuário que não há trabalho a fazer.
 
 *Done when:* a lista de skills órfãs (ou a confirmação de que está vazia) está em mãos.
@@ -29,8 +29,8 @@ Atribui cada skill órfã (sem bundle) a um bundle em `bundles.yaml`, uma pergun
 *Done when:* toda skill órfã tem uma resposta — um bundle existente, a sugestão nova aceita, ou um nome customizado via "Other".
 
 **Step 4: Aplicar em bundles.yaml**
-1. Para cada resposta, execute `pwsh SKILLS/assign-bundles/scripts/Set-SkillBundle.ps1 -Bundle "<nome>" -Skill "<skill>"` (mutating), acrescentando `-Description "<descrição>"` sempre que `<nome>` ainda não existir em `bundles.yaml` (sugestão nova aceita ou nome customizado).
-2. Se o script falhar (mensagem em stderr), corrija o argumento apontado e rode de novo.
+1. Para cada resposta, execute `node bin/colibri-skills.mjs catalog assign -s <skill> -b <nome> --yes` (mutating), acrescentando `--description "<descrição>"` sempre que `<nome>` ainda não existir em `bundles.yaml` (sugestão nova aceita ou nome customizado). Crie um bundle novo por comando.
+2. Se o comando falhar (mensagem `Erro:` em stderr), corrija o argumento apontado e rode de novo.
 
 *Done when:* rodar o Step 1 de novo mostra "Todas as skills pertencem a pelo menos 1 bundle."
 
@@ -40,5 +40,6 @@ Atribui cada skill órfã (sem bundle) a um bundle em `bundles.yaml`, uma pergun
 *Done when:* o resumo cobre cada skill que estava órfã no Step 1.
 
 ## Error Handling
-* Se `Set-SkillBundle.ps1` falhar por bundle inexistente sem `-Description`, repita o comando informando a descrição rascunhada no Step 2.
-* Se `Find-OrphanSkills.ps1` ou `Set-SkillBundle.ps1` não encontrarem `bundles.yaml`/`SKILLS/`, confirme que o comando está sendo executado a partir da raiz do repositório `agents-instructions`.
+* Se `catalog assign` falhar por bundle inexistente sem `--description`, repita o comando informando a descrição rascunhada no Step 2.
+* Se o comando não encontrar `bundles.yaml`/`SKILLS/`, confirme que ele está sendo executado a partir da raiz do repositório `agents-instructions`.
+* O comando muda o `bundles.yaml` do clone e não faz commit. Diga ao usuário para revisar com `git diff`.

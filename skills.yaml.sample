@@ -1,20 +1,22 @@
-# skills.yaml
-# Modelo para uso com Install-Skills.ps1
+# skills.yaml — manifesto de skills do projeto
+# Copie para a raiz do projeto como skills.yaml e faça commit. Depois rode, na raiz do projeto:
+#   node <clone do agents-instructions>/bin/colibri-skills.mjs install
+# (ou use o painel Skills do mod skill-bundles do Herdr).
 #
-# "bundles" referencia nomes definidos em bundles.yaml (ColibriAgile/agents-instructions).
-# Todo projeto deve declarar pelo menos o bundle "core" + o(s) bundle(s) de stack/temática
-# que fizerem sentido. Install-Skills.ps1 resolve cada bundle na lista real de skills.
-#
-# "sources" continua existindo para skills avulsas (não cobertas por nenhum bundle) ou
-# vindas de outros repositórios GitHub.
+# bundles: grupos de skills do bundles.yaml do catálogo. O core entra em todo projeto.
+# skills:  skills do catálogo que não estão nos bundles do projeto (opcional).
+# sources: skills de outros repositórios (opcional).
 
 bundles:
   - core
   - dotnet
   - code-review
 
+skills:
+  - colibri-design-kit
+
 sources:
-  - repo: pedronauck/skills/skills/mine
+  - repo: pedronauck/skills
     skills:
       - deslop
       - refactoring-analysis

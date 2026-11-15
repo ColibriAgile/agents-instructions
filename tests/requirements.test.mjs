@@ -17,7 +17,7 @@ test('R1/R2: curated requirements and host statuses are descriptive, not tool de
   assert.equal(windows.platformStatus, 'listed');
   assert.match(windows.notice, /ferramentas não verificadas/i);
   assert.match(requirementInfo(delphi.requirements, 'darwin').notice, /macOS/);
-  assert.equal(requirementInfo(catalog.skills.find(s => s.name === 'assign-bundles').requirements).summary, 'Requer PowerShell 7');
+  assert.equal(requirementInfo(catalog.skills.find(s => s.name === 'assign-bundles').requirements).summary, 'Requer Node.js');
   const unknown = requirementInfo(catalog.skills.find(s => s.name === 'commit').requirements);
   assert.equal(unknown.platformStatus, 'unknown');
   assert.equal(unknown.summary, 'Requisitos não catalogados');

@@ -24,4 +24,3 @@ jobs:
       - name: Wizard terminal checks
         if: runner.os != 'Windows'
         run: python3 tests/wizard-pty.py
-      - run: npm pack --dry-run

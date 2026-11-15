@@ -1,92 +1,153 @@
 # agents-instructions
 A repository designed to store and organize instruction files for AI agents, categorized by language, model, and use case. Its goal is to standardize, reuse, and evolve prompts, system messages, and configuration files across different AI ecosystems.
 
-## CLI multiplataforma (Node.js)
+## Skills como links para o clone
 
-Requer Node.js **22.20 ou superior** e npm. O CLI usa `skills@1.7.4` como motor, sem exigir PowerShell ou fzf. Agentes desta primeira versão: Claude Code, Codex, Cursor, GitHub Copilot, OpenCode e Windsurf.
+Este repositório é o **catálogo** de skills. O clone dele no seu computador é o único lugar com os arquivos das
+skills. Cada projeto recebe **links** para o clone, não cópias:
 
-Confira a versão com `node --version` no terminal em que executará o CLI. Versões incompatíveis são bloqueadas antes de abrir o wizard ou executar comandos, com uma mensagem indicando a versão exigida e a detectada. O campo `engines` do npm sozinho pode apenas emitir um aviso durante a instalação. Se encontrar `fs/promises ... export named 'glob'` no Node 20, atualize o Node.js para uma versão compatível e execute novamente; essa API é usada pelo motor `skills`.
+- 1 link por skill em `.agents/skills`, `.claude/skills` e `.windsurf/skills` (junction de diretório no Windows,
+  link simbólico no macOS e no Linux). Codex, Cursor, GitHub Copilot e OpenCode leem `.agents/skills`.
+- Um `git pull` no clone atualiza todos os projetos de uma vez. Uma skill editada no clone aparece na hora nos
+  projetos, também antes do commit.
+- Os links não entram em commits: a ferramenta grava 1 linha por link no `.git/info/exclude` do projeto.
 
-Para desenvolver e executar a partir do clone:
+Existem 2 ferramentas, com as mesmas regras (o mesmo motor, `engine/link-skills.mjs`):
+
+| Ferramenta | Para quem |
+| --- | --- |
+| Mod `skill-bundles` do [Herdr](https://github.com/dougcunha/herdr-mods/tree/main/skill-bundles-app) | Forma principal: um painel com o estado das skills do projeto focado. |
+| CLI `colibri-skills` (este repositório) | Para quem não usa o Herdr: wizard e comandos de terminal. |
+
+A decisão está no [ADR-002](docs/adr/002-skills-como-links-para-o-clone.md), e os detalhes na
+[spec](docs/specs/links-para-o-clone.md).
+
+## CLI `colibri-skills`
+
+Requer Git e Node.js **22.20 ou superior**. Confira a versão com `node --version`. Uma versão incompatível é
+bloqueada antes do wizard, com uma mensagem que diz a versão exigida e a detectada.
+
+Prepare o clone 1 vez:
 
 ```sh
 git clone https://github.com/ColibriAgile/agents-instructions.git
 cd agents-instructions
 npm ci --ignore-scripts
 npm run build
-npm start
 ```
 
-Sem argumentos, abre o wizard: ação → escopo → agentes → bundles ou busca por skills → método → prévia e confirmação. Use as setas para navegar, digite para pesquisar, Tab para marcar, Enter para confirmar e Ctrl+C para cancelar. Cópia é o padrão; symlink usa uma cópia canônica persistente, com fallback do motor para cópia quando necessário.
-
-Para abrir o wizard em outro projeto, em qualquer sistema:
+Depois, na pasta de um projeto (um repositório Git):
 
 ```sh
-node /caminho/do/clone/bin/colibri-skills.mjs --cwd /caminho/do/projeto
+node /caminho/do/clone/bin/colibri-skills.mjs
 ```
 
-Use caminhos do seu sistema, entre aspas quando contiverem espaços. No Windows, por exemplo: `node "C:/Projetos/agents-instructions/bin/colibri-skills.mjs" --cwd "C:/Projetos/Meu Projeto"`.
+Sem argumentos, a CLI abre o wizard: vincular as skills do projeto, escolher os bundles, adicionar ou remover
+skills avulsas, ver o estado, atualizar o clone e gerenciar o catálogo. Use as setas para navegar, digite para
+pesquisar, Tab para marcar, Enter para confirmar e Ctrl+C para cancelar. Toda mudança mostra uma prévia e pede
+confirmação.
 
-O nome de pacote previsto é `@colibriagile/agents-instructions`, mas **ainda não foi publicado**. Após publicação, `npx @colibriagile/agents-instructions@latest` poderá abrir o wizard sem clone. Para testar o empacotamento localmente, use `npm pack`; o tarball inclui o catálogo e os recursos das skills.
+Use caminhos do seu sistema, entre aspas quando tiverem espaços. No Windows, por exemplo:
+`node "C:/Projetos/agents-instructions/bin/colibri-skills.mjs" --cwd "C:/Projetos/Meu Projeto"`.
 
 ### Comandos sem wizard
 
-Os exemplos abaixo usam `node /caminho/do/clone/bin/colibri-skills.mjs` como executável. Após uma instalação via npm, o binário se chama `colibri-skills`.
+Os exemplos usam `colibri-skills` no lugar de `node /caminho/do/clone/bin/colibri-skills.mjs`.
 
 ```sh
-# Catálogo, busca de nomes e instalações administradas por este CLI
-node /caminho/do/clone/bin/colibri-skills.mjs list --available
-node /caminho/do/clone/bin/colibri-skills.mjs list --json
+# O estado das skills do projeto, e o catálogo
+colibri-skills list
+colibri-skills list --available
 
-# Ad hoc: somente a skill escolhida, sem alterar skills.yaml
-node /caminho/do/clone/bin/colibri-skills.mjs install --skill commit --agent claude-code codex --yes
+# Projeto novo: grava os bundles no skills.yaml (o core entra sempre) e cria os links
+colibri-skills install --bundle dotnet code-review --yes
 
-# Projeto: salva bundles em skills.yaml, inclui core e preserva fontes existentes
-node /caminho/do/clone/bin/colibri-skills.mjs install --bundle dotnet code-review --agent claude-code --yes
+# Projeto que já tem skills.yaml (clone novo, worktree novo, depois de um git clean)
+colibri-skills install --yes
 
-# Reaplica o manifest já existente
-node /caminho/do/clone/bin/colibri-skills.mjs install --agent claude-code --yes
+# Troca os bundles do projeto pelos escolhidos e remove os links que sobram
+colibri-skills install --bundle frontend --replace --yes
 
-# Instalação global e escolha do método
-node /caminho/do/clone/bin/colibri-skills.mjs install --skill commit --agent claude-code codex --global --method symlink --yes
+# Skill avulsa: só neste computador (extra), ou gravada em skills: do skills.yaml
+colibri-skills install --skill commit --yes
+colibri-skills install --skill commit --keep --yes
 
-# Atualiza a partir do catálogo que acompanha a versão do CLI em execução
-node /caminho/do/clone/bin/colibri-skills.mjs update --skill commit --yes
+# Skill de outro repositório (entra em sources: com --keep)
+colibri-skills install --skill deslop --repo someone/skills --keep --yes
 
-# Remove apenas os destinos escolhidos
-node /caminho/do/clone/bin/colibri-skills.mjs remove --skill commit --agent claude-code --yes
+# Tira skills avulsas do skills.yaml e remove os links
+colibri-skills remove --skill commit --yes
 
-# Reconciliação: lista extras administrados pelo CLI; remove só nomes explícitos
-node /caminho/do/clone/bin/colibri-skills.mjs reconcile --json
-node /caminho/do/clone/bin/colibri-skills.mjs reconcile --skill commit --yes
+# Atualiza o clone do catálogo e os clones de outros repositórios
+colibri-skills update
 
 # Confira uma operação antes de executá-la
-node /caminho/do/clone/bin/colibri-skills.mjs install --skill commit --agent claude-code --dry-run
+colibri-skills install --bundle dotnet --dry-run
 ```
 
-`--cwd` escolhe o projeto; `--catalog` escolhe outro clone/catálogo local com `bundles.yaml` e `SKILLS/`. Alterações locais nas skills são utilizáveis imediatamente, sem commit, push ou `git pull`. Fontes externas declaradas no manifest podem exigir rede/Git. Não há download remoto das skills da Colibri durante uma instalação do catálogo empacotado.
+`--cwd` escolhe o projeto (a raiz Git da pasta). `--catalog` escolhe outro clone do catálogo. `--json` dá a saída
+para máquinas, com os valores em inglês.
 
-### Estado, conflitos e compatibilidade
+### Estados
 
-- O CLI registra propriedade e preferências em `.colibri-skills.json` no projeto ou `~/.colibri-agents/skills.json` no escopo global. Não confunda esse registro com o lock do motor. Inclua `.colibri-skills.json` no `.gitignore` do consumidor se as preferências forem individuais.
-- `skills.yaml` continua sendo o manifest compartilhável do projeto. `skills` é uma lista opcional de nomes avulsos do catálogo, além de `bundles` e `sources`. Campos extras e comentários são preservados ao acrescentar bundles.
-- No motor fixado, Codex, Cursor, Copilot e OpenCode compartilham `.agents/skills` no projeto e no home; não são quatro cópias independentes. O CLI mostra os destinos e exige selecionar todos os consumidores administrados quando uma operação afeta conteúdo compartilhado.
-- Atualização/remoção trabalham com instalações registradas por este CLI. Instalações anteriores dos scripts PowerShell não são adotadas automaticamente. Para migrar, revise `install --dry-run` com o manifest/agentes desejados e depois use `install --force --yes` para assumir explicitamente os destinos existentes.
-- Conteúdo manual, arquivos modificados e destinos não administrados são protegidos. `--force` permite substituir/remover esses conflitos explicitamente; `--yes` apenas confirma a operação, sem desativar a proteção. Diretórios de agente redirecionados por symlink exigem resolução manual.
-- Em remoções parciais, o lock do motor é preservado enquanto outro destino ainda usa a skill. Uma cópia canônica usada para symlinks pode permanecer para proteger outros consumidores; os destinos selecionados são removidos. O CLI mantém a propriedade desse armazenamento para permitir reinstalação sem `--force`, mas não o lista como instalação ativa sem destinos registrados.
-- Um arquivo `.lock` ao lado do estado impede duas operações simultâneas. Ctrl+C, SIGTERM ou SIGHUP durante uma operação encerram o motor, revertem a skill que estava sendo instalada ou atualizada, liberam o lock e saem com o código do sinal (130, 143 ou 129); basta repetir o comando, sem `--force`. Se o sinal chegar depois de todas as mudanças aplicadas e registradas, a operação termina normalmente, sai com 0 e avisa em stderr que o sinal chegou após a conclusão. Só um encerramento que não pode ser tratado (SIGKILL, queda do sistema ou de energia) deixa o lock para trás: confira que não há operação ativa antes de excluí-lo e tentar novamente; se a nova tentativa acusar `Unmanaged destination`, revise o destino parcial e use `--force` para substituí-lo.
-- Atualizar o CLI e atualizar skills são operações distintas. Ao usar o pacote publicado, execute a versão desejada (`@latest` ou versão fixa) e depois `update`; ao usar um clone, as skills vêm desse clone.
-- O instalador é multiplataforma; algumas skills exigem ferramentas específicas, como Delphi XE2/Windows, PowerShell, Python ou serviços internos. O CLI não converte esses requisitos. A pasta `INSTRUCTIONS/` continua no fluxo legado; esta versão instala skills.
+| Na tela | `--json` | Quando |
+| --- | --- | --- |
+| vinculada | `linked` | Os 3 links existem e apontam para o clone. |
+| faltando | `missing` | O `skills.yaml` pede a skill, mas falta um link. `install` cria. |
+| cópia | `copy` | Uma instalação antiga (cópia). `install` troca por link. |
+| sobrando | `stale` | Um link que o `skills.yaml` não pede mais. `install` remove. |
+| conflito | `conflict` | O projeto tem uma pasta própria com o nome da skill. Só muda com `install --force -s <skill>`. |
+| fora do clone | `absent` | O `skills.yaml` pede uma skill que o catálogo não tem. |
+| extra | `extra` | Vinculada, mas fora do `skills.yaml`. |
+| local | `local` | Uma skill escrita à mão no projeto. A ferramenta não toca (salvo `remove --force`). |
+| sem clone | `unsupported` | Skill de outro repositório que não foi clonado. |
 
-Verificação: `npm run check`, `npm test` e `npm pack --dry-run`. Em macOS/Linux, `python3 tests/wizard-pty.py` também exercita o wizard em um terminal real. A CI define Windows, Linux e macOS com Node 22.20 e 24; resultados locais não substituem a execução dessa matriz.
+### O manifesto do projeto
 
-Os scripts PowerShell abaixo continuam disponíveis para o fluxo legado.
+Cada projeto declara o que usa num `skills.yaml`, com commit no repositório do projeto (veja `skills.yaml.sample`):
+
+```yaml
+bundles:
+  - core
+  - dotnet
+
+skills:          # skills do catálogo fora dos bundles do projeto
+  - code-review
+
+sources:         # skills de outros repositórios
+  - repo: someone/skills
+    skills:
+      - deslop
+```
+
+A CLI preserva os comentários e os campos extras do arquivo. As skills de outros repositórios são links para um
+clone desse repositório, que a ferramenta mantém em `~/.config/herdr-app/cache/skill-bundles/sources/` (a mesma
+pasta que o mod usa).
+
+### Migração de instalações antigas
+
+As versões anteriores instalavam cópias: os scripts PowerShell (`Install-Skills.ps1`) e a primeira versão desta
+CLI. Para migrar um projeto, rode `colibri-skills install` nele 1 vez:
+
+- Uma cópia sem mudanças é apagada e vira link.
+- Uma cópia que você editou vai para `.agents/skills-backup/<skill>`. A saída diz quais foram.
+- Uma pasta de skill que o Git rastreia é um **conflito**: só muda com `install --force -s <skill>`.
+- O `skills-lock.json` e o `.colibri-skills.json` do projeto somem quando ficam vazios.
+- Os links antigos em `.codex/skills` são removidos.
+
+Confira também:
+
+- **Hook de Git**: se o projeto tem `pwsh .../Install-Skills.ps1 -Silent` em `.git/hooks/post-checkout` ou
+  `post-merge`, apague essas linhas. O script não existe mais. Com links, o hook não é necessário.
+- **`.gitignore`**: o bloco antigo (`.agents/`, `.claude/skills/`, `.codex/skills/`, `skills-lock.json`) pode ficar.
+  Ele também esconde as skills escritas à mão no projeto. Se você quer fazer commit de uma skill local, remova o
+  bloco: os links continuam escondidos pelo `.git/info/exclude`.
 
 ### Requisitos de execução das skills
 
-O wizard mostra avisos como **“Requer Windows e Delphi XE2”** ou **“Requer PowerShell 7”** durante a escolha das skills e na prévia anterior à confirmação. Bundles indicam quantas skills têm requisitos declarados e quantas apresentam restrição para o sistema atual. A prévia detalha cada skill, inclusive quando a seleção veio de bundles ou de `skills.yaml`.
+O wizard mostra avisos como **“Requer Windows e Delphi XE2”** durante a escolha das skills e na prévia anterior à confirmação. Bundles indicam quantas skills têm requisitos declarados e quantas apresentam restrição para o sistema atual. A prévia detalha cada skill, inclusive quando a seleção veio de bundles ou de `skills.yaml`.
 
-Esses dados estão em `skill-requirements.yaml`, separado das instruções das skills e incluído no pacote npm:
+Esses dados estão em `skill-requirements.yaml`, separado das instruções das skills:
 
 ```yaml
 version: 1
@@ -97,125 +158,67 @@ skills:
     notes:
       - Também requer MSBuild .NET Framework 4 e as bibliotecas do projeto.
   assign-bundles:
-    tools: [PowerShell 7]
+    tools: [Node.js]
 ```
 
-Os identificadores de sistema aceitos são `win32` (Windows), `darwin` (macOS) e `linux`. `platforms`, `tools` e `notes` são listas opcionais; cada entrada precisa declarar ao menos uma lista não vazia. Nomes de skills inexistentes, versões desconhecidas do formato, campos inválidos e YAML incorreto são rejeitados. Catálogos antigos sem esse arquivo continuam funcionando.
+Os identificadores de sistema aceitos são `win32` (Windows), `darwin` (macOS) e `linux`. `platforms`, `tools` e `notes` são listas opcionais; cada entrada precisa declarar ao menos uma lista não vazia. Versões desconhecidas do formato, campos inválidos e YAML incorreto são rejeitados. Uma entrada de uma skill que não existe mais gera só um aviso. Catálogos antigos sem esse arquivo continuam funcionando.
 
 A cobertura inicial inclui `delphi-xe2-build`, `assign-bundles`, `colibri-cis-testes` e `deep-review`. Skills sem entrada mostram **“Requisitos não catalogados”**; isso não significa compatibilidade com qualquer sistema. PowerShell 7 é o runtime de referência declarado para os fluxos `pwsh`, sem auditoria da versão mínima que cada script admite. Fontes externas não herdam requisitos de uma skill do catálogo que tenha o mesmo nome.
 
-Nas instalações administradas, os avisos vêm do catálogo da versão do CLI em execução. Eles não são uma auditoria retroativa do conteúdo instalado, que pode pertencer a uma versão anterior.
+O CLI compara somente a restrição de sistema operacional declarada com o sistema atual. **Não verifica binários, versões, serviços, licenças, credenciais ou permissões; não instala dependências nem executa os scripts da skill.** Estar em um sistema contemplado não garante que as ferramentas estejam disponíveis. Vincular em outro sistema permanece permitido, por exemplo para preparar um projeto que será usado em outra máquina.
 
-O CLI compara somente a restrição de sistema operacional declarada com o sistema atual. **Não verifica binários, versões, serviços, licenças, credenciais ou permissões; não instala dependências nem executa os scripts da skill.** Estar em um sistema contemplado não garante que as ferramentas estejam disponíveis. Instalar em outro sistema permanece permitido, por exemplo para preparar um projeto que será usado em outra máquina; atualizações e remoções continuam disponíveis.
+`list --available`, `list` e as prévias exibem os requisitos. No JSON de `list`, cada skill inclui `requirements` (ou `null` quando desconhecido) e `runtime`, com `summary`, `platformStatus`, `notice` e `notes`. Os estados são `unknown` (sem entrada), `unspecified` (sistemas não declarados), `listed` (sistema contemplado) e `mismatch` (restrição para o sistema atual). Esses estados são informativos, não resultados de execução. Use `install --dry-run` para consultar a prévia sem alterações.
 
-`list --available`, `list` e as prévias exibem os requisitos. Em JSON, cada skill inclui `requirements` (ou `null` quando desconhecido) e `runtime`, com `summary`, `platformStatus`, `notice` e `notes`. Os estados são `unknown` (sem entrada), `unspecified` (sistemas não declarados), `listed` (sistema contemplado) e `mismatch` (restrição para o sistema atual). Esses estados são informativos, não resultados de execução. Use `install --dry-run --json` para consultar a prévia sem alterações.
+## Gerenciar o catálogo
 
-## Bundles de skills
+Os comandos abaixo mudam o clone (`bundles.yaml` e `SKILLS/`) e **não fazem commit**. Revise com `git diff`, faça
+commit e push. O wizard tem as mesmas ações em "Gerenciar o catálogo", e o mod do Herdr tem o botão **Catalog**.
 
-`bundles.yaml` é o catálogo central de bundles por stack (`dotnet`, `delphi`, `frontend`) e por
-temática (`sdd`, `code-review`, `authoring`), além do bundle `core`
-(obrigatório em todo projeto).
-
-Cada projeto declara os bundles que usa em um `skills.yaml` próprio (veja `skills.yaml.sample`),
-commitado no repositório do projeto. `Install-Skills.ps1` resolve os bundles do manifesto,
-instala as skills via `npx skills`, e reconcilia: detecta skills instaladas que não pertencem
-ao manifesto (ex: bundle `authoring` instalado pontualmente e esquecido) e oferece removê-las.
-Skills escritas à mão no próprio projeto (sem `sourceType` no `npx skills list --json`) nunca
-entram na reconciliação.
-
-### Projeto novo
-
-Requer [`fzf`](https://github.com/junegunn/fzf) no PATH (`scoop install fzf` / `winget install fzf`).
-
-```powershell
-# Na raiz do projeto
-pwsh <caminho-local-do-clone>\Init-Skills.ps1
-```
-
-Lista os bundles do `bundles.yaml` num picker fzf (multi-seleção com TAB; `core` sempre entra,
-sem precisar escolher), grava o `skills.yaml` e garante o bloco no `.gitignore`. Rodar de novo
-sobrescreve com confirmação, marcando `[já incluído]` nos bundles já presentes.
-
-### Instalar/atualizar
-
-```powershell
-# Na raiz do projeto, com skills.yaml presente
-pwsh <caminho-local-do-clone>\Install-Skills.ps1
-```
-
-Ao final, o resumo diz quais skills foram atualizadas (`~`) ou instaladas pela primeira vez (`+`)
-e quantas ficaram sem mudança, comparando o `skills-lock.json` do projeto antes e depois. Skill
-que você alterou aqui e aparece "sem mudança" não chegou ao projeto: confira se o push foi feito
-e de qual branch as skills vieram.
-
-Se `skills.yaml` não existir e a execução for interativa, `Install-Skills.ps1` chama o
-`Init-Skills.ps1` automaticamente antes de instalar. Com `-Silent` (ex: hook de git) isso não
-acontece — falha pedindo pra rodar o `Init-Skills.ps1` manualmente primeiro, já que o picker
-fzf precisa de terminal interativo.
-
-### Testar skills de uma branch
-
-Com a cópia local numa branch já enviada ao remoto, `Install-Skills.ps1` instala as skills
-de agents-instructions dessa branch (`owner/repo#branch` no `npx skills add`) e avisa que não
-é a padrão; `-Ref <branch>` escolhe outra explicitamente. Para voltar, faça checkout da branch
-padrão e rode o script de novo. `Update-AllSkills.ps1` fora da branch padrão exige
-`-Ref <branch>`, para que a branch de teste não chegue a todos os projetos por engano.
-
-### Atualizar todos os projetos de uma vez
-
-Depois de mexer nas skills deste repositório, `Update-AllSkills.ps1` propaga para todos os
-projetos sob uma pasta base — cada pasta com `skills.yaml` recebe um `Install-Skills.ps1`:
-
-```powershell
-pwsh <caminho-local-do-clone>\Update-AllSkills.ps1 -ListOnly   # confere o alcance antes
-pwsh <caminho-local-do-clone>\Update-AllSkills.ps1
-```
-
-O padrão de `-Root` é a pasta que contém este clone. A sincronização do `bundles.yaml`
-(git pull + checagem de push pendente) roda **uma vez**, não por projeto. Falha em um projeto
-não interrompe os demais: o resumo final lista os que falharam com o comando para reproduzir,
-e o script sai com código 1. Use `-Exclude '*\arquivados\*'` para pular caminhos e `-Silent`
-para imprimir só o resumo.
-
-Bundle extra pontual (ex: mexer no CLAUDE.md do projeto), sem alterar o `skills.yaml` commitado:
-
-```powershell
-npx skills add ColibriAgile/agents-instructions -s writing-agents-md writing-skills -y
-```
-
-Remova manualmente quando terminar, ou deixe para a próxima execução do `Install-Skills.ps1`
-detectar e perguntar.
-
-Para rodar a sincronização automaticamente a cada checkout/pull, adicione em
-`.git/hooks/post-checkout` e `.git/hooks/post-merge` do projeto:
+`bundles.yaml` é o catálogo de bundles por stack (`dotnet`, `delphi`, `frontend`) e por tema (`sdd`,
+`code-review`, `authoring`), além do `core`, que entra em todo projeto.
 
 ```sh
-#!/bin/sh
-pwsh <caminho-local-do-clone>/Install-Skills.ps1 -Silent
+# Skills que não estão em nenhum bundle
+colibri-skills catalog orphans
+
+# Põe skills num bundle; --description cria o bundle quando ele não existe
+colibri-skills catalog assign -s minha-skill -b dotnet --yes
+colibri-skills catalog assign -s minha-skill -b dados --description "Dados: SQL e relatórios." --yes
+
+# Tira skills de um bundle
+colibri-skills catalog unassign -s minha-skill -b dotnet --yes
+
+# Apaga um bundle (as pastas das skills ficam; o core nunca sai)
+colibri-skills catalog bundle-delete -b dados --yes
+
+# Apaga a pasta de uma skill e tira a skill de todos os bundles e do skill-requirements.yaml
+colibri-skills catalog skill-delete -s minha-skill --yes
 ```
 
-No `.gitignore` do projeto que consome `skills.yaml`, ignore os artefatos gerados pelo
-`npx skills add` (reproduzíveis a qualquer momento, não são fonte de verdade):
+### Trazer uma skill de um repositório externo
 
-```gitignore
-.agents/
-.claude/skills/
-.codex/skills/
-skills-lock.json
+```sh
+colibri-skills import vercel-labs/agent-skills -s deploy-to-vercel --yes
 ```
 
-### Trazer skill de repositório externo
+A CLI clona o repositório no cache, copia a pasta da skill para `SKILLS/` (sem o `.git`) e diz o comando
+`catalog assign` para pôr a skill num bundle. `--force` substitui uma skill que já existe.
 
-Para adicionar ao catálogo (`SKILLS/`) uma skill que já existe em outro repositório, em vez de
-escrever do zero, use `Import-Skill.ps1`. Ele baixa em pasta temporária isolada e move só o
-resultado para `SKILLS/`, sem deixar `.claude/skills`, `.agents` ou `skills-lock.json` sujos
-neste repositório:
+### Skills que o modelo não deve invocar sozinho
 
-```powershell
-pwsh Import-Skill.ps1 -Source vercel-labs/agent-skills -Skills deploy-to-vercel
+```sh
+colibri-skills model-invocation
 ```
 
-Aceita várias skills do mesmo `Source` de uma vez (`-Skills a, b, c`) e `-Force` para
-sobrescrever uma pasta já existente. Ao final, imprime o comando de
-`SKILLS/assign-bundles/scripts/Set-SkillBundle.ps1` para cada skill baixada — rode-o em
-seguida para colocá-la em um bundle de `bundles.yaml`.
+Cria `agents/openai.yaml` (com `allow_implicit_invocation: false`) em cada skill cujo `SKILL.md` tem
+`disable-model-invocation: true`.
+
+## Desenvolvimento da CLI
+
+- Regras: [`.claude/rules/cli.md`](.claude/rules/cli.md) (texto de tela em pt-BR, testes como processo, spec antes de implementar).
+- Verificação: `npm run check` e `npm test`. Em macOS e Linux, `python3 tests/wizard-pty.py` exercita o wizard num
+  terminal real. O CI roda Windows, Linux e macOS com Node 22.20 e 24.
+- **Motor**: `engine/link-skills.mjs` é uma cópia do arquivo do repositório
+  [herdr-mods](https://github.com/dougcunha/herdr-mods). Não edite a cópia. Mude o arquivo lá e rode
+  `npm run engine:sync -- <pasta do clone do herdr-mods>`. O teste `tests/engine.test.mjs` confere o hash.
+- O `link.bat` cria junctions de `INSTRUCTIONS` e `AGENTS`. Ele não gerencia skills.

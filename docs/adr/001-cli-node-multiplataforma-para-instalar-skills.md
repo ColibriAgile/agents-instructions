@@ -1,7 +1,7 @@
 # ADR-001: CLI Node.js multiplataforma para instalar skills
 
 - **Date**: 2026-10-29
-- **Status**: Proposed (passa a Accepted com a aprovação do PR)
+- **Status**: Substituído em parte pelo [ADR-002](002-skills-como-links-para-o-clone.md): o motor `skills`, as cópias, o estado próprio, o escopo global e a distribuição por npm saíram. Ficam o wizard, os comandos, o pt-BR e os requisitos declarados.
 - **Deciders**: Leonardo Barrocal (autor); revisão do time no PR
 - **Tags**: cli, distribuição, skills, portabilidade
 

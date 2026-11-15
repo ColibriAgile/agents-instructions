@@ -1,6 +1,6 @@
 # Spec: skills como links para o clone
 
-- **Status**: em implementação no branch `feat/links-para-o-clone`
+- **Status**: implementada no branch `feat/links-para-o-clone`
 - **ADR**: [ADR-002](../adr/002-skills-como-links-para-o-clone.md)
 - **Nota**: o repositório não tem o modelo do `to-spec`. Esta spec usa as seções que a regra `.claude/rules/cli.md`
   pede: o comportamento, os pontos de teste e o roteiro manual do que muda no Windows.
@@ -127,8 +127,8 @@ A primeira ação num projeto (`install`) troca as cópias por links:
 
 ## Migração para quem usa o repositório hoje
 
-1. **Hook `post-checkout`**: quem instalou o hook de `Update-AllSkills.ps1` precisa remover o hook. O script não
-   existe mais, e o hook falha. O `README.md` diz como.
+1. **Hook de Git**: quem pôs `pwsh .../Install-Skills.ps1 -Silent` em `.git/hooks/post-checkout` ou `post-merge`
+   precisa apagar essas linhas. O script não existe mais, e o hook falha. O `README.md` diz como.
 2. **Bloco antigo do `.gitignore`** (`.agents/`, `.claude/skills/`, `.codex/skills/`, `skills-lock.json`): continua
    válido. Ele esconde as pastas inteiras, também as skills Locais. A pessoa pode remover o bloco: os links ficam
    escondidos pelo `.git/info/exclude`.
@@ -161,7 +161,8 @@ de teste em `--catalog`.
     código.
 14. Cópia do motor: o SHA-256 de `engine/link-skills.mjs` é o valor de `engine/ENGINE.json`.
 
-O wizard (TTY) fica no `tests/wizard-pty.py`, que roda só em macOS e Linux.
+O wizard (TTY) fica no `tests/wizard-pty.py`, que roda só em macOS e Linux: cancelar, a prévia do `install`, o estado em
+pt-BR e os requisitos de uma skill avulsa antes da confirmação. Em todos, o projeto não muda.
 
 ### Roteiro manual no Windows
 
