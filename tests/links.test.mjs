@@ -213,3 +213,27 @@ test('sources: uma skill de outro repositório é clonada no cache e vinculada',
   const bad = run('install', '--skill', 'omega', '--repo', '--upload-pack=x', '--yes');
   assert.equal(bad.status, 1);
 });
+
+test('P13: um skills.yaml com catalog: só é lido e alterado com o clone desse catálogo', async t => {
+  // The test catalog is test/catalog. A project of another catalog: nothing is read, linked or written.
+  const other = await setup(t, 'catalog: outro/catalogo\nbundles:\n  - core\n');
+  for (const args of [['list'], ['install', '--yes'], ['install', '--bundle', 'web', '--yes'], ['remove', '--skill', 'alpha', '--yes']]) {
+    const result = other.run(...args);
+    assert.equal(result.status, 1, args.join(' '));
+    assert.match(result.stderr, /Este projeto usa o catálogo outro\/catalogo \(catalog: no skills\.yaml\), e este clone é de test\/catalog\. Nenhum arquivo foi alterado\./);
+  }
+  assert.ok(!existsSync(join(other.project, '.claude')), 'no link is made');
+  assert.equal(await readFile(join(other.project, 'skills.yaml'), 'utf8'), 'catalog: outro/catalogo\nbundles:\n  - core\n');
+
+  const invalid = await setup(t, 'catalog: ../x\nbundles:\n  - core\n');
+  const bad = invalid.run('install', '--yes');
+  assert.equal(bad.status, 1);
+  assert.match(bad.stderr, /"catalog: \.\.\/x" não é um catálogo\. Escreva como owner\/nome\./);
+
+  // The catalog of the clone: the project works, and a write keeps the key.
+  const own = await setup(t, 'catalog: test/catalog\nbundles:\n  - core\n');
+  const done = own.run('install', '--bundle', 'web', '--yes');
+  assert.equal(done.status, 0, done.stderr);
+  assert.deepEqual(own.states(), { alpha: 'linked', beta: 'linked', gamma: 'linked' });
+  assert.match(await readFile(join(own.project, 'skills.yaml'), 'utf8'), /^catalog: test\/catalog\n/);
+});

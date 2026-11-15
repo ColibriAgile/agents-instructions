@@ -1,10 +1,10 @@
 import * as p from '@clack/prompts';
 import { loadCatalog } from './catalog.js';
 import type { Catalog } from './catalog.js';
-import { context, projectRoot, runCommand } from './commands.js';
+import { context, projectRoot, readProject, runCommand } from './commands.js';
 import type { Options } from './commands.js';
 import { engine } from './engine.js';
-import type { Details, ProjectState } from './engine.js';
+import type { Details } from './engine.js';
 import { readManifest } from './manifest.js';
 import { bundleRequirementHint, requirementInfo } from './requirements.js';
 import { stateLabel } from './texts.js';
@@ -88,7 +88,7 @@ export async function wizard(initial: Options = {}): Promise<void> {
       p.log.info('O core faz parte de todo projeto. Os bundles escolhidos substituem os do skills.yaml; as skills avulsas e as fontes externas ficam.');
       await runCommand('install', options, catalog);
     } else if (action === 'add') {
-      const state = await engine<ProjectState>({ op: 'read', project, ...(await context(options, catalog)).base });
+      const state = await readProject(project, await context(options, catalog));
       const have = new Set(state.rows.map(r => r.name));
       const bundle = answer(await p.select({ message: 'Filtro de categoria', options: [
         { value: '*', label: 'Todas as skills' }, ...Object.entries(catalog.bundles).map(([value, b]) => ({ value, label: value, hint: b.description })),
@@ -110,7 +110,7 @@ export async function wizard(initial: Options = {}): Promise<void> {
       ] }));
       await runCommand('install', options, catalog);
     } else {
-      const state = await engine<ProjectState>({ op: 'read', project, ...(await context(options, catalog)).base });
+      const state = await readProject(project, await context(options, catalog));
       const removable = state.rows.filter(r => r.state === 'extra' || r.state === 'stale' || r.from.includes('sources'));
       if (!removable.length) { p.outro('Nenhuma skill avulsa para remover. As skills de um bundle saem com "Escolher os bundles do projeto".'); return; }
       options.skill = answer(await p.autocompleteMultiselect<string>({ message: 'Escolha as skills a remover', required: true,

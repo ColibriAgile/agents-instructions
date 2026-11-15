@@ -14,9 +14,11 @@ export const sourcesRoot = (): string =>
 
 export type State = 'linked' | 'missing' | 'copy' | 'stale' | 'conflict' | 'absent' | 'unsupported' | 'extra' | 'local';
 export interface Row { name: string; state: State; repo: string; from: string[]; tracked: boolean }
-export interface EngineManifest { bundles: string[]; skills: string[]; sources: { repo: string; skills: string[] }[] }
+export interface EngineManifest { catalog: string | null; bundles: string[]; skills: string[]; sources: { repo: string; skills: string[] }[] }
 export interface ProjectState {
   git: boolean; manifest: EngineManifest | null; catalogError: string | null; unknown: string[]; rows: Row[];
+  /** `catalog:` of skills.yaml names another catalog than the one of the clone (or is not a catalog name). */
+  catalogProblem: { code: 'catalog_invalid' | 'catalog_other'; wanted: string; have: string | null } | null;
   lockError: string | null; lockOther: number; oldGitignore: boolean; retired: number;
 }
 export interface Problem { code: string; name: string; text: string }

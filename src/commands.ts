@@ -11,7 +11,7 @@ import type { Applied, Curated, Details, ProjectState, Row, SourceClone, State }
 import { atomicWrite, manifestText, readManifest, repoName, saveManifest } from './manifest.js';
 import type { ManifestContent } from './manifest.js';
 import { requirementInfo, summarizeDescription, unknownNotice } from './requirements.js';
-import { changeText, problemText, stateHint, stateLabel } from './texts.js';
+import { catalogProblemText, changeText, problemText, stateHint, stateLabel } from './texts.js';
 
 export interface Options {
   cwd?: string; catalog?: string; skill?: string[]; bundle?: string[]; yes?: boolean; force?: boolean; dryRun?: boolean;
@@ -30,6 +30,16 @@ export function projectRoot(options: Options): string {
   if (result.error) throw new Error('O git não foi encontrado. Instale o Git e rode o comando de novo.');
   if (result.status !== 0) throw new Error(`${cwd} não está num repositório Git. Rode git init no projeto, ou informe a pasta do projeto com --cwd.`);
   return resolve(result.stdout.trim());
+}
+
+/**
+ * The state of a project (`text`: a skills.yaml that is not written yet). A skills.yaml with `catalog:` is read
+ * and changed only with the clone of that catalog: the engine reports another clone, and nothing is done.
+ */
+export async function readProject(project: string, ctx: Context, text?: string): Promise<ProjectState> {
+  const state = await engine<ProjectState>({ op: 'read', project, ...ctx.base, ...(text === undefined ? {} : { manifestText: text }) });
+  if (state.catalogProblem) throw new Error(catalogProblemText(state.catalogProblem));
+  return state;
 }
 
 export interface Context { clone: string; catalog: Catalog; base: { clone: string; catalogRepo: string; sourcesRoot: string } }
@@ -90,7 +100,7 @@ async function list(options: Options, ctx: Context): Promise<void> {
     return;
   }
   const project = projectRoot(options);
-  const state = await engine<ProjectState>({ op: 'read', project, ...ctx.base });
+  const state = await readProject(project, ctx);
   // The declared requirements are of the catalog: a skill of another repository has none.
   const rows = state.rows.map(row => {
     const requirements = row.repo.toLowerCase() === ctx.catalog.repo.toLowerCase() ? ctx.catalog.skills.find(s => s.name === row.name)?.requirements ?? null : null;
@@ -181,7 +191,7 @@ async function install(options: Options, ctx: Context): Promise<void> {
   const repos = [...content.sources.map(s => s.repo), ...(options.repo ? [options.repo] : [])];
   const cloneErrors = options.dryRun ? [] : await cloneSources(ctx, repos);
 
-  const state = await engine<ProjectState>({ op: 'read', project, ...ctx.base, ...(text === undefined ? {} : { manifestText: text }) });
+  const state = await readProject(project, ctx, text);
   const of = (...states: State[]) => state.rows.filter(r => states.includes(r.state)).map(r => r.name);
   const extra = options.keep ? [] : names;
   const conflicts = of('conflict');
@@ -227,7 +237,7 @@ async function remove(options: Options, ctx: Context): Promise<void> {
   };
   const changed = manifest.revision !== null && (content.skills.length !== manifest.skills.length || content.sources.some((s, i) => s.skills.length !== manifest.sources[i]!.skills.length));
   const text = changed ? manifestText(manifest, content) : undefined;
-  const state = await engine<ProjectState>({ op: 'read', project, ...ctx.base, ...(text === undefined ? {} : { manifestText: text }) });
+  const state = await readProject(project, ctx, text);
   const row = (name: string) => state.rows.find(r => r.name === name);
   const unknown = names.filter(n => !row(n) && !manifest.skills.includes(n) && !manifest.sources.some(s => s.skills.includes(n)));
   if (unknown.length) throw new Error(`Skill(s) que o projeto não tem: ${unknown.join(', ')}`);

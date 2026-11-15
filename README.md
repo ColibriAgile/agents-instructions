@@ -88,6 +88,14 @@ colibri-skills install --bundle dotnet --dry-run
 `--cwd` escolhe o projeto (a raiz Git da pasta). `--catalog` escolhe outro clone do catálogo. `--json` dá a saída
 para máquinas, com os valores em inglês.
 
+### Projeto de outro catálogo
+
+Um `skills.yaml` pode nomear o catálogo do projeto com `catalog: owner/nome`. Sem essa chave, o projeto usa o
+catálogo do clone. Com a chave, o `colibri-skills` só lê e altera o projeto com o clone desse catálogo: com outro
+clone, ele para com um erro e não altera nenhum arquivo. Passe o clone certo com `--catalog <pasta>`. Dois catálogos
+podem ter skills com o mesmo nome, e esta regra impede um link para a skill errada. Uma gravação do `skills.yaml`
+mantém a chave.
+
 ### Estados
 
 | Na tela | `--json` | Quando |

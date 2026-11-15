@@ -35,6 +35,13 @@ const problems: Record<string, (name: string) => string> = {
 };
 
 /** The pt-BR text of an engine problem. An unknown code shows the engine text, so nothing is hidden. */
+/** The text of `catalogProblem` of the engine: skills.yaml names a catalog that is not the one of the clone. */
+export function catalogProblemText(problem: { code: string; wanted: string; have: string | null }): string {
+  if (problem.code === 'catalog_invalid') return `skills.yaml: "catalog: ${problem.wanted}" não é um catálogo. Escreva como owner/nome.`;
+  return `Este projeto usa o catálogo ${problem.wanted} (catalog: no skills.yaml), e este clone é ${problem.have ? `de ${problem.have}` : 'de outro catálogo'}. ` +
+    `Nenhum arquivo foi alterado. Use o clone de ${problem.wanted}: --catalog <pasta do clone>.`;
+}
+
 export function problemText(problem: Problem): string {
   return problems[problem.code]?.(problem.name) ?? `${problem.name}: ${problem.text}`;
 }
