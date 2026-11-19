@@ -23,7 +23,7 @@ Os passos citam estes itens pelo nome. Os valores ficam só aqui.
 | Campo Release notes | `customfield_10089` |
 | Campo Refinement | `customfield_10545` |
 
-As operações `listJiraIssueTransitions`, `lookupJiraAccountId`, `getJiraBoardSprintData`, `getJiraProjectVersions` e `listJiraProjectComponents` rodam pelo `executeRead` do MCP do Atlassian.
+As operações `listJiraIssueTransitions`, `getJiraBoardSprintData`, `getJiraProjectVersions` e `listJiraProjectComponents` rodam pelo `executeRead` do MCP do Atlassian.
 
 ## Argumentos
 
@@ -126,7 +126,12 @@ As operações `listJiraIssueTransitions`, `lookupJiraAccountId`, `getJiraBoardS
    <ol><li><p>…</p></li></ol>
    ```
 
-   - **Menção:** só com o argumento de usuário. Ache o `accountId` com `lookupJiraAccountId`. Com mais de 1 resultado, **pergunte** qual é. A menção é `<span data-type="mention" data-user-id="<accountId>">@<displayName></span>`. Sem o argumento, tire o parágrafo da menção.
+   - **Menção:** só com o argumento de usuário. Não use `lookupJiraAccountId`: no site, ele devolve vazio mesmo para usuários que existem. Ache o `accountId` pela JQL, que resolve o nome de exibição:
+     1. `searchJiraIssuesUsingJql` com `assignee = "<nome>" OR reporter = "<nome>" ORDER BY updated DESC`, `fields: ["assignee", "reporter"]`, `view: "full"` e `maxResults: 1`. Use o `accountId` e o `displayName` do campo que tem o nome.
+     2. Se a JQL dá erro de usuário desconhecido ou não traz tarefa, repita com o nome completo. O argumento pode ser só o primeiro nome (`Renato` → `Renato Vieira`).
+     3. Se ainda não acha, ou se o nome casa com mais de 1 usuário, **pergunte** o nome completo ou o e-mail.
+
+     A menção é `<span data-type="mention" data-user-id="<accountId>">@<displayName></span>`. Sem o argumento, tire o parágrafo da menção.
    - **Validade:** a frase sai quando o link não é um artefato.
    - **O que testar:** 1 item por comportamento que a sessão mudou, ligado aos critérios de aceite da tarefa. Escreva cada item como uma ação do QA e o resultado esperado.
 2. Publique com `addOrEditJiraIssueComment`, `contentFormat: "html"`.
