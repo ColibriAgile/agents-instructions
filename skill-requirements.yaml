@@ -28,6 +28,11 @@ skills:
     notes:
       - Os exemplos usam PowerShell; para os scripts Python, use py -3 no Windows ou python3 em macOS/Linux.
       - Revisão de PR exige gh autenticado; runtimes não nativos exigem compozy e suas configurações.
+  # SKILLS/colibri-campos-release/SKILL.md, seção Constantes. Lê os IDs dos campos em SKILLS/colibri-notas-release/SKILL.md e SKILLS/colibri-refinar-tarefa/SKILL.md.
+  colibri-campos-release:
+    tools: [MCP Atlassian]
+    notes:
+      - O MCP do Atlassian precisa de permissão de escrita no Jira para gravar os campos Release title e Release notes.
   # SKILLS/colibri-refinar-tarefa/SKILL.md, seção Constantes.
   colibri-refinar-tarefa:
     tools: [MCP Atlassian]

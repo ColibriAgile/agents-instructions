@@ -1,6 +1,6 @@
 ---
 name: colibri-notas-release
-description: 'Notas de release de uma versão (Fix Version) do Jira, publicadas no Confluence e no Slack. Use quando o usuário pedir as notas de release de uma versão do Jira. Não use para a nota de release do market-place nem para liberar pacotes em produção (use colibri-deploy-producao).'
+description: 'Notas de release de uma versão (Fix Version) do Jira, publicadas no Confluence e no Slack. Use quando o usuário pedir as notas de release de uma versão do Jira. Não use para a nota de release do market-place, para preencher os campos de release de um chamado (use colibri-campos-release) nem para liberar pacotes em produção (use colibri-deploy-producao).'
 argument-hint: 'Informe o nome exato da versão do Jira (por exemplo: Tablet 2.2).'
 ---
 

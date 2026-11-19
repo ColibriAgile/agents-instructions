@@ -55,7 +55,7 @@ As operações `listJiraIssueTransitions`, `getJiraBoardSprintData`, `getJiraPro
    - **Versão:** as versões `unreleased` do projeto (`getJiraProjectVersions`). Proponha a versão mais usada pelas tarefas recentes do mesmo componente: `searchJiraIssuesUsingJql` com `project = <projeto> AND component = "<componente>" AND fixVersion in unreleasedVersions() ORDER BY updated DESC`, `fields: ["fixVersions"]`.
    - **Componente:** os componentes do projeto (`listJiraProjectComponents`). Proponha o componente que corresponde ao repositório da sessão.
    - **Sprint:** a sprint ativa do board da tarefa (`getJiraBoardSprintData` com `projectKeyOrId` e `includeIssues: false`; o `boardId` de uma sprint antiga da tarefa evita ambiguidade).
-   - **Release title e Release notes:** um texto para o cliente final, em pt-BR, escrito a partir da descrição da tarefa e do que a sessão mudou. O título tem 1 linha. As notas dizem o que muda para o usuário, sem nome de classe, arquivo ou tabela.
+   - **Release title e Release notes:** os textos da skill `colibri-campos-release`, no modo proposta. Envie à skill um resumo do que a sessão mudou. A proposta tem os 2 campos, também quando só 1 está vazio.
    - **Refinement:** o texto da skill `colibri-refinar-tarefa`, no modo proposta.
 6. Mostre todas as propostas numa só mensagem e **pergunte** quais a skill grava.
 7. Grave as propostas aprovadas:

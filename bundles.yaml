@@ -90,6 +90,7 @@ bundles:
   release:
     description: Passagem de tarefas do Jira para teste, liberação de pacotes Colibri para produção e notas de release.
     skills:
+      - colibri-campos-release
       - colibri-deploy-producao
       - colibri-notas-release
       - colibri-refinar-tarefa
