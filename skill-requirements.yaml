@@ -28,8 +28,13 @@ skills:
     notes:
       - Os exemplos usam PowerShell; para os scripts Python, use py -3 no Windows ou python3 em macOS/Linux.
       - Revisão de PR exige gh autenticado; runtimes não nativos exigem compozy e suas configurações.
-  # SKILLS/para-teste/SKILL.md, passos 1 a 7.
-  para-teste:
+  # SKILLS/colibri-refinar-tarefa/SKILL.md, seção Constantes.
+  colibri-refinar-tarefa:
+    tools: [MCP Atlassian]
+    notes:
+      - O MCP do Atlassian precisa de permissão de escrita no Jira para gravar o campo Refinement.
+  # SKILLS/colibri-para-teste/SKILL.md, passos 1 a 7. Lê os IDs dos campos em SKILLS/colibri-notas-release/SKILL.md e SKILLS/colibri-refinar-tarefa/SKILL.md.
+  colibri-para-teste:
     tools: [Git, GitHub CLI, MCP Atlassian]
     notes:
       - O gh precisa estar autenticado com permissão para disparar workflows e ler artefatos do repositório.

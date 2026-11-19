@@ -1,5 +1,5 @@
 ---
-name: para-teste
+name: colibri-para-teste
 description: 'Passa uma tarefa do Jira para teste ao final da sessão: valida a tarefa, envia o código, dispara o build, comenta com o link do pacote e move a tarefa para Ready to test.'
 argument-hint: '[CHAVE-123] [@usuário a mencionar no comentário]'
 disable-model-invocation: true
@@ -19,9 +19,11 @@ Os passos citam estes itens pelo nome. Os valores ficam só aqui.
 | Status de entrada | `In Progress` ou `Ready to test` |
 | Status de saída | `Ready to test` |
 | Campo Sprint | `customfield_10020` |
-| Campo Release title | `customfield_10088` |
-| Campo Release notes | `customfield_10089` |
-| Campo Refinement | `customfield_10545` |
+
+Os IDs dos outros campos ficam só nas skills do mesmo bundle. Antes do passo 1, leia a tabela Constantes de cada uma:
+
+- Release title e Release notes: `../colibri-notas-release/SKILL.md`.
+- Refinement: `../colibri-refinar-tarefa/SKILL.md`.
 
 As operações `listJiraIssueTransitions`, `getJiraBoardSprintData`, `getJiraProjectVersions` e `listJiraProjectComponents` rodam pelo `executeRead` do MCP do Atlassian.
 
@@ -32,7 +34,7 @@ As operações `listJiraIssueTransitions`, `getJiraBoardSprintData`, `getJiraPro
 
 ## Passo 1: Validar a tarefa
 
-1. Leia a tarefa com `getJiraIssue`, `view: "evidence"` e `fields` com `status`, `assignee`, `fixVersions`, `components`, `project` e os 4 campos das constantes. Um campo que vem só com o `id`, sem `value`, está vazio. Um campo que não vem na resposta não existe no projeto: o item dele não se aplica.
+1. Leia a tarefa com `getJiraIssue`, `view: "evidence"` e `fields` com `status`, `assignee`, `fixVersions`, `components`, `project`, Sprint, Refinement, Release title e Release notes. Um campo que vem só com o `id`, sem `value`, está vazio. Um campo que não vem na resposta não existe no projeto: o item dele não se aplica.
 2. Leia o usuário atual com `atlassianUserInfo`.
 3. Confira cada item:
 
@@ -54,7 +56,7 @@ As operações `listJiraIssueTransitions`, `getJiraBoardSprintData`, `getJiraPro
    - **Componente:** os componentes do projeto (`listJiraProjectComponents`). Proponha o componente que corresponde ao repositório da sessão.
    - **Sprint:** a sprint ativa do board da tarefa (`getJiraBoardSprintData` com `projectKeyOrId` e `includeIssues: false`; o `boardId` de uma sprint antiga da tarefa evita ambiguidade).
    - **Release title e Release notes:** um texto para o cliente final, em pt-BR, escrito a partir da descrição da tarefa e do que a sessão mudou. O título tem 1 linha. As notas dizem o que muda para o usuário, sem nome de classe, arquivo ou tabela.
-   - **Refinement:** um texto com as seções `Contexto`, `User Story`, `Situação Atual`, `Melhoria Proposta`, `Critérios de Aceite` e `Notas Técnicas`, escrito a partir da descrição da tarefa.
+   - **Refinement:** o texto da skill `colibri-refinar-tarefa`, no modo proposta.
 6. Mostre todas as propostas numa só mensagem e **pergunte** quais a skill grava.
 7. Grave as propostas aprovadas:
    - Sprint: `transitionJiraIssue` com `sprintId`, sem `transitionId`.
