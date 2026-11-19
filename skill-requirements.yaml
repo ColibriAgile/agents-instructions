@@ -28,6 +28,12 @@ skills:
     notes:
       - Os exemplos usam PowerShell; para os scripts Python, use py -3 no Windows ou python3 em macOS/Linux.
       - Revisão de PR exige gh autenticado; runtimes não nativos exigem compozy e suas configurações.
+  # SKILLS/para-teste/SKILL.md, passos 1 a 7.
+  para-teste:
+    tools: [Git, GitHub CLI, MCP Atlassian]
+    notes:
+      - O gh precisa estar autenticado com permissão para disparar workflows e ler artefatos do repositório.
+      - O MCP do Atlassian precisa do conector v2 (discover e execute*), com permissão de escrita no Jira.
   # SKILLS/colibri-notas-release/SKILL.md, seção Ferramentas.
   colibri-notas-release:
     tools: [MCP Atlassian, MCP Slack]

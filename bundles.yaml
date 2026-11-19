@@ -20,6 +20,7 @@ bundles:
       - grill-with-docs
       - grilling
       - no-workarounds
+      - para-teste
       - repository-cli-efficiency
       - investigar-logs
 
