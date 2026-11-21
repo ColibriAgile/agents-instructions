@@ -312,6 +312,10 @@
                                 <label class="cm-check"><input type="checkbox" checked><span>Executar quando o agendamento for perdido</span></label>
                                 <label class="cm-check cm-check--nested"><input type="checkbox" disabled><span>Somente no dia atual</span></label>
                             </div>
+                            <div class="cm-field">
+                                <span class="cm-field__label" id="ex-switch-label">Agendamento ativo</span>
+                                <label class="cm-switch"><input type="checkbox" role="switch" aria-labelledby="ex-switch-label" checked><span aria-hidden="true" data-on="Sim" data-off="Não">Sim</span></label>
+                            </div>
                             <div class="cm-form__actions">
                                 <div class="cm-btn-group" role="group">
                                     <button type="button" class="cm-btn">Cancelar</button>
@@ -443,6 +447,15 @@
             botao.setAttribute('aria-expanded', aberto);
             secao.querySelector('.cm-nav__list').hidden = !aberto;
         });
+    });
+    // Chave liga/desliga: o texto ao lado troca com ela (data-on / data-off; padrão Sim / Não).
+    document.querySelectorAll('.cm-switch > input').forEach(function (chave) {
+        var texto = chave.nextElementSibling;
+        function atualizar() {
+            texto.textContent = chave.checked ? (texto.dataset.on || 'Sim') : (texto.dataset.off || 'Não');
+        }
+        chave.addEventListener('change', atualizar);
+        atualizar();
     });
     // Tema: data-theme no <html>. Segue o sistema até a pessoa escolher; a escolha fica gravada.
     function applyTheme(tema) {

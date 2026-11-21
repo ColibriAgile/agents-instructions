@@ -1701,6 +1701,43 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
 .cm-check > input { margin-top: 1px; }
 .cm-check--nested { margin-left: 24px; }
 .cm-check:has(input:disabled) { color: var(--cm-ink-3); cursor: not-allowed; }
+/* Chave liga/desliga: o estado escrito ao lado ("Sim"/"Não"), nunca só a posição. */
+.cm-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--cm-ink);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.35;
+    cursor: pointer;
+}
+.cm-switch > input[type="checkbox"] {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 18px;
+    vertical-align: middle;
+    background-color: var(--cm-line-strong);
+    background-image: radial-gradient(circle, #fff 0 6.5px, transparent 7px);
+    background-size: 18px 18px;
+    background-position: left -1px center;
+    border-color: var(--cm-line-strong);
+    border-radius: 10px;
+    transition: background-color 120ms var(--cm-ease), background-position 120ms var(--cm-ease), border-color 120ms var(--cm-ease), box-shadow 120ms var(--cm-ease);
+}
+.cm-switch > input[type="checkbox"]:hover { border-color: var(--cm-check-hover); }
+.cm-switch > input[type="checkbox"]:checked {
+    background-color: var(--cm-accent);
+    background-image: radial-gradient(circle, #fff 0 6.5px, transparent 7px);
+    background-position: right -1px center;
+    border-color: var(--cm-accent);
+}
+.cm-switch > input[type="checkbox"]:focus-visible { border-color: var(--cm-focus); box-shadow: var(--cm-focus-ring); }
+.cm-switch:has(input:disabled) { color: var(--cm-ink-3); cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) {
+    .cm-switch > input[type="checkbox"] { transition: none; }
+}
 /* Hover e foco repetem o seletor: .cm-btn-group--compact .cm-btn:hover zeraria o min-width e o botão
    de um dígito encolheria sob o mouse, perderia o hover e voltaria a crescer (tremor). */
 .cm-toggles .cm-toggle,
