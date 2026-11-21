@@ -44,6 +44,14 @@ skills:
     notes:
       - O gh precisa estar autenticado com permissão para disparar workflows e ler artefatos do repositório.
       - O MCP do Atlassian precisa do conector v2 (discover e execute*), com permissão de escrita no Jira.
+  # SKILLS/colibri-testar-pacote/SKILL.md, passos 1 a 6; scripts/aplicar-pacote.ps1. Lê o mapa de pacotes em SKILLS/colibri-deploy-producao/references/pipeline-colibri.md.
+  colibri-testar-pacote:
+    platforms: [win32]
+    tools: [Git, GitHub CLI, PowerShell 7, Colibri Master local]
+    notes:
+      - O gh precisa estar autenticado com permissão para disparar workflows, ler logs e baixar artefatos do repositório.
+      - O Colibri Master precisa estar no ar; a URL padrão é http://localhost:4000.
+      - O envio multipart usa Invoke-RestMethod -Form, que exige PowerShell 7.
   # SKILLS/colibri-notas-release/SKILL.md, seção Ferramentas.
   colibri-notas-release:
     tools: [MCP Atlassian, MCP Slack]

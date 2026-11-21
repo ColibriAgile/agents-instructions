@@ -88,13 +88,14 @@ bundles:
       - writing-skills
 
   release:
-    description: Passagem de tarefas do Jira para teste, liberação de pacotes Colibri para produção e notas de release.
+    description: Passagem de tarefas do Jira para teste, teste de pacotes no Colibri Master local, liberação de pacotes Colibri para produção e notas de release.
     skills:
       - colibri-campos-release
       - colibri-deploy-producao
       - colibri-notas-release
       - colibri-refinar-tarefa
       - colibri-para-teste
+      - colibri-testar-pacote
 
   api-docs:
     description: Documentação de APIs a partir de collections e specs — geração de Markdown para wiki/RAG.
