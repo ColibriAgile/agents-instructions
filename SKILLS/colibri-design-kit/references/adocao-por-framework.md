@@ -114,6 +114,8 @@ O CSS do kit só entrega o visual; reimplemente no framework do projeto (o `exem
   }
   ```
 
+  Num formulário, o mesmo componente vai dentro de um `.cm-field`, com o rótulo do campo (`<span class="cm-field__label" id>`) apontado pelo `aria-labelledby` da chave e a dica em `.cm-field__hint` (`aria-describedby`); o dependente leva `.cm-field--nested` e `disabled`. No Colibri Totem, `SwitchField`.
+
   Em Vue, Angular ou Blazor, a mesma marcação com o texto ligado ao estado (`v-model`, `[(ngModel)]`, `@bind`). Com biblioteca de componentes, não use a chave dela (`dxSwitch`, `MatSlideToggle`, `MuiSwitch`, `DxCheckBox` em modo chave): o visual, a ausência do texto ao lado e a cor de destaque são do tema dela; use a marcação do kit.
 - **Estados de componente:** `.is-active`, `.is-open`, `.is-disabled`, `.is-invalid`, `.is-hidden` são aplicados pelo código do projeto.
 - **Diálogos empilhados no Bootstrap 3** (ex.: seletor de imagens aberto sobre um diálogo de edição, ou o diálogo de carregamento sobre outro): todos os modais têm a mesma camada (`--cm-layer-modal`), então o último no DOM fica por cima; declare o de cima depois do de baixo. Ao fechar qualquer modal, o Bootstrap 3 tira `modal-open` do `<body>` e o diálogo que ficou aberto perde a rolagem: devolva a classe num handler global, testando o estado do próprio Bootstrap (um modal pode ficar com a classe `in` já escondido):

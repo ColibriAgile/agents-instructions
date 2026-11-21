@@ -78,6 +78,11 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **21/11/2026 (chave liga/desliga no formulário):** ao trocar pela chave as caixas que ligavam e desligavam recursos no admin do Colibri Totem, faltavam o campo dependente recuado e o rótulo apagado da chave desabilitada.
+  - **Regra:** `DESIGN.md`, seção 7, "Formulários", na chave liga/desliga: num formulário, ela é um `.cm-field` (rótulo, chave, dica), e o dependente fica recuado e desabilitado, à vista.
+  - **Implementação:** `colibri-ui.css`: `.cm-field--nested` e o rótulo em `ink-3` com a chave desabilitada. Em `exemplo.html`, a dica de "Agendamento ativo" e o dependente "Avisar por e-mail".
+  - **Skill:** `adocao-por-framework.md`, a chave dentro do `.cm-field`.
+
 - **21/11/2026 (chave liga/desliga):** o kit só tinha a caixa de seleção, e o admin do Colibri Totem ligava e desligava os meios de pagamento com uma caixa e o rótulo "Ativo"/"Desativado". Ligar e desligar pede uma chave. Pedido do usuário.
   - **Regra:** `DESIGN.md`, seção 7, "Formulários": chave liga/desliga `.cm-switch` para ligar ou desligar um recurso ou item, com o estado escrito ao lado ("Não"/"Sim", ou o par do contexto) e o nome do recurso fora dela; a caixa fica para escolher itens e opções. Entrou no "Não faça" (seção 8).
   - **Implementação:** `colibri-ui.css`: `.cm-switch` sobre o `input[type="checkbox"]` do kit (trilho de 32 × 18 px, cantos de 10 px, bolinha branca, foco e desabilitado do kit, sem animação com movimento reduzido). Em `exemplo.html`, "Agendamento ativo" no formulário.

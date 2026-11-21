@@ -1735,6 +1735,9 @@ input[type="radio"]:disabled { cursor: not-allowed; opacity: .45; }
 }
 .cm-switch > input[type="checkbox"]:focus-visible { border-color: var(--cm-focus); box-shadow: var(--cm-focus-ring); }
 .cm-switch:has(input:disabled) { color: var(--cm-ink-3); cursor: not-allowed; }
+/* Chave num formulário: o campo que depende de outro fica recuado, e o rótulo apaga com a chave desabilitada. */
+.cm-field--nested { margin-left: 24px; }
+.cm-field:has(.cm-switch > input:disabled) .cm-field__label { color: var(--cm-ink-3); }
 @media (prefers-reduced-motion: reduce) {
     .cm-switch > input[type="checkbox"] { transition: none; }
 }
