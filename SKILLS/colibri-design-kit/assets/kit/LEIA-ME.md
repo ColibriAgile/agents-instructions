@@ -78,6 +78,12 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **22/11/2026 (Avalonia: seta de 24, colunas de marca estreitas e abas):** no `Plugins.Manager.Config`, pedido do usuário: colunas de marca do tamanho do título, faixa da seta de ordenação em 24 (32 é espaço demais) e, nos webhooks, o erro da última execução fora da grade, numa aba do painel.
+  - **Regra:** nenhuma nova. Abas (`.cm-tabs`, seção 7, "Detalhe") e colunas de marca centralizadas (seção 7) passam a valer no Avalonia.
+  - **Implementação:** tema `CoLib.Ui.Avalonia` (dotnet-lib#87): `DataGridSortIconMinWidth` em 24 e `TextBlock.centro` ajustado; `TabControl`/`TabItem` no visual do `.cm-tab` e `Ellipse.pendencia-aba` (`.cm-tab__dot`).
+  - **Skill:** na seção Avalonia de `adocao-por-framework.md`, as abas na tabela de equivalências, com a aba fora de vista que sai da árvore, e a largura das colunas de marca (título mais 42).
+  - **Na aplicação:** texto longo que não cabe na linha (mensagem de erro, observação) sai da grade: na coluna, uma marca; o texto, no painel do registro.
+
 - **22/11/2026 (Avalonia: colunas que preenchem a grade):** pedido do usuário: o equivalente ao `ColumnAutoWidth` do DevExpress, com as colunas preenchendo a grade e encolhendo até uma largura mínima antes da barra de rolagem. As colunas `*` do Avalonia fazem isso, mas prendem o arraste (medido).
   - **Regra:** nenhuma nova. A regra da tabela que rola de lado (seção 7, "Responsivo") e a de redimensionar colunas seguem; o preenchimento só ocupa a sobra.
   - **Implementação:** `PreenchimentoDeColunas` no `CoLib.Ui.Avalonia` da `_lib` (dotnet-lib#87), ligado pelo tema do DataGrid: colunas com `Peso` crescem com a sobra e encolhem até o `MinWidth` antes da rolagem, com largura em pixels e arraste livre. `TextBlock.centro` também na primeira coluna.
