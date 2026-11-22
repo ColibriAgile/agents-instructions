@@ -31,6 +31,7 @@ bundles:
       - colibri-connection-string
       - colibri-dotnet-aderencia
       - colibri-logging
+      - colibri-migrar-ui-avalonia
       - colibri-ports
       - csharp-tests
       - csharp-tests-refactor
