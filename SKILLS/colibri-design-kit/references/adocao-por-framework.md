@@ -108,6 +108,7 @@ Confira cada ajuste na medição; compilar não prova que o estilo pegou. Cor s�
 |---|---|
 | `.cm-btn--primary`, `.cm-btn--danger-text` | `Button.primario`, `Button.perigo` |
 | `.cm-btn-group`, `.cm-btn-group--compact` | `StackPanel.grupo-botoes`, `StackPanel.grupo-botoes.compacto` (bordas compartilhadas, cantos nas pontas, 120 de largura mínima, principal na ponta direita) |
+| `.cm-switch` | `ToggleButton.chave` (trilho de 32 × 18, bolinha de 14, "Não"/"Sim" escrito ao lado pelo próprio modelo); o nome do recurso num `TextBlock.rotulo` acima e em `AutomationProperties.Name`. Não use `CheckBox` para ligar ou desligar, nem o `ToggleSwitch` do Fluent, que tem outra medida e anima o trilho |
 | `.cm-dialog__aside` (destrutiva à parte) | `Button.perigo` numa coluna à esquerda do `Grid` do rodapé, fora do `StackPanel.grupo-botoes` |
 | `.cm-statusbar`, `__item`, `__item--grow` | `Border.barra-status` com um `Grid` (`*,Auto,Auto`); o item longo com `TextTrimming="CharacterEllipsis"` e o valor em `ToolTip.Tip` |
 | `.cm-icon-btn`, `.cm-icon-btn--danger` | `Button.acao-linha`, `Button.acao-linha.perigo` (30 × 30, sem moldura; `ToolTip.Tip` e `AutomationProperties.Name` obrigatórios) |
