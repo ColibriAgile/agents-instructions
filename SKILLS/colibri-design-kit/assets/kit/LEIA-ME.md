@@ -78,6 +78,12 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **22/11/2026 (Avalonia: campos e colunas redimensionáveis):** no `Plugins.Manager.Config`, as colunas das grades não redimensionavam, e as caixas de texto tinham a borda escura do Fluent (preto a 60%, fundo translúcido, borda de 2 px no foco). Pedido do usuário.
+  - **Regra:** nenhuma nova. O `.cm-input` (seção 7, "Formulários") e a regra da tabela que rola de lado (seção 7, "Responsivo") passam a valer no Avalonia.
+  - **Implementação:** tema `CoLib.Ui.Avalonia` da `_lib` (dotnet-lib#84). `TextBox`, `ComboBox` e `NumericUpDown` no visual do `.cm-input`, com o halo de foco no token novo `CmFocusRing`. `CanUserResizeColumns` ligado no tema da grade.
+  - **Skill:** na seção Avalonia de `adocao-por-framework.md`, os campos na tabela de equivalências; as colunas sem `*` (coluna proporcional prende as vizinhas no mínimo); e três armadilhas novas: estados do Fluent com pseudo-classe, `BoxShadow` sem `{x:Null}` e seletor combinado que vale para o tipo comum. Rubrica v29 (K3 e C1 em XAML).
+  - **Na aplicação:** troque as colunas `*` do `DataGrid` por largura em pixels ou `Auto` e tire as cores próprias dos campos.
+
 - **22/11/2026 (barra de status; grupo de botões no Avalonia):** o `Plugins.Manager.Config` tinha uma barra de status na largura da janela, que passava por baixo da lateral e cortava o degradê, e que repetia a versão já mostrada no rodapé da lateral. O kit não tinha barra de status, porque nenhuma aplicação tinha usado uma. Os botões do app estavam soltos e com o texto à esquerda. Pedido do usuário.
   - **Regra:** `DESIGN.md`, seção 5, "Barra de status" (opcional): no pé da área principal, nunca na largura da janela, discreta (legenda de 12 px em `ink-3`, sem faixa nem borda), sem a versão, com o item longo cortado e o texto inteiro na dica, e sem ação nem alerta. Entrou no "Não faça" (seção 8).
   - **Implementação:** `colibri-ui.css`: `.cm-statusbar`, `__item`, `__item--grow`. Em `exemplo.html`, a barra no pé da `.cm-main`. No Avalonia (tema `CoLib.Ui.Avalonia` da `_lib`): `Border.barra-status` discreta, `StackPanel.grupo-botoes` (`.cm-btn-group`), o texto do `Button` centralizado e a chave liga/desliga `ToggleButton.chave` (`.cm-switch`), que trocou a caixa "Ativo" do webhook.
