@@ -52,6 +52,12 @@ skills:
       - O gh precisa estar autenticado com permissão para disparar workflows, ler logs e baixar artefatos do repositório.
       - O Colibri Master precisa estar no ar; a URL padrão é http://localhost:4000.
       - O envio multipart usa Invoke-RestMethod -Form, que exige PowerShell 7.
+  # SKILLS/colibri-capturas-avalonia/SKILL.md, passos 2 e 3; references/jira-anexos.md; scripts/enviar-imagens.ps1.
+  colibri-capturas-avalonia:
+    tools: [.NET SDK 11, PowerShell 7, MCP Atlassian]
+    notes:
+      - As capturas usam Avalonia.Headless com Skia e não exigem sessão gráfica.
+      - O envio ao Jira usa o conector v2 do MCP do Atlassian (executeWrite) com permissão de escrita; PowerShell 7 só é necessário para esse envio.
   # SKILLS/colibri-migrar-ui-avalonia/SKILL.md, passos 1 e 5.
   colibri-migrar-ui-avalonia:
     tools: [.NET SDK 11]

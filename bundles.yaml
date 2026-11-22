@@ -97,6 +97,7 @@ bundles:
       - colibri-refinar-tarefa
       - colibri-para-teste
       - colibri-testar-pacote
+      - colibri-capturas-avalonia
 
   api-docs:
     description: Documentação de APIs a partir de collections e specs — geração de Markdown para wiki/RAG.
