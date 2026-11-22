@@ -78,6 +78,12 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **22/11/2026 (colunas de marca e de ação centralizadas):** na tela de plugins do `Plugins.Manager.Config`, o ✓ de POS, CIS e PIS e o botão de configurar ficavam no centro da célula, e o título, à esquerda. Pedido do usuário: título e conteúdo centralizados; a versão continua à esquerda.
+  - **Regra:** seção 7, "Navegação e listas" e regra da grade como tabela: coluna de marca (✓) e de ação no meio da linha com título e conteúdo centralizados (`.cm-cell--center`); a coluna de ações no fim continua à direita.
+  - **Implementação:** `.cm-cell--center` em `colibri-ui.css`. Tema `CoLib.Ui.Avalonia`: `TextBlock.centro` no título e `CellStyleClasses="centro"` na célula de texto.
+  - **Skill:** coluna centralizada na seção Avalonia de `adocao-por-framework.md`, com a condição da seta de ordenação.
+  - **Na aplicação:** nas colunas de marca e de ação no meio da linha, centralize título e conteúdo.
+
 - **22/11/2026 (Avalonia: campos e colunas redimensionáveis):** no `Plugins.Manager.Config`, as colunas das grades não redimensionavam, e as caixas de texto tinham a borda escura do Fluent (preto a 60%, fundo translúcido, borda de 2 px no foco). Pedido do usuário.
   - **Regra:** nenhuma nova. O `.cm-input` (seção 7, "Formulários") e a regra da tabela que rola de lado (seção 7, "Responsivo") passam a valer no Avalonia.
   - **Implementação:** tema `CoLib.Ui.Avalonia` da `_lib` (dotnet-lib#84). `TextBox`, `ComboBox` e `NumericUpDown` no visual do `.cm-input`, com o halo de foco no token novo `CmFocusRing`. `CanUserResizeColumns` ligado no tema da grade.
