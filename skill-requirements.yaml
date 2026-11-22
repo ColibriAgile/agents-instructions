@@ -52,6 +52,12 @@ skills:
       - O gh precisa estar autenticado com permissão para disparar workflows, ler logs e baixar artefatos do repositório.
       - O Colibri Master precisa estar no ar; a URL padrão é http://localhost:4000.
       - O envio multipart usa Invoke-RestMethod -Form, que exige PowerShell 7.
+  # SKILLS/colibri-migrar-ui-avalonia/SKILL.md, passos 1 e 5.
+  colibri-migrar-ui-avalonia:
+    tools: [.NET SDK 11]
+    notes:
+      - Requer o checkout do dotnet-lib (em geral o submódulo _lib) com o projeto CoLib.Ui.Avalonia.
+      - A conferência visual na Demo exige uma sessão gráfica; os testes headless não exigem.
   # SKILLS/colibri-notas-release/SKILL.md, seção Ferramentas.
   colibri-notas-release:
     tools: [MCP Atlassian, MCP Slack]
