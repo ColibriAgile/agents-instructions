@@ -107,6 +107,9 @@ Confira cada ajuste na medição; compilar não prova que o estilo pegou. Cor s�
 | Kit | Avalonia |
 |---|---|
 | `.cm-btn--primary`, `.cm-btn--danger-text` | `Button.primario`, `Button.perigo` |
+| `.cm-btn-group`, `.cm-btn-group--compact` | `StackPanel.grupo-botoes`, `StackPanel.grupo-botoes.compacto` (bordas compartilhadas, cantos nas pontas, 120 de largura mínima, principal na ponta direita) |
+| `.cm-dialog__aside` (destrutiva à parte) | `Button.perigo` numa coluna à esquerda do `Grid` do rodapé, fora do `StackPanel.grupo-botoes` |
+| `.cm-statusbar`, `__item`, `__item--grow` | `Border.barra-status` com um `Grid` (`*,Auto,Auto`); o item longo com `TextTrimming="CharacterEllipsis"` e o valor em `ToolTip.Tip` |
 | `.cm-icon-btn`, `.cm-icon-btn--danger` | `Button.acao-linha`, `Button.acao-linha.perigo` (30 × 30, sem moldura; `ToolTip.Tip` e `AutomationProperties.Name` obrigatórios) |
 | `.cm-panel` | `Border.superficie` (a grade fica dentro, com `ClipToBounds="True"`) |
 | `.cm-topbar`, `.cm-topbar__title`, `.cm-topbar__menu` | `Border.barra-superior`, `TextBlock.titulo-pagina`, `Button.barra-menu` |
@@ -115,6 +118,10 @@ Confira cada ajuste na medição; compilar não prova que o estilo pegou. Cor s�
 | `.bi` | `TextBlock.icone` com o código do glifo (`Text="&#xF503;"`; o código está em `icons/bootstrap-icons.min.css` do kit) |
 
 **Lateral.** Monte com a estrutura do comentário de `TemaColibri.axaml`: `Border.lateral` encaixado à esquerda de um `DockPanel`, com `MinWidth` 230 (nunca `Width`, para crescer até o rótulo mais longo); cabeçalho com o nome do produto e o botão de recolher à direita; itens com ícone e rótulo; versão completa no rodapé. Recolher esconde a lateral inteira (`IsVisible`) e mostra o `Button.barra-menu` à esquerda do título na barra superior. **Não use `SplitView` com `CompactInline`**: o trilho de ícones de 48 px não existe no kit, e o `SplitView` fixa a largura do painel.
+
+**Barra de status.** `Border.barra-status` encaixado embaixo (`DockPanel.Dock="Bottom"`) no `DockPanel` da área principal, à direita da `Border.lateral`, nunca no `DockPanel` da janela: ali ela passa por baixo da lateral e corta o degradê. O conteúdo da página fica com `Margin="16,16,16,0"` e a barra dá o respiro de baixo. Sem a versão, que já está no `Border.lateral-rodape`.
+
+**Botões.** Lado a lado, sempre num `StackPanel.grupo-botoes`, nunca num `StackPanel` com `Spacing` nem em colunas vizinhas de um `Grid`. O Avalonia monta o grupo com `:nth-child(1)` e `:nth-last-child(1)` para os cantos e com `ZIndex` para a borda de cima na emenda; não é limitação do framework. Um botão escondido com `IsVisible` continua contando no `:nth-child`, então use `IsEnabled` para a ação indisponível. Rodapé de formulário com exclusão: `Grid` com `ColumnDefinitions="Auto,*,Auto"`, `Button.perigo` na primeira coluna e o grupo Cancelar | Salvar na última. Não ponha `MinWidth` no botão do projeto: o grupo já dá os 120.
 
 **Grade (`DataGrid`), pela regra da grade como tabela.** `TemaColibri.DataGrid.axaml` já cobre o que o tema Fluent do DataGrid faz fora do kit; não repita no projeto:
 
@@ -129,6 +136,7 @@ Confira cada ajuste na medição; compilar não prova que o estilo pegou. Cor s�
 
 - Comentário XML não aceita dois hífens seguidos: não escreva `.cm-btn--primary` nem `--cm-*` dentro de `<!-- -->` (erro `AVLN1001` no build); escreva `cm-btn + primary`.
 - O Fluent encolhe o botão pressionado para 98%: o tema da `_lib` desliga isso (`RenderTransform` nulo), porque o retorno por escala é do perfil Operação.
+- O Fluent alinha o texto do botão à esquerda quando ele tem `MinWidth` ou `Width`: o tema da `_lib` fixa `HorizontalContentAlignment="Center"` no `Button`. Item de lista ou da lateral que precisa do texto à esquerda declara `Left` na própria classe, como o `Button.lateral`.
 - Foco na lateral em branco a 75%, não no azul-claro do resto da janela, que some no degradê.
 
 **Medir sem o ambiente real.** A aplicação costuma depender de banco e licença para abrir. Para conferir a grade e a lateral, monte um projeto descartável (fora do repositório) que referencia o projeto da aplicação, `Avalonia.Headless` e `Avalonia.Skia` na versão do Avalonia dela e `NSubstitute`, cria os ViewModels com dublês (como nos testes), abre a janela real e captura:
