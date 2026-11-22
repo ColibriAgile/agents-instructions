@@ -30,13 +30,15 @@ Desvios já registrados (mantenha): <lista ou "nenhum">.
 Qualquer outro desvio do kit só com a minha confirmação.
 ```
 
+**Avalonia (`*.axaml`):** troque a linha das classes por "Use as classes do tema `CoLib.Ui.Avalonia` da `_lib` (tabela de equivalência e armadilhas na seção "Avalonia" de `<caminho absoluto desta skill>/references/adocao-por-framework.md`); a marcação de `exemplo.html` é a referência da anatomia, não do código." Ajuste que vale para toda aplicação Avalonia vai para o tema da `_lib`, não para o `App.axaml` do projeto.
+
 Quando o impeccable propuser algo que contraria o kit, o kit vence; desvio que o usuário confirmar vai para `DECISOES.md` pelo verbo `desvio`.
 
 Conclua quando o impeccable terminar a refatoração da página.
 
 ## 4. Medir depois
 
-Execute de novo [`./aderencia.md`](./aderencia.md) na página, do mesmo modo (sem o fechamento de próximos passos); a tendência do relatório mostra antes → depois. Com navegador, confira também o alinhamento em 1440, 1920, ~900 e 320 px e os dois temas (Operação: a resolução real da superfície e, no consumidor, um esquema claro e um escuro).
+Execute de novo [`./aderencia.md`](./aderencia.md) na página, do mesmo modo (sem o fechamento de próximos passos); a tendência do relatório mostra antes → depois. Com navegador, confira também o alinhamento em 1440, 1920, ~900 e 320 px e os dois temas (Operação: a resolução real da superfície e, no consumidor, um esquema claro e um escuro). No Avalonia, no lugar do navegador, faça a captura headless da seção "Avalonia" de [`./adocao-por-framework.md`](./adocao-por-framework.md), com as medidas, a interação (clique, setas, hover), os dois temas, a lateral recolhida e a janela na largura mínima.
 
 Item que passou de aprovado para reprovado é regressão: corrija antes de concluir. Conclua quando a página não tiver regressões nem item ★ reprovado, ou quando cada reprovação restante tiver motivo escrito (desvio confirmado, dependência de outra página, verificação impossível aqui).
 

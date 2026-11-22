@@ -359,6 +359,36 @@ pre.log,
     background: var(--cm-scroll-bg);
 }
 .cm-content { padding: 20px 24px 32px; }
+/* Barra de status (opcional; DESIGN.md, seção 5): linha de legenda no pé da .cm-main, fora da área rolável, sobre o
+   plano da página. Só na área principal (a lateral vai até a base), sem faixa, sem borda e sem a versão. */
+.cm-statusbar {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 16px;
+    min-height: 28px;
+    padding: 6px 24px 7px;
+    color: var(--cm-ink-3);
+    background: transparent;
+    font-size: 12px;
+    line-height: 1.3;
+}
+.cm-statusbar__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    white-space: nowrap;
+}
+.cm-statusbar__item > .bi { font-size: 12px; }
+/* O item longo (caminho, endereço) ocupa o que sobra e corta com reticências; o texto inteiro vai no title. */
+.cm-statusbar__item--grow {
+    display: block;
+    flex: 1 1 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .cm-content[tabindex="-1"]:focus { outline: none; }
 /* Pular para o conteúdo: primeiro item do Tab, escondido acima da janela até receber o foco. */
 .cm-skip,

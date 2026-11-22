@@ -32,6 +32,7 @@ Complementa o passo 3 de [`./adotar.md`](./adotar.md). A marcação de cada comp
 | Bootstrap 3 / AngularJS | `colibri-ui.css` + `colibri-ui.bootstrap3.css`, carregado depois do CSS das bibliotecas (cobre `.btn`, `.modal`, `.form-control` (borda de foco também no `.modal-body`; somente leitura e desabilitado com os tokens), `.form-group`, `.input-group` (halo do foco no conjunto, como no `.cm-input-group`) e `.input-group-addon`, `.has-error` (com o halo do kit no foco), `.checkbox`/`.radio`, `.cm-check` e `.cm-toggle` no `.modal-body`, angular-growl, pnotify 1.2 e PNotify 5, chosen (também com o `chosen-bootstrap.css`), bootstrap-daterangepicker 2.1 (Cancelar | Aplicar agrupados), c3, Dropzone, `ng-cloak`). Nos gráficos c3, passe as cores das séries pela paleta `--cm-chart-*` (lida com `getComputedStyle`), porque o c3 escreve a cor no SVG. Menus: `.cm-menu` junto com `.dropdown-menu`. Diretivas/templates do projeto passam a emitir as classes `cm-`. No rodapé do modal, a ação destrutiva à parte usa `.btn.cm-btn--danger-text.cm-dialog__aside`. Com pnotify, configure posição e largura (abaixo). |
 | Bootstrap 4/5, React, Vue, Blazor sem biblioteca | Não use o adaptador Bootstrap 3. Implemente os componentes com as classes `cm-` ou transponha os tokens `--cm-*` para o tema do framework (ex.: variáveis `--bs-*`), usando o adaptador só como referência. |
 | DevExpress Blazor | `colibri-ui.devexpress.css` depois do tema. Temas Fluent: variáveis `--dxds-font-family-*`; clássicos/Bootstrap externo: `--bs-*`. Escolha o `SizeMode` mais próximo da escala (13 px, controle de 32 px) e ajuste o resto por `--dxds-font-size-*`. Classes internas (`--dxbl-*`, `.dxbl-*`) só sem alternativa, com o motivo em `DECISOES.md`. Grade (`DxGrid`), pela regra da grade como tabela: o adaptador ainda não traz esse bloco, porque não foi conferido numa aplicação Blazor. Parta das variáveis do tema em `.dxbl-grid` (`--dxbl-grid-font-size: 13px`, `--dxbl-grid-bg: var(--cm-surface)`, `--dxbl-grid-color: var(--cm-ink)`, `--dxbl-grid-border-color: var(--cm-line)`, `--dxbl-grid-header-bg: var(--cm-surface-2)`, `--dxbl-grid-header-color: var(--cm-ink-2)`, `--dxbl-grid-hover-bg: var(--cm-hover)`, `--dxbl-grid-selection-bg: var(--cm-accent-soft)`, `--dxbl-grid-selection-color: var(--cm-ink)`, `--dxbl-grid-focus-frame-color: var(--cm-focus)`, `--dxbl-grid-text-cell-padding-x: 8px` e o `--dxbl-grid-text-cell-padding-y` que leve a linha a 36 px com o `--dxbl-grid-line-height` do tema), meça cabeçalho e linha no navegador e, conferido, leve o bloco ao adaptador. |
+| Avalonia (aplicação desktop .NET) | Sem CSS: o kit chega pelo tema `CoLib.Ui.Avalonia` do submódulo `_lib` (dotnet-lib), que transpõe os tokens e os componentes `cm-` para XAML. Siga a seção "Avalonia" abaixo: ordem dos `StyleInclude`, classes equivalentes, as armadilhas do tema Fluent (o `DataGridCell` fixa 15 px; a seleção usa o acento do Fluent a 60%) e a medição headless. |
 | DevExtreme (React, Angular, Vue, jQuery) | `colibri-ui.devexpress.css` fixa a fonte em `.dx-widget` e `.dx-overlay-wrapper` (popups anexados ao `<body>`) e leva a DataGrid e a caixa de seleção à regra da grade como tabela, nos dois temas. Na página, a grade fica num `.cm-panel` com `showBorders={false}`, sem `rowAlternationEnabled` nem `showColumnLines`; colunas de versão, data e contagem recebem `cssClass="cm-mono"`; na coluna de comandos (`type="buttons"`), os botões usam `icon="bi bi-…"` e a ação destrutiva `cssClass="cm-icon-btn--danger"`; colunas numéricas (código, quantidade, valor) recebem `alignment="right"`, e as que chegam como texto ordenam pelo número com `calculateSortValue`. Em grades que exportam, aplique formatação só de tela (ex.: caixa de frase) com `cellTemplate`/`groupCellTemplate`, não com `customizeText`, que também vai para o arquivo. O TreeList (`dxTreeList`) não é coberto pelo adaptador: prefira uma `.cm-table` com recuo pelo nível. Não repita no CSS do projeto o que o adaptador já cobre: ajuste de grade que valha para todas as aplicações volta ao kit. Prefira temas *compact*. Não carregue Roboto/Inter do tema (inclusive `@import` do Google Fonts dentro de CSS gerado pelo ThemeBuilder). Gráficos (`dxChart`, `dxPieChart` etc.) escrevem a fonte como estilo inline no SVG, a partir do tema de visualização, e o adaptador não os alcança: registre um tema de visualização com `font.family` igual a `--cm-font` (`registerTheme`/`currentTheme` de `devextreme/viz/themes`) e confira no navegador (exemplo abaixo). Com diálogos do kit ou do Bootstrap, suba a camada dos popups do DevExtreme (abaixo). |
 
 Em qualquer biblioteca de terceiros, a fonte vai em `:root`/`body` e nas classes raiz dos componentes, nunca só num contêiner da página, porque calendários, listas suspensas e diálogos são renderizados fora dele.
@@ -75,6 +76,86 @@ $.pnotify({
 Object.assign(PNotify.defaultStack, {firstpos1: 64, firstpos2: 16, spacing1: 8, spacing2: 8});
 PNotify.defaults.width = 'min(calc(100vw - 32px), 380px)';
 ``` Se o serviço passar um ícone próprio (`icon: 'bi bi-…'`), dê também uma classe por tipo (`addclass`) e pinte o ícone pelo token do estado no CSS do projeto.
+
+## Avalonia (aplicação desktop .NET)
+
+Aplicação desktop Avalonia com o perfil Admin (ex.: `Plugins.Manager.Config`). Conferido no Avalonia 12.1.6 com o `Avalonia.Controls.DataGrid` 12.1.2; em outra versão, meça de novo (abaixo), porque os nomes de parte e os valores do tema Fluent mudam. As regras são as mesmas do `DESIGN.md`; muda só a implementação. 1 px do kit é 1 DIP do Avalonia (a escala do Windows multiplica os dois do mesmo jeito).
+
+**Onde fica a implementação.** No tema `CoLib.Ui.Avalonia` do submódulo `_lib` (dotnet-lib), não no projeto: `Tema/Tokens.axaml` (tokens claro e escuro em `ThemeDictionaries`, fontes embutidas, medidas), `Tema/TemaColibri.axaml` (janela, tipografia, botões, campos, lateral, barra superior, ação de linha) e `Tema/TemaColibri.DataGrid.axaml` (grade como tabela). Ajuste de componente que vale para todas as aplicações vai para o tema da `_lib`, por PR no dotnet-lib, e a regra correspondente volta a esta skill. No `App.axaml` do projeto ficam só os estilos próprios dele. Nada é copiado de `assets/kit/` para o projeto: o `DESIGN.md` e o `PRODUCT.md` continuam na raiz.
+
+**Ordem dos estilos** (`App.axaml`, `RequestedThemeVariant="Default"` para seguir o Windows):
+
+```xml
+<Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+    <StyleInclude Source="avares://CoLib.Ui.Avalonia/Tema/TemaColibri.axaml" />
+    <StyleInclude Source="avares://CoLib.Ui.Avalonia/Tema/TemaColibri.DataGrid.axaml" />
+</Application.Styles>
+```
+
+O tema Colibri vem depois do Fluent. Precedência, conferida na medição:
+
+- Um `Style` de `Application.Styles` vence o setter simples de `ControlTheme`, por isso os ajustes de componente usam seletor de parte do template (`/template/ ContentPresenter#PART_ContentPresenter`, `/template/ Rectangle#BackgroundRectangle`).
+- Ele **não** vence o estilo do tema com pseudo-classe (`^:focus`, `^:current`, `^:selected`) se o seletor daqui não repetir a pseudo-classe: escreva `DataGridCell:focus /template/ Grid#FocusVisual`, não `DataGridCell /template/ Grid#FocusVisual`.
+- Ele também não vence um valor escrito no próprio template (ex.: `Fill` do `PART_ColumnHeadersAndRowsSeparator`): aí, troque o recurso do Fluent em `Styles.Resources`, com a cor do token por `DynamicResource` (`<SolidColorBrush x:Key="DataGridGridLinesBrush" Color="{DynamicResource CmLineColor}" />`).
+
+Confira cada ajuste na medição; compilar não prova que o estilo pegou. Cor só por `{DynamicResource Cm…Brush}`, para acompanhar o tema escuro; `StaticResource` só nos pincéis iguais nos dois temas (lateral, `CmActionBorderBrush`).
+
+**Classes equivalentes** (lista completa no cabeçalho de `TemaColibri.axaml`):
+
+| Kit | Avalonia |
+|---|---|
+| `.cm-btn--primary`, `.cm-btn--danger-text` | `Button.primario`, `Button.perigo` |
+| `.cm-btn-group`, `.cm-btn-group--compact` | `StackPanel.grupo-botoes`, `StackPanel.grupo-botoes.compacto` (bordas compartilhadas, cantos nas pontas, 120 de largura mínima, principal na ponta direita) |
+| `.cm-switch` | `ToggleButton.chave` (trilho de 32 × 18, bolinha de 14, "Não"/"Sim" escrito ao lado pelo próprio modelo); o nome do recurso num `TextBlock.rotulo` acima e em `AutomationProperties.Name`. Não use `CheckBox` para ligar ou desligar, nem o `ToggleSwitch` do Fluent, que tem outra medida e anima o trilho |
+| `.cm-dialog__aside` (destrutiva à parte) | `Button.perigo` numa coluna à esquerda do `Grid` do rodapé, fora do `StackPanel.grupo-botoes` |
+| `.cm-statusbar`, `__item`, `__item--grow` | `Border.barra-status` com um `Grid` (`*,Auto,Auto`); o item longo com `TextTrimming="CharacterEllipsis"` e o valor em `ToolTip.Tip` |
+| `.cm-icon-btn`, `.cm-icon-btn--danger` | `Button.acao-linha`, `Button.acao-linha.perigo` (30 × 30, sem moldura; `ToolTip.Tip` e `AutomationProperties.Name` obrigatórios) |
+| `.cm-panel` | `Border.superficie` (a grade fica dentro, com `ClipToBounds="True"`) |
+| `.cm-topbar`, `.cm-topbar__title`, `.cm-topbar__menu` | `Border.barra-superior`, `TextBlock.titulo-pagina`, `Button.barra-menu` |
+| `.cm-sidebar`, `__head`, `__brand`, `__collapse`, `.cm-nav`, `.cm-nav__link` (`.is-active`), `.cm-nav__section`, `__section-toggle`, `.cm-sidebar__foot` | `Border.lateral`, `Border.lateral-cabeca`, `TextBlock.lateral-marca`, `Button.lateral-recolher`, `StackPanel.lateral-nav`, `Button.lateral` (`.selecionado`), `Border.lateral-secao`, `TextBlock.lateral-grupo`, `Border.lateral-rodape` |
+| `.cm-field__label`, `.cm-mono` | `TextBlock.rotulo`, `TextBlock.dado` |
+| `.bi` | `TextBlock.icone` com o código do glifo (`Text="&#xF503;"`; o código está em `icons/bootstrap-icons.min.css` do kit) |
+
+**Lateral.** Monte com a estrutura do comentário de `TemaColibri.axaml`: `Border.lateral` encaixado à esquerda de um `DockPanel`, com `MinWidth` 230 (nunca `Width`, para crescer até o rótulo mais longo); cabeçalho com o nome do produto e o botão de recolher à direita; itens com ícone e rótulo; versão completa no rodapé. Recolher esconde a lateral inteira (`IsVisible`) e mostra o `Button.barra-menu` à esquerda do título na barra superior. **Não use `SplitView` com `CompactInline`**: o trilho de ícones de 48 px não existe no kit, e o `SplitView` fixa a largura do painel.
+
+**Barra de status.** `Border.barra-status` encaixado embaixo (`DockPanel.Dock="Bottom"`) no `DockPanel` da área principal, à direita da `Border.lateral`, nunca no `DockPanel` da janela: ali ela passa por baixo da lateral e corta o degradê. O conteúdo da página fica com `Margin="16,16,16,0"` e a barra dá o respiro de baixo. Sem a versão, que já está no `Border.lateral-rodape`.
+
+**Botões.** Lado a lado, sempre num `StackPanel.grupo-botoes`, nunca num `StackPanel` com `Spacing` nem em colunas vizinhas de um `Grid`. O Avalonia monta o grupo com `:nth-child(1)` e `:nth-last-child(1)` para os cantos e com `ZIndex` para a borda de cima na emenda; não é limitação do framework. Um botão escondido com `IsVisible` continua contando no `:nth-child`, então use `IsEnabled` para a ação indisponível. Rodapé de formulário com exclusão: `Grid` com `ColumnDefinitions="Auto,*,Auto"`, `Button.perigo` na primeira coluna e o grupo Cancelar | Salvar na última. Não ponha `MinWidth` no botão do projeto: o grupo já dá os 120.
+
+**Grade (`DataGrid`), pela regra da grade como tabela.** `TemaColibri.DataGrid.axaml` já cobre o que o tema Fluent do DataGrid faz fora do kit; não repita no projeto:
+
+- O tema Fluent põe `FontSize="15"` no `DataGridCell`, e isso vence o 13 herdado do `DataGrid`: **definir `FontSize` no `DataGrid` não muda o texto das linhas**. O tema da `_lib` fixa 13 na célula.
+- Texto da célula com margem `12,0,12,0` (24 entre colunas) e cabeçalho com recuo 12: o tema da `_lib` leva a 16 na primeira coluna (`:nth-child(1)`) e a 16 entre colunas. Na última coluna o recuo direito fica em 8 (o kit pede 12), por falta de seletor confiável da última coluna.
+- Seleção em `SystemAccentColor` com opacidade 0,6 por `StaticResource` (trocar o pincel não basta): o tema da `_lib` põe `action-soft` opaco no `BackgroundRectangle` da linha, e o hover em `hover`.
+- Separador vertical e hover cinza no cabeçalho, separador entre cabeçalho e linhas em preto a 40%, retângulo de foco de 2 px preto/branco e marcador de célula atual: desligados ou trocados por `line`. O foco aparece como contorno `focus` de 2 px na linha selecionada com a grade em `:focus` (a grade não recebe `:focus-visible` ao andar pelas setas depois de um clique). Numa grade editável, sem a marca da célula atual, não foi conferido: meça antes de usar.
+- Na página: `GridLinesVisibility="Horizontal"`, `HeadersVisibility="Column"`, sem `AlternatingRowBackground`. Colunas com `CellStyleClasses="dado"` em versão, data, hora, contagem e código (mono 12/500), `"numero"` nas numéricas (valor à direita, título com `<TextBlock TextAlignment="Right"/>` no `Header`) e `"acao"` na coluna de `Button.acao-linha`.
+- **Limitação conhecida:** o cabeçalho do DataGrid reserva à direita uma coluna de 32 para a seta de ordenação, então o título de uma coluna numérica termina 24 antes do valor, e a seta não passa para a esquerda do rótulo como no `.cm-sort.cm-cell--end`. Até o tema da `_lib` trazer um modelo de cabeçalho próprio, aceite e não compense com margem negativa.
+
+**Armadilhas do XAML.**
+
+- Comentário XML não aceita dois hífens seguidos: não escreva `.cm-btn--primary` nem `--cm-*` dentro de `<!-- -->` (erro `AVLN1001` no build); escreva `cm-btn + primary`.
+- O Fluent encolhe o botão pressionado para 98%: o tema da `_lib` desliga isso (`RenderTransform` nulo), porque o retorno por escala é do perfil Operação.
+- O Fluent alinha o texto do botão à esquerda quando ele tem `MinWidth` ou `Width`: o tema da `_lib` fixa `HorizontalContentAlignment="Center"` no `Button`. Item de lista ou da lateral que precisa do texto à esquerda declara `Left` na própria classe, como o `Button.lateral`.
+- Foco na lateral em branco a 75%, não no azul-claro do resto da janela, que some no degradê.
+
+**Medir sem o ambiente real.** A aplicação costuma depender de banco e licença para abrir. Para conferir a grade e a lateral, monte um projeto descartável (fora do repositório) que referencia o projeto da aplicação, `Avalonia.Headless` e `Avalonia.Skia` na versão do Avalonia dela e `NSubstitute`, cria os ViewModels com dublês (como nos testes), abre a janela real e captura:
+
+```csharp
+AppBuilder.Configure<App>().UseSkia()
+    .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false })
+    .SetupWithoutStarting();
+Application.Current!.RequestedThemeVariant = ThemeVariant.Dark; // e Light
+var janela = new JanelaPrincipal(viewModel);
+janela.Show();
+Dispatcher.UIThread.RunJobs(); AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+janela.CaptureRenderedFrame()!.Save("tela.png");
+```
+
+Com WinForms no projeto, remova os usings implícitos (`<Using Remove="System.Windows.Forms" />` e `System.Drawing`), que colidem com `Button`, `Point` e `DataGrid` do Avalonia. Meça pela árvore visual (`GetVisualDescendants()`): cabeçalho 36, `DataGridRow` 37 (36 + divisor), `DataGridCell.FontSize` 13 com a família Google Sans Flex, texto da primeira coluna em x = 16, `BackgroundRectangle` da linha selecionada em `action-soft` com opacidade 1, `Button.lateral` com 37 de altura e x = 16 na lateral. Exercite também a interação, porque é nela que o tema Fluent volta: clique numa célula (`janela.MouseDown`/`MouseUp`), seta para baixo (`janela.KeyPress`) e passe o mouse numa linha (`janela.MouseMove`); confira `FocusVisual` e `CurrencyVisual` invisíveis na célula com `:focus`/`:current`, o `Fill` do `PART_ColumnHeadersAndRowsSeparator` em `line`, o contorno `focus` na linha selecionada e o hover em `hover`. Confira as capturas nos dois temas e com a lateral recolhida.
+
+**Fora do alcance no desktop.** Itens só de navegador ficam n/a: link "Pular para o conteúdo", `data-theme`, `prefers-reduced-motion` em CSS, 320 px, ícone da aba e a lateral sobre o conteúdo até 920 px. No lugar dessas larguras, confira a janela na largura mínima dela (`MinWidth`), com a lateral aberta e recolhida: nada cortado nem sobreposto, e só a grade rola por dentro.
 
 ## Comportamentos que o projeto precisa implementar
 
