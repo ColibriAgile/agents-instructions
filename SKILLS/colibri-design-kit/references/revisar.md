@@ -61,6 +61,7 @@ Leia também as linhas `-`. Perder um sinal é regressão mesmo quando nenhuma l
 | `.ct-keyboard`, `.ct-keypad` ou `.ct-teclado` trocados por teclado próprio, `hidden` na camada fora de uso, `bi-shift-fill` na Maiúscula ligada | O14 |
 | `.ct-product__link` (o cartão inteiro tocável), o `.ct-product__add` de um cartão ou o `aria-label` dele | O12 |
 | `.cm-skip` ou o `id="conteudo"` da área de conteúdo | S1 |
+| Avalonia: `StyleInclude` de `TemaColibri.DataGrid.axaml`, `CellStyleClasses="dado"` ou `"numero"`, `AutomationProperties.Name` de `Button.acao-linha`, `MinWidth` da `Border.lateral` trocado por `Width` | K3, K2, S2 |
 | informação da loja (`.ct-loja__info`), taxa ou total antes de finalizar | W2 |
 | `viewport-fit=cover`, `env(safe-area-inset-bottom)`, campo em 16 px, metadados de prévia | W6 |
 

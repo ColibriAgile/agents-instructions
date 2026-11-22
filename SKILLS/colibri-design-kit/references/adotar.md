@@ -6,7 +6,7 @@ Procedimento do verbo `adotar` (e do argumento que não é verbo). Leva o kit ao
 
 Rode `<pasta-da-skill-impeccable>/scripts/impeccable context` uma vez (com `--target <pasta do frontend>` em monorepo) e, sem alterar nada, descubra e anote:
 
-- Framework e biblioteca de componentes, com versão: Bootstrap 3/AngularJS, Bootstrap 4/5, React, Blazor (DevExpress, com tema), DevExtreme etc.
+- Framework e biblioteca de componentes, com versão: Bootstrap 3/AngularJS, Bootstrap 4/5, React, Blazor (DevExpress, com tema), DevExtreme, Avalonia (desktop .NET, com `*.axaml`) etc. Com Avalonia, a plataforma é nativa (`## Platform` do `PRODUCT.md`, confirmada com o usuário) e o passo 3 muda (abaixo).
 - Pasta de estáticos servida e a entrada HTML que o navegador carrega (layout/_Host/index.html).
 - Página inicial (recebe `.cm-page--home`) e página mais usada.
 - Superfícies de toque (perfil Operação): cardápio de tablet, totem, telas de produção de KDS, painel de pedidos prontos. Para cada uma: orientação e resolução, navegador e versão mínima do aparelho (WebView), alvo de build declarado (`lightningcss`, `build.target`), se é tela de consumidor ou de produção (KDS), e se já existe tema ou cor configurável pelo lojista (campos, onde grava, como chega ao app). Tema existente entra como migração para o esquema por canal (seção 9 do `DESIGN.md` do kit).
@@ -50,6 +50,8 @@ Para `<estáticos>/colibri-ui/` (ou a pasta confirmada), mantendo `fonts/` e `lo
 - Não copie `DESIGN.md`, `PRODUCT.template.md`, `PRODUCT.toque.template.md`, `LEIA-ME.md`, `exemplo.html`, `exemplo-entrada.html`, `exemplo-pedidos.html` nem `exemplo-toque.html` para o projeto: o `DESIGN.md` e os modelos de `PRODUCT.md` viram arquivos do impeccable nos passos 4–5; os demais são referência da skill.
 
 Depois ajuste a carga na entrada HTML, nesta ordem: CSS do framework e tema da biblioteca → `bootstrap-icons.min.css` → `colibri-ui.css` → adaptadores (perfil Operação: `bootstrap-icons.min.css` → `colibri-touch.css` → `colibri-producao.css` e/ou `colibri-cards.css`, só com o perfil Produção e o perfil Cards, respectivamente). Remova fontes e ícones de CDN. Detalhes por framework e comportamentos de JavaScript do shell: [`./adocao-por-framework.md`](./adocao-por-framework.md).
+
+**Avalonia:** nada de `assets/kit/` é copiado. O kit chega pelo tema `CoLib.Ui.Avalonia` do submódulo `_lib`: atualize o submódulo, referencie o projeto do tema, monte os `StyleInclude` do `App.axaml` na ordem e o shell (lateral e barra superior) com as classes do tema, como manda a seção "Avalonia" de [`./adocao-por-framework.md`](./adocao-por-framework.md). Na validação (passo 7), a medição da grade e da lateral é a captura headless dessa seção, no lugar do navegador.
 
 Se o usuário pediu só a documentação (sem tocar no código), pule este passo e registre isso em `DECISOES.md`.
 

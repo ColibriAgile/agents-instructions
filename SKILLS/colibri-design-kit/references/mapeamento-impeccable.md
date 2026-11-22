@@ -8,7 +8,7 @@ Parta de `../assets/kit/PRODUCT.template.md`, que já está no schema 1:
 
 - Mantenha o comentário `<!-- impeccable:product-schema 1 -->` exatamente como está.
 - Não escreva `## Register`: a 4.x descontinuou esse campo e o `doctor` aponta `product-deprecated-register`. O modo das páginas Colibri é **Operate** (a pessoa conclui uma tarefa); o impeccable o registra no brief de cada superfície quando a página for trabalhada, não no `PRODUCT.md`.
-- `## Platform` é `web`, salvo projeto nativo confirmado pelo usuário.
+- `## Platform` é `web`, salvo projeto nativo confirmado pelo usuário (ex.: aplicação desktop Avalonia, `desktop (Windows, Avalonia)`); no nativo, `## Capabilities and Constraints` diz que o visual vem do tema `CoLib.Ui.Avalonia` da `_lib`.
 - A personalidade e as três antirreferências da linha Colibri ficam em `## Brand Commitments`, com o mesmo texto do modelo; os cinco princípios ficam em `## Product Principles`.
 - `## Operating Context` começa com o cenário fixo da linha (estações Windows, janela reduzida até tablet) e recebe os fluxos do produto; `## Capabilities and Constraints` mantém a restrição de operação sem internet.
 - `## Stack` só em projeto sem código (não é o caso de uma adoção). `## Evidence on Hand` só quando o usuário apontar dados ou material reais; senão, omita.
