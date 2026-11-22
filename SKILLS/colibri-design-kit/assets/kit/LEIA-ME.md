@@ -78,6 +78,11 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **22/11/2026 (Catálogo: remover vínculo, arrasto no AngularJS e DevExtreme 19.2):** aprendido na refatoração do Colibri Catálogo (Combo, Classe, Observação, Promoção, Local de produção e shell).
+  - **Regra:** a ação destrutiva (seção 7) distingue remover um vínculo de excluir um cadastro: tirar um item de uma lista ou agrupamento confirma com o verbo "remover" e diz que o cadastro continua.
+  - **Implementação:** nenhuma mudança de CSS.
+  - **Skill:** em `adocao-por-framework.md`, o arrasto do ng-sortable com as classes do kit (opções da lista, linha arrastada com as colunas, setas com o foco), o diálogo de exclusão compartilhado com o verbo como parâmetro, a exclusão dentro do diálogo de edição, o "Pular para o conteúdo" com rota no hash, a grade clicável com botões e, no DevExtreme, a exclusão pela coluna de comandos, o K2 da 19.2 e o `dxCheckBox` com `text`.
+
 - **22/11/2026 (Avalonia: página inicial):** o `Plugins.Manager.Config` ganha a página Início, com os cartões de Plugins e Webhooks. Pedido do usuário.
   - **Regra:** nenhuma nova. Cartões (seção 7, "Cartões"), etiquetas de estado e a marca na página inicial passam a valer no Avalonia.
   - **Implementação:** tema `CoLib.Ui.Avalonia` (dotnet-lib#90): `WrapPanel.cartoes`, `Button.cartao`/`Border.cartao`, `Border.etiqueta` e `Image.marca-inicio`, com o PNG do colibri colorido gerado do SVG do kit; tokens de estado (soft e line) e a sombra do cartão.
