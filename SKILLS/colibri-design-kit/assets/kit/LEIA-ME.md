@@ -78,6 +78,12 @@ Kit da linha visual comum das aplicações Colibri, para adotar em qualquer uma 
 
 Mais recente no topo. Todos os arquivos do kit são mantidos à mão.
 
+- **22/11/2026 (Avalonia: página inicial):** o `Plugins.Manager.Config` ganha a página Início, com os cartões de Plugins e Webhooks. Pedido do usuário.
+  - **Regra:** nenhuma nova. Cartões (seção 7, "Cartões"), etiquetas de estado e a marca na página inicial passam a valer no Avalonia.
+  - **Implementação:** tema `CoLib.Ui.Avalonia` (dotnet-lib#90): `WrapPanel.cartoes`, `Button.cartao`/`Border.cartao`, `Border.etiqueta` e `Image.marca-inicio`, com o PNG do colibri colorido gerado do SVG do kit; tokens de estado (soft e line) e a sombra do cartão.
+  - **Skill:** cartões, etiquetas e a marca na tabela de equivalências do Avalonia em `adocao-por-framework.md`. Na mesma linha da lateral, o grupo recolhível (`ToggleButton.lateral-grupo` numa `Border.lateral-secao`, com o divisor e o chevron): o Plugin Manager usava o rótulo fixo, sem divisor nem chevron, fora do padrão das outras aplicações.
+  - **Na aplicação:** página inicial com poucos cartões, cada um abrindo a página dele; contexto técnico (banco, framework, pasta) fica na barra de status, não num cartão.
+
 - **22/11/2026 (Avalonia: seta de 24, colunas de marca estreitas e abas):** no `Plugins.Manager.Config`, pedido do usuário: colunas de marca do tamanho do título, faixa da seta de ordenação em 24 (32 é espaço demais) e, nos webhooks, o erro da última execução fora da grade, numa aba do painel.
   - **Regra:** nenhuma nova. Abas (`.cm-tabs`, seção 7, "Detalhe") e colunas de marca centralizadas (seção 7) passam a valer no Avalonia.
   - **Implementação:** tema `CoLib.Ui.Avalonia` (dotnet-lib#87): `DataGridSortIconMinWidth` em 24 e `TextBlock.centro` ajustado; `TabControl`/`TabItem` no visual do `.cm-tab` e `Ellipse.pendencia-aba` (`.cm-tab__dot`).
