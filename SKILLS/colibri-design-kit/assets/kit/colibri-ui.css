@@ -885,6 +885,8 @@ pre.log,
 .cm-cell--main > .cm-cell__text { min-width: 0; }
 .cm-cell--actions { display: flex; justify-content: flex-end; }
 .cm-cell--end { text-align: right; }
+/* Coluna de marca (✓ de sim/não) ou de uma ação no meio da linha: título e conteúdo centralizados. */
+.cm-cell--center { text-align: center; justify-content: center; }
 .cm-cell__title {
     color: var(--cm-ink);
     font-size: 13px;
@@ -904,6 +906,8 @@ pre.log,
 }
 .cm-table__head > .cm-head--indent { padding-left: 28px; }
 .cm-table__head > .cm-cell--end { text-align: right; }
+.cm-table__head > .cm-cell--center { text-align: center; }
+.cm-table__head > .cm-sort.cm-cell--center { justify-content: center; }
 /* Coluna numérica (código, ordem, quantidade, valor, preço): título e valor à direita com .cm-cell--end. No
    título que ordena (.cm-sort.cm-cell--end), a seta vai à esquerda do rótulo, para o texto terminar na mesma
    borda dos números, com ou sem seta. */
