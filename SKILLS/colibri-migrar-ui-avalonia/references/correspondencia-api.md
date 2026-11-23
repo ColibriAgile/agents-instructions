@@ -31,7 +31,7 @@ Namespaces novos: diálogos em `CoLib.Ui.Avalonia.Dialogos`; posição de janela
 | `new HtmlDlgConsulta().ComTitulo(...).ComColunas(params string[]).ComAoAtualizar(Func<IEnumerable<object>>)` | `DlgConsulta<T>.Criar().ComTitulo(...).ComColunas(colunas).ComAoAtualizar(ct => ...).ExecutarAsync(pai, itens)` → `T?` |
 | `HtmlDlgConsulta.ComHtmlTemplate(HtmlTemplate)` | `DlgConsulta<T>.ComTemplateItem(IDataTemplate)` |
 | `HtmlDlgConsulta.ComPersistenciaDoDialogo(id)` | `DlgConsulta<T>.ComPersistenciaDoDialogo(id, baseDir)` |
-| `Teclado` / `HtmlTeclado` | `Teclado` (`UserControl`, `ModoTeclado`; eventos `TeclaDigitada`, `Apagar`, `Limpar`, `Confirmar`, `Cancelar`) |
+| `Teclado` / `HtmlTeclado` | `Teclado` (`UserControl`, `ModoTeclado`; eventos `TeclaDigitada`, `Apagar`, `Limpar`). Não tem tecla OK nem Esc: o diálogo confirma e cancela pelo rodapé, pelo Enter e pelo Esc |
 | `FormStateSaver` (componente do `Form`) | `new FormStateSaver(janela, formId)`; o JSON gravado é igual ao antigo |
 | `FormIdleDetector(IContainer)` | `new FormIdleDetector(janela)` + `Start()`; `Dispose()` solta a janela |
 | `form.MoverParaMonitor(id, ocultarBarraTarefas)` | `janela.MoverParaMonitor(indice, FormPositionOptions)` |
