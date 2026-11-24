@@ -48,6 +48,7 @@ Leia também as linhas `-`. Perder um sinal é regressão mesmo quando nenhuma l
 | `@media (hover: hover)`, `.is-closing` na saída de uma camada | A7 |
 | rótulo ou ícone ao lado de uma cor de estado | C3 |
 | `.cm-switch` trocado por caixa de seleção, `role="switch"` ou o "Sim"/"Não" ao lado da chave | K4 |
+| `cm-page` tirado da raiz da página (a raiz só com a classe do projeto, ou a página embrulhada num contêiner sem `.cm-page`) | P3 |
 | `var(--cm-*)` ou `var(--ct-*)` trocado por cor literal | C1 |
 | `font-variant-numeric: tabular-nums`, `cm-mono` em dado | T2 |
 | `.cm-btn-group` desfeito | K1 |
