@@ -4,13 +4,7 @@ SKILLS/.system/
 __pycache__/
 *.pyc
 
-# Artefatos gerados por `npx skills add` (Install-Skills.ps1) — reproduzíveis a
-# partir de skills.yaml + bundles.yaml, não são fonte de verdade.
-.agents/
-.claude/skills/
-.codex/skills/
 .tmp*/
-skills-lock.json
 banks/
 claude/
 
