@@ -110,3 +110,9 @@ bundles:
       - kb
       - kb-yt-channel
 
+  dconnect:
+    description: "DConnect: DeliveryMock, ambiente de testes e publicação de release."
+    skills:
+      - dconnect-delivery-mock
+      - dconnect-release-publish
+      - dconnect-test-environment
