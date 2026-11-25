@@ -8,6 +8,11 @@
 #        detectar.sh -l G-N1              # lista arquivo:linha de um padrão (id da 1ª coluna)
 #
 # Execute na raiz do repositório (ou do submódulo). A saída tem: id, linha da matriz, ocorrências, arquivos, descrição.
+# As linhas de comentário (// e ///) não contam.
+#
+# Limites conhecidos (confira à mão):
+#   - D-TJS conta também um método de extensão do projeto com o nome ToJsonString (por exemplo sobre o Newtonsoft).
+#   - D-DIC lista os dicionários. O script não sabe quais converters estão no perfil que lê cada dicionário.
 set -u
 
 LISTAR=""
@@ -15,16 +20,24 @@ if [ "${1:-}" = "-l" ]; then LISTAR="$2"; shift 2; fi
 REV="${1:-HEAD}"; [ $# -gt 0 ] && shift
 if [ $# -eq 0 ]; then set -- '*.cs' ':!*Testes/*' ':!*.Testes/*' ':!*Tests/*' ':!*.Designer.cs'; fi
 
+# Ocorrências no formato arquivo:linha:texto, sem as linhas que são só comentário.
+ocorrencias() {
+    local regex="$1"; shift
+    git grep -I -n -E "$regex" "$REV" -- "$@" | sed "s/^$REV://" | grep -v -E '^[^:]+:[0-9]+:[[:space:]]*//'
+}
+
 linha() {
     local id="$1" matriz="$2" desc="$3" regex="$4"; shift 4
     if [ -n "$LISTAR" ]; then
-        [ "$LISTAR" = "$id" ] && git grep -I -n -E "$regex" "$REV" -- "$@" | sed "s/^$REV://"
+        [ "$LISTAR" = "$id" ] && ocorrencias "$regex" "$@"
         return
     fi
-    local occ arq
-    occ=$(git grep -I -E "$regex" "$REV" -- "$@" | wc -l)
-    arq=$(git grep -I -l -E "$regex" "$REV" -- "$@" | wc -l)
-    [ "$occ" -gt 0 ] && printf '%-7s %-9s %5s occ %4s arq  %s\n' "$id" "$matriz" "$occ" "$arq" "$desc"
+    local achados occ arq
+    achados=$(ocorrencias "$regex" "$@")
+    [ -z "$achados" ] && return
+    occ=$(printf '%s\n' "$achados" | wc -l)
+    arq=$(printf '%s\n' "$achados" | cut -d: -f1 | sort -u | wc -l)
+    printf '%-7s %-9s %5s occ %4s arq  %s\n' "$id" "$matriz" "$occ" "$arq" "$desc"
 }
 
 [ -z "$LISTAR" ] && echo "== A. Newtonsoft que ainda existe (inventário da migração) =="
@@ -72,7 +85,7 @@ linha D-NEW  G5,G6   'new JsonSerializerOptions (deve ser 1 por perfil, estátic
 linha D-SEM  L1,T1,W1 'Serialize/Deserialize sem opções (usa o padrão estrito)' 'JsonSerializer\.(Serialize|Deserialize)(Async|ToNode|ToElement|ToUtf8Bytes|ToDocument)?(<[^(]+>)?\([^,()]+\)' "$@"
 linha D-NOD  N9      'node.Deserialize<T>() sem opções'               '\.Deserialize<[^(]+>\(\)' "$@"
 linha D-TJS  N10,W1  'ToJsonString() sem opções (escapa acento)'      '\.ToJsonString\(\)' "$@"
-linha D-GVL  N1,N2   'GetValue<T>() (tipo exato)'                     '\.GetValue<' "$@"
+linha D-GVL  N1,N2   'GetValue<T>() (tipo exato)'                     '\.GetValue<[^(]+>\(\)' "$@"
 linha D-CST  N1,N3   'Cast direto de JsonNode'                        '\((int|long|decimal|double|bool|string|Guid|DateTime)\??\) *\w+(\??\[[^]]+\])+' "$@"
 linha D-NUL  N3      'Membro em nó que pode ser null (!. depois de índice)' '\]\!\.(ToString|GetValue|AsObject|AsArray|AsValue|ToJsonString)\(' "$@"
 linha D-PAR  N4,N7,L2 'JsonNode.Parse / JsonDocument.Parse'           '(JsonNode|JsonDocument|JsonObject|JsonArray)\.Parse\(' "$@"
@@ -84,11 +97,13 @@ linha D-SNK  W14     'Política SnakeCaseLower / CamelCase'            'JsonNami
 linha D-CNV  T4,sec9 'Converter de tipo de valor (confira o par T e T?)' ': *(System\.Text\.Json\.Serialization\.)?JsonConverter<(decimal|int|long|double|Guid|DateTime|DateTimeOffset|bool)\??>' "$@"
 linha D-ATR  G9      '[JsonConverter] em tipo ou propriedade (a coleção do perfil ganha do tipo)' '\[(System\.Text\.Json\.Serialization\.)?JsonConverter\(typeof' "$@"
 linha D-ADD  G9,sec9 'Converters.Add no perfil'                       'Converters\.Add\(|Converters *= *\{' "$@"
+linha D-KEY  G10     'Converter de string/Guid/DateTime/bool (precisa de ReadAsPropertyName)' ': *(System\.Text\.Json\.Serialization\.)?JsonConverter<(string|Guid|DateTime|bool)\??>' "$@"
+linha D-DIC  G10     'Dicionário em propriedade (a chave passa pelo converter do perfil)' 'public [^=;(]*I?(ReadOnly)?Dictionary<(string|Guid|DateTime|bool|[A-Z]\w*), *[^>]+>+\?? [A-Z]\w* *\{' "$@"
 linha D-ENC  W1      'Encoder definido'                               'UnsafeRelaxedJsonEscaping|JavaScriptEncoder\.' "$@"
 
 [ -z "$LISTAR" ] && echo && echo "== E. Bibliotecas HTTP =="
 linha E-FLU  sec10   'Chamada JSON do Flurl (confira se passa o perfil)' '\.(GetJsonAsync|ReceiveJson|PostJsonAsync|PutJsonAsync|PatchJsonAsync)\b' "$@"
 linha E-FLS  sec10   'Perfil passado ao Flurl'                        'DefaultJsonSerializer|Settings\.JsonSerializer' "$@"
 linha E-RFT  sec10   'Refit (padrão: camelCase, sem enum em texto)'   'RestService\.For|AddRefitClient|RefitSettings|SystemTextJsonContentSerializer' "$@"
-linha E-MVC  -       'Opções JSON do ASP.NET Core'                    'AddJsonOptions|ConfigureHttpJsonOptions|AddNewtonsoftJson' "$@"
+linha E-MVC  G11     'Opções JSON do ASP.NET Core (um converter muda o binding e o OpenAPI)' 'AddJsonOptions|ConfigureHttpJsonOptions|AddNewtonsoftJson' "$@"
 exit 0

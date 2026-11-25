@@ -1,33 +1,41 @@
 // Converters de leitura tolerante para System.Text.Json.
 // Eles repetem as conversões que o Newtonsoft fazia sem configuração.
 // Copie este arquivo para o projeto, troque o namespace e registre os converters no perfil JSON.
-// Prova de cada caso: assets/jsondiff (seção 15).
+// Prova de cada caso: assets/jsondiff (seções 15 e 18).
 
 using System.Buffers;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+// Alias e nomes completos: um projeto que ainda tem o Newtonsoft em global using tem tipos com os mesmos nomes
+// (JsonConverter, JsonConverter<T>, JsonConverterAttribute, JsonException, JsonSerializer). Sem isto, o arquivo não
+// compila nesse projeto (CS0104). Importante num projeto compartilhado (.projitems), que compila dentro de cada consumidor.
+using JsonConverter = System.Text.Json.Serialization.JsonConverter;
+using JsonException = System.Text.Json.JsonException;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Colibri.Json.Tolerante;
 
 /// <summary>
-/// Lê <c>""</c> e texto em branco como <c>null</c> em QUALQUER tipo de valor anulável
-/// (<c>int?</c>, <c>decimal?</c>, <c>Guid?</c>, <c>DateTime?</c>, enum anulável).
+/// Lê <c>""</c> e texto em branco como <see langword="null"/> em qualquer tipo de valor anulável
+/// (<c>int?</c>, <c>decimal?</c>, <c>Guid?</c>, <c>DateTime?</c>, enum anulável), como o Newtonsoft lia.
 /// Os outros valores vão para o converter do tipo não anulável do mesmo perfil.
 /// </summary>
 /// <remarks>
-/// Motivo: um <c>JsonConverter&lt;T&gt;</c> não recebe o <c>null</c> de um <c>T?</c>, mas recebe o <c>""</c>.
-/// Um converter só para <c>T</c> lança com <c>""</c>. O Newtonsoft devolvia <c>null</c>.
-/// Usa reflexão (<c>MakeGenericType</c>): não use em aplicação publicada com trimming ou AOT.
-/// Custo medido no .NET 11: 19% a mais de tempo e 0 bytes a mais na leitura de um objeto com 6 campos anuláveis
+/// Um <c>JsonConverter&lt;T&gt;</c> não recebe o <c>null</c> de um <c>T?</c>, mas recebe o <c>""</c> e lança.
+/// Usa reflexão (<c>MakeGenericType</c>): não use em aplicação publicada com trimming ou AOT. Funciona com
+/// <c>JsonSerializerIsReflectionEnabledByDefault=false</c> e com perfil só de contexto gerado (provado).
+/// Custo medido no .NET 11: cerca de 19% a mais de tempo e 0 bytes a mais na leitura de um objeto com 6 campos anuláveis
 /// (assets/jsondiff, seção 16). Um número em texto num campo numérico anulável usa um caminho mais lento.
 /// </remarks>
 public sealed class VazioComoNuloConverterFactory : JsonConverterFactory
 {
+    /// <inheritdoc />
     public override bool CanConvert(Type typeToConvert)
         => Nullable.GetUnderlyingType(typeToConvert) is not null;
 
+    /// <inheritdoc />
     public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
         var tipo = Nullable.GetUnderlyingType(typeToConvert)!;
@@ -35,12 +43,12 @@ public sealed class VazioComoNuloConverterFactory : JsonConverterFactory
         return (JsonConverter)Activator.CreateInstance(typeof(VazioComoNuloConverter<>).MakeGenericType(tipo))!;
     }
 
-    private sealed class VazioComoNuloConverter<T> : JsonConverter<T?>
+    private sealed class VazioComoNuloConverter<T> : System.Text.Json.Serialization.JsonConverter<T?>
         where T : struct
     {
         private static readonly bool _numerico = Type.GetTypeCode(typeof(T)) is >= TypeCode.SByte and <= TypeCode.Decimal;
 
-        private JsonConverter<T>? _interno;
+        private System.Text.Json.Serialization.JsonConverter<T>? _interno;
         private bool _internoDoSistema;
 
         public override bool HandleNull
@@ -57,7 +65,7 @@ public sealed class VazioComoNuloConverterFactory : JsonConverterFactory
             var interno = Interno(options);
 
             // O converter de número do sistema, chamado direto, não aplica o NumberHandling do perfil ("12" em int?).
-            // Só nesse caso a leitura passa pelo JsonSerializer, que é mais lento (medido: cerca de 2 vezes).
+            // Só nesse caso a leitura passa pelo JsonSerializer, que é mais lento.
             return _internoDoSistema && _numerico && reader.TokenType == JsonTokenType.String
                 ? JsonSerializer.Deserialize<T>(ref reader, options)
                 : interno.Read(ref reader, typeof(T), options);
@@ -71,12 +79,12 @@ public sealed class VazioComoNuloConverterFactory : JsonConverterFactory
                 Interno(options).Write(writer, value.Value, options);
         }
 
-        private JsonConverter<T> Interno(JsonSerializerOptions options)
+        private System.Text.Json.Serialization.JsonConverter<T> Interno(JsonSerializerOptions options)
         {
             if (_interno is not null)
                 return _interno;
 
-            var interno = (JsonConverter<T>)options.GetConverter(typeof(T));
+            var interno = (System.Text.Json.Serialization.JsonConverter<T>)options.GetConverter(typeof(T));
             _internoDoSistema = interno.GetType().Assembly == typeof(JsonSerializer).Assembly;
 
             return _interno = interno;
@@ -100,10 +108,12 @@ public sealed class VazioComoNuloConverterFactory : JsonConverterFactory
 }
 
 /// <summary>
-/// Lê número e booleano em campo <c>string</c>. O texto fica igual ao do json (<c>12.50</c> vira <c>"12.50"</c>).
+/// Lê número e booleano em campo <see langword="string"/>, como o Newtonsoft lia.
+/// O texto fica igual ao do json (<c>12.50</c> vira <c>"12.50"</c>).
 /// </summary>
-public sealed class TextoToleranteJsonConverter : JsonConverter<string>
+public sealed class TextoToleranteJsonConverter : System.Text.Json.Serialization.JsonConverter<string>
 {
+    /// <inheritdoc />
     public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         => reader.TokenType switch
         {
@@ -112,8 +122,21 @@ public sealed class TextoToleranteJsonConverter : JsonConverter<string>
             _ => throw new JsonException($"O valor {reader.TokenType} não pode ser lido como texto.")
         };
 
+    /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
         => writer.WriteStringValue(value);
+
+    // Chave de dicionário: um converter de T na coleção Converters também recebe a chave de um Dictionary<T, V>.
+    // Sem ReadAsPropertyName e WriteAsPropertyName, o dicionário lança NotSupportedException na leitura e na escrita
+    // (assets/jsondiff, seção 18). Todo converter deste arquivo para um tipo que pode ser chave tem os 2 métodos.
+
+    /// <inheritdoc />
+    public override string ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        => reader.GetString()!;
+
+    /// <inheritdoc />
+    public override void WriteAsPropertyName(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
+        => writer.WritePropertyName(value);
 
     // HasValueSequence: o ASP.NET Core 10 entrega o valor em vários segmentos.
     private static string TextoBruto(ref Utf8JsonReader reader)
@@ -123,10 +146,12 @@ public sealed class TextoToleranteJsonConverter : JsonConverter<string>
 }
 
 /// <summary>
-/// Lê <c>true</c>/<c>false</c>, <c>"true"</c>/<c>"false"</c> sem diferenciar a caixa, e número (0 é falso).
+/// Lê <c>true</c>/<c>false</c>, <c>"true"</c>/<c>"false"</c> sem diferenciar a caixa, e número (0 é falso),
+/// como o Newtonsoft lia.
 /// </summary>
-public sealed class BoolToleranteJsonConverter : JsonConverter<bool>
+public sealed class BoolToleranteJsonConverter : System.Text.Json.Serialization.JsonConverter<bool>
 {
+    /// <inheritdoc />
     public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         => reader.TokenType switch
         {
@@ -134,25 +159,52 @@ public sealed class BoolToleranteJsonConverter : JsonConverter<bool>
             JsonTokenType.False => false,
             JsonTokenType.Number when reader.TryGetDecimal(out var numero) => numero != 0,
             JsonTokenType.String when bool.TryParse(reader.GetString(), out var valor) => valor,
-            _ => throw new JsonException($"O valor {Recebido.Texto(ref reader)} não pode ser lido como booleano.")
+            _ => throw new JsonException($"O valor {ValorRecebido.Texto(ref reader)} não pode ser lido como booleano.")
         };
 
+    /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
         => writer.WriteBooleanValue(value);
+
+    /// <inheritdoc />
+    public override bool ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        => bool.TryParse(reader.GetString(), out var valor)
+            ? valor
+            : throw new JsonException($"A chave {ValorRecebido.Texto(ref reader)} não pode ser lida como booleano.");
+
+    /// <inheritdoc />
+    public override void WriteAsPropertyName(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
+        => writer.WritePropertyName(value ? bool.TrueString : bool.FalseString);
 }
 
 /// <summary>
-/// Lê GUID com chaves, com parênteses, sem hifens ou no formato padrão.
+/// Lê GUID com chaves, com parênteses, sem hifens ou no formato padrão, como o Newtonsoft lia.
 /// </summary>
-public sealed class GuidToleranteJsonConverter : JsonConverter<Guid>
+/// <remarks>
+/// Cobre a propriedade <see cref="Guid"/>. O <c>Guid?</c> fica com a <see cref="VazioComoNuloConverterFactory"/>,
+/// que delega o valor não vazio a este converter.
+/// </remarks>
+public sealed class GuidToleranteJsonConverter : System.Text.Json.Serialization.JsonConverter<Guid>
 {
+    /// <inheritdoc />
     public override Guid Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         => reader.TokenType == JsonTokenType.String && Guid.TryParse(reader.GetString(), out var guid)
             ? guid
-            : throw new JsonException($"O valor {Recebido.Texto(ref reader)} não é um GUID.");
+            : throw new JsonException($"O valor {ValorRecebido.Texto(ref reader)} não é um GUID.");
 
+    /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, Guid value, JsonSerializerOptions options)
         => writer.WriteStringValue(value);
+
+    /// <inheritdoc />
+    public override Guid ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        => Guid.TryParse(reader.GetString(), out var guid)
+            ? guid
+            : throw new JsonException($"A chave {ValorRecebido.Texto(ref reader)} não é um GUID.");
+
+    /// <inheritdoc />
+    public override void WriteAsPropertyName(Utf8JsonWriter writer, Guid value, JsonSerializerOptions options)
+        => writer.WritePropertyName(value.ToString("D"));
 }
 
 /// <summary>
@@ -161,11 +213,12 @@ public sealed class GuidToleranteJsonConverter : JsonConverter<Guid>
 /// <remarks>
 /// Passe só os formatos que a origem envia de fato. Um formato ambíguo (<c>dd/MM</c> e <c>MM/dd</c>) lê a data errada sem erro.
 /// </remarks>
-public sealed class DataToleranteJsonConverter(params string[] formatosExtras) : JsonConverter<DateTime>
+public sealed class DataToleranteJsonConverter(params string[] formatosExtras) : System.Text.Json.Serialization.JsonConverter<DateTime>
 {
     // "yyyy-MM-dd HH:mm:ss" (espaço no lugar do T) é o formato que o Newtonsoft aceitava e o System.Text.Json recusa.
     private readonly string[] _formatos = [.. formatosExtras, "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.FFFFFFF"];
 
+    /// <inheritdoc />
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.String)
@@ -177,32 +230,51 @@ public sealed class DataToleranteJsonConverter(params string[] formatosExtras) :
                 return data;
         }
 
-        throw new JsonException($"O valor {Recebido.Texto(ref reader)} não é uma data aceita pelo contrato.");
+        throw new JsonException($"O valor {ValorRecebido.Texto(ref reader)} não é uma data aceita pelo contrato.");
     }
 
+    /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         => writer.WriteStringValue(value);
+
+    /// <inheritdoc />
+    public override DateTime ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var texto = reader.GetString();
+
+        if (DateTime.TryParseExact(texto, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var data)
+            || DateTime.TryParse(texto, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out data)
+            || DateTime.TryParseExact(texto, _formatos, CultureInfo.InvariantCulture, DateTimeStyles.None, out data))
+            return data;
+
+        throw new JsonException($"A chave {ValorRecebido.Texto(ref reader)} não é uma data aceita pelo contrato.");
+    }
+
+    /// <inheritdoc />
+    public override void WriteAsPropertyName(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+        => writer.WritePropertyName(value.ToString("yyyy-MM-ddTHH:mm:ss.FFFFFFFK", CultureInfo.InvariantCulture));
 }
 
 /// <summary>
-/// Lê enum em número, em texto (sem diferenciar a caixa) e em número dentro de texto. Escreve o enum como NÚMERO.
+/// Lê enum em número, em texto (sem diferenciar a caixa) e em número dentro de texto. Escreve o enum como número,
+/// como o Newtonsoft sem <c>StringEnumConverter</c>.
 /// </summary>
 /// <remarks>
-/// Motivo: o Newtonsoft lia texto e número, e escrevia número. O <c>JsonStringEnumConverter</c> também lê os dois,
-/// mas escreve texto: ele muda o json enviado. Use o <c>JsonStringEnumConverter</c> só no enum que tinha
-/// <c>StringEnumConverter</c> no Newtonsoft.
+/// Não assume o enum que tem <c>[JsonConverter]</c> no tipo: um converter da coleção do perfil ganha do atributo do tipo,
+/// e o enum com <c>JsonStringEnumConverter</c> passaria a ser escrito como número.
+/// Usa reflexão (<c>MakeGenericType</c>): não use em aplicação publicada com trimming ou AOT.
 /// </remarks>
 public sealed class EnumToleranteConverterFactory : JsonConverterFactory
 {
-    // Um converter na coleção Converters ganha do atributo [JsonConverter] do tipo (no Newtonsoft era o contrário).
-    // Sem esta condição, um enum com JsonStringEnumConverter no tipo passaria a ser escrito como número.
+    /// <inheritdoc />
     public override bool CanConvert(Type typeToConvert)
-        => typeToConvert.IsEnum && !typeToConvert.IsDefined(typeof(JsonConverterAttribute), inherit: false);
+        => typeToConvert.IsEnum && !typeToConvert.IsDefined(typeof(System.Text.Json.Serialization.JsonConverterAttribute), inherit: false);
 
+    /// <inheritdoc />
     public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         => (JsonConverter)Activator.CreateInstance(typeof(EnumToleranteConverter<>).MakeGenericType(typeToConvert))!;
 
-    private sealed class EnumToleranteConverter<T> : JsonConverter<T>
+    private sealed class EnumToleranteConverter<T> : System.Text.Json.Serialization.JsonConverter<T>
         where T : struct, Enum
     {
         private static readonly bool _semSinal = Type.GetTypeCode(typeof(T)) == TypeCode.UInt64;
@@ -213,7 +285,7 @@ public sealed class EnumToleranteConverterFactory : JsonConverterFactory
                 JsonTokenType.Number when _semSinal && reader.TryGetUInt64(out var numero) => (T)Enum.ToObject(typeof(T), numero),
                 JsonTokenType.Number when reader.TryGetInt64(out var numero) => (T)Enum.ToObject(typeof(T), numero),
                 JsonTokenType.String when Enum.TryParse<T>(reader.GetString(), ignoreCase: true, out var valor) => valor,
-                _ => throw new JsonException($"O valor {Recebido.Texto(ref reader)} não pode ser lido como {typeof(T).Name}.")
+                _ => throw new JsonException($"O valor {ValorRecebido.Texto(ref reader)} não pode ser lido como {typeof(T).Name}.")
             };
 
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
@@ -223,18 +295,27 @@ public sealed class EnumToleranteConverterFactory : JsonConverterFactory
             else
                 writer.WriteNumberValue(Convert.ToInt64(value, CultureInfo.InvariantCulture));
         }
+
+        // A chave de dicionário continua como no System.Text.Json: o nome do enum.
+        public override T ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            => Enum.TryParse<T>(reader.GetString(), ignoreCase: true, out var valor)
+                ? valor
+                : throw new JsonException($"A chave {ValorRecebido.Texto(ref reader)} não pode ser lida como {typeof(T).Name}.");
+
+        public override void WriteAsPropertyName(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
+            => writer.WritePropertyName(value.ToString());
     }
 }
 
 /// <summary>
-/// Texto do valor recebido, para a mensagem de erro. Sem ele, o log de produção não mostra o dado que causou a falha.
+/// Texto do valor recebido, para a mensagem de erro. Sem ele, o log não mostra o dado que causou a falha.
 /// </summary>
 /// <remarks>
-/// Decisão: os converters de GUID, data, booleano e enum mostram o valor, cortado em 60 caracteres.
-/// O converter de texto não mostra, porque um campo de texto pode ter dado pessoal ou segredo.
-/// Se a regra do projeto proíbe dado externo no log, troque <c>Recebido.Texto(ref reader)</c> por <c>reader.TokenType</c>.
+/// Os converters de GUID, data, booleano e enum mostram o valor, cortado em 60 caracteres. O converter de texto não
+/// mostra, porque um campo de texto pode ter dado pessoal ou segredo.
+/// A classe é file-local: um assembly que enxerga outro pelo InternalsVisibleTo veria 2 classes com o mesmo nome.
 /// </remarks>
-internal static class Recebido
+file static class ValorRecebido
 {
     private const int MAXIMO = 60;
 
@@ -250,7 +331,7 @@ internal static class Recebido
         if (texto.Length > MAXIMO)
             texto = texto[..MAXIMO] + "...";
 
-        return reader.TokenType == JsonTokenType.String ? $"\"{texto}\"" : texto;
+        return reader.TokenType is JsonTokenType.String or JsonTokenType.PropertyName ? $"\"{texto}\"" : texto;
     }
 }
 
@@ -264,16 +345,20 @@ public static class LeituraTolerante
     /// </summary>
     /// <param name="opcoes">O perfil JSON.</param>
     /// <param name="formatosDeData">Os formatos de data extras do contrato, por exemplo <c>"yyyyMMdd HH:mm:ss"</c>.</param>
+    /// <remarks>
+    /// O primeiro converter que aceita o tipo ganha. Um converter do projeto para o mesmo tipo (texto, data) precisa ser
+    /// adicionado antes desta chamada, ou ele nunca é usado.
+    /// </remarks>
     public static JsonSerializerOptions ComLeituraTolerante(this JsonSerializerOptions opcoes, params string[] formatosDeData)
     {
         opcoes.PropertyNameCaseInsensitive = true;
         opcoes.NumberHandling |= JsonNumberHandling.AllowReadingFromString;
-        opcoes.Converters.Add(new VazioComoNuloConverterFactory());
-        opcoes.Converters.Add(new TextoToleranteJsonConverter());
-        opcoes.Converters.Add(new BoolToleranteJsonConverter());
         opcoes.Converters.Add(new GuidToleranteJsonConverter());
         opcoes.Converters.Add(new DataToleranteJsonConverter(formatosDeData));
+        opcoes.Converters.Add(new TextoToleranteJsonConverter());
+        opcoes.Converters.Add(new BoolToleranteJsonConverter());
         opcoes.Converters.Add(new EnumToleranteConverterFactory());
+        opcoes.Converters.Add(new VazioComoNuloConverterFactory());
 
         return opcoes;
     }

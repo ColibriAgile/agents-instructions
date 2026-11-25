@@ -2,6 +2,8 @@
 
 Use este arquivo quando o projeto usa a dotnet-lib como submódulo. Os números são do commit `e9880a3c`. Confira o commit atual antes de usar um número.
 
+> **Atenção (2026-11-25):** a branch `refactor/remover-newtonsoft-e-leitura-tolerante` (tarefa WIN-3440) corrige a maior parte deste arquivo. Ela ainda não está no `master`. Se o commit gravado do submódulo contém `CoLib.Extensions/Json/Source/LeituraToleranteJsonConverters.cs`, use a seção "Estado depois da WIN-3440" no fim deste arquivo. Reescreva as tabelas abaixo quando a branch entrar no `master`.
+
 - Último commit com Newtonsoft: `002ba58d`. Migração: `c377e584` (PR #75).
 - Prova no perfil do CIS (2026-11-25): `TicketPos.TicketId` é `Guid` não anulável e lança com GUID entre chaves; `VendaPos.TicketId` é `Guid?` e funciona. Com um converter de `Guid` mais a fábrica de vazio como nulo, os 106 testes do CIS passam, inclusive os goldens de escrita.
 - A lib passa o perfil ao Flurl com `WithSettings` em `CoLib.Extensions/Flurl/Source/FlurlExtensions.cs`. O `HttpTest` da lib usa o mesmo perfil.
@@ -75,3 +77,14 @@ Itens do commit base sem risco no HEAD:
 - `[EnumMember]`: os valores são iguais aos nomes C#.
 - `JObject.Merge`: a `_lib` reescreveu as 3 regras.
 
+## Estado depois da WIN-3440
+
+Vale só para um commit que contém a branch `refactor/remover-newtonsoft-e-leitura-tolerante`.
+
+- **Newtonsoft:** não há mais `PackageReference` nem `using` no repositório. `CoLib.Plugin` e `CoLib.Plugin.Com` usam a classe pública `JsonDoPlugin`. Um consumidor que recebia o Newtonsoft pelo `CoLib.Plugin` não compila.
+- **Converters tolerantes:** `CoLib.Extensions/Json/Source/LeituraToleranteJsonConverters.cs` (os mesmos do asset da skill).
+- **Perfis com a leitura tolerante completa (L1, T1 a T4, T8, D1 para `DateTime`, E1):** os 3 perfis do CIS, `PerfisJsonDoPis.ApiDoCliente`, `PerfisJsonDoPis.PersistenciaCompartilhada`, `PerfilJsonDoEvento`, os 4 perfis do Payment e `PerfilJsonDaMensageria`.
+- **Perfil estrito de propósito:** `PerfisJsonDoPis.Api` e `ConfigurarApi`. O `pos-integration-service` passa esse perfil ao ASP.NET (G11). A migração do PIS é outra tarefa.
+- **Encoder relaxado:** PIS (cliente e persistência), Evento, Bloqueio, Mensageria, Payment, e o perfil novo `PerfisJsonDePlugins.Dom` para o json que o host monta por DOM.
+- **Abertos:** 1 propriedade `DateTimeOffset` do PIS sem leitura tolerante; os converters de `DateTimeOffset` do Licenciamento lançam `FormatException`; teste de contrato do contexto gerado só no PIS; `required` em DTO (65 ocorrências) não verificado.
+- **Testes de exemplo:** `SondaDeLeituraJson` e os testes `*EntradasSujasTestes` (bateria), `JsonDoPluginCaracterizacaoTestes` (caracterização de DOM) e `JsonDoPluginDiferencasAceitasTestes`.

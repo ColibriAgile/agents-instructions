@@ -22,6 +22,8 @@ Há 2 classes de falha. Trate as 2:
 - **Nome honesto no teste:** um json montado à mão não é "resposta real". Use "real" só para um texto capturado do sistema externo.
 - **Um perfil por contrato:** cada contrato externo tem 1 `JsonSerializerOptions` estático e imutável (`MakeReadOnly`). Toda chamada passa o perfil. Uma chamada sem opções usa o padrão estrito.
 - **Um serializador por tipo:** um tipo não passa pelo Newtonsoft e pelo STJ. Cada biblioteca ignora os atributos da outra sem aviso.
+- **Quem consome o perfil decide o alcance:** antes de acrescentar um converter, procure quem usa o perfil e o método público que o configura. Um perfil de cliente (lê resposta externa) recebe a tolerância. Um perfil que um host passa ao ASP.NET (`AddJsonOptions`, `ConfigureHttpJsonOptions`) não recebe sem decisão do dono do serviço (G11).
+- **Projeto compartilhado compila no consumidor:** num `.projitems` ou num submódulo, verifique no consumidor, e não na lib: `global using` do Newtonsoft (nomes ambíguos), `JsonSerializerIsReflectionEnabledByDefault`, trimming, AOT e `TreatWarningsAsErrors`. Uma dependência nova do projeto compartilhado vale para todo consumidor.
 - **Sem tolerância nova:** repita só o que o Newtonsoft aceitava. Não aceite um formato que o sistema externo não envia. Os converters da skill têm 1 diferença conhecida: texto só com espaços em campo anulável vira `null`, e o Newtonsoft lançava para número.
 
 ## Escopo por pedido
@@ -43,6 +45,7 @@ Há 2 classes de falha. Trate as 2:
 | `scripts/detectar.sh` | Conta os padrões de risco por id da matriz. Precisa de `bash` e `git` (no Windows, o Git Bash) | Passo 2 |
 | `assets/ConvertersTolerantes.cs` | Converters que repetem a tolerância do Newtonsoft (provados) | Passo 4 |
 | `assets/jsondiff/` | Programa que executa o mesmo caso no Newtonsoft e no STJ | Quando um caso não está na matriz |
+| `assets/jsondiff-sem-reflexao/` | Prova dos converters com a reflexão do STJ desligada, contexto gerado e Newtonsoft em `global using` | Depois de alterar um converter, e quando um consumidor desliga a reflexão |
 
 ## Passos
 
@@ -94,12 +97,14 @@ Ordem de prioridade: exceção já vista em produção, depois THROWS em leitura
 1. **Leitura tolerante:** copie `assets/ConvertersTolerantes.cs` para o projeto, troque o namespace e chame `ComLeituraTolerante(formatosDeData)` na criação de cada perfil que lê dado externo. Ele fecha L1, T1, T2, T3, T4, T8, D1 e E1 de uma vez.
    - Se o perfil já tem um converter de `decimal` ou de data, mantenha o converter do projeto e acrescente os outros um a um: `VazioComoNuloConverterFactory` (delega o valor não vazio ao converter de `T` do perfil), `TextoToleranteJsonConverter`, `BoolToleranteJsonConverter`, `GuidToleranteJsonConverter` e `EnumToleranteConverterFactory`.
    - Um converter existente só para `T?` (por exemplo de `Guid?`) vira um converter de `T`; a fábrica cobre o `T?`.
-   - As 2 fábricas usam `MakeGenericType`. Num projeto publicado com trimming ou AOT, escreva um converter por tipo anulável no lugar delas.
+   - As 2 fábricas usam `MakeGenericType`. Num projeto publicado com trimming ou AOT, escreva um converter por tipo anulável no lugar delas. Elas funcionam com `JsonSerializerIsReflectionEnabledByDefault=false` (provado em `assets/jsondiff-sem-reflexao`).
+   - A ordem importa: o primeiro converter que aceita o tipo ganha. Um converter do projeto para `string` ou data fica antes do converter da skill, ou ele nunca é usado.
+   - Um converter do projeto para `string`, `Guid`, enum, `DateTime` ou `bool` precisa de `ReadAsPropertyName` e `WriteAsPropertyName`. Sem eles, todo dicionário com essa chave lança quando a reflexão está desligada (G10).
    - Custo medido da fábrica: 19% a mais de tempo na leitura de um objeto com 6 campos anuláveis, sem alocação extra. Em caminho muito quente, meça no projeto.
 2. **Enum:** o `EnumToleranteConverterFactory` lê texto e número e escreve número, como o Newtonsoft. Ele não toca um enum que tem `[JsonConverter]` no tipo. Use `JsonStringEnumConverter` só no enum que tinha `StringEnumConverter`. Troque `[EnumMember(Value)]` por `[JsonStringEnumMemberName]`.
 3. **Ordem dos converters:** um converter na coleção `Converters` do perfil ganha do atributo `[JsonConverter]` do **tipo** (G9). No Newtonsoft era o contrário. Depois de acrescentar um converter a um perfil, procure os tipos com `[JsonConverter]` que esse converter aceita e confirme que o json escrito deles não mudou. O atributo na **propriedade** continua com prioridade.
 4. **Escrita:** compare o json enviado com o golden. As diferenças comuns são acento escapado (W1), `5.0` que vira `5` (W3), `null` que passa a ser escrito (W8), tipo derivado sem propriedades (W5), tupla e campo que somem (V2) e nome snake case diferente (W14).
-5. **DOM:** troque `GetValue<T>()` e cast direto por funções tolerantes do projeto ou da `_lib` (`AsInteger`, `AsDecimal`, `AsString`). Trate o `null` do C# onde havia `JValue` nulo (N3). Use `DeepClone()` ao mover um nó (N6).
+5. **DOM:** troque `GetValue<T>()` e cast direto por funções tolerantes do projeto ou da `_lib` (`AsInteger`, `AsDecimal`, `AsString`). Trate o `null` do C# onde havia `JValue` nulo (N3, N18). Use `DeepClone()` ao mover um nó (N6). O `JToken.ToString()` tem regras próprias para número, booleano e data (N5, N16, N17). Num projeto que monta json por `JObject` ou `dynamic`, grave primeiro a saída do código antigo (`references/testes.md`, seção 5).
 6. **`object` e `dynamic`:** troque a propriedade `object` por um tipo concreto ou `JsonNode`. O valor lido é `JsonElement`, e `dynamic` sobre ele lança em tempo de execução (O1 a O5).
 7. **`required`:** o Newtonsoft ignorava. O STJ lança se o campo falta. Retire o `required` do DTO de entrada externa quando o campo é opcional no contrato real (V7).
 8. **Contexto gerado:** registre cada tipo raiz, inclusive `List<T>` e os tipos que entram por `object` (G1 a G3).
@@ -117,6 +122,8 @@ Leia `references/testes.md` e crie, para cada perfil que lê ou escreve dado ext
 2. o teste de contrato, se o perfil usa contexto gerado;
 3. a prova de equivalência com o Newtonsoft como oráculo (ou o golden em arquivo, quando o oráculo não é possível);
 4. pelo menos 1 resposta real por operação de leitura, em arquivo. Procure uma captura no repositório, nos logs ou na documentação do sistema externo. Se não há captura, peça uma ao usuário e registre a falta no relatório. Não invente uma.
+
+A bateria inclui 1 leitura pelo perfil congelado com um DTO do contexto real, 1 ida e volta de dicionário e 1 comparação da escrita com texto literal (`references/testes.md`, seção 1).
 
 Depois troque as entradas de teste criadas pelo serializador (`RespondWithJson(objeto)`, `Serializar(esperado)`) por texto, nos testes de leitura que o usuário indicar.
 
@@ -163,4 +170,6 @@ Para revisar uma migração de outra pessoa, faça os passos 1 a 3 sobre o diff 
 - teste que prova um formato só numa propriedade anulável;
 - teste com nome "real" e json montado à mão;
 - perfil novo sem bateria de entradas sujas;
+- converter novo de `string`, `Guid`, enum, `DateTime` ou `bool` sem `ReadAsPropertyName` e `WriteAsPropertyName`;
+- converter novo num perfil que o ASP.NET Core usa;
 - `required` novo em DTO de entrada externa.

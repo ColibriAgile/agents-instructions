@@ -1,0 +1,33 @@
+reflexao padrao ligada: False
+
+##### A. CHAVE DE DICIONARIO COM CONVERTER NO PERFIL (G10)
+  sem converter                        : {"PorTexto":{"a":1},"PorGuid":{"0f8fad5b-d9cb-469f-a165-70867728950e":"x"},"PorEnum":{"Dois":7},"PorData":{"2026-11-25T10:00:00":2},"PorBooleano":{"True":3}}
+  converter de string SEM os 2 metodos : THROW NotSupportedException: The type 'System.String' is not a supported dictionary key using converter of type 'TextoSemChaveJsonConverter'. Custom 
+  ComLeituraTolerante                  : {"PorTexto":{"a":1},"PorGuid":{"0f8fad5b-d9cb-469f-a165-70867728950e":"x"},"PorEnum":{"Dois":7},"PorData":{"2026-11-25T10:00:00":2},"PorBooleano":{"True":3}}
+
+##### B. LEITURA TOLERANTE PELO CONTEXTO GERADO
+  [=] {"InteiroN":""} -> <null>
+  [=] {"InteiroN":"12"} -> 12
+  [=] {"LongoN":"12"} -> 12
+  [=] {"DecimalN":""} -> <null>
+  [=] {"DecimalN":"1.50"} -> 1,50
+  [=] {"Guid":"{0f8fad5b-d9cb-469f-a165-70867728950e}"} -> 0f8fad5b-d9cb-469f-a165-70867728950e
+  [=] {"GuidN":""} -> <null>
+  [=] {"GuidN":"0f8fad5bd9cb469fa16570867728950e"} -> 0f8fad5b-d9cb-469f-a165-70867728950e
+  [=] {"Data":"2026-11-25 10:00:00"} -> 25/11/2026 10:00:00
+  [=] {"DataN":""} -> <null>
+  [=] {"Enum":"Dois"} -> Dois
+  [=] {"EnumN":""} -> <null>
+  [=] {"EnumN":"dois"} -> Dois
+  [=] {"EnumComAtributo":"Dois"} -> Dois
+  [=] {"Texto":12.50} -> 12.50
+  [=] {"Booleano":"true"} -> True
+  [=] {"BooleanoN":1} -> True
+  [=] {"BooleanoN":""} -> <null>
+  [=] {"Lista":["",null,"3",4]} -> null|null|3|4
+
+##### C. ESCRITA: OS CONVERTERS NAO MUDAM O JSON
+  sem converter       : {"InteiroN":2,"LongoN":null,"DecimalN":5,"Guid":"00000000-0000-0000-0000-000000000000","GuidN":null,"Data":"0001-01-01T00:00:00","DataN":null,"Enum":2,"EnumN":null,"EnumComAtributo":"Dois","Texto":"abc","Booleano":true,"BooleanoN":null,"Lista":[1,null]}
+  ComLeituraTolerante : {"InteiroN":2,"LongoN":null,"DecimalN":5,"Guid":"00000000-0000-0000-0000-000000000000","GuidN":null,"Data":"0001-01-01T00:00:00","DataN":null,"Enum":2,"EnumN":null,"EnumComAtributo":"Dois","Texto":"abc","Booleano":true,"BooleanoN":null,"Lista":[1,null]}
+
+falhas=0

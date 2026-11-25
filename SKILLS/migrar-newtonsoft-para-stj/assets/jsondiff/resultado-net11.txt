@@ -37,8 +37,8 @@
 [NS-THROWS] objeto no lugar de lista   <= {"Nome":"a"}
     NS : THROW JsonSerializationException: Cannot deserialize the current JSON object (e.g. {"name":"value"}) into type 'System.Collection
     STJ: THROW JsonException: The JSON value could not be converted to System.Collections.Generic.List`1[PNome]. Path: $ | Li
-[NS-THROWS] BOM no inicio   <= ?{"Nome":"a"}
-    NS : THROW JsonReaderException: Unexpected character encountered while parsing value: ?. Path '', line 0, position 0.
+[NS-THROWS] BOM no inicio   <= ﻿{"Nome":"a"}
+    NS : THROW JsonReaderException: Unexpected character encountered while parsing value: ﻿. Path '', line 0, position 0.
     STJ: THROW JsonException: '0xEF' is an invalid start of a value. Path: $ | LineNumber: 0 | BytePositionInLine: 0.
 
 ##### 2. LEITURA: coercao de tipos primitivos
@@ -378,13 +378,13 @@
 
 ##### 7. ESCRITA
 [SILENT] acentos e simbolos
-    NS : {"Valor":"a�ao <b> & 'x' + \"y\" / �\u2028 ??"}
+    NS : {"Valor":"ação <b> & 'x' + \"y\" /  \u2028 😀"}
     STJ: {"Valor":"a\u00E7\u00E3o \u003Cb\u003E \u0026 \u0027x\u0027 \u002B \u0022y\u0022 / \u00A0\u2028 \uD83D\uDE00"}
-    TOL: {"Valor":"a�ao <b> & 'x' + \"y\" / \u00A0\u2028 \uD83D\uDE00"}
+    TOL: {"Valor":"ação <b> & 'x' + \"y\" / \u00A0\u2028 \uD83D\uDE00"}
 [SILENT] acentos com EscapeNonAscii
     NS : {"Valor":"a\u00e7\u00e3o <b>"}
     STJ: {"Valor":"a\u00E7\u00E3o \u003Cb\u003E"}
-    TOL: {"Valor":"a�ao <b>"}
+    TOL: {"Valor":"ação <b>"}
 [SILENT] decimal 5m
     NS : {"Valor":5.0}
     STJ: {"Valor":5}
@@ -569,8 +569,8 @@
     NS : True
     STJ: THROW InvalidOperationException: An element of type 'Number' cannot be converted to a 'System.Boolean'.
 [=] ToString() de texto
-    NS : ol�
-    STJ: ol�
+    NS : olá
+    STJ: olá
 [SILENT] ToString() de data ISO
     NS : 25/11/2026 10:00:00
     STJ: 2026-11-25T10:00:00
@@ -629,7 +629,7 @@
     NS : {"v":5.0}
     STJ: {"v":5}
 [SILENT] DOM escreve acento
-    NS : {"v":"a�ao<"}
+    NS : {"v":"ação<"}
     STJ: {"v":"a\u00E7\u00E3o\u003C"}
 [SILENT] DateTime via DOM
     NS : 02/01/2026 03:04:05
@@ -667,8 +667,8 @@
   runtime: 11.0.0  NS: 13.0.0.0  TZ: -03:00:00
 
 ##### 11. PERFIL COMO O DO CIS (case-insensitive + AllowReadingFromString + converters da _lib)
-  "" -> decimal? (DecimalComPonto e JsonConverter<decimal>) : THROW JsonException: O valor String nao pode ser lido como Decimal.
-  "" -> decimal                                             : THROW JsonException: O valor String nao pode ser lido como Decimal.
+  "" -> decimal? (DecimalComPonto e JsonConverter<decimal>) : THROW JsonException: O valor String não pode ser lido como Decimal.
+  "" -> decimal                                             : THROW JsonException: O valor String não pode ser lido como Decimal.
   null -> decimal?                                          : null
   "" -> int?                                                : THROW JsonException: The JSON value could not be converted to System.Nullable`1[System.Int32]. Path: $.valor | LineNumber: 0 | Byte
   "" -> Guid? (GuidLeniente)                                : null
@@ -751,15 +751,43 @@
 [= (os 3 lancam)] INVALIDO: vazio em Guid nao anulavel
 [= (os 3 lancam)] INVALIDO: texto em int
 [= (os 3 lancam)] INVALIDO: data errada
-  escrita NS      : {"I":1,"D":5.0,"Gn":null,"G":"00000000-0000-0000-0000-000000000000","Dtn":null,"Dt":"2026-11-25T10:00:00","Mn":2,"M":1,"S":"a�ao","B":true,"Bn":null,"L":0}
+  escrita NS      : {"I":1,"D":5.0,"Gn":null,"G":"00000000-0000-0000-0000-000000000000","Dtn":null,"Dt":"2026-11-25T10:00:00","Mn":2,"M":1,"S":"ação","B":true,"Bn":null,"L":0}
   escrita reflexao: {"I":1,"D":5,"Gn":null,"G":"00000000-0000-0000-0000-000000000000","Dtn":null,"Dt":"2026-11-25T10:00:00","Mn":2,"M":1,"S":"a\u00E7\u00E3o","B":true,"Bn":null,"L":0}
   escrita gerado  : {"I":1,"D":5,"Gn":null,"G":"00000000-0000-0000-0000-000000000000","Dtn":null,"Dt":"2026-11-25T10:00:00","Mn":2,"M":1,"S":"a\u00E7\u00E3o","B":true,"Bn":null,"L":0}
 
 ##### 16. CUSTO DA VazioComoNuloConverterFactory
   objeto com 6 campos anulaveis preenchidos, 300000 leituras, melhor de 5:
-  sem a fabrica            :     414 ns por objeto, 184 bytes
-  com VazioComoNulo        :     483 ns por objeto, 184 bytes  (1,17x)
-  com ComLeituraTolerante  :     525 ns por objeto, 304 bytes  (1,27x)
+  sem a fabrica            :     446 ns por objeto, 184 bytes
+  com VazioComoNulo        :     508 ns por objeto, 184 bytes  (1,14x)
+  com ComLeituraTolerante  :     639 ns por objeto, 304 bytes  (1,43x)
+
+##### 18. CONVERTER DO PERFIL x CHAVE DE DICIONARIO (G10), COM REFLEXAO
+  Com a reflexao ligada, o STJ usa o converter interno para a chave e o defeito nao aparece.
+  Com JsonSerializerIsReflectionEnabledByDefault=false, o converter sem os 2 metodos lanca: veja assets/jsondiff-sem-reflexao.
+  entrada                          : {"PorTexto":{"a":1},"PorGuid":{"0f8fad5b-d9cb-469f-a165-70867728950e":"x"},"PorEnum":{"Mesa":7},"PorData":{"2026-11-25T10:00:00":2},"PorBooleano":{"True":3}}
+  NS  ler e escrever               : {"PorTexto":{"a":1},"PorGuid":{"0f8fad5b-d9cb-469f-a165-70867728950e":"x"},"PorEnum":{"em_mesa":7},"PorData":{"2026-11-25T10:00:00":2},"PorBooleano":{"True":3}}
+  STJ padrao                       : {"PorTexto":{"a":1},"PorGuid":{"0f8fad5b-d9cb-469f-a165-70867728950e":"x"},"PorEnum":{"Mesa":7},"PorData":{"2026-11-25T10:00:00":2},"PorBooleano":{"True":3}}
+  STJ converter de string SEM chave: {"PorTexto":{"a":1},"PorGuid":{"0f8fad5b-d9cb-469f-a165-70867728950e":"x"},"PorEnum":{"Mesa":7},"PorData":{"2026-11-25T10:00:00":2},"PorBooleano":{"True":3}}
+  STJ ComLeituraTolerante          : {"PorTexto":{"a":1},"PorGuid":{"0f8fad5b-d9cb-469f-a165-70867728950e":"x"},"PorEnum":{"Mesa":7},"PorData":{"2026-11-25T10:00:00":2},"PorBooleano":{"True":3}}
+  igual ao STJ padrao              : True
+
+##### 19. JToken.ToString() E CASTS x JsonNode (N16 a N20), cultura pt-BR
+  ToString() de 1.50 (N16)           NS : 1,5                            STJ: 1.50
+  ToString() de 12                   NS : 12                             STJ: 12
+  ToString() de true (N17)           NS : True                           STJ: true
+  ToString() de null (N3)            NS :                                STJ: THROW NullReferenceException: Object reference not set to an instance of an object.
+  ?.ToString() de null (N3)          NS :                                STJ: <null>
+  ToString() de data ISO (N5)        NS : 25/11/2026 10:00:00            STJ: 2026-11-25T10:00:00
+  ToString() de objeto               NS : {\n  "a": 1\n}                 STJ: {\n  "a": 1\n}
+  campo ausente is null              NS : True                           STJ: True
+  campo null is null (N18)           NS : False                          STJ: True
+  (bool?) de "true" (N1)             NS : True                           STJ: THROW InvalidOperationException: An element of type 'String' cannot be converted to a 'System.Boolean'.
+  (bool?) de 1 (N1)                  NS : True                           STJ: THROW InvalidOperationException: An element of type 'Number' cannot be converted to a 'System.Boolean'.
+  Value<decimal?> de "9,50" (N19)    NS : 950                            STJ: THROW InvalidOperationException: An element of type 'String' cannot be converted to a 'System.Nullable`1[System.Decimal]'.
+  Value<decimal?> de 1.50            NS : 1.5                            STJ: 1.50
+  ["c"] = (dynamic)'x' (N20)         NS : {"c":120}                      STJ: {"c":"x"}
+  objeto.ToString() sem argumento    NS : {\n  "a": 1\n}                 STJ: {\n  "a": 1\n}
+  objeto compacto                    NS : {"a":"ação"}                   STJ: {"a":"a\u00E7\u00E3o"}
 
 ##### 17. ENUM COM CONVERTER NO TIPO x EnumToleranteConverterFactory (G9)
   sem a leitura tolerante : {"M":"Mesa","Mn":"Mesa","Numero":1}

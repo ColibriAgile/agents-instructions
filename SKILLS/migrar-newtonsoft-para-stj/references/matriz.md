@@ -1,6 +1,6 @@
 # Matriz de incompatibilidades Newtonsoft.Json -> System.Text.Json
 
-Provado em 2026-11-25 com .NET 11.0.0, Newtonsoft 13.0.4, Flurl.Http 4.0.2 e Refit 17.0.0. O resultado bruto está em `assets/jsondiff/resultado-net11.txt`.
+Provado em 2026-11-25 com .NET 11.0.0, Newtonsoft 13.0.4, Flurl.Http 4.0.2 e Refit 17.0.0. O resultado bruto está em `assets/jsondiff/resultado-net11.txt`. Os casos que dependem da reflexão desligada estão em `assets/jsondiff-sem-reflexao/resultado-net11.txt`.
 
 Legenda:
 
@@ -115,6 +115,13 @@ Legenda:
 | N13 | `SelectToken` (JSONPath) | Existe | Não existe | Compilação | Navegação manual ou a função da `_lib` | Doc |
 | N15 | `JObject.Merge` | Existe. Padrão: array concatena, `null` da origem não substitui | Não existe | Compilação + SILENT na regra reescrita | Escrever a regra e testar array e `null`. A `_lib` tem 3 regras (`MesclagemDoCis`, `MesclarObjeto` com e sem nulos) | Sim (lado NS) |
 | N14 | `JsonElement` usado depois do `Dispose` do `JsonDocument` | n/a | `ObjectDisposedException` | THROWS | `.Clone()` ou `JsonNode` | Sim |
+| N16 | `ToString()` de um número fracionário (`1.50`) | `1,5` na cultura atual, sem o zero final | `1.50` (texto bruto) | SILENT | Para repetir: `double.Parse(texto, Invariant).ToString(CurrentCulture)`. Um inteiro sai igual nas 2 | Sim |
+| N17 | `ToString()` de um booleano | `True` | `true` | SILENT | `bool.TrueString` e `bool.FalseString` | Sim |
+| N18 | Campo com o `null` do json: `obj["x"] is null`, `Where(x => obj[x] is not null)` | `False`: o campo conta como presente (`JValue` nulo) | `True`: igual ao campo ausente | SILENT | `ContainsKey` ou `TryGetPropertyValue` para separar ausente de nulo | Sim |
+| N19 | `Value<decimal?>()` de `"9,50"` | `950` (formato invariante com separador de milhar) | `GetValue<decimal?>()` lança `InvalidOperationException` | THROWS | Para repetir: `decimal.Parse(texto, NumberStyles.Number, InvariantCulture)`. O `950` é um defeito antigo: decida com o usuário | Sim |
+| N20 | `char` atribuído a um `JObject` por `dynamic` | Número (`'x'` vira `120`) | Texto (`"x"`) | SILENT | Converter o `char` para `int` antes, se o leitor espera número | Sim |
+
+Seção 19 do `jsondiff`. Ela prova também que `(bool?)token` aceita `"true"` e `1` (N1) e que o `ToString()` sem argumento escreve o objeto indentado nas 2 bibliotecas.
 
 ## 7. Contexto gerado e opções
 
@@ -129,6 +136,8 @@ Legenda:
 | G7 | ASP.NET Core 10: converter próprio que não trata `HasValueSequence` | Dado perdido ou `ArgumentOutOfRangeException` | THROWS / SILENT | Corrigir o converter. Chave temporária `Microsoft.AspNetCore.UseStreamBasedJsonParsing` | Doc |
 | G8 | .NET 10: propriedade `Type` em tipo polimórfico (`$type`) | `InvalidOperationException` | THROWS | Renomear ou `[JsonIgnore]` | Doc |
 | G9 | Converter no `Converters` e atributo no tipo | O `Converters` ganha do atributo de tipo. No Newtonsoft era o contrário | SILENT | Rever a ordem | Sim |
+| G10 | Converter no `Converters` para um tipo que é chave de dicionário (`string`, `Guid`, enum, `DateTime`, `bool`), sem `ReadAsPropertyName` e `WriteAsPropertyName` | Com a reflexão ligada: funciona (o STJ usa o converter interno para a chave). Com `JsonSerializerIsReflectionEnabledByDefault=false`: `NotSupportedException` na leitura e na escrita de todo `Dictionary<T, V>` | THROWS | Implementar os 2 métodos em todo converter desses tipos. Escrever a chave como o STJ padrão: `bool` vira `True`, enum vira o nome | Sim (`jsondiff-sem-reflexao`, seção A) |
+| G11 | Converter próprio num perfil que o ASP.NET Core usa (`AddJsonOptions`, `ConfigureHttpJsonOptions`) | O binding das requisições fica tolerante, e o schema OpenAPI de `string`, `bool`, `Guid`, data e tipo anulável pode mudar. Um converter que o host acrescenta depois perde para o primeiro | SILENT | Não acrescentar converters a um perfil de servidor sem decisão do dono do serviço. Separar o perfil do cliente do perfil do servidor | Não verificado (só o uso foi lido) |
 
 ## 8. Mudanças do .NET 11 fora do STJ
 
@@ -153,6 +162,8 @@ Regra do STJ: um `JsonConverter<T>` não recebe o `null` de um `T?`, mas recebe 
 | `"true"` em `bool` | Nenhum | `true` | `JsonException` |
 
 Correção geral: `assets/ConvertersTolerantes.cs` (`VazioComoNuloConverterFactory` cobre todo `T?`).
+
+Cuidado com a chave de dicionário (G10): um converter de `T` na coleção `Converters` também recebe a chave de um `Dictionary<T, V>`. Os converters do asset implementam `ReadAsPropertyName` e `WriteAsPropertyName`. Um converter escrito no projeto para `string`, `Guid`, enum, `DateTime` ou `bool` precisa dos mesmos 2 métodos. O defeito não aparece num teste com a reflexão ligada.
 
 Cuidado com a ordem (G9, provado na seção 17 do `jsondiff`): um converter de enum na coleção `Converters` assume também o enum que tem `[JsonConverter(typeof(JsonStringEnumConverter<T>))]` no tipo. O json escrito muda de `"Mesa"` para `1`, sem exceção. O `EnumToleranteConverterFactory` da skill recusa esses enums. Um converter escrito no projeto precisa da mesma condição.
 

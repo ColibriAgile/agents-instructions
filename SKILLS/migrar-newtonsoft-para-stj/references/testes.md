@@ -24,6 +24,8 @@ public sealed class Sonda
     public MeuEnum? Enum { get; set; }
     public string? Texto { get; set; }
     public bool Booleano { get; set; }
+    public Dictionary<string, int>? PorTexto { get; set; }   // G10: a chave também passa pelo converter de string
+    public Dictionary<Guid, int>? PorGuid { get; set; }      // G10
 }
 
 [Theory]
@@ -44,6 +46,8 @@ public sealed class Sonda
 [InlineData("""{"booleano":"true"}""")]            // T3
 [InlineData("""{"booleano":1}""")]                 // T3
 [InlineData("""{"campoNovo":1}""")]                // membro desconhecido
+[InlineData("""{"porTexto":{"a":1}}""")]           // G10
+[InlineData("""{"porGuid":{"0f8fad5b-d9cb-469f-a165-70867728950e":1}}""")]  // G10
 public void Ler_QuandoEntradaSuja_DeveLerSemExcecao(string json)
     => Should.NotThrow(() => JsonSerializer.Deserialize<Sonda>(json, PerfilDoProjeto.Opcoes));
 ```
@@ -56,6 +60,11 @@ Regras:
 - Acrescente um segundo teste que confirma o valor lido nos casos de incidente (`""` vira `null`, GUID com chaves vira o GUID).
 - A sonda tem `Guid` e `Guid?`, `DateTime` e `DateTime?` de propósito. Um formato que funciona no tipo anulável pode falhar no tipo não anulável, e o contrário. Ao testar um DTO real, escolha um campo de cada tipo.
 - Confirme que o teste detecta o defeito: execute 1 vez com a correção revertida. Os casos de incidente devem falhar.
+- Fixe os nomes da sonda com `[JsonPropertyName]` quando o perfil tem política de nomes. Um nome que não casa é ignorado sem aviso, e o `Should.NotThrow` passa sem ler o campo. Prefira comparar o valor lido.
+- A cópia do perfil com outro resolver prova os converters, mas não prova o perfil congelado nem o contexto gerado. Acrescente 1 leitura suja por perfil com um DTO já registrado no contexto real, sem cópia: `JsonSerializer.Deserialize(json, Perfil.Opcoes.GetTypeInfo(typeof(Dto)))`.
+- Acrescente 1 teste de ida e volta de dicionário (leitura e escrita) e confirme que a chave escrita não mudou.
+- Confirme que a escrita não mudou: serialize a sonda com o perfil e compare com um texto literal. Um converter novo na coleção `Converters` pode mudar a escrita de um tipo que tinha `[JsonConverter]` (G9).
+- O teste do projeto roda com a reflexão ligada. Se um consumidor usa `JsonSerializerIsReflectionEnabledByDefault=false`, trimming ou AOT, execute `assets/jsondiff-sem-reflexao` depois de alterar um converter. O defeito G10 só aparece nessa condição.
 
 ## 2. Teste de contrato do contexto gerado
 
@@ -120,3 +129,18 @@ Se o projeto já migrou, crie o golden a partir do último commit com Newtonsoft
 - Não use `RespondWithJson(objeto)` nem `Serializar(esperado)` para criar a entrada de um teste de leitura.
 - Use a palavra "real" no nome do teste só quando o texto foi capturado do sistema externo. Um json montado à mão recebe um nome que diz isso (por exemplo `Ler_JsonNoFormatoDoCis_...`), e o resumo declara que falta a captura real.
 - Retire os dados pessoais e os segredos da resposta real antes de gravar o arquivo.
+
+## 5. Caracterização de código com `JObject`, `JToken` ou `dynamic`
+
+Use este teste para migrar um projeto que monta e lê json por DOM (`JObject`, `JToken.ToString()`, `Value<T>()`, `dynamic`). O compilador não mostra as diferenças, e a matriz tem 20 linhas só para o DOM (N1 a N20).
+
+1. Antes de trocar a biblioteca, escreva um teste temporário que chama cada função pública que escreve ou lê json e grava a saída num arquivo. Use entradas que revelam diferenças:
+   - **Escrita:** texto com acento e `< > & ' + "`, `decimal` inteiro (`5m`), `double` inteiro, `float`, data local e UTC, `Guid`, enum, `null`, `TimeSpan`, `char`, lista, dicionário, tupla, campo público, tipo derivado e objeto anônimo.
+   - **Leitura:** texto vazio e em branco, campo ausente, campo `null`, número em texto, texto em campo numérico, `true` em texto, número fracionário, texto com data ISO, objeto e lista onde o código espera texto, nome em outra caixa, vírgula final, aspas simples, `[]` e `null` na raiz.
+2. Fixe a cultura no teste (`CultureInfo.CurrentCulture`). O `JToken.ToString()` de um número depende da cultura (N16).
+3. Transforme o arquivo em testes com texto literal esperado. Cuidado com `\uXXXX` no texto esperado: escreva o escape literal, e não o caractere.
+4. Execute os testes com o código antigo. Todos passam. Guarde os testes no git (`git add` ou um commit próprio) antes da troca.
+5. Troque a biblioteca. O arquivo de teste não muda: `git diff` do arquivo fica vazio.
+6. Para cada caso que você decidir não repetir (por exemplo N5, N12, L4), tire o caso do teste de caracterização e crie um teste de "diferença aceita" com o resultado antigo e a linha da matriz no comentário.
+
+Um caso que lança no código antigo também é um resultado: registre o tipo da exceção.

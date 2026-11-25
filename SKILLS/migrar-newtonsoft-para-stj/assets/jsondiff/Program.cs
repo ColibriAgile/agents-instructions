@@ -267,4 +267,5 @@ Console.WriteLine($"  runtime: {Environment.Version}  NS: {typeof(NJ.JsonConvert
 await Parte2.Run();
 Parte3.Run();
 Parte4.Run();
+Parte5.Run();
 Parte3b.Run();

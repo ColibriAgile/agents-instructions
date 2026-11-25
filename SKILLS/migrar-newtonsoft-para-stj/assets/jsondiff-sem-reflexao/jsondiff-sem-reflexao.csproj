@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net11.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- As condições de um consumidor estrito: sem a reflexão padrão do System.Text.Json e com aviso como erro. -->
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../ConvertersTolerantes.cs" Link="ConvertersTolerantes.cs" />
+    <!-- Um host que ainda tem o Newtonsoft em global using: o asset precisa compilar sem nome ambíguo (CS0104). -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <Using Include="Newtonsoft.Json" />
+    <Using Include="Newtonsoft.Json.Linq" />
+    <Using Include="Newtonsoft.Json.Serialization" />
+  </ItemGroup>
+</Project>
