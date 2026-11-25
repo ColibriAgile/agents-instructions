@@ -58,8 +58,8 @@ skills:
     notes:
       - As capturas usam Avalonia.Headless com Skia e não exigem sessão gráfica.
       - O envio ao Jira usa o conector v2 do MCP do Atlassian (executeWrite) com permissão de escrita; PowerShell 7 só é necessário para esse envio.
-  # SKILLS/colibri-migrar-ui-avalonia/SKILL.md, passos 1 e 5.
-  colibri-migrar-ui-avalonia:
+  # SKILLS/migrar-ui-para-avalonia/SKILL.md, passos 1 e 5.
+  migrar-ui-para-avalonia:
     tools: [.NET SDK 11]
     notes:
       - Requer o checkout do dotnet-lib (em geral o submódulo _lib) com o projeto CoLib.Ui.Avalonia.
@@ -70,8 +70,8 @@ skills:
     notes:
       - O MCP do Atlassian precisa do conector v2 (discover e execute*), com acesso de escrita ao Confluence.
       - O MCP do Slack precisa estar autenticado no workspace Sistema Colibri e permitir envio de arquivo; sem ele, a skill publica só no Confluence. O envio usa curl.
-  # SKILLS/migrar-newtonsoft-stj/SKILL.md, Passos 2 e 4; scripts/detectar.sh e assets/jsondiff.
-  migrar-newtonsoft-stj:
+  # SKILLS/migrar-newtonsoft-para-stj/SKILL.md, Passos 2 e 4; scripts/detectar.sh e assets/jsondiff.
+  migrar-newtonsoft-para-stj:
     tools: [Git, Bash, .NET SDK]
     notes:
       - O scripts/detectar.sh usa bash e git grep; no Windows, execute no Git Bash.

@@ -1,6 +1,6 @@
 ---
 name: colibri-capturas-avalonia
-description: "Capturas Avalonia: gera imagens PNG das telas Avalonia de um projeto Colibri sem monitor (headless com Skia), nos temas claro e escuro, revisa cada imagem e, quando pedido, põe as imagens num comentário do Jira. Use quando o usuário pedir imagens, prints, screenshots ou capturas das telas Avalonia para uma tarefa, um PR, uma documentação ou o QA, ou quando quiser conferir o visual das telas sem abrir o aplicativo. Não use para testes headless de comportamento (use os testes do projeto), para telas WinForms ou web, nem para migrar telas para Avalonia (use colibri-migrar-ui-avalonia)."
+description: "Capturas Avalonia: gera imagens PNG das telas Avalonia de um projeto Colibri sem monitor (headless com Skia), nos temas claro e escuro, revisa cada imagem e, quando pedido, põe as imagens num comentário do Jira. Use quando o usuário pedir imagens, prints, screenshots ou capturas das telas Avalonia para uma tarefa, um PR, uma documentação ou o QA, ou quando quiser conferir o visual das telas sem abrir o aplicativo. Não use para testes headless de comportamento (use os testes do projeto), para telas WinForms ou web, nem para migrar telas para Avalonia (use migrar-ui-para-avalonia)."
 ---
 
 # Capturas das telas Avalonia

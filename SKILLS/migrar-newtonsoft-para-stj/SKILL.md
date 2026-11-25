@@ -1,5 +1,5 @@
 ---
-name: migrar-newtonsoft-stj
+name: migrar-newtonsoft-para-stj
 description: "Newtonsoft.Json para System.Text.Json no .NET 10/11: migra um projeto C#, ou audita e corrige um projeto já migrado, com matriz de incompatibilidades provada por execução, script de detecção, converters de leitura tolerante e os testes que detectam a falha antes da produção. Use sempre que o usuário pedir para trocar, remover ou migrar o Newtonsoft (Json.NET, JObject, JToken, JsonConvert, JsonProperty) para o System.Text.Json (STJ, JsonNode), ou quando um projeto migrado lançar JsonException 'could not be converted', NotSupportedException 'JsonTypeInfo metadata', erro em GetValue, 'The node already has a parent', erro de GUID com chaves, de data vazia ou de número em texto, ou quando um campo chegar null, vazio ou com outro nome depois da migração. Use também para revisar um PR dessa migração. Não use para atualizar pacotes NuGet (use atualizar-pacotes-nuget) nem para criar um contrato JSON novo sem relação com o Newtonsoft."
 ---
 

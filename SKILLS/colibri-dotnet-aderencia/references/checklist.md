@@ -126,14 +126,14 @@ Todos os workflows das referências usam `runs-on: [self-hosted, colibri]` e act
 
 ## TST — Testes
 
-Regras completas: skills `atualizar-testes-mtp` e `csharp-tests`.
+Regras completas: skills `migrar-testes-para-mtp` e `csharp-tests`.
 
 | ID | Regra | Verificar | Força | Sev. | N/A quando |
 | --- | --- | --- | --- | --- | --- |
 | TST-01 | Os testes usam `xunit.v3` com Microsoft.Testing.Platform (MTP). | `csproj[].packages` (`xunit.v3`, `xunit`) | comum | 🔴 (o `test-dotnet-mtp` exige MTP) | — |
 | TST-02 | O `global.json` tem `"test": {"runner": "Microsoft.Testing.Platform"}`. | `raiz.global_json` | comum | 🔴 | — |
 | TST-03 | A cobertura usa `Microsoft.Testing.Extensions.CodeCoverage`. Não há `coverlet.collector`. | `csproj[].packages` | comum | 🟡 | — |
-| TST-04 | Não há resíduo de VSTest (`Microsoft.NET.Test.Sdk`, `xunit.runner.visualstudio`). | `csproj[].packages` | regra da `atualizar-testes-mtp` (as 3 referências ainda têm o resíduo) | ⚪ | — |
+| TST-04 | Não há resíduo de VSTest (`Microsoft.NET.Test.Sdk`, `xunit.runner.visualstudio`). | `csproj[].packages` | regra da `migrar-testes-para-mtp` (as 3 referências ainda têm o resíduo) | ⚪ | — |
 | TST-05 | As asserções usam Shouldly. A referência a NSubstitute só existe quando algum teste a usa (`Substitute.For`): referência sem uso é ❌. Dublês feitos à mão são aceitos; a rubrica não exige trocá-los por NSubstitute. | `csproj[].packages`, `sinais.assert_classico`, busca de `Substitute.For` nos testes | comum | 🟡 | NSubstitute: nenhum teste usa `Substitute.For`. |
 | TST-06 | O nome dos projetos de teste tem um sufixo único, igual ao `project-suffix` do `testes.yml`. | `csproj[]` com `is_test`, `workflows[]` | parcial (`.Testes` em DConnect e PIS; `.Tests` no BOC) | ⚪ | — |
 | TST-07 | Os testes de banco leem `DbServer`, `DbName`, `DbUser`, `DbPassword` de variável de ambiente (padrão `DbFixture`). Nenhuma credencial fica no repositório. | leitura das fixtures | regra da `colibri-connection-string` | 🟡 | Não há teste de banco. |
@@ -201,7 +201,7 @@ O relatório indica, para cada achado, quem executa a correção. Esta skill nã
 | LOG-* | skill `colibri-logging` |
 | POR-01 a POR-05 | skill `colibri-ports` |
 | DB-01 a DB-03, DB-07, TST-07 | skill `colibri-connection-string` |
-| TST-01 a TST-04 | skill `atualizar-testes-mtp` |
+| TST-01 a TST-04 | skill `migrar-testes-para-mtp` |
 | TST-05, TST-06, TST-08 | skills `csharp-tests` e `csharp-tests-refactor` |
 | LIB-05, atualização de pacotes | skill `atualizar-pacotes-nuget` |
 | DB-04 (EF Core para Dapper), LIB-01, LIB-02 | `sdd-planejar-refatoracao` (mudança estrutural com plano próprio) |

@@ -118,6 +118,6 @@ bundles:
   dotnet-migracoes:
     description: "Migrações de biblioteca em projetos .NET (JSON, testes e UI) — instalação pontual, remover ao final da migração."
     skills:
-      - migrar-newtonsoft-stj
-      - atualizar-testes-mtp
-      - colibri-migrar-ui-avalonia
+      - migrar-newtonsoft-para-stj
+      - migrar-testes-para-mtp
+      - migrar-ui-para-avalonia

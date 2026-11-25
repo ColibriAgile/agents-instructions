@@ -1,5 +1,5 @@
 ---
-name: colibri-migrar-ui-avalonia
+name: migrar-ui-para-avalonia
 description: "Avalonia: migração dos diálogos de CoLib.UI (WinForms + DevExpress) e da ponte CoLib.Plugin.UI para CoLib.Ui.Avalonia num projeto Colibri. Use quando o usuário pedir para migrar para Avalonia os diálogos de um projeto (DlgMsg, HtmlDlg, DlgPedeValor, DlgEscolheValorGrid, HtmlDlgConsulta, DlgAguarde). Don't use for reescrever telas próprias do projeto feitas com controles DevExpress (XtraForm, GridControl), para alterar CoLib.UI ou o tema da _lib, nem para o visual do perfil Admin (use colibri-design-kit)."
 ---
 

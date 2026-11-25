@@ -1,5 +1,5 @@
 ---
-name: atualizar-testes-mtp
+name: migrar-testes-para-mtp
 description: 'MTP: migra um projeto de testes .NET de VSTest para Microsoft.Testing.Platform, para imediatamente sem alterar nada quando o projeto já é MTP, remove Microsoft.NET.Test.Sdk e coverlet.collector, adiciona Microsoft.Testing.Extensions.CodeCoverage, alinha xUnit à MTP v2 e corrige o CS0619 da migração xUnit v3 para v4, troca a action do workflow testes.yml para a action MTP dedicada e recupera zero-testes com o fallback InvokeTestingPlatform. Use quando o usuário pedir para migrar testes de VSTest para MTP, quando a execução falhar ao carregar a extensão de cobertura MTP, quando um teste retornar zero resultados ou o erro "Testing with VSTest target is no longer supported", ou quando um workflow de testes precisar trocar para a action MTP. Don''t use for atualizar pacotes de um projeto que já é MTP (use atualizar-pacotes-nuget) nem para escrever novos testes.'
 ---
 

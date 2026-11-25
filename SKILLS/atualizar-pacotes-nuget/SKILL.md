@@ -1,6 +1,6 @@
 ---
 name: atualizar-pacotes-nuget
-description: 'tight NuGet: atualiza dependências .NET com dotnet outdated, valida restore/build/testes, sincroniza submódulos e decide entre corrigir uma incompatibilidade autorizada ou fazer rollback. Use quando uma solução .NET precisar de atualização de pacotes ou quando testes quebrarem após uma atualização de pacotes. Don''t use for migrar um projeto de testes para MTP sem atualização de pacotes (use atualizar-testes-mtp) nem para alterações de código sem relação com dependências ou rollback sem confirmação explícita.'
+description: 'tight NuGet: atualiza dependências .NET com dotnet outdated, valida restore/build/testes, sincroniza submódulos e decide entre corrigir uma incompatibilidade autorizada ou fazer rollback. Use quando uma solução .NET precisar de atualização de pacotes ou quando testes quebrarem após uma atualização de pacotes. Don''t use for migrar um projeto de testes para MTP sem atualização de pacotes (use migrar-testes-para-mtp) nem para alterações de código sem relação com dependências ou rollback sem confirmação explícita.'
 argument-hint: 'Informe a solução .sln ou .slnx; sem caminho, a skill seleciona uma solução única na raiz ou solicita escolha.'
 disable-model-invocation: true
 ---
@@ -13,7 +13,7 @@ Mantém uma atualização NuGet **tight**: uma solução por vez, restore explí
 
 - Descubra atualizações somente com `dotnet outdated`.
 - Mantenha uma solução em foco até restore, build e testes concluírem.
-- Trate a migração de VSTest para MTP como trabalho de `atualizar-testes-mtp`; uma solução já MTP é atualizada e testada normalmente por esta skill, com a sintaxe de teste MTP.
+- Trate a migração de VSTest para MTP como trabalho de `migrar-testes-para-mtp`; uma solução já MTP é atualizada e testada normalmente por esta skill, com a sintaxe de teste MTP.
 
 ## Passos
 
@@ -44,7 +44,7 @@ Mantém uma atualização NuGet **tight**: uma solução por vez, restore explí
 2. Execute `rtk dotnet outdated -u <solução> --no-restore`.
 3. Registre cada pacote alterado no formato `pacote: versão anterior => versão nova`.
 4. Classifique atualizações major, prévias, mudanças de runner e avisos de dependência como risco de compatibilidade.
-5. Ao detectar que `xunit.runner.visualstudio` cruzou de 3.x para 4.x em uma solução ainda em VSTest, registre isso como possível gatilho de migração para MTP no relatório final; não altere pacotes de cobertura nem chame `atualizar-testes-mtp` automaticamente aqui.
+5. Ao detectar que `xunit.runner.visualstudio` cruzou de 3.x para 4.x em uma solução ainda em VSTest, registre isso como possível gatilho de migração para MTP no relatório final; não altere pacotes de cobertura nem chame `migrar-testes-para-mtp` automaticamente aqui.
 6. Pare antes da próxima solução quando `dotnet outdated` falhar, não resolver uma dependência ou indicar incompatibilidade de versão.
 
 *Done when:* a solução atualizou ou confirmou todos os pacotes disponíveis, cada mudança de versão e risco está registrado, e qualquer possível gatilho de migração MTP foi anotado para o relatório final.
@@ -62,18 +62,18 @@ Mantém uma atualização NuGet **tight**: uma solução por vez, restore explí
 
 1. Quando o `global.json` da solução (passo 1.8) não declarar MTP, execute `rtk dotnet test <solução> --no-build --no-restore --nologo --logger "console;verbosity=minimal"`.
 2. Quando o `global.json` da solução já declarar MTP, execute `rtk dotnet test --solution <solução> --no-build --no-restore --nologo --verbosity:minimal`; não use `--logger`, é opção exclusiva de VSTest.
-3. Migrar uma solução de VSTest para MTP não é responsabilidade desta skill. Quando o usuário pedir essa migração, leia `SKILLS/atualizar-testes-mtp/SKILL.md` em full e siga seus passos; volte a esta skill somente após a validação MTP concluir.
+3. Migrar uma solução de VSTest para MTP não é responsabilidade desta skill. Quando o usuário pedir essa migração, leia `SKILLS/migrar-testes-para-mtp/SKILL.md` em full e siga seus passos; volte a esta skill somente após a validação MTP concluir.
 4. Considere a validação concluída somente com sucesso e quantidade maior que zero. Explique projetos sem testes.
 5. Se um teste falhar, repita somente esse teste ou projeto com saída suficiente para identificar a causa. Depois de corrigir uma incompatibilidade autorizada, repita restore quando referências mudarem, build e testes.
 6. Classifique uma falha que passa isolada e na repetição da suíte como flakiness; registre o teste e o resultado, sem alterar o comportamento para silenciar o sinal.
 
-*Done when:* todos os testes executáveis da solução passaram (VSTest, MTP direto, ou via `atualizar-testes-mtp` quando a migração foi solicitada), a quantidade total foi registrada e cada warning, flakiness ou projeto sem testes recebeu explicação.
+*Done when:* todos os testes executáveis da solução passaram (VSTest, MTP direto, ou via `migrar-testes-para-mtp` quando a migração foi solicitada), a quantidade total foi registrada e cada warning, flakiness ou projeto sem testes recebeu explicação.
 
 ### 6. Corrigir incompatibilidades autorizadas
 
 1. Ao detectar uma quebra causada pela atualização, informe pacote, projeto, erro e etapa afetada.
 2. Solicite uma escolha entre corrigir a incompatibilidade e fazer rollback com versão fixada. Continue somente com autorização explícita; rollback nunca é automático.
-3. Aplique a correção mínima compatível nos arquivos da própria atualização. Para uma quebra que só ocorre durante uma migração VSTest→MTP em andamento (global.json, cobertura, CS0619 do xUnit v4, workflow), trate-a em `atualizar-testes-mtp` em vez de duplicar a lógica aqui.
+3. Aplique a correção mínima compatível nos arquivos da própria atualização. Para uma quebra que só ocorre durante uma migração VSTest→MTP em andamento (global.json, cobertura, CS0619 do xUnit v4, workflow), trate-a em `migrar-testes-para-mtp` em vez de duplicar a lógica aqui.
 4. Após qualquer correção, reexecute somente restore afetado, build afetado e testes afetados; depois repita a suíte da solução.
 
 *Done when:* a incompatibilidade tem correção mínima autorizada ou rollback explicitamente documentado, e a solução afetada passou novamente.
