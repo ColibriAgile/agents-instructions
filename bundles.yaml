@@ -27,11 +27,9 @@ bundles:
     description: Projetos .NET / Colibri.
     skills:
       - atualizar-pacotes-nuget
-      - atualizar-testes-mtp
       - colibri-connection-string
       - colibri-dotnet-aderencia
       - colibri-logging
-      - colibri-migrar-ui-avalonia
       - colibri-ports
       - csharp-tests
       - csharp-tests-refactor
@@ -116,3 +114,10 @@ bundles:
       - dconnect-delivery-mock
       - dconnect-release-publish
       - dconnect-test-environment
+
+  dotnet-migracoes:
+    description: "Migrações de biblioteca em projetos .NET (JSON, testes e UI) — instalação pontual, remover ao final da migração."
+    skills:
+      - migrar-newtonsoft-stj
+      - atualizar-testes-mtp
+      - colibri-migrar-ui-avalonia

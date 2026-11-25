@@ -70,3 +70,9 @@ skills:
     notes:
       - O MCP do Atlassian precisa do conector v2 (discover e execute*), com acesso de escrita ao Confluence.
       - O MCP do Slack precisa estar autenticado no workspace Sistema Colibri e permitir envio de arquivo; sem ele, a skill publica só no Confluence. O envio usa curl.
+  # SKILLS/migrar-newtonsoft-stj/SKILL.md, Passos 2 e 4; scripts/detectar.sh e assets/jsondiff.
+  migrar-newtonsoft-stj:
+    tools: [Git, Bash, .NET SDK]
+    notes:
+      - O scripts/detectar.sh usa bash e git grep; no Windows, execute no Git Bash.
+      - O assets/jsondiff foi provado no .NET 11 e restaura Newtonsoft.Json, Flurl.Http e Refit do NuGet.

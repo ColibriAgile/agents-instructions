@@ -1,0 +1,767 @@
+
+##### 1. LEITURA: nomes e tolerancia de sintaxe
+[SILENT] case diferente   <= {"nome":"a"}
+    NS : "a"
+    STJ: <null>
+    TOL: "a"
+[=] membro desconhecido   <= {"Nome":"a","Extra":1}
+    NS : "a"
+    STJ: "a"
+[THROWS] comentario   <= {/*c*/"Nome":"a"}
+    NS : "a"
+    STJ: THROW JsonException: '/' is invalid after a value. Expected either ',', '}', or ']'. Path: $ | LineNumber: 0 | ByteP
+[THROWS] virgula final   <= {"Nome":"a",}
+    NS : "a"
+    STJ: THROW JsonException: The JSON object contains a trailing comma at the end which is not supported in this mode. Chang
+[THROWS] aspas simples   <= {'Nome':'a'}
+    NS : "a"
+    STJ: THROW JsonException: ''' is an invalid start of a property name. Expected a '"'. Path: $ | LineNumber: 0 | BytePosit
+[THROWS] nome sem aspas   <= {Nome:"a"}
+    NS : "a"
+    STJ: THROW JsonException: 'N' is an invalid start of a property name. Expected a '"'. Path: $ | LineNumber: 0 | BytePosit
+[=] propriedade duplicada   <= {"Nome":"a","Nome":"b"}
+    NS : "b"
+    STJ: "b"
+[THROWS] texto vazio   <= 
+    NS : "<objeto null>"
+    STJ: THROW JsonException: The input does not contain any JSON tokens. Expected the input to start with a valid JSON token
+[THROWS] so espacos   <=   
+    NS : "<objeto null>"
+    STJ: THROW JsonException: The input does not contain any JSON tokens. Expected the input to start with a valid JSON token
+[=] literal null   <= null
+    NS : "<objeto null>"
+    STJ: "<objeto null>"
+[NS-THROWS] array no lugar de objeto   <= []
+    NS : THROW JsonSerializationException: Cannot deserialize the current JSON array (e.g. [1,2,3]) into type 'PNome' because the type req
+    STJ: THROW JsonException: The JSON value could not be converted to PNome. Path: $ | LineNumber: 0 | BytePositionInLine: 1
+[NS-THROWS] objeto no lugar de lista   <= {"Nome":"a"}
+    NS : THROW JsonSerializationException: Cannot deserialize the current JSON object (e.g. {"name":"value"}) into type 'System.Collection
+    STJ: THROW JsonException: The JSON value could not be converted to System.Collections.Generic.List`1[PNome]. Path: $ | Li
+[NS-THROWS] BOM no inicio   <= ?{"Nome":"a"}
+    NS : THROW JsonReaderException: Unexpected character encountered while parsing value: ?. Path '', line 0, position 0.
+    STJ: THROW JsonException: '0xEF' is an invalid start of a value. Path: $ | LineNumber: 0 | BytePositionInLine: 0.
+
+##### 2. LEITURA: coercao de tipos primitivos
+[THROWS] numero entre aspas -> int   <= {"Valor":"12"}
+    NS : 12 (Int32)
+    STJ: THROW JsonException: The JSON value could not be converted to System.Int32. Path: $.Valor | LineNumber: 0 | BytePosi
+    TOL: 12 (Int32)
+[NS-THROWS] 12.0 -> int   <= {"Valor":12.0}
+    NS : THROW JsonReaderException: Input string '12.0' is not a valid integer. Path 'Valor', line 1, position 13.
+    STJ: THROW JsonException: The JSON value could not be converted to System.Int32. Path: $.Valor | LineNumber: 0 | BytePosi
+[NS-THROWS] 12.5 -> int   <= {"Valor":12.5}
+    NS : THROW JsonReaderException: Input string '12.5' is not a valid integer. Path 'Valor', line 1, position 13.
+    STJ: THROW JsonException: The JSON value could not be converted to System.Int32. Path: $.Valor | LineNumber: 0 | BytePosi
+[NS-THROWS] "12.0" -> int   <= {"Valor":"12.0"}
+    NS : THROW JsonReaderException: Could not convert string to integer: 12.0. Path 'Valor', line 1, position 15.
+    STJ: THROW JsonException: The JSON value could not be converted to System.Int32. Path: $.Valor | LineNumber: 0 | BytePosi
+[NS-THROWS] null -> int   <= {"Valor":null}
+    NS : THROW JsonSerializationException: Error converting value {null} to type 'System.Int32'. Path 'Valor', line 1, position 13.
+    STJ: THROW JsonException: The JSON value could not be converted to System.Int32. Path: $.Valor | LineNumber: 0 | BytePosi
+[NS-THROWS] "" -> int   <= {"Valor":""}
+    NS : THROW JsonSerializationException: Error converting value {null} to type 'System.Int32'. Path 'Valor', line 1, position 11.
+    STJ: THROW JsonException: The JSON value could not be converted to System.Int32. Path: $.Valor | LineNumber: 0 | BytePosi
+[THROWS] "" -> int?   <= {"Valor":""}
+    NS : <null>
+    STJ: THROW JsonException: The JSON value could not be converted to System.Nullable`1[System.Int32]. Path: $.Valor | LineN
+[NS-THROWS] true -> int   <= {"Valor":true}
+    NS : THROW JsonReaderException: Unexpected character encountered while parsing value: t. Path 'Valor', line 1, position 10.
+    STJ: THROW JsonException: The JSON value could not be converted to System.Int32. Path: $.Valor | LineNumber: 0 | BytePosi
+[THROWS] 1e3 -> long   <= {"Valor":1e3}
+    NS : 1000 (Int64)
+    STJ: THROW JsonException: The JSON value could not be converted to System.Int64. Path: $.Valor | LineNumber: 0 | BytePosi
+[THROWS] numero -> string   <= {"Valor":12}
+    NS : "12"
+    STJ: THROW JsonException: The JSON value could not be converted to System.String. Path: $.Valor | LineNumber: 0 | BytePos
+[THROWS] decimal -> string   <= {"Valor":12.50}
+    NS : "12.50"
+    STJ: THROW JsonException: The JSON value could not be converted to System.String. Path: $.Valor | LineNumber: 0 | BytePos
+[THROWS] bool -> string   <= {"Valor":true}
+    NS : "true"
+    STJ: THROW JsonException: The JSON value could not be converted to System.String. Path: $.Valor | LineNumber: 0 | BytePos
+[NS-THROWS] objeto -> string   <= {"Valor":{"a":1}}
+    NS : THROW JsonReaderException: Unexpected character encountered while parsing value: {. Path 'Valor', line 1, position 10.
+    STJ: THROW JsonException: The JSON value could not be converted to System.String. Path: $.Valor | LineNumber: 0 | BytePos
+[=] data ISO -> string   <= {"Valor":"2026-11-25T10:00:00-03:00"}
+    NS : "2026-11-25T10:00:00-03:00"
+    STJ: "2026-11-25T10:00:00-03:00"
+[THROWS] "true" -> bool   <= {"Ativo":"true"}
+    NS : True (Boolean)
+    STJ: THROW JsonException: The JSON value could not be converted to System.Boolean. Path: $.Ativo | LineNumber: 0 | BytePo
+[THROWS] 1 -> bool   <= {"Ativo":1}
+    NS : True (Boolean)
+    STJ: THROW JsonException: The JSON value could not be converted to System.Boolean. Path: $.Ativo | LineNumber: 0 | BytePo
+[NS-THROWS] "1" -> bool   <= {"Ativo":"1"}
+    NS : THROW JsonReaderException: Could not convert string to boolean: 1. Path 'Ativo', line 1, position 12.
+    STJ: THROW JsonException: The JSON value could not be converted to System.Boolean. Path: $.Ativo | LineNumber: 0 | BytePo
+[NS-THROWS] null -> bool   <= {"Ativo":null}
+    NS : THROW JsonSerializationException: Error converting value {null} to type 'System.Boolean'. Path 'Ativo', line 1, position 13.
+    STJ: THROW JsonException: The JSON value could not be converted to System.Boolean. Path: $.Ativo | LineNumber: 0 | BytePo
+[THROWS] "1,5" virgula -> decimal   <= {"Valor":"1,5"}
+    NS : 15m
+    STJ: THROW JsonException: The JSON value could not be converted to System.Decimal. Path: $.Valor | LineNumber: 0 | BytePo
+[THROWS] "1.5" -> decimal   <= {"Valor":"1.5"}
+    NS : 1.5m
+    STJ: THROW JsonException: The JSON value could not be converted to System.Decimal. Path: $.Valor | LineNumber: 0 | BytePo
+    TOL: 1.5m
+[=] 6.66 -> decimal   <= {"Valor":6.66}
+    NS : 6.66m
+    STJ: 6.66m
+[=] 1.10 -> decimal (escala)   <= {"Valor":1.10}
+    NS : 1.10m
+    STJ: 1.10m
+[THROWS] "" -> decimal?   <= {"Valor":""}
+    NS : <null>
+    STJ: THROW JsonException: The JSON value could not be converted to System.Nullable`1[System.Decimal]. Path: $.Valor | Lin
+[THROWS] "NaN" -> double   <= {"Valor":"NaN"}
+    NS : NaNd
+    STJ: THROW JsonException: The JSON value could not be converted to System.Double. Path: $.Valor | LineNumber: 0 | BytePos
+    TOL: NaNd
+[THROWS] NaN literal -> double   <= {"Valor":NaN}
+    NS : NaNd
+    STJ: THROW JsonException: 'N' is an invalid start of a value. Path: $.Valor | LineNumber: 0 | BytePositionInLine: 9.
+[THROWS] guid sem hifens   <= {"Valor":"0f8fad5bd9cb469fa16570867728950e"}
+    NS : 0f8fad5b-d9cb-469f-a165-70867728950e (Guid)
+    STJ: THROW JsonException: The JSON value could not be converted to System.Guid. Path: $.Valor | LineNumber: 0 | BytePosit
+[THROWS] guid com chaves   <= {"Valor":"{0f8fad5b-d9cb-469f-a165-70867728950e}"}
+    NS : 0f8fad5b-d9cb-469f-a165-70867728950e (Guid)
+    STJ: THROW JsonException: The JSON value could not be converted to System.Guid. Path: $.Valor | LineNumber: 0 | BytePosit
+[NS-THROWS] "" -> Guid   <= {"Valor":""}
+    NS : THROW JsonSerializationException: Error converting value "" to type 'System.Guid'. Path 'Valor', line 1, position 11.
+    STJ: THROW JsonException: The JSON value could not be converted to System.Guid. Path: $.Valor | LineNumber: 0 | BytePosit
+[THROWS] "" -> Guid?   <= {"Valor":""}
+    NS : <null>
+    STJ: THROW JsonException: The JSON value could not be converted to System.Nullable`1[System.Guid]. Path: $.Valor | LineNu
+[THROWS] "" -> objeto   <= {"Valor":""}
+    NS : "<sub null>"
+    STJ: THROW JsonException: The JSON value could not be converted to PNome. Path: $.Valor | LineNumber: 0 | BytePositionInL
+[THROWS] "" -> lista   <= {"Valor":""}
+    NS : <null>
+    STJ: THROW JsonException: The JSON value could not be converted to System.Collections.Generic.List`1[System.Int32]. Path:
+[=] null -> lista com inicializador   <= {"Valor":null}
+    NS : <null>
+    STJ: <null>
+[NS-THROWS] valor unico no lugar de lista   <= {"Valor":5}
+    NS : THROW JsonSerializationException: Error converting value 5 to type 'System.Collections.Generic.List`1[System.Int32]'. Path 'Valor
+    STJ: THROW JsonException: The JSON value could not be converted to System.Collections.Generic.List`1[System.Int32]. Path:
+[THROWS] array de numeros -> byte[]   <= {"Valor":[1,2]}
+    NS : 2 (Int32)
+    STJ: THROW JsonException: The JSON value could not be converted to System.Byte[]. Path: $.Valor | LineNumber: 0 | BytePos
+
+##### 3. LEITURA: datas
+[=] DateTime   <= {"Valor":"2026-11-25T10:00:00"}
+    NS : 2026-11-25T10:00:00.000 Kind=Unspecified
+    STJ: 2026-11-25T10:00:00.000 Kind=Unspecified
+[=] DateTime   <= {"Valor":"2026-11-25T10:00:00Z"}
+    NS : 2026-11-25T10:00:00.000 Kind=Utc
+    STJ: 2026-11-25T10:00:00.000 Kind=Utc
+[=] DateTime   <= {"Valor":"2026-11-25T10:00:00-03:00"}
+    NS : 2026-11-25T10:00:00.000 Kind=Local
+    STJ: 2026-11-25T10:00:00.000 Kind=Local
+[=] DateTime   <= {"Valor":"2026-11-25T10:00:00.1234567890Z"}
+    NS : 2026-11-25T10:00:00.123 Kind=Utc
+    STJ: 2026-11-25T10:00:00.123 Kind=Utc
+[=] DateTime   <= {"Valor":"2026-11-25"}
+    NS : 2026-11-25T00:00:00.000 Kind=Unspecified
+    STJ: 2026-11-25T00:00:00.000 Kind=Unspecified
+[THROWS] DateTime   <= {"Valor":"2026-11-25 10:00:00"}
+    NS : 2026-11-25T10:00:00.000 Kind=Unspecified
+    STJ: THROW JsonException: The JSON value could not be converted to System.DateTime. Path: $.Valor | LineNumber: 0 | ByteP
+[NS-THROWS] DateTime   <= {"Valor":"20261125 10:00:00"}
+    NS : THROW JsonReaderException: Could not convert string to DateTime: 20261125 10:00:00. Path 'Valor', line 1, position 28.
+    STJ: THROW JsonException: The JSON value could not be converted to System.DateTime. Path: $.Valor | LineNumber: 0 | ByteP
+[NS-THROWS] DateTime   <= {"Valor":"25\/11\/2026"}
+    NS : THROW JsonReaderException: Could not convert string to DateTime: 25/11/2026. Path 'Valor', line 1, position 23.
+    STJ: THROW JsonException: The JSON value could not be converted to System.DateTime. Path: $.Valor | LineNumber: 0 | ByteP
+[NS-THROWS] DateTime   <= {"Valor":"25\/11\/2026 10:00:00"}
+    NS : THROW JsonReaderException: Could not convert string to DateTime: 25/11/2026 10:00:00. Path 'Valor', line 1, position 32.
+    STJ: THROW JsonException: The JSON value could not be converted to System.DateTime. Path: $.Valor | LineNumber: 0 | ByteP
+[THROWS] DateTime   <= {"Valor":"11\/25\/2026"}
+    NS : 2026-11-25T00:00:00.000 Kind=Unspecified
+    STJ: THROW JsonException: The JSON value could not be converted to System.DateTime. Path: $.Valor | LineNumber: 0 | ByteP
+[THROWS] DateTime   <= {"Valor":"\/Date(1795600800000)\/"}
+    NS : 2026-11-25T10:00:00.000 Kind=Utc
+    STJ: THROW JsonException: The JSON value could not be converted to System.DateTime. Path: $.Valor | LineNumber: 0 | ByteP
+[THROWS] DateTime   <= {"Valor":"2026-11-25t10:00:00z"}
+    NS : 2026-11-25T10:00:00.000 Kind=Utc
+    STJ: THROW JsonException: The JSON value could not be converted to System.DateTime. Path: $.Valor | LineNumber: 0 | ByteP
+[NS-THROWS] DateTime   <= {"Valor":""}
+    NS : THROW JsonSerializationException: Error converting value {null} to type 'System.DateTime'. Path 'Valor', line 1, position 11.
+    STJ: THROW JsonException: The JSON value could not be converted to System.DateTime. Path: $.Valor | LineNumber: 0 | ByteP
+[THROWS] "" -> DateTime?   <= {"Valor":""}
+    NS : <null>
+    STJ: THROW JsonException: The JSON value could not be converted to System.Nullable`1[System.DateTime]. Path: $.Valor | Li
+[NS-THROWS] numero -> DateTime   <= {"Valor":1795600800}
+    NS : THROW JsonReaderException: Unexpected character encountered while parsing value: 1. Path 'Valor', line 1, position 10.
+    STJ: THROW JsonException: The JSON value could not be converted to System.DateTime. Path: $.Valor | LineNumber: 0 | ByteP
+[=] DateTimeOffset sem offset   <= {"Valor":"2026-11-25T10:00:00"}
+    NS : 2026-11-25T10:00:00.0000000-03:00
+    STJ: 2026-11-25T10:00:00.0000000-03:00
+[THROWS] DateTimeOffset espaco   <= {"Valor":"2026-11-25 10:00:00"}
+    NS : 2026-11-25T10:00:00.0000000-03:00
+    STJ: THROW JsonException: The JSON value could not be converted to System.DateTimeOffset. Path: $.Valor | LineNumber: 0 |
+[=] TimeSpan hh:mm   <= {"Valor":"01:30"}
+    NS : 01:30:00 (TimeSpan)
+    STJ: 01:30:00 (TimeSpan)
+[=] TimeSpan com dias   <= {"Valor":"1.02:03:04"}
+    NS : 1.02:03:04 (TimeSpan)
+    STJ: 1.02:03:04 (TimeSpan)
+[NS-THROWS] TimeSpan numero   <= {"Valor":90}
+    NS : THROW JsonSerializationException: Error converting value 90 to type 'System.TimeSpan'. Path 'Valor', line 1, position 11.
+    STJ: THROW JsonException: The JSON value could not be converted to System.TimeSpan. Path: $.Valor | LineNumber: 0 | ByteP
+[=] DateOnly   <= {"Valor":"2026-11-25"}
+    NS : 25/11/2026 (DateOnly)
+    STJ: 25/11/2026 (DateOnly)
+[NS-THROWS] DateOnly com hora   <= {"Valor":"2026-11-25T00:00:00"}
+    NS : THROW JsonSerializationException: Error converting value 25/11/2026 00:00:00 to type 'System.DateOnly'. Path 'Valor', line 1, pos
+    STJ: THROW JsonException: The JSON value could not be converted to System.DateOnly. Path: $.Valor | LineNumber: 0 | ByteP
+
+##### 4. LEITURA: enums
+[THROWS] enum texto   <= {"Valor":"Mesa"}
+    NS : Mesa (Modo)
+    STJ: THROW JsonException: The JSON value could not be converted to Modo. Path: $.Valor | LineNumber: 0 | BytePositionInLi
+    TOL: Mesa (Modo)
+[THROWS] enum texto minusculo   <= {"Valor":"mesa"}
+    NS : Mesa (Modo)
+    STJ: THROW JsonException: The JSON value could not be converted to Modo. Path: $.Valor | LineNumber: 0 | BytePositionInLi
+    TOL: Mesa (Modo)
+[=] enum numero   <= {"Valor":1}
+    NS : Mesa (Modo)
+    STJ: Mesa (Modo)
+[THROWS] enum numero em texto   <= {"Valor":"1"}
+    NS : Mesa (Modo)
+    STJ: THROW JsonException: The JSON value could not be converted to Modo. Path: $.Valor | LineNumber: 0 | BytePositionInLi
+    TOL: Mesa (Modo)
+[THROWS] enum EnumMember   <= {"Valor":"em_mesa"}
+    NS : Mesa (Modo)
+    STJ: THROW JsonException: The JSON value could not be converted to Modo. Path: $.Valor | LineNumber: 0 | BytePositionInLi
+[NS-THROWS] enum desconhecido texto   <= {"Valor":"Outro"}
+    NS : THROW JsonSerializationException: Error converting value "Outro" to type 'Modo'. Path 'Valor', line 1, position 16.
+    STJ: THROW JsonException: The JSON value could not be converted to Modo. Path: $.Valor | LineNumber: 0 | BytePositionInLi
+[=] enum numero fora da faixa   <= {"Valor":99}
+    NS : 99 (Modo)
+    STJ: 99 (Modo)
+[NS-THROWS] enum ""   <= {"Valor":""}
+    NS : THROW JsonSerializationException: Error converting value "" to type 'Modo'. Path 'Valor', line 1, position 11.
+    STJ: THROW JsonException: The JSON value could not be converted to Modo. Path: $.Valor | LineNumber: 0 | BytePositionInLi
+[THROWS] enum? ""   <= {"Valor":""}
+    NS : <null>
+    STJ: THROW JsonException: The JSON value could not be converted to System.Nullable`1[Modo]. Path: $.Valor | LineNumber: 0
+[NS-THROWS] enum null   <= {"Valor":null}
+    NS : THROW JsonSerializationException: Error converting value {null} to type 'Modo'. Path 'Valor', line 1, position 13.
+    STJ: THROW JsonException: The JSON value could not be converted to Modo. Path: $.Valor | LineNumber: 0 | BytePositionInLi
+
+##### 5. LEITURA: object, dicionario
+[SILENT] object   <= {"Valor":12}
+    NS : "Int64"
+    STJ: "JsonElement"
+[SILENT] object   <= {"Valor":12.5}
+    NS : "Double"
+    STJ: "JsonElement"
+[SILENT] object   <= {"Valor":"txt"}
+    NS : "String"
+    STJ: "JsonElement"
+[SILENT] object   <= {"Valor":true}
+    NS : "Boolean"
+    STJ: "JsonElement"
+[SILENT] object   <= {"Valor":"2026-11-25T10:00:00"}
+    NS : "DateTime"
+    STJ: "JsonElement"
+[SILENT] object   <= {"Valor":{"a":1}}
+    NS : "JObject"
+    STJ: "JsonElement"
+[SILENT] object   <= {"Valor":[1,2]}
+    NS : "JArray"
+    STJ: "JsonElement"
+[SILENT] Dictionary<string,object>   <= {"Valor":{"n":1,"s":"x","o":{"a":1}}}
+    NS : "n:Int64,s:String,o:JObject"
+    STJ: "n:JsonElement,s:JsonElement,o:JsonElement"
+[THROWS] dict raiz + cast (long)   <= {"n":1}
+    NS : 1 (Int64)
+    STJ: THROW InvalidCastException: Unable to cast object of type 'System.Text.Json.JsonElement' to type 'System.Int64'.
+[THROWS] dict raiz + Convert.ToInt32   <= {"n":1}
+    NS : 1 (Int32)
+    STJ: THROW InvalidCastException: Unable to cast object of type 'System.Text.Json.JsonElement' to type 'System.IConvertible'.
+[SILENT] dict raiz + ToString   <= {"n":1.50,"s":"x"}
+    NS : "1,5|x"
+    STJ: "1.50|x"
+[SILENT] dict raiz + is string   <= {"s":"x"}
+    NS : True (Boolean)
+    STJ: False (Boolean)
+[THROWS] Dictionary<string,string> com numero   <= {"n":1}
+    NS : "1"
+    STJ: THROW JsonException: The JSON value could not be converted to System.String. Path: $.n | LineNumber: 0 | BytePositio
+[=] Dictionary<int,string>   <= {"1":"a"}
+    NS : "a"
+    STJ: "a"
+
+##### 6. LEITURA: visibilidade, construtores, required
+[=] setter privado sem atributo   <= {"Nome":"a"}
+    NS : "<null>"
+    STJ: "<null>"
+[=] setter privado com atributo   <= {"Nome":"a"}
+    NS : "a"
+    STJ: "a"
+[SILENT] propriedade privada com [JsonProperty]   <= {"nome":"a"}
+    NS : "a"
+    STJ: "<null>"
+[SILENT] lista get-only (popular)   <= {"Itens":[1,2]}
+    NS : 2 (Int32)
+    STJ: 0 (Int32)
+[SILENT] objeto get-only (popular)   <= {"Sub":{"Nome":"novo"}}
+    NS : "novo"
+    STJ: "inicial"
+[SILENT] lista com inicializador {9} + [1]   <= {"Valor":[1]}
+    NS : "9,1"
+    STJ: "1"
+[SILENT] campo publico   <= {"Campo":"a"}
+    NS : "a"
+    STJ: <null>
+    TOL: "a"
+[=] construtor com parametros   <= {"Nome":"a","Idade":3}
+    NS : "a/3"
+    STJ: "a/3"
+[=] construtor: falta parametro   <= {"Nome":"a"}
+    NS : "a/0"
+    STJ: "a/0"
+[THROWS] construtor: nome do parametro != propriedade   <= {"Nome":"a"}
+    NS : "<null>"
+    STJ: THROW InvalidOperationException: Each parameter in the deserialization constructor on type 'CtorDiff' must bind to an object pro
+[NS-THROWS] 2 construtores publicos   <= {"Nome":"a","Idade":3}
+    NS : THROW JsonSerializationException: Unable to find a constructor to use for type Ctor2. A class should either have a default constr
+    STJ: THROW NotSupportedException: Deserialization of types without a parameterless constructor, a singular parameterized construc
+[THROWS] so construtor privado   <= {"Nome":"a"}
+    NS : "a"
+    STJ: THROW NotSupportedException: Deserialization of types without a parameterless constructor, a singular parameterized construc
+[THROWS] required ausente   <= {"Idade":3}
+    NS : "<null>"
+    STJ: THROW JsonException: JSON deserialization for type 'Req' was missing required properties including: 'Nome'.
+[=] required null   <= {"Nome":null}
+    NS : "<null>"
+    STJ: "<null>"
+[=] null em string nao anulavel com padrao   <= {"Nome":null,"Itens":null}
+    NS : "<null>/<null>"
+    STJ: "<null>/<null>"
+[SILENT] idem + NullValueHandling.Ignore   <= {"Nome":null,"Itens":null}
+    NS : "padrao/lista"
+    STJ: "<null>/<null>"
+[THROWS] null -> int + NullValueHandling.Ignore   <= {"Valor":null}
+    NS : 0 (Int32)
+    STJ: THROW JsonException: The JSON value could not be converted to System.Int32. Path: $.Valor | LineNumber: 0 | BytePosi
+[SILENT] atributo Newtonsoft lido   <= {"nome_completo":"a","Segredo":"s"}
+    NS : "a/<null>"
+    STJ: "<null>/s"
+[SILENT] atributo STJ lido   <= {"nome_completo":"a","Segredo":"s"}
+    NS : "<null>/s"
+    STJ: "a/<null>"
+[SILENT] DataMember lido   <= {"nome_dc":"a"}
+    NS : "a"
+    STJ: "<null>"
+[NS-THROWS] propriedade interface   <= {"Animal":{"Nome":"x"}}
+    NS : THROW JsonSerializationException: Could not create an instance of type IAnimal. Type is an interface or abstract class and cannot
+    STJ: THROW NotSupportedException: Deserialization of interface or abstract types is not supported. Type 'IAnimal'. Path: $.Animal
+[THROWS] Id e ID   <= {"Id":1,"ID":2}
+    NS : "1/2"
+    STJ: "1/2"
+    TOL: THROW InvalidOperationException: The JSON property name for 'Colide.ID' collides with another property.
+[SILENT] struct com campo   <= {"X":1,"Y":2}
+    NS : "1/2"
+    STJ: "0/2"
+    TOL: "1/2"
+[SILENT] ValueTuple   <= {"Item1":1,"Item2":"a"}
+    NS : "1/a"
+    STJ: "0/"
+    TOL: "1/a"
+[NS-THROWS] profundidade 70   <= {"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":{"Eu":null}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+    NS : THROW JsonReaderException: The reader's MaxDepth of 64 has been exceeded. Path 'Eu.Eu.Eu.Eu.Eu.Eu.Eu.Eu.Eu.Eu.Eu.Eu.Eu.Eu.
+    STJ: THROW JsonException: The maximum configured depth of 64 has been exceeded. Cannot read next JSON object. Path: $.Eu.
+
+##### 7. ESCRITA
+[SILENT] acentos e simbolos
+    NS : {"Valor":"a‡ao <b> & 'x' + \"y\" / ÿ\u2028 ??"}
+    STJ: {"Valor":"a\u00E7\u00E3o \u003Cb\u003E \u0026 \u0027x\u0027 \u002B \u0022y\u0022 / \u00A0\u2028 \uD83D\uDE00"}
+    TOL: {"Valor":"a‡ao <b> & 'x' + \"y\" / \u00A0\u2028 \uD83D\uDE00"}
+[SILENT] acentos com EscapeNonAscii
+    NS : {"Valor":"a\u00e7\u00e3o <b>"}
+    STJ: {"Valor":"a\u00E7\u00E3o \u003Cb\u003E"}
+    TOL: {"Valor":"a‡ao <b>"}
+[SILENT] decimal 5m
+    NS : {"Valor":5.0}
+    STJ: {"Valor":5}
+[=] decimal 5.00m
+    NS : {"Valor":5.00}
+    STJ: {"Valor":5.00}
+[=] decimal 0.1m+0.2m
+    NS : {"Valor":0.3}
+    STJ: {"Valor":0.3}
+[SILENT] double 5.0
+    NS : {"Valor":5.0}
+    STJ: {"Valor":5}
+[=] double 0.1+0.2
+    NS : {"Valor":0.30000000000000004}
+    STJ: {"Valor":0.30000000000000004}
+[=] double 1e21
+    NS : {"Valor":1E+21}
+    STJ: {"Valor":1E+21}
+[THROWS] double NaN
+    NS : {"Valor":"NaN"}
+    STJ: THROW ArgumentException: .NET number values such as positive and negative infinity cannot be written as valid JSON. To m
+[=] float 1.1f em object
+    NS : {"Valor":1.1}
+    STJ: {"Valor":1.1}
+[=] DateTime Unspecified
+    NS : {"Valor":"2026-11-25T10:00:00"}
+    STJ: {"Valor":"2026-11-25T10:00:00"}
+[=] DateTime Local
+    NS : {"Valor":"2026-11-25T10:00:00-03:00"}
+    STJ: {"Valor":"2026-11-25T10:00:00-03:00"}
+[=] DateTime Utc + ms
+    NS : {"Valor":"2026-11-25T10:00:00.12Z"}
+    STJ: {"Valor":"2026-11-25T10:00:00.12Z"}
+[=] DateTime com ticks
+    NS : {"Valor":"2026-11-25T10:00:00.1234567"}
+    STJ: {"Valor":"2026-11-25T10:00:00.1234567"}
+[=] DateTimeOffset
+    NS : {"Valor":"2026-11-25T10:00:00-03:00"}
+    STJ: {"Valor":"2026-11-25T10:00:00-03:00"}
+[=] TimeSpan
+    NS : {"Valor":"1.02:03:04.0050000"}
+    STJ: {"Valor":"1.02:03:04.0050000"}
+[=] DateOnly
+    NS : {"Valor":"2026-11-25"}
+    STJ: {"Valor":"2026-11-25"}
+[=] Guid
+    NS : {"Valor":"0f8fad5b-d9cb-469f-a165-70867728950e"}
+    STJ: {"Valor":"0f8fad5b-d9cb-469f-a165-70867728950e"}
+[=] byte[]
+    NS : {"Valor":"AQL/"}
+    STJ: {"Valor":"AQL/"}
+[SILENT] enum, flags, chave enum
+    NS : {"M":1,"F":3,"D":{"Balcao":1}}
+    STJ: {"M":1,"F":3,"D":{"Balcao":1}}
+    TOL: {"M":"Mesa","F":"A, B","D":{"Balcao":1}}
+[SILENT] enum + StringEnumConverter (NS)
+    NS : {"M":"em_mesa","F":"A, B","D":{"Balcao":1}}
+    STJ: {"M":1,"F":3,"D":{"Balcao":1}}
+    TOL: {"M":"Mesa","F":"A, B","D":{"Balcao":1}}
+[=] null e padrao
+    NS : {"Valor":null}
+    STJ: {"Valor":null}
+[SILENT] campo publico
+    NS : {"Campo":"a"}
+    STJ: {}
+    TOL: {"Campo":"a"}
+[SILENT] struct com campo
+    NS : {"X":1,"Y":2}
+    STJ: {"Y":2}
+    TOL: {"Y":2,"X":1}
+[SILENT] ValueTuple
+    NS : {"T":{"Item1":1,"Item2":"a"}}
+    STJ: {"T":{}}
+    TOL: {"T":{"Item1":1,"Item2":"a"}}
+[=] Tuple<int,string>
+    NS : {"Item1":1,"Item2":"a"}
+    STJ: {"Item1":1,"Item2":"a"}
+[=] anonimo
+    NS : {"Nome":"a","Sub":{"X":1}}
+    STJ: {"Nome":"a","Sub":{"X":1}}
+[SILENT] atributo Newtonsoft
+    NS : {"nome_completo":"a"}
+    STJ: {"Nome":"a","Segredo":"s"}
+[SILENT] atributo STJ
+    NS : {"Nome":"a","Segredo":"s"}
+    STJ: {"nome_completo":"a"}
+[SILENT] DataContract/DataMember
+    NS : {"nome_dc":"a"}
+    STJ: {"Nome":"a","SemAtributo":"b"}
+[SILENT] ShouldSerializeX
+    NS : {"B":"b"}
+    STJ: {"A":"a","B":"b"}
+[SILENT] [DefaultValue] + DefaultValueHandling.Ignore
+    NS : {}
+    STJ: {"V":5,"Z":0,"N":null}
+[SILENT] propriedade privada [JsonProperty]
+    NS : {"nome":"a"}
+    STJ: {}
+[SILENT] derivado declarado como base / interface
+    NS : {"Item":{"D":"deriv","B":"base"},"Lista":[{"D":"deriv","B":"base"}],"Animal":{"Nome":"gato","Vidas":7}}
+    STJ: {"Item":{"B":"base"},"Lista":[{"B":"base"}],"Animal":{"Nome":"gato"}}
+[=] raiz derivada (ordem das propriedades)
+    NS : {"D":"deriv","B":"base"}
+    STJ: {"D":"deriv","B":"base"}
+[=] object com derivado
+    NS : {"Valor":{"D":"deriv","B":"base"}}
+    STJ: {"Valor":{"D":"deriv","B":"base"}}
+[NS-THROWS] ciclo de referencia
+    NS : THROW JsonSerializationException: Self referencing loop detected for property 'Eu' with type 'Loop'. Path ''.
+    STJ: THROW JsonException: A possible object cycle was detected. This can either be due to a cycle or if the object depth 
+[THROWS] ciclo + ReferenceLoopHandling.Ignore
+    NS : {"X":"x"}
+    STJ: THROW JsonException: A possible object cycle was detected. This can either be due to a cycle or if the object depth 
+[THROWS] Type
+    NS : {"T":"System.String, System.Private.CoreLib, Version=11.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e"}
+    STJ: THROW NotSupportedException: Serialization and deserialization of 'System.Type' instances is not supported. Path: $.T.
+[NS-THROWS] delegate
+    NS : THROW JsonSerializationException: Self referencing loop detected for property 'Module' with type 'System.Reflection.RuntimeModule
+    STJ: THROW NotSupportedException: Serialization and deserialization of 'System.Action' instances is not supported. Path: $.A.
+[SILENT] Exception
+    NS : {"ClassName":"System.InvalidOperationException","Message":"falhou","Data":null,"InnerException":{"ClassName":"System.Exception","Message":"interna","Data":null,"InnerException":null,"HelpURL":null,"StackTraceString":null,"RemoteStackTraceString":null,"RemoteStackIndex":0,"ExceptionMethod":null,"HResult":-2146233088,"Source":null,"WatsonBuckets":null},"HelpURL":null,"StackTraceString":null,"RemoteStackTraceString":null,"RemoteStackIndex":0,"ExceptionMethod":null,"HResult":-2146233079,"Source":null,"WatsonBuckets":null}
+    STJ: {"TargetSite":null,"Message":"falhou","Data":{},"InnerException":{"TargetSite":null,"Message":"interna","Data":{},"InnerException":null,"HelpLink":null,"Source":null,"HResult":-2146233088,"StackTrace":null},"HelpLink":null,"Source":null,"HResult":-2146233079,"StackTrace":null}
+[THROWS] DataTable
+    NS : [{"a":1}]
+    STJ: THROW NotSupportedException: Serialization and deserialization of 'System.Type' instances is not supported. Path: $.Columns.
+[THROWS] Id e ID
+    NS : {"Id":1,"ID":2}
+    STJ: {"Id":1,"ID":2}
+    TOL: THROW InvalidOperationException: The JSON property name for 'Colide.ID' collides with another property.
+[SILENT] JObject dentro de objeto
+    NS : {"Valor":{"a":1}}
+    STJ: {"Valor":{"a":[]}}
+[NS-THROWS] JsonObject dentro de objeto
+    NS : THROW JsonSerializationException: Self referencing loop detected for property 'Parent' with type 'System.Text.Json.Nodes.JsonObje
+    STJ: {"Valor":{"a":1}}
+[=] Dictionary<string,object> misto
+    NS : {"n":1,"d":1.5,"dt":"2026-01-02T00:00:00","x":null}
+    STJ: {"n":1,"d":1.5,"dt":"2026-01-02T00:00:00","x":null}
+[=] IEnumerable preguicoso
+    NS : [{"Valor":1},{"Valor":2}]
+    STJ: [{"Valor":1},{"Valor":2}]
+[=] string com \r\n e tab
+    NS : {"Valor":"a\r\n\tb"}
+    STJ: {"Valor":"a\r\n\tb"}
+[=] long maior que 2^53
+    NS : {"Valor":9007199254740993}
+    STJ: {"Valor":9007199254740993}
+    NS  indentado: {\r\n  "S": {\r\n    "N": "a"\r\n  },\r\n  "L": [],\r\n  "O": {},\r\n  "A": [\r\n    1\r\n  ]\r\n}
+    STJ indentado: {\r\n  "S": {\r\n    "N": "a"\r\n  },\r\n  "L": [],\r\n  "O": {},\r\n  "A": [\r\n    1\r\n  ]\r\n}
+
+##### 8. NOMES: politicas
+  NS  snake : {"id_do_pdv":1,"cnpj_da_loja":null,"endereco2":null,"a_b1":null,"url_base":null,"item1":null,"id":null,"e_tag":null,"numero_nf_ce":null,"chaves_do_dic":{"MinhaChave":1}}
+  STJ snake : {"id_do_pdv":1,"cnpj_da_loja":null,"endereco2":null,"ab1":null,"url_base":null,"item1":null,"id":null,"e_tag":null,"numero_nf_ce":null,"chaves_do_dic":{"MinhaChave":1}}
+  NS  camel : {"idDoPDV":1,"cnpjDaLoja":null,"endereco2":null,"aB1":null,"urlBase":null,"item1":null,"id":null,"eTag":null,"numeroNFCe":null,"chavesDoDic":{"minhaChave":1}}
+  NS  camel2: {"idDoPDV":1,"cnpjDaLoja":null,"endereco2":null,"aB1":null,"urlBase":null,"item1":null,"id":null,"eTag":null,"numeroNFCe":null,"chavesDoDic":{"MinhaChave":1}}
+  STJ camel : {"idDoPDV":1,"cnpjDaLoja":null,"endereco2":null,"aB1":null,"urlBase":null,"item1":null,"id":null,"eTag":null,"numeroNFCe":null,"chavesDoDic":{"MinhaChave":1}}
+  STJ Web   : {"idDoPDV":1,"cnpjDaLoja":null,"endereco2":null,"aB1":null,"urlBase":null,"item1":null,"id":null,"eTag":null,"numeroNFCe":null,"chavesDoDic":{"MinhaChave":1}}
+
+##### 9. DOM: JToken x JsonNode
+[THROWS] int de texto "12"
+    NS : 12
+    STJ: THROW InvalidOperationException: An element of type 'String' cannot be converted to a 'System.Int32'.
+[THROWS] string de numero 12
+    NS : 12
+    STJ: THROW InvalidOperationException: An element of type 'Number' cannot be converted to a 'System.String'.
+[THROWS] (string) de numero 12
+    NS : 12
+    STJ: THROW InvalidOperationException: An element of type 'Number' cannot be converted to a 'System.String'.
+[THROWS] long de 1.0
+    NS : 1
+    STJ: THROW InvalidOperationException: An element of type 'Number' cannot be converted to a 'System.Int64'.
+[=] int de 12
+    NS : 12
+    STJ: 12
+[SILENT] decimal de 6.66
+    NS : 6.6600000000000001421085471520m
+    STJ: 6.66m
+[=] (decimal) de double 6.66 no .NET 11
+    NS : 6.6600000000000001421085471520m
+    STJ: 6.6600000000000001421085471520m
+[THROWS] bool de numero
+    NS : True
+    STJ: THROW InvalidOperationException: An element of type 'Number' cannot be converted to a 'System.Boolean'.
+[=] ToString() de texto
+    NS : ol 
+    STJ: ol 
+[SILENT] ToString() de data ISO
+    NS : 25/11/2026 10:00:00
+    STJ: 2026-11-25T10:00:00
+[SILENT] tipo do token de data
+    NS : Date
+    STJ: String
+[=] ToString() de objeto (indentacao)
+    NS : {\r\n  "x": 1\r\n}
+    STJ: {\r\n  "x": 1\r\n}
+[THROWS] membro em valor nulo
+    NS : [] tipo=Null
+    STJ: THROW NullReferenceException: Object reference not set to an instance of an object.
+[SILENT] nulo is null
+    NS : False
+    STJ: True
+[=] propriedade ausente encadeada
+    NS : <null>
+    STJ: <null>
+[NS-THROWS] indice em valor escalar
+    NS : THROW InvalidOperationException: Cannot access child value on Newtonsoft.Json.Linq.JValue.
+    STJ: THROW InvalidOperationException: The node must be of type 'JsonObject'.
+[=] indice de array fora da faixa
+    NS : THROW ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Paramet
+    STJ: THROW ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Paramet
+[=] nome com outra caixa
+    NS : <null>
+    STJ: <null>
+[THROWS] numero maior que long
+    NS : Integer 12345678901234567890
+    STJ: THROW InvalidOperationException: An element of type 'Number' cannot be converted to a 'System.Int64'.
+[SILENT] ToObject<PInt> de {"valor":"1"}
+    NS : 1
+    STJ: 0
+[THROWS] mover no para outro pai
+    NS : {"c":{"x":1}} (clonou)
+    STJ: THROW InvalidOperationException: The node already has a parent.
+[THROWS] Parse com chave duplicada
+    NS : 2
+    STJ: THROW ArgumentException: An item with the same key has already been added. Key: a (Parameter 'key')
+[NS-THROWS] Parse de ""
+    NS : THROW JsonReaderException: Error reading JToken from JsonReader. Path '', line 0, position 0.
+    STJ: THROW JsonReaderException: The input does not contain any JSON tokens. Expected the input to start with a valid JSON token
+[SILENT] Parse de "null"
+    NS : Null
+    STJ: C# null
+[THROWS] Parse com comentario/aspas simples
+    NS : 1
+    STJ: THROW JsonReaderException: ''' is an invalid start of a property name. Expected a '"'. LineNumber: 0 | BytePositionInLine:
+[NS-THROWS] Add com chave existente
+    NS : THROW ArgumentException: Can not add property n to Newtonsoft.Json.Linq.JObject. Property with the same name already exi
+    STJ: THROW ArgumentException: An item with the same key has already been added. Key: n (Parameter 'key')
+[=] valor decimal criado em codigo 5.0m
+    NS : {"v":5.0}
+    STJ: {"v":5.0}
+[SILENT] valor double criado em codigo 5.0
+    NS : {"v":5.0}
+    STJ: {"v":5}
+[SILENT] DOM escreve acento
+    NS : {"v":"a‡ao<"}
+    STJ: {"v":"a\u00E7\u00E3o\u003C"}
+[SILENT] DateTime via DOM
+    NS : 02/01/2026 03:04:05
+    STJ: 2026-01-02T03:04:05
+[SILENT] DeepEquals 1 vs 1.0
+    NS : False
+    STJ: True
+[THROWS] GetValue<long> em no criado com int
+    NS : 1
+    STJ: THROW InvalidOperationException: A value of type 'System.Int32' cannot be converted to a 'System.Int64'.
+[THROWS] GetValue<decimal> em no criado com double
+    NS : 1.5m
+    STJ: THROW InvalidOperationException: A value of type 'System.Double' cannot be converted to a 'System.Decimal'.
+[THROWS] object lido: Convert.ToDecimal
+    NS : 1.5m
+    STJ: THROW InvalidCastException: Unable to cast object of type 'System.Text.Json.JsonElement' to type 'System.IConvertible'.
+[SILENT] object lido: Equals("x")
+    NS : True
+    STJ: False
+[THROWS] JsonElement depois do Dispose do JsonDocument
+    NS : n/a
+    STJ: THROW ObjectDisposedException: Cannot access a disposed object. Object name: 'JsonDocument'.
+
+##### 10. CONTEXTO GERADO (sem reflexao) e opcoes
+  tipo fora do contexto      : THROW NotSupportedException: JsonTypeInfo metadata for type 'NaoRegistrado' was not provided by TypeInfoResolver of type 'Ct
+  List<T> de tipo registrado : THROW NotSupportedException: JsonTypeInfo metadata for type 'System.Collections.Generic.List`1[PNome]' was not provided by T
+  object com tipo fora       : THROW NotSupportedException: JsonTypeInfo metadata for type 'NaoRegistrado' was not provided by TypeInfoResolver of type 'Ct
+  object com int             : THROW NotSupportedException: JsonTypeInfo metadata for type 'System.Int32' was not provided by TypeInfoResolver of type 'Ctx
+  object com Dictionary      : THROW NotSupportedException: JsonTypeInfo metadata for type 'System.Collections.Generic.Dictionary`2[System.String,System.Ob
+  anonimo                    : THROW NotSupportedException: JsonTypeInfo metadata for type '<>f__AnonymousType9`1[System.Int32]' was not provided by TypeIn
+  ler tipo fora do contexto  : THROW NotSupportedException: JsonTypeInfo metadata for type 'NaoRegistrado' was not provided by TypeInfoResolver of type 'Ct
+  derivado em contexto gerado: {"Item":{"B":"base"},"Lista":[],"Animal":null}
+  mudar opcoes depois do uso : THROW InvalidOperationException: This JsonSerializerOptions instance is read-only or has already been used in serialization or d
+  NS com tipo que so tem atributo STJ: {"Nome":"a","Segredo":"s"}
+  runtime: 11.0.0  NS: 13.0.0.0  TZ: -03:00:00
+
+##### 11. PERFIL COMO O DO CIS (case-insensitive + AllowReadingFromString + converters da _lib)
+  "" -> decimal? (DecimalComPonto e JsonConverter<decimal>) : THROW JsonException: O valor String nao pode ser lido como Decimal.
+  "" -> decimal                                             : THROW JsonException: O valor String nao pode ser lido como Decimal.
+  null -> decimal?                                          : null
+  "" -> int?                                                : THROW JsonException: The JSON value could not be converted to System.Nullable`1[System.Int32]. Path: $.valor | LineNumber: 0 | Byte
+  "" -> Guid? (GuidLeniente)                                : null
+  "{guid}" -> Guid NAO anulavel (GuidLeniente e de Guid?)   : THROW JsonException: The JSON value could not be converted to System.Guid. Path: $.valor | LineNumber: 0 | BytePositionInLine: 49.
+  "" -> Guid NAO anulavel                                   : THROW JsonException: The JSON value could not be converted to System.Guid. Path: $.valor | LineNumber: 0 | BytePositionInLine: 11.
+  "" -> enum?                                               : THROW JsonException: The JSON value could not be converted to System.Nullable`1[Modo]. Path: $.valor | LineNumber: 0 | BytePosition
+  "1" -> enum (numero em texto, sem converter de enum)      : THROW JsonException: The JSON value could not be converted to Modo. Path: $.valor | LineNumber: 0 | BytePositionInLine: 12.
+  12 -> string                                              : THROW JsonException: The JSON value could not be converted to System.String. Path: $.valor | LineNumber: 0 | BytePositionInLine: 11
+  "true" -> bool                                            : THROW JsonException: The JSON value could not be converted to System.Boolean. Path: $.ativo | LineNumber: 0 | BytePositionInLine: 1
+  "S" -> bool                                               : THROW JsonException: The JSON value could not be converted to System.Boolean. Path: $.ativo | LineNumber: 0 | BytePositionInLine: 1
+  "12.0" -> int (AllowReadingFromString)                    : THROW JsonException: The JSON value could not be converted to System.Int32. Path: $.valor | LineNumber: 0 | BytePositionInLine: 15.
+  " 12 " -> int (espacos)                                   : THROW JsonException: The JSON value could not be converted to System.Int32. Path: $.valor | LineNumber: 0 | BytePositionInLine: 15.
+    NS: " 12 " -> int                                       : 12
+
+##### 12. ITENS ANTES SEM PROVA
+  D4 NS IsoDateTimeConverter AssumeLocal le sem fuso        : 2026-11-25T10:00:00 Kind=Unspecified
+  D4 STJ le sem fuso                                        : 2026-11-25T10:00:00 Kind=Unspecified
+  D4 NS AssumeLocal escreve Unspecified                     : {"Valor":"2026-11-25T10:00:00"}
+  D4 STJ escreve Unspecified                                : {"Valor":"2026-11-25T10:00:00"}
+  D4 NS DateTimeZoneHandling.Utc escreve Local              : {"Valor":"2026-11-25T13:00:00Z"}
+  E4 NS StringEnumConverter + SnakeCase                     : {"M":"venda_no_balcao"}
+  E4 STJ JsonStringEnumConverter()                          : {"M":"VendaNoBalcao"}
+  E4 STJ JsonStringEnumConverter(SnakeCaseLower)            : {"M":"venda_no_balcao"}
+  E4 STJ le "VendaNoBalcao" com conv SnakeCaseLower         : VendaNoBalcao
+  W8 NS [JsonObject(ItemNullValueHandling.Ignore)]          : {"B":"b"}
+  W8 STJ mesmo tipo                                         : {"A":null,"B":"b"}
+  G9 NS: atributo no tipo x Converters                      : "atributo-do-tipo"
+  G9 STJ: atributo no tipo x Converters                     : "colecao-Converters"
+  W9 NS ReferenceLoopHandling.Ignore                        : {"X":"x"}
+  W9 STJ ReferenceHandler.IgnoreCycles                      : {"Eu":null,"X":"x"}
+  dynamic sobre JObject: d.a.b + 1                          : 2
+  dynamic sobre JsonNode: d.a.b                             : THROW RuntimeBinderException: 'System.Text.Json.Nodes.JsonObject' does not contain a definition for 'a'
+  dynamic sobre JsonElement (object lido): d.a              : THROW RuntimeBinderException: 'System.Text.Json.JsonElement' does not contain a definition for 'a'
+  dynamic sobre ExpandoObject lido pelo STJ                 : JsonElement
+  Merge NS padrao (array concat, null da origem ignorado)   : {"l":[1,2],"n":1,"o":{"x":1,"y":2}}
+  JsonNode: nao existe Merge                                : sem API. Cada projeto escreve a propria regra de array e de null
+
+##### 13. FLURL 4.0.2
+  opcoes padrao do DefaultJsonSerializer                    : CaseInsensitive=True; Naming=null; DictKey=null; NumberHandling=Strict; IgnoreReadOnly=False; DefaultIgnore=Never; IncludeFields=False; Encoder=padrao; Converters=[]
+  le {"nome":"a"} em Nome                                   : a
+  le {"Valor":"12"} em int                                  : THROW JsonException: The JSON value could not be converted to System.Int32. Path: $.Valor | LineNumber: 0 | BytePositionInLine: 13.
+  le "" (corpo vazio)                                       : null
+  escreve acento, enum, derivado                            : {"T":"a\u00E7\u00E3o\u003C","M":1,"B":{"B":"base"}}
+  HttpTest.RespondWithJson emite                            : {"NomeCompleto":"a\u00E7\u00E3o","Attr":{"nome_completo":"a"}}
+  GetJsonAsync<T> com corpo vazio 200                       : null
+  GetJsonAsync<T> com corpo HTML 200                        : THROW FlurlParsingException: Response could not be deserialized to JSON: GET http://x.test/c
+  GetJsonAsync<PNome> com {"nome"}                          : a
+  PostJsonAsync envia                                       : {"NomeCompleto":"a\u00E7\u00E3o","D":5}
+
+##### 14. REFIT 17.0.0
+  Refit: versao                                             : 17.0.0.0
+  GetDefaultJsonSerializerOptions()                         : CaseInsensitive=True; Naming=JsonCamelCaseNamingPolicy; DictKey=null; NumberHandling=Strict; IgnoreReadOnly=False; DefaultIgnore=Never; IncludeFields=False; Encoder=padrao; Converters=[]
+  construtores                                              : (JsonSerializerOptions) | ()
+  new RefitSettings().ContentSerializer                     : SystemTextJsonContentSerializer CaseInsensitive=True; Naming=JsonCamelCaseNamingPolicy; DictKey=null; NumberHandling=Strict; IgnoreReadOnly=False; DefaultIgnore=Never; IncludeFields=False; Encoder=padrao; Converters=[]
+  Refit.Reflection: versao                                  : 17.0.0.0
+  Refit.Reflection: SystemTextJsonContentSerializer         : nao existe neste assembly
+
+##### 15. CONVERTERS TOLERANTES DA SKILL x NEWTONSOFT
+[=] vazio em todos os anulaveis
+[DIFERENTE] espacos em anulaveis
+    NS      : THROW JsonReaderException: Could not convert string to integer:   . Path 'i', line 1, position 9.
+    reflexao: I=null D=null Gn=null G=vazio Dtn=null Dt=0001-01-01T00:00:00 Mn=null M=Nenhum S=null B=False Bn=null L=0
+    gerado  : I=null D=null Gn=null G=vazio Dtn=null Dt=0001-01-01T00:00:00 Mn=null M=Nenhum S=null B=False Bn=null L=0
+[=] null em anulaveis
+[=] numero em texto em anulaveis
+[=] numero em anulaveis
+[=] guid com chaves
+[=] guid sem hifens
+[=] data com espaco
+[=] data ISO
+[=] data do CIS (formato extra)
+[=] enum texto / minusculo / numero em texto
+[=] enum numero em texto
+[=] enum numero
+[=] numero e bool em string
+[=] bool em string
+[=] texto em bool
+[=] numero em bool
+[= (os 3 lancam)] INVALIDO: vazio em int nao anulavel
+[= (os 3 lancam)] INVALIDO: vazio em Guid nao anulavel
+[= (os 3 lancam)] INVALIDO: texto em int
+[= (os 3 lancam)] INVALIDO: data errada
+  escrita NS      : {"I":1,"D":5.0,"Gn":null,"G":"00000000-0000-0000-0000-000000000000","Dtn":null,"Dt":"2026-11-25T10:00:00","Mn":2,"M":1,"S":"a‡ao","B":true,"Bn":null,"L":0}
+  escrita reflexao: {"I":1,"D":5,"Gn":null,"G":"00000000-0000-0000-0000-000000000000","Dtn":null,"Dt":"2026-11-25T10:00:00","Mn":2,"M":1,"S":"a\u00E7\u00E3o","B":true,"Bn":null,"L":0}
+  escrita gerado  : {"I":1,"D":5,"Gn":null,"G":"00000000-0000-0000-0000-000000000000","Dtn":null,"Dt":"2026-11-25T10:00:00","Mn":2,"M":1,"S":"a\u00E7\u00E3o","B":true,"Bn":null,"L":0}
+
+##### 16. CUSTO DA VazioComoNuloConverterFactory
+  objeto com 6 campos anulaveis preenchidos, 300000 leituras, melhor de 5:
+  sem a fabrica            :     414 ns por objeto, 184 bytes
+  com VazioComoNulo        :     483 ns por objeto, 184 bytes  (1,17x)
+  com ComLeituraTolerante  :     525 ns por objeto, 304 bytes  (1,27x)
+
+##### 17. ENUM COM CONVERTER NO TIPO x EnumToleranteConverterFactory (G9)
+  sem a leitura tolerante : {"M":"Mesa","Mn":"Mesa","Numero":1}
+  com a leitura tolerante : {"M":"Mesa","Mn":"Mesa","Numero":1}
+  leitura tolerante       : M=Balcao Mn=null Numero=Mesa

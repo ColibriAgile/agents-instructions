@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net11.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>$(NoWarn);CS8618;CS0649;CS0414;SYSLIB1037;SYSLIB1038;SYSLIB0020;CS8602;CS8600;CS8604</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../ConvertersTolerantes.cs" Link="ConvertersTolerantes.cs" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Flurl.Http" Version="4.0.2" />
+    <PackageReference Include="Refit" Version="17.0.0" />
+    <PackageReference Include="Refit.Reflection" Version="17.0.0" />
+  </ItemGroup>
+</Project>
