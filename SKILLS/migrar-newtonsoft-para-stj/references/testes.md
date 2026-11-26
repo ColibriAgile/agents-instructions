@@ -88,7 +88,7 @@ Ajuste o filtro para os tipos que o projeto serializa. Registre também `List<T>
 Este é o teste mais forte. Ele executa a mesma entrada no código antigo e no código novo e compara os resultados. Ele não depende de um arquivo que alguém pode aceitar de novo sem ler.
 
 1. Copie o código antigo de serialização (modelos e funções que usam o Newtonsoft) para uma pasta `Legado` do projeto de **testes**, num namespace próprio (por exemplo `Projeto.Legado`). Obtenha o código com `git show <commit-base>:<arquivo>`.
-2. Referencie o pacote `Newtonsoft.Json` só no projeto de testes. O projeto de produção fica sem ele.
+2. Referencie o pacote `Newtonsoft.Json` só no projeto de testes, e só durante a migração. O projeto de produção fica sem ele.
 3. Escreva 1 teoria de leitura: cada entrada passa pelo legado e pelo novo. Compare os valores lidos, ou compare "os 2 lançam".
 4. Escreva 1 teoria de escrita: cada objeto de exemplo é escrito pelos 2 lados. Compare o texto.
 5. Registre cada diferença aceita como um caso explícito com a linha da matriz. Exemplo: o legado devolve `6.6600000000000001421` e o novo devolve `6.66` (N12).
@@ -107,6 +107,18 @@ public void Ler_QuandoMesmaEntrada_DeveDarOMesmoResultadoDoLegado(string json)
 ```
 
 Quando o legado não cabe no projeto de testes (dependências demais), use o golden em arquivo abaixo.
+
+### Fim do oráculo
+
+O oráculo é temporário. O usuário não quer o Newtonsoft em nenhum projeto depois da migração.
+
+1. Execute o oráculo e grave cada resultado como valor esperado fixo: `[InlineData(entrada, esperado)]` ou um arquivo `.esperado.json` ao lado da captura real.
+2. Troque cada teoria de equivalência por uma teoria que compara o código novo com o valor fixo. Mantenha as diferenças aceitas como casos explícitos com a linha da matriz.
+3. Apague a pasta `Legado` (ou `Oraculo`) e o `PackageReference` do Newtonsoft no projeto de testes.
+4. Migre para `JsonNode` os testes comuns e as fixtures que usam `JObject` para montar ou ler json. Um plugin de teste e um programa de prova em `docs/` também saem do Newtonsoft.
+5. Confira: nenhum `.csproj`, `using` ou `project.assets.json` cita o Newtonsoft. Um comentário que explica o comportamento antigo pode ficar.
+
+Se o usuário pede para apagar a prova em vez de congelar, apague e registre no relatório o que deixou de ter teste.
 
 ### Golden do json enviado, criado com o Newtonsoft
 
@@ -139,7 +151,7 @@ Use quando o json chega por uma chamada de método (por exemplo `Notificar(event
 3. **Troque o binário.** Compile em `Release`, confira que a DLL tem a gravação (procure o texto da pasta no binário) e faça o backup do original com o hash. Para o serviço que carrega a DLL, copie e inicie de novo. A operação pede administrador: use um script `Start-Process -Verb RunAs` e diga ao usuário que aceite o UAC.
 4. **Gere o tráfego.** Chame as rotas HTTP do host com `curl`, inclusive corpo com quebra de linha, tab, aspas, caractere de controle e emoji. Para o que só acontece na tela do host, peça ao usuário as operações (venda, cancelamento com permissão, pagamento) quando não há controle do desktop.
 5. **Restaure.** Feche todos os processos que carregam a DLL (o host, as telas de configuração), copie o original e confira o hash.
-6. **Prove.** Execute cada captura no oráculo e no código novo (seção 3). Grave 1 captura por tipo de evento e por origem no projeto de testes e troque nomes de pessoas reais.
+6. **Prove.** Execute cada captura no oráculo e no código novo (seção 3). Grave 1 captura por tipo de evento e por origem no projeto de testes e troque nomes de pessoas reais. Grave também a saída do oráculo para cada captura, para o teste continuar depois do fim do oráculo.
 
 Registre também o que não foi capturado: um callback que nenhum plugin chamou continua sem prova.
 

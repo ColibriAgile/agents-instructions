@@ -18,7 +18,8 @@ Há 2 classes de falha. Trate as 2:
 - **Par `T` e `T?`:** um `JsonConverter<T>` não recebe o `null` de um `T?`, mas recebe o `""`. Um `JsonConverter<T?>` não é usado para uma propriedade `T`. Cada converter de tipo de valor cobre os 2 tipos, ou o perfil usa `VazioComoNuloConverterFactory`. Antes de dizer que um formato "já funciona", teste uma propriedade `T` e uma propriedade `T?`: o mesmo nome de campo pode ser `Guid` num modelo e `Guid?` em outro.
 - **Perfil inteiro, não só o incidente:** o incidente mostra 1 campo, mas a causa é a tolerância que o perfil perdeu. Ao corrigir um perfil, feche todas as colunas da tabela do passo 3 que o Newtonsoft cobria, inclusive número em campo `string` (T2) e texto em campo `bool` (T3). Um perfil corrigido só para o campo do incidente falha de novo no campo seguinte.
 - **Entrada do teste vem de fora:** o teste de leitura usa texto literal ou arquivo com a resposta real. Uma entrada criada pelo serializador em teste não prova nada.
-- **Newtonsoft como oráculo:** a prova de equivalência executa a mesma entrada no código antigo e no código novo. O código antigo fica só no projeto de testes. Um golden em arquivo serve quando o oráculo não é possível, e entra num commit separado, com o Newtonsoft ainda no projeto.
+- **Newtonsoft como oráculo temporário:** durante a migração, a prova de equivalência executa a mesma entrada no código antigo e no código novo. O código antigo fica só no projeto de testes. Um golden em arquivo serve quando o oráculo não é possível, e entra num commit separado, com o Newtonsoft ainda no projeto.
+- **Fim sem Newtonsoft:** no fim da migração, nenhum projeto do repositório referencia o Newtonsoft: produção, testes, fixtures, plugins de teste e programas de prova em `docs/`. Antes de apagar o oráculo, grave a saída dele como valores esperados fixos nos testes (`references/testes.md`, seção 3, "Fim do oráculo"). Se uma lib ou um submódulo deixa de trazer o Newtonsoft, migre o código de teste para o STJ. Não acrescente o pacote para o teste compilar.
 - **Nome honesto no teste:** um json montado à mão não é "resposta real". Use "real" só para um texto capturado do sistema externo.
 - **Um perfil por contrato:** cada contrato externo tem 1 `JsonSerializerOptions` estático e imutável (`MakeReadOnly`). Toda chamada passa o perfil. Uma chamada sem opções usa o padrão estrito.
 - **Um serializador por tipo:** um tipo não passa pelo Newtonsoft e pelo STJ. Cada biblioteca ignora os atributos da outra sem aviso.
@@ -124,7 +125,7 @@ Leia `references/testes.md` e crie, para cada perfil que lê ou escreve dado ext
 
 1. a bateria de entradas sujas;
 2. o teste de contrato, se o perfil usa contexto gerado;
-3. a prova de equivalência com o Newtonsoft como oráculo (ou o golden em arquivo, quando o oráculo não é possível);
+3. a prova de equivalência com o Newtonsoft como oráculo (ou o golden em arquivo, quando o oráculo não é possível). No fim, congele a saída do oráculo e apague o oráculo;
 4. pelo menos 1 resposta real por operação de leitura, em arquivo. Procure uma captura no repositório, nos logs ou na documentação do sistema externo. Se não há captura, peça uma ao usuário e registre a falta no relatório. Não invente uma. Se o json chega por uma chamada de método de um host instalado, siga `references/testes.md`, seção "Captura do json que um host envia".
 
 A bateria inclui 1 leitura pelo perfil congelado com um DTO do contexto real, 1 ida e volta de dicionário e 1 comparação da escrita com texto literal (`references/testes.md`, seção 1).
@@ -133,7 +134,7 @@ Depois troque as entradas de teste criadas pelo serializador (`RespondWithJson(o
 
 Execute os testes com a skill de validação .NET do repositório.
 
-*Done when:* os 4 tipos de teste existem para cada perfil de dado externo e passam, e os testes novos falham no código sem a correção (execute 1 vez com a correção revertida e registre quantos falham).
+*Done when:* os 4 tipos de teste existem para cada perfil de dado externo e passam, e os testes novos falham no código sem a correção (execute 1 vez com a correção revertida e registre quantos falham). Nenhum projeto referencia o Newtonsoft: procure `Newtonsoft` nos `.csproj`, nos `using` e nos `project.assets.json`, inclusive como dependência indireta.
 
 ### 6. Relatar
 
