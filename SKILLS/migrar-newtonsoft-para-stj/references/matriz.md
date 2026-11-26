@@ -1,6 +1,6 @@
 # Matriz de incompatibilidades Newtonsoft.Json -> System.Text.Json
 
-Provado em 2026-11-25 com .NET 11.0.0, Newtonsoft 13.0.4, Flurl.Http 4.0.2 e Refit 17.0.0. O resultado bruto está em `assets/jsondiff/resultado-net11.txt`. Os casos que dependem da reflexão desligada estão em `assets/jsondiff-sem-reflexao/resultado-net11.txt`.
+Provado em 2026-11-25 (seção 20 em 2026-11-26) com .NET 11.0.0, Newtonsoft 13.0.4, Flurl.Http 4.0.2 e Refit 17.0.0. O resultado bruto está em `assets/jsondiff/resultado-net11.txt`. Os casos que dependem da reflexão desligada estão em `assets/jsondiff-sem-reflexao/resultado-net11.txt`.
 
 Legenda:
 
@@ -95,6 +95,10 @@ Legenda:
 | W14 | Snake case: `AB1` | `a_b1` | `ab1` | SILENT | Fixar o nome com `[JsonPropertyName]` | Sim |
 | W15 | `CamelCasePropertyNamesContractResolver`: chave de dicionário | `minhaChave` | `MinhaChave` | SILENT | `DictionaryKeyPolicy` | Sim |
 | W16 | Indentação | Igual nos casos testados | Igual | Igual | Nenhuma | Sim |
+| W17 | `UnsafeRelaxedJsonEscaping` com emoji (fora do BMP), U+007F a U+009F, U+00A0 | Texto bruto | `😀`, `\u007F`, ` `: o encoder relaxado ainda escapa | SILENT | Json equivalente. Só importa para hash, assinatura ou comparação de texto | Sim |
+| W18 | Surrogate isolado (`"\ud800"`) lido e escrito de novo | Escreve | `InvalidOperationException` na escrita (não `JsonException`) | THROWS | O `catch (JsonException)` do chamador não pega. Trate no ponto de escrita, se o host pode enviar | Sim |
+
+Seção 20 do `jsondiff`: W17, W18 e o `ToJsonString()` padrão escreve `"` como `"` e `<` como `<` (W2).
 
 ## 6. DOM: `JToken` para `JsonNode`
 
@@ -121,7 +125,14 @@ Legenda:
 | N19 | `Value<decimal?>()` de `"9,50"` | `950` (formato invariante com separador de milhar) | `GetValue<decimal?>()` lança `InvalidOperationException` | THROWS | Para repetir: `decimal.Parse(texto, NumberStyles.Number, InvariantCulture)`. O `950` é um defeito antigo: decida com o usuário | Sim |
 | N20 | `char` atribuído a um `JObject` por `dynamic` | Número (`'x'` vira `120`) | Texto (`"x"`) | SILENT | Converter o `char` para `int` antes, se o leitor espera número | Sim |
 
-Seção 19 do `jsondiff`. Ela prova também que `(bool?)token` aceita `"true"` e `1` (N1) e que o `ToString()` sem argumento escreve o objeto indentado nas 2 bibliotecas.
+| N21 | Objeto ou array como texto: `JToken.ToString()` trocado por `ToJsonString()` | Indentado | Compacto | SILENT | `JsonNode.ToString()` indenta como o Newtonsoft. O `ToJsonString()` não | Sim |
+| N22 | `Value<int?>()` de `1.5`, `2.5` ou `true`; `Value<decimal?>()` de `true` | `2`, `2` (arredonda para o par), `1`, `1` | `GetValue<T>()` lança. `AsInteger` da `_lib` lança `OverflowException` em `1.5` | THROWS | Para repetir: `Convert.ToInt32(decimal)` no número e 1/0 no booleano | Sim |
+| N23 | Passagem: `JObject.Parse` + `ToString(Formatting.None)` de volta ao host | Reescreve: tira `.000` da data, leva `+05:00` ao fuso local, `/Date()/` vira ISO, `1e3` vira `1000.0`, `1e400` vira `"Infinity"`, `-0` vira `0`, `1.50` vira `1.5` (com `FloatParseHandling.Double`) | Devolve o texto original | SILENT | Normalmente é correção. Registre como mudança aceita, com captura real | Sim |
+| N24 | `ToString()` de `1.50` depende de quem leu | `JObject.Parse` (`double`): `1,5`. `FloatParseHandling.Decimal`: `1,50` | `1.50` | SILENT | Confira o parse de cada chamador no commit base. 2 caminhos do mesmo projeto podem dar textos diferentes | Sim |
+
+Seção 19 do `jsondiff`. Ela prova também que `(bool?)token` aceita `"true"` e `1` (N1) e que o `ToString()` sem argumento escreve o objeto indentado nas 2 bibliotecas. Seção 20: N5 com fuso, N21 a N24.
+
+Para repetir o `JToken.ToString()` inteiro (N5, N16, N17, N21, N24) num campo de texto, use `assets/TextoComoJToken.cs`.
 
 ## 7. Contexto gerado e opções
 

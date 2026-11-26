@@ -44,6 +44,7 @@ Há 2 classes de falha. Trate as 2:
 | `references/dotnet-lib.md` | Estado dos perfis da dotnet-lib (`_lib`) e as lacunas abertas | Quando o projeto usa a `_lib` |
 | `scripts/detectar.sh` | Conta os padrões de risco por id da matriz. Precisa de `bash` e `git` (no Windows, o Git Bash) | Passo 2 |
 | `assets/ConvertersTolerantes.cs` | Converters que repetem a tolerância do Newtonsoft (provados) | Passo 4 |
+| `assets/TextoComoJToken.cs` | Repete o `JToken.ToString()` de um `JsonNode`: número na cultura, `True`, data, objeto indentado (provado com oráculo) | Passo 4, item 5, quando um campo json chega ao consumidor como texto |
 | `assets/jsondiff/` | Programa que executa o mesmo caso no Newtonsoft e no STJ | Quando um caso não está na matriz |
 | `assets/jsondiff-sem-reflexao/` | Prova dos converters com a reflexão do STJ desligada, contexto gerado e Newtonsoft em `global using` | Depois de alterar um converter, e quando um consumidor desliga a reflexão |
 
@@ -56,6 +57,7 @@ Há 2 classes de falha. Trate as 2:
 3. Se o projeto já migrou, o modo é **auditoria**. Encontre o último commit com Newtonsoft: `git log --oneline -i --grep="newtonsoft\|system.text.json"` e use o pai do commit da migração.
 4. Se o usuário informou uma exceção de produção, encontre a linha dela na matriz primeiro. Ela define a prioridade.
 5. Se o projeto usa uma biblioteca compartilhada por submódulo (por exemplo `_lib`), compare o commit gravado com o checkout: `git ls-tree HEAD _lib` e `git -C _lib rev-parse HEAD`. Uma correção que existe só no checkout local não entra no build do servidor. Confira com `git -C _lib merge-base --is-ancestor <correção> <commit gravado>`.
+6. Se o código antigo chamava uma função json da biblioteca compartilhada (por exemplo `ParseJson`), leia essa função no **último ponteiro do submódulo com Newtonsoft** no histórico do projeto (`git log -- _lib` e `git ls-tree <commit> _lib`), e não no commit que uma referência cita. As opções dela (por exemplo `FloatParseHandling.Decimal`) mudam o texto de número (N24).
 
 *Done when:* o modo e o commit base estão registrados, e o commit gravado de cada submódulo foi comparado com o checkout.
 
@@ -87,6 +89,8 @@ Esta tabela é o resultado principal da auditoria. Ela mostra onde a tolerância
 2. Marque "Sim" só quando a opção ou o converter existe e cobre `T` e `T?`. Se há dúvida, execute 1 entrada com uma propriedade de cada tipo. Não conclua pela leitura do nome do converter.
 3. Inclua 1 linha para cada chamada que não passa perfil: Flurl sem `WithSettings`, Refit com `RefitSettings` padrão, `JsonSerializer` sem opções, `ToJsonString()` e `node.Deserialize<T>()` sem opções. Os padrões dessas bibliotecas estão na seção 10 da matriz.
 4. Para cada "Não" num perfil que lê dado externo, conte as propriedades expostas com o id `C-DEC`, `C-GUI` e `C-DTM` do script.
+5. Num projeto que só lê DOM (`JsonObject` e funções `As*`, sem DTO), faça 1 linha por função de conversão e por ponto de leitura. Acrescente a coluna "campo como texto" (N5, N16, N17, N21, N24).
+6. Para cada THROWS, leia o `catch` do chamador. Um `catch (JsonException)` com valor de retorno (por exemplo "devolve o payload cru como sucesso") transforma a falha em SILENT. Uma exceção que não é `JsonException` (`FormatException`, `OverflowException`, `InvalidOperationException`) passa por esse `catch`.
 
 *Done when:* cada perfil e cada chamada sem perfil têm uma linha, e cada "Não" tem a quantidade de propriedades expostas.
 
@@ -104,7 +108,7 @@ Ordem de prioridade: exceção já vista em produção, depois THROWS em leitura
 2. **Enum:** o `EnumToleranteConverterFactory` lê texto e número e escreve número, como o Newtonsoft. Ele não toca um enum que tem `[JsonConverter]` no tipo. Use `JsonStringEnumConverter` só no enum que tinha `StringEnumConverter`. Troque `[EnumMember(Value)]` por `[JsonStringEnumMemberName]`.
 3. **Ordem dos converters:** um converter na coleção `Converters` do perfil ganha do atributo `[JsonConverter]` do **tipo** (G9). No Newtonsoft era o contrário. Depois de acrescentar um converter a um perfil, procure os tipos com `[JsonConverter]` que esse converter aceita e confirme que o json escrito deles não mudou. O atributo na **propriedade** continua com prioridade.
 4. **Escrita:** compare o json enviado com o golden. As diferenças comuns são acento escapado (W1), `5.0` que vira `5` (W3), `null` que passa a ser escrito (W8), tipo derivado sem propriedades (W5), tupla e campo que somem (V2) e nome snake case diferente (W14).
-5. **DOM:** troque `GetValue<T>()` e cast direto por funções tolerantes do projeto ou da `_lib` (`AsInteger`, `AsDecimal`, `AsString`). Trate o `null` do C# onde havia `JValue` nulo (N3, N18). Use `DeepClone()` ao mover um nó (N6). O `JToken.ToString()` tem regras próprias para número, booleano e data (N5, N16, N17). Num projeto que monta json por `JObject` ou `dynamic`, grave primeiro a saída do código antigo (`references/testes.md`, seção 5).
+5. **DOM:** troque `GetValue<T>()` e cast direto por funções tolerantes do projeto ou da `_lib` (`AsInteger`, `AsDecimal`, `AsString`). Trate o `null` do C# onde havia `JValue` nulo (N3, N18). Use `DeepClone()` ao mover um nó (N6). O `JToken.ToString()` tem regras próprias para número, booleano, data e objeto (N5, N16, N17, N21, N24): para repetir, use `assets/TextoComoJToken.cs`, e não `AsString()` nem `ToJsonString()`. O `Value<int?>()` arredonda fração e converte booleano (N22). Num projeto que monta json por `JObject` ou `dynamic`, grave primeiro a saída do código antigo (`references/testes.md`, seção 5).
 6. **`object` e `dynamic`:** troque a propriedade `object` por um tipo concreto ou `JsonNode`. O valor lido é `JsonElement`, e `dynamic` sobre ele lança em tempo de execução (O1 a O5).
 7. **`required`:** o Newtonsoft ignorava. O STJ lança se o campo falta. Retire o `required` do DTO de entrada externa quando o campo é opcional no contrato real (V7).
 8. **Contexto gerado:** registre cada tipo raiz, inclusive `List<T>` e os tipos que entram por `object` (G1 a G3).
@@ -121,7 +125,7 @@ Leia `references/testes.md` e crie, para cada perfil que lê ou escreve dado ext
 1. a bateria de entradas sujas;
 2. o teste de contrato, se o perfil usa contexto gerado;
 3. a prova de equivalência com o Newtonsoft como oráculo (ou o golden em arquivo, quando o oráculo não é possível);
-4. pelo menos 1 resposta real por operação de leitura, em arquivo. Procure uma captura no repositório, nos logs ou na documentação do sistema externo. Se não há captura, peça uma ao usuário e registre a falta no relatório. Não invente uma.
+4. pelo menos 1 resposta real por operação de leitura, em arquivo. Procure uma captura no repositório, nos logs ou na documentação do sistema externo. Se não há captura, peça uma ao usuário e registre a falta no relatório. Não invente uma. Se o json chega por uma chamada de método de um host instalado, siga `references/testes.md`, seção "Captura do json que um host envia".
 
 A bateria inclui 1 leitura pelo perfil congelado com um DTO do contexto real, 1 ida e volta de dicionário e 1 comparação da escrita com texto literal (`references/testes.md`, seção 1).
 

@@ -88,3 +88,13 @@ Vale só para um commit que contém a branch `refactor/remover-newtonsoft-e-leit
 - **Encoder relaxado:** PIS (cliente e persistência), Evento, Bloqueio, Mensageria, Payment, e o perfil novo `PerfisJsonDePlugins.Dom` para o json que o host monta por DOM.
 - **Abertos:** 1 propriedade `DateTimeOffset` do PIS sem leitura tolerante; os converters de `DateTimeOffset` do Licenciamento lançam `FormatException`; teste de contrato do contexto gerado só no PIS; `required` em DTO (65 ocorrências) não verificado.
 - **Testes de exemplo:** `SondaDeLeituraJson` e os testes `*EntradasSujasTestes` (bateria), `JsonDoPluginCaracterizacaoTestes` (caracterização de DOM) e `JsonDoPluginDiferencasAceitasTestes`.
+
+## Json real do host Delphi (POS e CIS)
+
+Capturado em 2026-11-26 no Plugins.Manager instalado (`plugins-manager` 8ec907f, pasta `Plugins.Manager.Testes/Capturas`). Use como referência para outro consumidor do mesmo host, e confirme com uma captura própria.
+
+- **Contexto de evento do POS:** json estrito, com espaço depois de `:` e `,` no nível de fora. Acento como `ç` (hex maiúsculo). Data `yyyy-MM-ddTHH:mm:ss` sem fração e sem fuso, e também `dd/MM/yy` e `HH:mm` em texto. Número como `46.5`, sem expoente. GUID entre chaves (`{C80F765C-...}`).
+- **Requisição REST do CIS (`TratarRest`):** json indentado com TAB. Todos os campos são texto (`URI`, `Command`, `QueryParams`, `PostStream`). O `PostStream` escapa `\n`, `\t`, `\`, `\"` e `\u0001`. Com `Content-Type: text/plain`, o CIS decodifica o corpo como ISO-8859-1.
+- **Resposta do CIS:** `Content-Type: application/json; charset=ISO-8859-1`.
+- Nas 64 capturas, o Newtonsoft e o STJ deram o mesmo json, byte a byte, na passagem pelo host (N23 sem efeito).
+- **Não capturado:** o retorno de teclado, consulta, template e permissão da UI legada.

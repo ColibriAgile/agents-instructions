@@ -269,3 +269,4 @@ Parte3.Run();
 Parte4.Run();
 Parte5.Run();
 Parte3b.Run();
+Parte6.Run();

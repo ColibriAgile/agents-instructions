@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../ConvertersTolerantes.cs" Link="ConvertersTolerantes.cs" />
+    <Compile Include="../TextoComoJToken.cs" Link="TextoComoJToken.cs" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Flurl.Http" Version="4.0.2" />
     <PackageReference Include="Refit" Version="17.0.0" />

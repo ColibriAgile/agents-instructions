@@ -793,3 +793,30 @@
   sem a leitura tolerante : {"M":"Mesa","Mn":"Mesa","Numero":1}
   com a leitura tolerante : {"M":"Mesa","Mn":"Mesa","Numero":1}
   leitura tolerante       : M=Balcao Mn=null Numero=Mesa
+
+##### 20. PASSAGEM DE DOM, ToString() E ESCAPE (N21 a N24, W17, W18), cultura pt-BR, fuso local
+  fuso local: -03:00:00
+  passagem "2026-11-25T10:00:00" (N23)     NS : {"v":"2026-11-25T10:00:00"}          STJ: {"v":"2026-11-25T10:00:00"}
+  passagem "2026-11-25T10:00:00.000" (N23) NS : {"v":"2026-11-25T10:00:00"}          STJ: {"v":"2026-11-25T10:00:00.000"}
+  passagem "2026-11-25T10:00:00+05:00" (N23) NS : {"v":"2026-11-25T02:00:00-03:00"}    STJ: {"v":"2026-11-25T10:00:00+05:00"}
+  passagem "/Date(1764064800000)/" (N23)   NS : {"v":"2025-11-25T10:00:00Z"}         STJ: {"v":"/Date(1764064800000)/"}
+  passagem 1.50 (N23)                      NS : {"v":1.5}                            STJ: {"v":1.50}
+  passagem 1e3 (N23)                       NS : {"v":1000.0}                         STJ: {"v":1e3}
+  passagem 1e400 (N23)                     NS : {"v":"Infinity"}                     STJ: {"v":1e400}
+  passagem -0 (N23)                        NS : {"v":0}                              STJ: {"v":-0}
+  passagem 0.12345678901234567890123456789 (N23) NS : {"v":0.12345678901234568}            STJ: {"v":0.12345678901234567890123456789}
+  objeto: ToString() x ToJsonString() (N21) NS : {\n  "a": 1\n}                     STJ: {"a":1}
+  Value<int?> de 1.5 (N22)                 NS : 2                                    STJ: THROW InvalidOperationException
+  Value<int?> de 2.5 (N22)                 NS : 2                                    STJ: THROW InvalidOperationException
+  Value<int?> de true (N22)                NS : 1                                    STJ: THROW InvalidOperationException
+  Value<decimal?> de true (N22)            NS : 1                                    STJ: THROW InvalidOperationException
+  ToString() de 1.50, JObject.Parse (N24)  NS : 1,5                                  STJ: 1.50
+  ToString() de 1.50, Decimal (N24)        NS : 1,50                                 STJ: 1.50
+  ToString() de data com fuso (N5)         NS : 25/11/2026 02:00:00                  STJ: 2026-11-25T10:00:00+05:00
+  escrita relaxada de emoji (W17)          NS : {"x":"😀"}                           STJ: {"x":"\uD83D\uDE00"}
+  escrita relaxada de U+007F (W17)         NS : {"x":""}                            STJ: {"x":"\u007F"}
+  escrita relaxada de U+0080 (W17)         NS : {"x":""}                            STJ: {"x":"\u0080"}
+  escrita relaxada de U+00A0 (W17)         NS : {"x":" "}                            STJ: {"x":"\u00A0"}
+  ToJsonString() padrão de aspas (W2)      NS : {"x":"a\"<b>"}                       STJ: {"x":"a\u0022\u003Cb\u003E"}
+  passagem de "\ud800" (W18)               NS : 9                                    STJ: THROW InvalidOperationException
+  passagem de "\ud800" via JsonElement (W18) NS : n/a                                  STJ: THROW InvalidOperationException

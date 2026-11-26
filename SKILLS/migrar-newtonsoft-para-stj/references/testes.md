@@ -130,9 +130,26 @@ Se o projeto já migrou, crie o golden a partir do último commit com Newtonsoft
 - Use a palavra "real" no nome do teste só quando o texto foi capturado do sistema externo. Um json montado à mão recebe um nome que diz isso (por exemplo `Ler_JsonNoFormatoDoCis_...`), e o resumo declara que falta a captura real.
 - Retire os dados pessoais e os segredos da resposta real antes de gravar o arquivo.
 
+### Captura do json que um host envia (COM, plugin, processo instalado)
+
+Use quando o json chega por uma chamada de método (por exemplo `Notificar(evento, contexto)` de um host Delphi) e não há log do texto bruto. Peça a autorização do usuário antes do passo 3: ele troca um binário instalado e para um serviço.
+
+1. **Encontre o commit instalado.** Leia o `ProductVersion` da DLL instalada (`1.2.1.93+<hash>`) e o do submódulo. Crie um `git worktree` nesse commit. No worktree, aponte o submódulo para o clone local (`git config submodule._lib.url <caminho local>`, `git -c protocol.file.allow=always submodule update --init`) e use `core.longpaths=true` no Windows.
+2. **Grave o texto bruto.** Acrescente 1 linha de gravação no início de cada ponto de entrada, antes do parse. Grave só se uma pasta de captura existe, num arquivo por chamada (processo, origem, sequência), e engula toda exceção da gravação. Este código não entra no repositório.
+3. **Troque o binário.** Compile em `Release`, confira que a DLL tem a gravação (procure o texto da pasta no binário) e faça o backup do original com o hash. Para o serviço que carrega a DLL, copie e inicie de novo. A operação pede administrador: use um script `Start-Process -Verb RunAs` e diga ao usuário que aceite o UAC.
+4. **Gere o tráfego.** Chame as rotas HTTP do host com `curl`, inclusive corpo com quebra de linha, tab, aspas, caractere de controle e emoji. Para o que só acontece na tela do host, peça ao usuário as operações (venda, cancelamento com permissão, pagamento) quando não há controle do desktop.
+5. **Restaure.** Feche todos os processos que carregam a DLL (o host, as telas de configuração), copie o original e confira o hash.
+6. **Prove.** Execute cada captura no oráculo e no código novo (seção 3). Grave 1 captura por tipo de evento e por origem no projeto de testes e troque nomes de pessoas reais.
+
+Registre também o que não foi capturado: um callback que nenhum plugin chamou continua sem prova.
+
+### Prova de que o teste falha sem a correção
+
+Ao reverter a correção para contar as falhas, o `Copy-Item` de volta preserva a data do arquivo, e o build incremental pode reutilizar a DLL antiga. Toque os arquivos restaurados (`LastWriteTime = Get-Date`) antes do build final, ou confira que os testes novos passam de novo.
+
 ## 5. Caracterização de código com `JObject`, `JToken` ou `dynamic`
 
-Use este teste para migrar um projeto que monta e lê json por DOM (`JObject`, `JToken.ToString()`, `Value<T>()`, `dynamic`). O compilador não mostra as diferenças, e a matriz tem 20 linhas só para o DOM (N1 a N20).
+Use este teste para migrar um projeto que monta e lê json por DOM (`JObject`, `JToken.ToString()`, `Value<T>()`, `dynamic`). O compilador não mostra as diferenças, e a matriz tem 24 linhas só para o DOM (N1 a N24).
 
 1. Antes de trocar a biblioteca, escreva um teste temporário que chama cada função pública que escreve ou lê json e grava a saída num arquivo. Use entradas que revelam diferenças:
    - **Escrita:** texto com acento e `< > & ' + "`, `decimal` inteiro (`5m`), `double` inteiro, `float`, data local e UTC, `Guid`, enum, `null`, `TimeSpan`, `char`, lista, dicionário, tupla, campo público, tipo derivado e objeto anônimo.
