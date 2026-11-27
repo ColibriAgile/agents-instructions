@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: compilar-no-linux
+expected_outcome: |
+  App compila no Linux; saída e cópia de modelos continuam equivalentes no Windows.
+context:
+  scaffold_script: place-files.sh

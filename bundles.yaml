@@ -121,3 +121,8 @@ bundles:
       - migrar-newtonsoft-para-stj
       - migrar-testes-para-mtp
       - migrar-ui-para-avalonia
+
+  win-linux:
+    description: "Compatibilidade de projetos .NET entre Windows e Linux."
+    skills:
+      - dotnet-multiplataforma

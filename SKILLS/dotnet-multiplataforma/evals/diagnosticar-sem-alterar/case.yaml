@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: diagnosticar-sem-alterar
+expected_outcome: |
+  Relatório dos três problemas, sem alterar arquivos.
+context:
+  scaffold_script: place-files.sh
