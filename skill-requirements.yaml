@@ -76,3 +76,9 @@ skills:
     notes:
       - O scripts/detectar.sh usa bash e git grep; no Windows, execute no Git Bash.
       - O assets/jsondiff foi provado no .NET 11 e restaura Newtonsoft.Json, Flurl.Http e Refit do NuGet.
+  # SKILLS/dotnet-multiplataforma/SKILL.md, etapas 1 a 4; scripts/.
+  dotnet-multiplataforma:
+    tools: [Python 3, .NET SDK, Git]
+    notes:
+      - Os scripts exigem Python 3.9 ou superior; use py -3 no Windows ou python3 em macOS/Linux.
+      - Verificar os dois sistemas exige um build no Windows e outro no Linux.
