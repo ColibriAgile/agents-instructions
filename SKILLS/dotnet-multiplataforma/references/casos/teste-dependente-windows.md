@@ -3,6 +3,7 @@ id: teste-dependente-windows
 titulo: Testes que supõem caminhos ou programas do Windows
 fase: teste
 status: sintoma-confirmado
+ajuste: com-risco
 checagem: nenhuma
 verificado_em: Linux, SDK 11.0.100, 2026-11-27
 sinais:
@@ -29,6 +30,12 @@ Decida primeiro se o comportamento testado existe no Linux:
   sistema de arquivos simulado). Se a falha revelar `\` fixo no código de produção, corrija a produção.
 - Não existe (registro, serviços, COM): pule explicitamente o teste fora do Windows com o recurso do framework em
   uso, para o relatório mostrar "ignorado" em vez de falha.
+
+## Riscos e opções
+
+- **Risco:** ajustar o teste pode esconder um defeito real de portabilidade, ou enfraquecer a cobertura no Windows.
+- **Opção recomendada:** separar o que deve funcionar no Linux (corrigir) do que é exclusivo do Windows (ignorar).
+- **Alternativa:** rodar esse conjunto de testes só no CI Windows.
 
 ## Armadilhas
 

@@ -3,6 +3,7 @@ id: comando-windows
 titulo: Exec ou evento de build que só funciona no cmd.exe
 fase: pos-build
 status: confirmado
+ajuste: com-risco
 checagem: comando_windows
 verificado_em: Linux, SDK 11.0.100, 2026-11-27 (Windows não testado)
 sinais:
@@ -43,6 +44,13 @@ Equivalentes: `del` -> `Delete`, `mkdir` -> `MakeDir`, `rmdir` -> `RemoveDir`, `
 
 Se o passo só faz sentido no Windows (registro COM, assinatura, instalador), condicione o `Target`:
 `Condition="$([MSBuild]::IsOSPlatform('Windows'))"`, e avise que o artefato correspondente não sai no Linux.
+
+## Riscos e opções
+
+- **Risco:** reescrever o comando muda também o build do Windows (`Copy` e `xcopy` diferem em subpastas, atributos e
+  tratamento de erro). Condicionar o passo ao Windows deixa o Linux sem o artefato que ele gera.
+- **Opção recomendada:** tarefa do MSBuild quando há equivalente direto; confirmar a saída no Windows.
+- **Alternativa:** dois alvos condicionados por sistema, mantendo o comando original no Windows.
 
 ## Armadilhas
 

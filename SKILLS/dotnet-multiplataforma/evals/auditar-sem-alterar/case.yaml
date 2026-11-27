@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: auditar-sem-alterar
+expected_outcome: |
+  Relatório classificado por risco, sem alterar o projeto.
+context:
+  scaffold_script: place-files.sh

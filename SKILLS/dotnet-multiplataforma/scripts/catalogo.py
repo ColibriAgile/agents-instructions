@@ -16,7 +16,9 @@ CASOS = SKILL / "references" / "casos"
 INDICE = SKILL / "references" / "INDICE.md"
 CHECAGENS = SKILL / "scripts" / "checagens"
 MODELO = SKILL / "assets" / "modelo-caso.md"
-CAMPOS = ("id", "titulo", "fase", "status", "checagem", "verificado_em", "sinais")
+CAMPOS = ("id", "titulo", "fase", "status", "ajuste", "checagem", "verificado_em", "sinais")
+AJUSTES = ("seguro", "com-risco", "incompativel")
+SECAO_RISCOS = "## Riscos e opções"
 FASES = ("restore", "build", "pos-build", "teste", "execucao")
 STATUS = ("confirmado", "sintoma-confirmado", "hipotese")
 ID = re.compile(r"[a-z][a-z0-9-]*")
@@ -44,12 +46,19 @@ def casos():
     return {a.stem: ler_caso(a) for a in sorted(CASOS.glob("*.md"))}
 
 
+def secao(nome, titulo):
+    """Texto de uma seção `## ...` de um caso, sem o título."""
+    texto = (CASOS / f"{nome}.md").read_text(encoding="utf-8")
+    m = re.search(rf"^{re.escape(titulo)}[ \t]*\n(.*?)(?=^## |\Z)", texto, re.M | re.S)
+    return m.group(1).strip() if m else ""
+
+
 def gerar_indice():
     linhas = ["# Índice de casos", "", "Gerado por `scripts/catalogo.py indice`. Não edite.", "",
-              "| caso | problema | fase | status | detecção |", "|---|---|---|---|---|"]
+              "| caso | problema | fase | status | ajuste | detecção |", "|---|---|---|---|---|---|"]
     for nome, c in sorted(casos().items(), key=lambda i: (FASES.index(i[1]["fase"]), i[0])):
         deteccao = "estática" if c["checagem"] != "nenhuma" else ("log" if c["sinais"] else "manual")
-        linhas.append(f"| [{nome}](casos/{nome}.md) | {c['titulo']} | {c['fase']} | {c['status']} | {deteccao} |")
+        linhas.append(f"| [{nome}](casos/{nome}.md) | {c['titulo']} | {c['fase']} | {c['status']} | {c['ajuste']} | {deteccao} |")
     return "\n".join(linhas) + "\n"
 
 
@@ -68,6 +77,10 @@ def validar():
             erros.append(f"{arquivo.name}: fase deve ser uma de {', '.join(FASES)}")
         if c.get("status") not in STATUS:
             erros.append(f"{arquivo.name}: status deve ser um de {', '.join(STATUS)}")
+        if c.get("ajuste") not in AJUSTES:
+            erros.append(f"{arquivo.name}: ajuste deve ser um de {', '.join(AJUSTES)}")
+        if not secao(arquivo.stem, SECAO_RISCOS):
+            erros.append(f"{arquivo.name}: falta a seção '{SECAO_RISCOS}'")
         modulo = c.get("checagem", "nenhuma")
         if modulo != "nenhuma" and not (CHECAGENS / f"{modulo}.py").is_file():
             erros.append(f"{arquivo.name}: checagem inexistente: {modulo}")

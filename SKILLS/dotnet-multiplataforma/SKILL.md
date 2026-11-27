@@ -1,6 +1,6 @@
 ---
 name: dotnet-multiplataforma
-description: Torna projetos .NET (C#, soluções .sln/.slnx, MSBuild) compiláveis tanto no Windows quanto no Linux, diagnosticando e corrigindo o que prende o build a um sistema só, e registrando cada descoberta nova em um catálogo. Use sempre que um projeto .NET que compila no Windows falhar no Linux, macOS, WSL, contêiner ou CI Linux (ou o contrário), ou quando o usuário falar em portar, compatibilizar, "rodar o build no Linux", multiplataforma ou cross-platform — também diante de erros como CS2001 arquivo não encontrado, NETSDK1100, MSB3073 com código 127, pastas "D:" surgindo no repositório ou testes que falham só fora do Windows, mesmo que o usuário não cite a skill. Não use apenas para instalar o SDK, nem para portar interface WinForms/WPF para outro framework.
+description: Torna projetos .NET (C#, soluções .sln/.slnx, MSBuild) compiláveis tanto no Windows quanto no Linux, diagnosticando e corrigindo o que prende o build a um sistema só, e registrando cada descoberta nova em um catálogo. Tem o modo `auditar`, que só relata o que é ajuste seguro, o que é arriscado e o que é incompatível. Use sempre que um projeto .NET que compila no Windows falhar no Linux, macOS, WSL, contêiner ou CI Linux (ou o contrário), ou quando o usuário falar em auditar, avaliar, portar, compatibilizar, "rodar o build no Linux", multiplataforma ou cross-platform — também diante de erros como CS2001 arquivo não encontrado, NETSDK1100, MSB3073 com código 127, pastas "D:" surgindo no repositório ou testes que falham só fora do Windows, mesmo que o usuário não cite a skill. Não use apenas para instalar o SDK, nem para portar interface WinForms/WPF para outro framework.
 compatibility: Python 3.9+ (só biblioteca padrão) e .NET SDK. Os scripts rodam em Windows e Linux.
 ---
 
@@ -15,6 +15,16 @@ Diga isso ao usuário quando houver projetos assim.
 
 `<skill-dir>` abaixo é o caminho absoluto da pasta deste arquivo. No Windows, use `py -3` onde os exemplos usam
 `python3`.
+
+## Modos
+
+| modo | quando | o que fazer |
+|---|---|---|
+| `corrigir` (padrão) | pedem para fazer compilar ou ajustar | etapas 1 a 5 abaixo |
+| `auditar` | o argumento é `auditar`, ou pedem auditoria, avaliação ou diagnóstico sem alterações | siga [`references/modo-auditar.md`](references/modo-auditar.md) no lugar das etapas abaixo |
+
+No modo `auditar`, nem o projeto nem a skill são alterados. Em dúvida entre os dois, audite: o relatório não impede
+corrigir depois.
 
 ## 1. Preparar
 

@@ -3,6 +3,7 @@ id: pacote-downgrade
 titulo: NU1605, downgrade de pacote tratado como erro
 fase: restore
 status: confirmado
+ajuste: com-risco
 checagem: nenhuma
 verificado_em: Linux, SDK 11.0.100, 2026-11-27 (Windows não testado)
 sinais:
@@ -22,6 +23,12 @@ repositório principal. Provavelmente falha também no Windows: não presuma que
 
 Alinhe a versão direta à exigida, depois de confirmar com o usuário, pois muda o que é entregue. Confira antes se o
 submódulo está no commit registrado (`git submodule status`, prefixo `+` indica diferença).
+
+## Riscos e opções
+
+- **Risco:** muda a versão entregue em todos os sistemas e pode alterar comportamento em execução.
+- **Opção recomendada:** alinhar à versão exigida, lendo as notas de versão e rodando os testes.
+- **Alternativa:** voltar a dependência (ou o submódulo) para a versão compatível.
 
 ## Armadilhas
 

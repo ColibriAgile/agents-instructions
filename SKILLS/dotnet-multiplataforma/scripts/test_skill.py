@@ -8,6 +8,7 @@ import caixa  # noqa: E402
 import catalogo  # noqa: E402
 from corrigir_caixa import corrigir  # noqa: E402
 from diagnosticar import executar  # noqa: E402
+import auditar  # noqa: E402
 
 WIN = "$([MSBuild]::IsOSPlatform('Windows'))"
 
@@ -105,6 +106,55 @@ class Submodulo(ComRepo):
         self.gravar("_lib/.git", "gitdir: x")
         self.gravar("_lib/a.csproj", "<Project><OutputPath>D:\\x</OutputPath></Project>")
         self.assertEqual("_lib", self.achados("caminho_drive")[0].submodulo)
+
+
+class Dependencias(ComRepo):
+    def test_aponta_ui_com_framework_e_codigo(self):
+        self.gravar("a.csproj", "<Project><TargetFramework>net48</TargetFramework><UseWPF>true</UseWPF>"
+                    '<COMReference Include="stdole" /></Project>')
+        self.gravar("A.cs", 'using System.ServiceProcess;\n[DllImport("user32.dll")]\nvar k = Registry.CurrentUser;\n')
+        casos = sorted(a.caso for a in self.achados("dependencia_windows"))
+        self.assertEqual(["api-windows"] * 3 + ["net-framework", "referencia-com", "ui-windows"], casos)
+
+    def test_ignora_comentarios_dll_portavel_e_tfm_moderno(self):
+        self.gravar("a.csproj", "<Project><TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks><UseWPF>false</UseWPF></Project>")
+        self.gravar("A.cs", '// Registry.CurrentUser\n/* [DllImport("kernel32")] */\n[DllImport("libsqlite3")]\n'
+                    "using System.Management.Automation;\n")
+        self.assertEqual([], self.achados("dependencia_windows"))
+
+
+class Auditoria(ComRepo):
+    def preparar(self):
+        self.gravar("Dir/a.cs", "")
+        self.gravar("p.csproj", '<Project><UseWindowsForms>true</UseWindowsForms><OutputPath>D:\\x</OutputPath>'
+                    '<Compile Include="dir/a.cs" /></Project>')
+
+    def test_classifica_por_risco_sem_alterar_o_repositorio(self):
+        self.preparar()
+        antes = {p: p.read_bytes() for p in self.raiz.rglob("*") if p.is_file()}
+        texto = auditar.relatorio(self.raiz, *executar(self.raiz))
+        partes = texto.split("\n## ")
+        parte = lambda inicio: next(p for p in partes if p.startswith(inicio))
+        self.assertIn("`caminho-caixa`", parte("1."))
+        self.assertIn("`caminho-drive`", parte("2."))
+        self.assertIn("`ui-windows`", parte("3."))
+        self.assertIn("**Opção recomendada", parte("2.") + texto)
+        self.assertEqual(antes, {p: p.read_bytes() for p in self.raiz.rglob("*") if p.is_file()})
+
+    def test_referencia_ambigua_nao_e_segura(self):
+        from comum import Achado
+        grupos = auditar.classificar([Achado("caminho-caixa", "a", 1, "ambíguo, há mais de um nome")], catalogo.casos())
+        self.assertEqual(["com-risco"], list(grupos))
+
+    def test_copia_fora_do_repositorio_e_sem_artefatos(self):
+        self.preparar()
+        self.gravar("bin/x.dll", "")
+        with self.assertRaises(ValueError):
+            auditar.copiar(self.raiz, self.raiz / "copia")
+        with tempfile.TemporaryDirectory() as fora:
+            auditar.copiar(self.raiz, Path(fora) / "c")
+            self.assertTrue((Path(fora) / "c" / "p.csproj").is_file())
+            self.assertFalse((Path(fora) / "c" / "bin").exists())
 
 
 class Catalogo(unittest.TestCase):

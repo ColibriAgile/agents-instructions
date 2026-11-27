@@ -3,6 +3,7 @@ id: windows-targeting
 titulo: Alvo net*-windows sem EnableWindowsTargeting
 fase: restore
 status: confirmado
+ajuste: seguro
 checagem: windows_targeting
 verificado_em: Linux, SDK 11.0.100, 2026-11-27 (Windows não testado)
 sinais:
@@ -27,6 +28,12 @@ No `Directory.Build.props` (na raiz que cobre os projetos):
   <EnableWindowsTargeting Condition="!$([MSBuild]::IsOSPlatform('Windows'))">true</EnableWindowsTargeting>
 </PropertyGroup>
 ```
+
+## Riscos e opções
+
+- **Risco:** nenhum no Windows, pois a propriedade fica condicionada aos outros sistemas. Habilita compilar, não executar.
+- **Opção recomendada:** propriedade condicionada no `Directory.Build.props` de cada escopo.
+- **Alternativa:** tirar o projeto do build no Linux com um filtro de solução (`.slnf`).
 
 ## Armadilhas
 

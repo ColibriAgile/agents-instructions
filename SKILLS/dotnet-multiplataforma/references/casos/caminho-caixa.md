@@ -3,6 +3,7 @@ id: caminho-caixa
 titulo: Caminho com maiúsculas ou minúsculas diferentes do disco
 fase: build
 status: confirmado
+ajuste: seguro
 checagem: caminho_caixa
 verificado_em: Linux, SDK 11.0.100, 2026-11-27 (Windows não testado)
 sinais:
@@ -29,6 +30,12 @@ neutro no Windows.
 
 Só renomeie o arquivo se o nome no disco for o errado. No Windows, mudar apenas a caixa exige dois passos:
 `git mv source tmp` e depois `git mv tmp Source`.
+
+## Riscos e opções
+
+- **Risco:** nenhum conhecido no Windows, que ignora a diferença. Referências ambíguas exigem decisão e saem desta classe.
+- **Opção recomendada:** corrigir as referências com `corrigir_caixa.py`.
+- **Alternativa:** renomear arquivos ou pastas; mexe em mais lugares e pede `git mv` em dois passos no Windows.
 
 ## Armadilhas
 

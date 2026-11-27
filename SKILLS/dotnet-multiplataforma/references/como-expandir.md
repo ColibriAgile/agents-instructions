@@ -29,6 +29,8 @@ acrescente a assinatura, a variação ou a armadilha no mesmo arquivo. Se uma re
    - `fase`: `restore`, `build`, `pos-build`, `teste` ou `execucao`.
    - `status`: `confirmado`, `sintoma-confirmado` ou `hipotese`. Só é `confirmado` o que foi compilado ou
      executado com a correção aplicada.
+   - `ajuste`: `seguro`, `com-risco` ou `incompativel`, pelos critérios de `modo-auditar.md`. A seção
+     `## Riscos e opções` é obrigatória e vai inteira para o relatório de auditoria.
    - `verificado_em`: sistema, versão do SDK e data. Diga o que ficou sem testar (normalmente o outro sistema).
    - `sinais`: uma expressão regular por linha, iniciada por `  - `, sem aspas. Prefira códigos de erro, que não
      mudam com o idioma do SDK.

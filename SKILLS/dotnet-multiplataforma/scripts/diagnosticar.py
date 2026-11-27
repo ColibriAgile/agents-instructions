@@ -2,7 +2,8 @@
 """Análise estática (somente leitura) do que impede um repositório .NET de compilar nos dois SOs.
 
 Uso: diagnosticar.py <pasta> [--json] [--apenas modulo1,modulo2]
-Saída: 0 sem achados, 1 com achados, 2 erro (inclusive checagem que falhou).
+Saída: 0 sem achados que afetem o build, 1 com achados, 2 erro (inclusive checagem que falhou).
+Achados de casos com fase `execucao` são listados, mas não mudam o código de saída.
 """
 import argparse
 import importlib
@@ -14,6 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import checagens  # noqa: E402
+from catalogo import casos  # noqa: E402
 from comum import Repo  # noqa: E402
 
 
@@ -40,6 +42,7 @@ def main():
         analisador.error(f"pasta não encontrada: {args.pasta}")
 
     achados, erros = executar(args.pasta, set(args.apenas.split(",")) if args.apenas else None)
+    catalogo = casos()
     if args.json:
         print(json.dumps({"achados": [a.dict() for a in achados], "erros": erros}, ensure_ascii=False, indent=2))
     else:
@@ -49,7 +52,8 @@ def main():
         for caso, lista in sorted(por_caso.items()):
             submodulos = sorted({a.submodulo for a in lista if a.submodulo})
             extra = f" | em submódulos: {', '.join(submodulos)}" if submodulos else ""
-            print(f"\n## {caso}: {len(lista)} achado(s){extra}  -> references/casos/{caso}.md")
+            ajuste = catalogo.get(caso, {}).get("ajuste", "?")
+            print(f"\n## {caso}: {len(lista)} achado(s) [{ajuste}]{extra}  -> references/casos/{caso}.md")
             for a in lista[: args.limite or None]:
                 print(f"  {a.arquivo}{f':{a.linha}' if a.linha else ''}  {a.detalhe}")
             if args.limite and len(lista) > args.limite:
@@ -58,7 +62,7 @@ def main():
             print("Nenhum achado nas checagens estáticas. Isso não substitui um build.")
         for e in erros:
             print(f"ERRO na checagem {e}", file=sys.stderr)
-    return 2 if erros else int(bool(achados))
+    return 2 if erros else int(any(catalogo.get(a.caso, {}).get("fase") != "execucao" for a in achados))
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ id: caminho-drive
 titulo: Caminho fixo com letra de unidade em OutputPath e similares
 fase: pos-build
 status: confirmado
+ajuste: com-risco
 checagem: caminho_drive
 verificado_em: Linux, SDK 11.0.100, 2026-11-27 (Windows não testado)
 sinais:
@@ -25,6 +26,13 @@ Mantenha o destino no Windows e deixe o padrão (`bin/`) nos outros sistemas, ju
 ```
 
 Se várias propriedades do mesmo `PropertyGroup` dependerem do caminho, condicione o grupo.
+
+## Riscos e opções
+
+- **Risco:** condicionado ao sistema, o Windows não muda; no Linux a saída vai para `bin/`, e scripts, empacotamento
+  ou depuração que esperam o destino antigo deixam de encontrar os arquivos. Remover o caminho muda também o Windows.
+- **Opção recomendada:** condicionar ao Windows.
+- **Alternativa:** tornar o destino uma propriedade configurável, com o valor atual como padrão no Windows.
 
 ## Armadilhas
 
